@@ -16,7 +16,6 @@ public class ExecutionSession : IFsDataProvider
     readonly string fileName;
     public Guid SessionId { get; private set; } = Guid.NewGuid();
     private ObjectKvc _sessionVars;
-    private FssAppNode _appNode;
     public IFsDataProvider ParentProvider => _provider;
 
    
@@ -38,7 +37,6 @@ public class ExecutionSession : IFsDataProvider
             n.SetParent(this);
         _sessionVars = new ObjectKvc(new
         {
-            app=new ObjectKvc(_appNode=new FssAppNode()),
             markdown=new CreateMarkdownNodeFunction(logger),
         });
         this._provider = new KvcProvider(_sessionVars, new DefaultFsDataProvider());
@@ -218,7 +216,7 @@ public class ExecutionSession : IFsDataProvider
         var n = _nodes.FirstOrDefault(c => c.NameLower == name);
         if (n == null)
             return _provider.Get(name);
-        return n.Evaluate(_provider);
+        return n.Evaluate(this);
     }
     public bool IsDefined(string name)
     {
@@ -229,26 +227,13 @@ public class ExecutionSession : IFsDataProvider
     }
 
     
-    public async Task<object?> RunNode(string nodePath)
+    public object EvaluateNode(string nodePath)
     {
-        var n = FindNodeByPath(nodePath);
-        if (n == null)
-            return null;
         var segments = nodePath.Split('.');
         var parentNodePath = string.Join(".", segments.Take(segments.Length - 1));
-        IFsDataProvider provider = (segments.Length > 1) ? FindNodeByPath(parentNodePath) : this;
-        
-        _appNode.ClearSink();
-
-        var _res = FuncScript.Evaluate(n.Expression,provider,
-            new {
-                app=_appNode
-            },FuncScript.ParseMode.Standard);
-        var res = FuncScript.Dref(_res);
-
-        _appNode.ActivateSignal();
+        var provider = (segments.Length > 1) ? (IFsDataProvider)FindNodeByPath(parentNodePath)! : this;
+        var res=provider.Get(segments.Last());
         return res;
-        
     }
 
 }

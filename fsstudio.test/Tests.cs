@@ -10,7 +10,7 @@ public class Tests
     }
 
     [Test]
-    public async Task TestRelativeRef()
+    public void TestRelativeRef()
     {
         var nodes = new[]
         {
@@ -30,7 +30,7 @@ public class Tests
                     new ExecutionNode()
                     {
                         Name = "a",
-                        Expression =null,
+                        Expression = null,
                         ExpressionType = ExpressionType.FsStudioParentNode,
                         Children = new ExecutionNode[]
                         {
@@ -45,8 +45,33 @@ public class Tests
                 }
             }
         };
-        var session = new ExecutionSession(nodes,null);
-        var res=await session.RunNode("x.y");
-        Assert.That(res,Is.EqualTo(11));
+        var session = new ExecutionSession(nodes, null);
+        var res = session.EvaluateNode("x.y");
+        Assert.That(res is int);
+        Assert.That((int)res, Is.EqualTo(11));
+    }
+
+    [Test]
+    public void NodeVariable()
+    {
+        var nodes = new[]
+        {
+            new ExecutionNode()
+            {
+                Name = "y",
+                Expression = "6",
+                ExpressionType = ExpressionType.FuncScript,
+            },
+            new ExecutionNode()
+            {
+                Name = "x",
+                Expression = "y+5",
+                ExpressionType = ExpressionType.FuncScript,
+            }
+        };
+        var session = new ExecutionSession(nodes, null);
+        var res = session.EvaluateNode("x");
+        Assert.That(res is int);
+        Assert.That((int)res, Is.EqualTo(11));
     }
 }

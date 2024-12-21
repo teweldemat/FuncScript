@@ -228,7 +228,7 @@ namespace fsstudio.server.fileSystem.Controllers
         }
 
         [HttpGet("{sessionId}/node/value/")]
-        public async Task<IActionResult> GetValue(Guid sessionId, string nodePath)
+        public IActionResult GetValue(Guid sessionId, string nodePath)
         {
             ExecutionSession? session;
             lock (GetSessionLock(sessionId))
@@ -237,16 +237,13 @@ namespace fsstudio.server.fileSystem.Controllers
                 if (session == null)
                     return NotFound($"Session with ID {sessionId} not found.");
             }
-
             try
             {
-                var val = await session.RunNode(nodePath);
-
+                var val = session.EvaluateNode(nodePath);
                 if (val is string str)
                 {
                     return Content(str, MediaTypeHeaderValue.Parse("text/plain"));
                 }
-
                 var sb = new StringBuilder();
                 FuncScript.Format(sb, val, asJsonLiteral: true);
                 var json = sb.ToString();
