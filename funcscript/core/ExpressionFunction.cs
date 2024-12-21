@@ -1,8 +1,4 @@
-﻿using System.Diagnostics.SymbolStore;
-using System.Runtime.Serialization;
-using funcscript.core;
-using System.Text;
-using funcscript.error;
+﻿using System.Text;
 using funcscript.model;
 
 namespace funcscript.core
