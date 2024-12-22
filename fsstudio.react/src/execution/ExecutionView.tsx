@@ -8,7 +8,7 @@ import EvalNodeComponent, { ExpressionType } from './EvalNodeComponent';
 import { SERVER_URL, SERVER_WS_URL } from '../backend';
 import axios from 'axios';
 import TextLogger from './RemoteLogger';
-import { useCodeMirror } from '@uiw/react-codemirror';
+import { EditorView, useCodeMirror } from '@uiw/react-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import ReactMarkdown from 'react-markdown';
 
@@ -30,7 +30,7 @@ const CodeEditor: React.FC<{ expression: string | null; setExpression: (exp: str
   useCodeMirror({
     container: editorRef.current,
     value: expression ?? '',
-    extensions: [javascript()],
+    extensions: [javascript(),EditorView.lineWrapping],
     onChange: (value) => {
       setExpression(value);
     },

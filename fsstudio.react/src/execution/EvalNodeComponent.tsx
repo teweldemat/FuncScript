@@ -37,7 +37,6 @@ interface EvalNodeComponentProps {
     selectedNode: string|null;
 }
 
-
 const EvalNodeComponent: React.FC<EvalNodeComponentProps> = ({ node, sessionId, onSelect, onModify, selectedNode }) => {
     const [children, setChildren] = useState<NodeItem[]>([]);
     const [open, setOpen] = useState(false);
@@ -78,7 +77,7 @@ const EvalNodeComponent: React.FC<EvalNodeComponentProps> = ({ node, sessionId, 
     };
 
     const handleSelect = (event: React.MouseEvent<HTMLElement>) => {
-        if (node.childrenCount == 0) {
+        if (node.childrenCount === 0) {
             onSelect(node.path!);
             event.stopPropagation();
         }
@@ -95,13 +94,11 @@ const EvalNodeComponent: React.FC<EvalNodeComponentProps> = ({ node, sessionId, 
         setMenuAnchorEl(null);
     };
 
-
     const handleApplayRename = () => {
         axios.post(`${SERVER_URL}/api/sessions/${sessionId}/node/rename`, {
             nodePath: node.path,
             newName: renamedName
         }).then(response => {
-            console.log('Expression updated:', response.data);
             setRenameMode(false);
             onModify();
         }).catch(error => {
@@ -110,19 +107,17 @@ const EvalNodeComponent: React.FC<EvalNodeComponentProps> = ({ node, sessionId, 
     };
 
     const handleDeleteItem = () => {
-
         axios.delete(`${SERVER_URL}/api/sessions/${sessionId}/node`, {
             params: {
                 nodePath: node.path,
             }
         }).then(response => {
-            console.log('Node deleted:', response.data);
-            if (node.path == selectedNode)
+            if (node.path === selectedNode)
                 onSelect(null);
             setDeleteItem(false);
             onModify();
         }).catch(error => {
-            console.error('Error deleteing node:', error);
+            console.error('Error deleting node:', error);
         });
     };
 
@@ -133,8 +128,8 @@ const EvalNodeComponent: React.FC<EvalNodeComponentProps> = ({ node, sessionId, 
                     return { ...x, path: (node.path ? node.path + "." : "") + x.name }
                 });
                 setChildren(chs);
-                if (chs.length == 0) //happens when the last child node is deleted
-                    onModify(); //notify the parent
+                if (chs.length === 0)
+                    onModify();
             })
             .catch(error => console.error('Failed to fetch children:', error));
     };
@@ -146,14 +141,20 @@ const EvalNodeComponent: React.FC<EvalNodeComponentProps> = ({ node, sessionId, 
             case 'add-text':
             case 'add-text-template':
                 setNewInputMode(true);
-                setNewNodeType(action === 'add-standard' ? ExpressionType.FuncScript : action === 'add-text' ? ExpressionType.ClearText : ExpressionType.FuncScriptTextTemplate);
+                setNewNodeType(
+                    action === 'add-standard'
+                        ? ExpressionType.FuncScript
+                        : action === 'add-text'
+                            ? ExpressionType.ClearText
+                            : ExpressionType.FuncScriptTextTemplate
+                );
                 break;
             case 'rename':
                 setRenameMode(true);
                 setRenamedName(node.name);
                 break;
             case 'delete':
-                setDeleteItem(true)
+                setDeleteItem(true);
                 break;
             default:
                 break;
@@ -166,9 +167,9 @@ const EvalNodeComponent: React.FC<EvalNodeComponentProps> = ({ node, sessionId, 
                 ParentNodePath: node.path,
                 Name: newName,
                 ExpressionType: newNodeType,
-                Expression: ""  // Ensure this is correctly formatted or required as per backend expectation
+                Expression: ""
             })
-                .then(response => {
+                .then(() => {
                     if (node.path) {
                         onSelect(node.path + "." + newName);
                     }
@@ -195,93 +196,106 @@ const EvalNodeComponent: React.FC<EvalNodeComponentProps> = ({ node, sessionId, 
             case ExpressionType.FuncScript:
                 return <FunctionsIcon />;
             case ExpressionType.FuncScriptTextTemplate:
-                return <><FunctionsIcon /><DescriptionIcon /></>; // Displaying both icons
+                return <><FunctionsIcon /><DescriptionIcon /></>;
             case ExpressionType.FsStudioParentNode:
-                return <CodeIcon />; // Assuming curly brace representation
+                return <CodeIcon />;
             default:
                 return <FolderIcon />;
         }
     }
+
     const isRoot = !node.path;
-    const menuItems = (isRoot ? ["Add Standard", "Add Text", "Add Text Template"] : ["Add Standard", "Add Text", "Add Text Template", "Rename", "Delete"]);
+    const menuItems = isRoot
+        ? ["Add Standard", "Add Text", "Add Text Template"]
+        : ["Add Standard", "Add Text", "Add Text Template", "Rename", "Delete"];
+
     return (
         <>
-            <ListItem onClick={handleSelect}
+            <ListItem
+                dense
+                onClick={handleSelect}
                 sx={{
-                    display: 'flex', alignItems: 'center', width: '100%',
-
-                    backgroundColor: (selectedNode && node.path === selectedNode) ? 'lightgray' : 'inherit', // Highlight the selected item
+                    display: 'flex',
+                    alignItems: 'center',
+                    width: '100%',
+                    py: 0.5,
+                    backgroundColor:
+                        selectedNode && node.path === selectedNode
+                            ? 'lightgray'
+                            : 'inherit',
                     cursor: 'pointer',
-                    '&:hover': node.childrenCount == 0 ?
-                        {
-                            backgroundColor: 'lightblue'
-                        }
-                        :
-                        {
-
-                        }
-
+                    '&:hover':
+                        node.childrenCount === 0
+                            ? {
+                                backgroundColor: 'lightblue'
+                            }
+                            : {}
                 }}
             >
                 <IconButton onClick={handleMenuClick} size="small">
                     <MoreVertIcon />
                 </IconButton>
                 <Menu anchorEl={menuAnchorEl} open={Boolean(menuAnchorEl)} onClose={handleCloseMenu}>
-                    {menuItems.map(mi => (<MenuItem key={mi} onClick={(event: React.MouseEvent<HTMLElement>) => {
-                        handleMenuAction(mi.toLowerCase().replaceAll(' ', '-'))
-                        event.stopPropagation();
-                    }}>{mi}</MenuItem>))}
-                </Menu>
-                {!isRoot && (<>
-                    {node.childrenCount > 0 && (
-                        <IconButton onClick={handleToggleExpand} size="small">
-                            {open ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-                        </IconButton>)}
-                    <ListItemIcon>
-                        {getIconForExpressionType()}
-                    </ListItemIcon>
-                    {!renameMode ? (
-                        <ListItemText primary={node.name} />
-                    ) : (
-                        <TextField
-                            size="small"
-                            value={renamedName}
-                            onChange={(e) => setRenamedName(e.target.value)}
-                            autoFocus
-                            inputRef={renameInputRef}
-
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter')
-                                    handleApplayRename();
-                                else if (e.key === "Escape")
-                                    setRenameMode(false);
+                    {menuItems.map(mi => (
+                        <MenuItem
+                            key={mi}
+                            onClick={(event: React.MouseEvent<HTMLElement>) => {
+                                handleMenuAction(mi.toLowerCase().replaceAll(' ', '-'));
+                                event.stopPropagation();
                             }}
-                        />
-                    )}
-                </>)}
-                {isRoot && (<ListItemText primary="Nodes" />)}
+                        >
+                            {mi}
+                        </MenuItem>
+                    ))}
+                </Menu>
+                {!isRoot && (
+                    <>
+                        {node.childrenCount > 0 && (
+                            <IconButton onClick={handleToggleExpand} size="small">
+                                {open ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                            </IconButton>
+                        )}
+                        <ListItemIcon>{getIconForExpressionType()}</ListItemIcon>
+                        {!renameMode ? (
+                            <ListItemText primary={node.name} />
+                        ) : (
+                            <TextField
+                                size="small"
+                                value={renamedName}
+                                onChange={(e) => setRenamedName(e.target.value)}
+                                autoFocus
+                                inputRef={renameInputRef}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') handleApplayRename();
+                                    else if (e.key === 'Escape') setRenameMode(false);
+                                }}
+                            />
+                        )}
+                    </>
+                )}
+                {isRoot && <ListItemText primary="Nodes" />}
             </ListItem>
+
             {newInputMode && (
                 <Box pl={isRoot ? 0 : 4}>
                     <TextField
                         size="small"
-                        label={`Enter name`}
+                        label="Enter name"
                         value={newName}
                         onChange={(e) => setNewName(e.target.value)}
                         onKeyDown={(e) => {
-                            if (e.key === 'Enter')
-                                handleAddItem();
-                            else if (e.key === "Escape")
-                                setNewInputMode(false);
+                            if (e.key === 'Enter') handleAddItem();
+                            else if (e.key === 'Escape') setNewInputMode(false);
                         }}
                         autoFocus
                         inputRef={newInputRef}
                     />
                 </Box>
             )}
+
             {(open || isRoot) && (
                 <Collapse in={open || isRoot} timeout="auto" unmountOnExit>
-                    <List component="div" disablePadding>
+                    <List component="div" disablePadding dense>
                         {children.map((child, index) => (
                             <Box key={index} pl={isRoot ? 0 : 4}>
                                 <EvalNodeComponent
@@ -296,6 +310,7 @@ const EvalNodeComponent: React.FC<EvalNodeComponentProps> = ({ node, sessionId, 
                     </List>
                 </Collapse>
             )}
+
             <Dialog
                 open={deleteItem}
                 onClose={() => setDeleteItem(false)}
