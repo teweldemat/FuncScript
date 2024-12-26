@@ -4,7 +4,7 @@ namespace funcscript.funcs.logic
 {
     public class TicksToDateFunction : IFsFunction
     {
-        public int MaxParsCount => 1;
+        private const int MaxParameters = 1;
 
         public CallType CallType => CallType.Prefix;
 
@@ -12,8 +12,8 @@ namespace funcscript.funcs.logic
 
         public object Evaluate(IFsDataProvider parent, IParameterList pars)
         {
-            if (pars.Count > this.MaxParsCount)
-                throw new error.EvaluationTimeException($"{this.Symbol} function: Invalid parameter count. Expected a maximum of {this.MaxParsCount}, but got {pars.Count}");
+            if (pars.Count > MaxParameters)
+                throw new error.EvaluationTimeException($"{this.Symbol} function: Invalid parameter count. Expected a maximum of {MaxParameters}, but got {pars.Count}");
 
             var par0 = pars.GetParameter(parent, 0);
 

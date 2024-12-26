@@ -5,7 +5,7 @@ namespace funcscript.funcs.logic
 {
     public class ReplaceIfNull : IFsFunction
     {
-        public int MaxParsCount => 2; 
+        private const int MaxParameters = 2;
 
         public CallType CallType => CallType.Infix;
 
@@ -13,8 +13,8 @@ namespace funcscript.funcs.logic
 
         public object Evaluate(IFsDataProvider parent, IParameterList pars)
         {
-            if (pars.Count != MaxParsCount)
-                throw new error.TypeMismatchError($"{Symbol} function expects exactly two parameters.");
+            if (pars.Count != MaxParameters)
+                throw new error.TypeMismatchError($"{Symbol} function expects exactly {MaxParameters} parameters.");
 
             var val = pars.GetParameter(parent, 0);
 

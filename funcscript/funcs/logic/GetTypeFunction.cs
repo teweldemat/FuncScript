@@ -5,7 +5,7 @@ namespace funcscript.funcs.os
 {
     internal class GetTypeFunction : IFsFunction
     {
-        public int MaxParsCount => 1;
+        private const int MaxParsCountValue = 1;
 
         public CallType CallType => CallType.Prefix;
 
@@ -13,8 +13,8 @@ namespace funcscript.funcs.os
 
         public object Evaluate(IFsDataProvider parent, IParameterList pars)
         {
-            if (pars.Count != this.MaxParsCount)
-                throw new error.EvaluationTimeException($"{this.Symbol} function: invalid parameter count. {this.MaxParsCount} expected, got {pars.Count}");
+            if (pars.Count != MaxParsCountValue)
+                throw new error.EvaluationTimeException($"{this.Symbol} function: invalid parameter count. {MaxParsCountValue} expected, got {pars.Count}");
 
             var par0 = pars.GetParameter(parent, 0);
             if (par0 == null)

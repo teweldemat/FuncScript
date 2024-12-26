@@ -1,11 +1,11 @@
-﻿using funcscript.core;
+using funcscript.core;
 using funcscript.model;
 
 namespace funcscript.funcs.keyvalue
 {
     internal class KvSelectFunction : IFsFunction
     {
-        public int MaxParsCount => 2;
+        private const int MaxParameters = 2;
 
         public CallType CallType => CallType.Prefix;
 
@@ -13,8 +13,8 @@ namespace funcscript.funcs.keyvalue
 
         public object Evaluate(IFsDataProvider parent, IParameterList pars)
         {
-            if (pars.Count != MaxParsCount)
-                throw new error.TypeMismatchError($"{Symbol} function: Invalid parameter count. Expected {MaxParsCount}, but got {pars.Count}");
+            if (pars.Count != MaxParameters)
+                throw new error.TypeMismatchError($"{Symbol} function: Invalid parameter count. Expected {MaxParameters}, but got {pars.Count}");
 
             var par0 = pars.GetParameter(parent, 0);
             var par1 = pars.GetParameter(parent, 1);

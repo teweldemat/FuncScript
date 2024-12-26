@@ -31,7 +31,7 @@ namespace funcscript.funcs.misc
 
     public class LogFunction : IFsFunction
     {
-        public int MaxParsCount => 2;
+        private const int MaxParameters = 2;
 
         public CallType CallType => CallType.Infix;
 

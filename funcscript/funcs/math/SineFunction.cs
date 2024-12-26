@@ -4,7 +4,7 @@ namespace funcscript.funcs.math
 {
     public class SineFunction : IFsFunction
     {
-        public int MaxParsCount => 1;
+        private const int MaxParameters = 1;
 
         public CallType CallType => CallType.Prefix;
 
@@ -40,7 +40,7 @@ namespace funcscript.funcs.math
 
     public class CosineFunction : IFsFunction
     {
-        public int MaxParsCount => 1;
+        private const int MaxParameters = 1;
 
         public CallType CallType => CallType.Prefix;
 

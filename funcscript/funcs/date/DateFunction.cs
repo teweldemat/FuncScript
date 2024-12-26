@@ -6,7 +6,7 @@ namespace funcscript.funcs.logic
 {
     public class DateFunction : IFsFunction
     {
-        public int MaxParsCount => 2;
+        private const int MaxParameters = 2;
 
         public CallType CallType => CallType.Prefix;
 
@@ -14,8 +14,8 @@ namespace funcscript.funcs.logic
 
         public object Evaluate(IFsDataProvider parent, IParameterList pars)
         {
-            if (pars.Count > this.MaxParsCount)
-                throw new error.EvaluationTimeException($"{this.Symbol} function: invalid parameter count. Max of {this.MaxParsCount} expected, got {pars.Count}");
+            if (pars.Count > MaxParameters)
+                throw new error.EvaluationTimeException($"{this.Symbol} function: invalid parameter count. Max of {MaxParameters} expected, got {pars.Count}");
 
             var par0 = pars.GetParameter(parent, 0);
 

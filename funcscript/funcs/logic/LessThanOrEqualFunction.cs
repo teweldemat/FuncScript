@@ -5,7 +5,7 @@ namespace funcscript.funcs.logic
 {
     public class LessThanOrEqualFunction : IFsFunction
     {
-        public int MaxParsCount => 2;
+        private const int MaxParameterCount = 2;
 
         public CallType CallType => CallType.Infix;
 
@@ -13,9 +13,9 @@ namespace funcscript.funcs.logic
 
         public object Evaluate(IFsDataProvider parent, IParameterList pars)
         {
-            if (pars.Count != this.MaxParsCount)
+            if (pars.Count != MaxParameterCount)
                 throw new error.EvaluationTimeException(
-                    $"{this.Symbol} function: Invalid parameter count. Expected {this.MaxParsCount}, but got {pars.Count}");
+                    $"{this.Symbol} function: Invalid parameter count. Expected {MaxParameterCount}, but got {pars.Count}");
 
             var par0 = pars.GetParameter(parent, 0);
             var par1 = pars.GetParameter(parent, 1);

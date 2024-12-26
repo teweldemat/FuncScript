@@ -5,7 +5,7 @@ namespace funcscript.funcs.math
 {
     public class DivisionFunction : IFsFunction
     {
-        public int MaxParsCount => -1;
+        private const int MaxParameters = -1; // Replacing MaxParsCount property with a constant
 
         public CallType CallType => CallType.Infix;
 

@@ -7,7 +7,7 @@ namespace funcscript.funcs.os
 {
     internal class SaveFileFunction : IFsFunction
     {
-        public int MaxParsCount => 2;
+        private const int MaxParameters = 2;
 
         public CallType CallType => CallType.Prefix;
 
@@ -15,8 +15,8 @@ namespace funcscript.funcs.os
 
         public object Evaluate(IFsDataProvider parent, IParameterList pars)
         {
-            if (pars.Count != this.MaxParsCount)
-                return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, $"{this.Symbol} function: invalid parameter count. {this.MaxParsCount} expected, got {pars.Count}");
+            if (pars.Count != MaxParameters)
+                return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, $"{this.Symbol} function: invalid parameter count. {MaxParameters} expected, got {pars.Count}");
 
             var par0 = pars.GetParameter(parent, 0);
             var par1 = pars.GetParameter(parent, 1);

@@ -4,8 +4,6 @@ namespace funcscript.funcs.logic
 {
     public class CaseFunction : IFsFunction
     {
-        public int MaxParsCount => -1;
-
         public CallType CallType => CallType.Prefix;
 
         public string Symbol => "Case";

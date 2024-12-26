@@ -7,7 +7,7 @@ namespace funcscript.funcs.text
 {
     public class FormatValueFunction : IFsFunction
     {
-        public int MaxParsCount => 2;
+        private const int MaxParameters = 2;
         public CallType CallType => CallType.Prefix;
         public string Symbol => "format";
 

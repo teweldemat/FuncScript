@@ -6,7 +6,7 @@ namespace funcscript.funcs.list
 {
     public class ReduceListFunction : IFsFunction
     {
-        public int MaxParsCount => 3;
+        private const int MaxParameters = 3;
 
         public CallType CallType => CallType.Dual;
 
@@ -18,7 +18,7 @@ namespace funcscript.funcs.list
             public object X;
             public object I;
 
-            public override int Count => 3;
+            public override int Count => MaxParameters;
 
             public override (object, CodeLocation) GetParameterWithLocation(IFsDataProvider provider, int index)
             {

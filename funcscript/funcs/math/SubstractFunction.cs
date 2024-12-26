@@ -5,7 +5,7 @@ namespace funcscript.funcs.math
 {
     public class SubstractFunction : IFsFunction
     {
-        public int MaxParsCount => -1;
+        private const int MaxParsCountValue = -1;
 
         public CallType CallType => CallType.Infix;
 

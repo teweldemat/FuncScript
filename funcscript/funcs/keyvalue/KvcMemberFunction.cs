@@ -5,7 +5,7 @@ namespace funcscript.funcs.keyvalue
 {
     public class KvcMemberFunction : IFsFunction
     {
-        public int MaxParsCount => 2;
+        private const int MaxParameterCount = 2;
 
         public CallType CallType => CallType.Infix;
 
@@ -27,8 +27,8 @@ namespace funcscript.funcs.keyvalue
 
         public object Evaluate(IFsDataProvider parent, IParameterList pars)
         {
-            if (pars.Count != MaxParsCount)
-                throw new error.TypeMismatchError($"{Symbol} function: Invalid parameter count. Expected {MaxParsCount}, but got {pars.Count}");
+            if (pars.Count != MaxParameterCount)
+                throw new error.TypeMismatchError($"{Symbol} function: Invalid parameter count. Expected {MaxParameterCount}, but got {pars.Count}");
 
             var par0 = pars.GetParameter(parent, 0);
             var par1 = pars.GetParameter(parent, 1);

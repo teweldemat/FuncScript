@@ -4,7 +4,7 @@ namespace funcscript.funcs.math
 {
     public class ModuloFunction : IFsFunction
     {
-        public int MaxParsCount => -1;
+        private const int MaxParameters = -1;
 
         public CallType CallType => CallType.Infix;
 

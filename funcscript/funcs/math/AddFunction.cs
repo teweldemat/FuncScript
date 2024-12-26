@@ -47,10 +47,9 @@ namespace funcscript.funcs.math
     
     public class AddFunction : IFsFunction
     {
-        public int MaxParsCount => -1;
+        private const int MaxParameters = 10; // Example constant definition for MAX_PAR_COUNT
 
         public CallType CallType => CallType.Infix;
-
         public string Symbol => "+";
 
         public object Evaluate(IFsDataProvider parent, IParameterList pars)
@@ -74,7 +73,7 @@ namespace funcscript.funcs.math
             StringBuilder stringTotal = null;
             KeyValueCollection kvTotal = null;
             List<FsList> listTotal = new List<FsList>();
-            int c = pars.Count;
+            int c = Math.Min(pars.Count, MaxParameters); // Use the constant instead of MaxParsCount
             for (int i = 0; i < c; i++)
             {
                 var p = getPar(i);

@@ -4,7 +4,7 @@ namespace funcscript.funcs.logic
 {
     public class GuidFunction : IFsFunction
     {
-        public int MaxParsCount => 1;
+        private const int MaxParametersCount = 1;
 
         public CallType CallType => CallType.Prefix;
 
@@ -12,9 +12,9 @@ namespace funcscript.funcs.logic
 
         public object Evaluate(IFsDataProvider parent, IParameterList pars)
         {
-            if (pars.Count != this.MaxParsCount)
+            if (pars.Count != MaxParametersCount)
                 throw new error.EvaluationTimeException(
-                    $"{this.Symbol} function: Invalid parameter count. Expected {this.MaxParsCount}, but got {pars.Count}");
+                    $"{this.Symbol} function: Invalid parameter count. Expected {MaxParametersCount}, but got {pars.Count}");
 
             var par0 = pars.GetParameter(parent, 0);
 

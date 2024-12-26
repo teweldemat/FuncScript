@@ -5,7 +5,7 @@ namespace funcscript.funcs.logic
 {
     public class NotEqualsFunction : IFsFunction
     {
-        public int MaxParsCount => 2;
+        private const int MaxParameterCount = 2;
 
         public CallType CallType => CallType.Infix;
 
@@ -13,9 +13,9 @@ namespace funcscript.funcs.logic
 
         public object Evaluate(IFsDataProvider parent, IParameterList pars)
         {
-            if (pars.Count != MaxParsCount)
+            if (pars.Count != MaxParameterCount)
                 return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH,
-                    $"{this.Symbol}: expected {this.MaxParsCount} got {pars.Count}");
+                    $"{this.Symbol}: expected {MaxParameterCount} got {pars.Count}");
 
             var par0 = pars.GetParameter(parent, 0);
             var par1 = pars.GetParameter(parent, 1);

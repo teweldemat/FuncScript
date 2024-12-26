@@ -114,7 +114,6 @@ namespace funcscript.openai
             };
         }
 
-        public int MaxParsCount => 4;
         public CallType CallType => CallType.Prefix;
         public string Symbol => "ChatGPT";
     }

@@ -6,7 +6,6 @@ namespace funcscript.core
     {
         object Evaluate(IFsDataProvider parent, IParameterList pars);
         String ParName(int index);
-        int MaxParsCount { get; }
         CallType CallType { get; }
         String Symbol { get; }
     }

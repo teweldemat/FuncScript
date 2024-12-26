@@ -5,7 +5,7 @@ namespace funcscript.funcs.logic
 {
     public class IfConditionFunction : IFsFunction
     {
-        public int MaxParsCount => 3;
+        private const int MaxParameters = 3;
 
         public CallType CallType => CallType.Infix;
 
@@ -13,7 +13,7 @@ namespace funcscript.funcs.logic
 
         public object Evaluate(IFsDataProvider parent, IParameterList pars)
         {
-            if (pars.Count < MaxParsCount)
+            if (pars.Count < MaxParameters)
                 throw new error.TypeMismatchError("IfConditionFunction requires three parameters: condition, trueResult, and falseResult.");
 
             var condition = pars.GetParameter(parent, 0);

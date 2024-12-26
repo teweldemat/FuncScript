@@ -7,7 +7,7 @@ namespace funcscript.funcs.os
 {
     internal class FileExistsFunction : IFsFunction
     {
-        public int MaxParsCount => 1;
+        private const int MaxParameters = 1;
 
         public CallType CallType => CallType.Prefix;
 
@@ -15,8 +15,8 @@ namespace funcscript.funcs.os
 
         public object Evaluate(IFsDataProvider parent, IParameterList pars)
         {
-            if (pars.Count != this.MaxParsCount)
-                throw new error.EvaluationTimeException($"{this.Symbol} function: invalid parameter count. {this.MaxParsCount} expected, got {pars.Count}");
+            if (pars.Count != MaxParameters)
+                throw new error.EvaluationTimeException($"{this.Symbol} function: invalid parameter count. {MaxParameters} expected, got {pars.Count}");
 
             var par0 = pars.GetParameter(parent, 0);
 

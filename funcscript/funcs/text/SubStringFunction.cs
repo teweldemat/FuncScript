@@ -5,7 +5,8 @@ namespace funcscript.funcs.text
 {
     public class SubStringFunction : IFsFunction
     {
-        public int MaxParsCount => 3;
+        private const int MaxParameters = 3;
+
         public CallType CallType => CallType.Prefix;
         public string Symbol => "substring";
 

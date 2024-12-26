@@ -5,7 +5,7 @@ namespace funcscript.funcs.logic
 {
     public class SwitchFunction : IFsFunction
     {
-        public int MaxParsCount => -1;
+        private const int MaxParameters = -1;
 
         public CallType CallType => CallType.Prefix;
 

@@ -6,7 +6,7 @@ namespace funcscript.funcs.list
 {
     public class ContainsFunction : IFsFunction
     {
-        public int MaxParsCount => 2;
+        private const int MaxParsCountValue = 2;
 
         public CallType CallType => CallType.Prefix;
 
@@ -14,8 +14,8 @@ namespace funcscript.funcs.list
 
         public object Evaluate(IFsDataProvider parent, IParameterList pars)
         {
-            if (pars.Count != this.MaxParsCount)
-                throw new error.TypeMismatchError($"{this.Symbol} function: Invalid parameter count. Expected {this.MaxParsCount}, but got {pars.Count}");
+            if (pars.Count != MaxParsCountValue)
+                throw new error.TypeMismatchError($"{this.Symbol} function: Invalid parameter count. Expected {MaxParsCountValue}, but got {pars.Count}");
 
             var container = pars.GetParameter(parent, 0);
             var item = pars.GetParameter(parent, 1);

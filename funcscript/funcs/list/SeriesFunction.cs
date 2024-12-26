@@ -5,7 +5,7 @@ namespace funcscript.funcs.list
 {
     public class SeriesFunction : IFsFunction
     {
-        public int MaxParsCount => 2;
+        private const int MaxParameters = 2;
 
         public CallType CallType => CallType.Prefix;
 
@@ -13,7 +13,7 @@ namespace funcscript.funcs.list
 
         public object Evaluate(IFsDataProvider parent, IParameterList pars)
         {
-            if (pars.Count < 2 || pars.Count > MaxParsCount)
+            if (pars.Count < 2 || pars.Count > MaxParameters)
                 throw new error.TypeMismatchError($"{this.Symbol}: Two parameters expected");
 
             var par0 = pars.GetParameter(parent, 0);

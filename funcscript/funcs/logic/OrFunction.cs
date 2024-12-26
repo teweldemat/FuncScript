@@ -5,7 +5,7 @@ namespace funcscript.funcs.logic
 {
     public class OrFunction : IFsFunction
     {
-        public int MaxParsCount => -1;
+        private const int MaxParametersCount = -1; // Replacing MaxParsCount property
 
         public CallType CallType => CallType.Infix;
 

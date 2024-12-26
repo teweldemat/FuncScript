@@ -6,7 +6,7 @@ namespace funcscript.funcs.os
 {
     internal class IsFileFunction : IFsFunction
     {
-        public int MaxParsCount => 1;
+        private const int ExpectedParameterCount = 1;
 
         public CallType CallType => CallType.Prefix;
 
@@ -14,8 +14,8 @@ namespace funcscript.funcs.os
 
         public object Evaluate(IFsDataProvider parent, IParameterList pars)
         {
-            if (pars.Count != this.MaxParsCount)
-                throw new error.EvaluationTimeException($"{this.Symbol} function: invalid parameter count. {this.MaxParsCount} expected, got {pars.Count}");
+            if (pars.Count != ExpectedParameterCount)
+                throw new error.EvaluationTimeException($"{this.Symbol} function: invalid parameter count. {ExpectedParameterCount} expected, got {pars.Count}");
 
             var par0 = pars.GetParameter(parent, 0);
             if (par0 == null || !(par0 is string))

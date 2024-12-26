@@ -4,7 +4,7 @@ namespace funcscript.funcs.math
 {
     public class MultiplyFunction : IFsFunction
     {
-        public int MaxParsCount => -1;
+        private const int MaxParameterCount = -1;
         public CallType CallType => CallType.Infix;
 
         public string Symbol => "*";

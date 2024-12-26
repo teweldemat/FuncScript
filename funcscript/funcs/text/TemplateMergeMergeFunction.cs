@@ -1,4 +1,4 @@
-﻿using funcscript.core;
+using funcscript.core;
 using funcscript.model;
 using System;
 using System.Text;
@@ -8,7 +8,7 @@ namespace funcscript.funcs.math
     public class TemplateMergeMergeFunction : IFsFunction
     {
         public const string SYMBOL = "_templatemerge";
-        public int MaxParsCount => -1;
+        private const int MAX_PARS_COUNT = -1; // Replaced MaxParsCount
 
         public CallType CallType => CallType.Infix;
 

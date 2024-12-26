@@ -6,7 +6,7 @@ namespace funcscript.funcs.list
 {
     public class TakeFunction : IFsFunction
     {
-        public int MaxParsCount => 2;
+        private const int MaxParameters = 2;
 
         public CallType CallType => CallType.Prefix;
 
@@ -14,8 +14,8 @@ namespace funcscript.funcs.list
 
         public object Evaluate(IFsDataProvider parent, IParameterList pars)
         {
-            if (pars.Count != this.MaxParsCount)
-                throw new error.TypeMismatchError($"{this.Symbol} function: Invalid parameter count. Expected {this.MaxParsCount}, but got {pars.Count}");
+            if (pars.Count != MaxParameters)
+                throw new error.TypeMismatchError($"{Symbol} function: Invalid parameter count. Expected {MaxParameters}, but got {pars.Count}");
 
             var par0 = pars.GetParameter(parent, 0);
             var par1 = pars.GetParameter(parent, 1);
@@ -29,10 +29,10 @@ namespace funcscript.funcs.list
                 return null;
 
             if (!(par0 is FsList))
-                throw new error.TypeMismatchError($"{this.Symbol} function: The first parameter should be {this.ParName(0)}");
+                throw new error.TypeMismatchError($"{Symbol} function: The first parameter should be {ParName(0)}");
 
             if (!(par1 is int))
-                throw new error.TypeMismatchError($"{this.Symbol} function: The second parameter should be {this.ParName(1)}");
+                throw new error.TypeMismatchError($"{Symbol} function: The second parameter should be {ParName(1)}");
 
             var lst = (FsList)par0;
             int n = (int)par1;

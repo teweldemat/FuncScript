@@ -5,7 +5,7 @@ namespace funcscript.funcs.logic
 {
     public class InFunction : IFsFunction
     {
-        public int MaxParsCount => 2;
+        private const int MaxParameterCount = 2;
 
         public CallType CallType => CallType.Infix;
 
@@ -13,9 +13,9 @@ namespace funcscript.funcs.logic
 
         public object Evaluate(IFsDataProvider parent, IParameterList pars)
         {
-            if (pars.Count != this.MaxParsCount)
+            if (pars.Count != MaxParameterCount)
                 throw new error.EvaluationTimeException(
-                    $"{this.Symbol} function: Invalid parameter count. Expected {this.MaxParsCount}, but got {pars.Count}");
+                    $"{Symbol} function: Invalid parameter count. Expected {MaxParameterCount}, but got {pars.Count}");
 
             var par0 = pars.GetParameter(parent, 0);
             var par1 = pars.GetParameter(parent, 1);
@@ -25,7 +25,7 @@ namespace funcscript.funcs.logic
 
             if (!(par1 is FsList))
                 throw new error.EvaluationTimeException(
-                    $"{this.Symbol} function: {this.ParName(1)} should be a list");
+                    $"{Symbol} function: {ParName(1)} should be a list");
 
             bool par0Numeric = FuncScript.IsNumeric(par0);
 

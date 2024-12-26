@@ -5,8 +5,8 @@ namespace funcscript.funcs.math
 {
     public class NegateFunction : IFsFunction
     {
-        public const string SYMBOL="neg";
-        public int MaxParsCount => 1;
+        public const string SYMBOL = "neg";
+        private const int MAX_PARS_COUNT = 1;
 
         public CallType CallType => CallType.Prefix;
 
@@ -14,8 +14,8 @@ namespace funcscript.funcs.math
 
         public object Evaluate(IFsDataProvider parent, IParameterList pars)
         {
-            if (pars.Count != 1)
-                return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH,"One parameter expected");
+            if (pars.Count != MAX_PARS_COUNT)
+                return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, "One parameter expected");
 
             var param = pars.GetParameter(parent, 0);
 

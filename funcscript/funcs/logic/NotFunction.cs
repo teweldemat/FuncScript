@@ -7,7 +7,7 @@ namespace funcscript.funcs.logic
     public class NotFunction : IFsFunction
     {
         public const string SYMBOL = "not";
-        public int MaxParsCount => 1;
+        private const int MAX_PARS_COUNT = 1;
 
         public CallType CallType => CallType.Prefix;
 
@@ -15,9 +15,9 @@ namespace funcscript.funcs.logic
 
         public object Evaluate(IFsDataProvider parent, IParameterList pars)
         {
-            if (pars.Count != this.MaxParsCount)
+            if (pars.Count != MAX_PARS_COUNT)
                 return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH,
-                    $"{this.Symbol}: expected {this.MaxParsCount} parameters got {pars.Count}");
+                    $"{this.Symbol}: expected {MAX_PARS_COUNT} parameters got {pars.Count}");
 
             var par0 = pars.GetParameter(parent, 0);
 
