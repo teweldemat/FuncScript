@@ -1,10 +1,10 @@
-﻿using funcscript.core;
+using funcscript.core;
 using funcscript.model;
 using System;
 
 namespace funcscript.funcs.list
 {
-    public class ContainsFunction : IFsFunction, IFsDref
+    public class ContainsFunction : IFsFunction
     {
         public int MaxParsCount => 2;
 
@@ -44,13 +44,6 @@ namespace funcscript.funcs.list
             }
 
             throw new error.TypeMismatchError($"{this.Symbol} function: Invalid types for parameters");
-        }
-
-        public object DrefEvaluate(IParameterList pars)
-        {
-            var container = FuncScript.Dref(pars.GetParameter(null, 0));
-            var item = FuncScript.Dref(pars.GetParameter(null, 1));
-            return EvaluateInternal(container, item);
         }
 
         public string ParName(int index)

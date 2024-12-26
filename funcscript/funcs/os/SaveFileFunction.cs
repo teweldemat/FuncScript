@@ -36,6 +36,7 @@ namespace funcscript.funcs.os
             {
                 // Save content to the specified file
                 File.WriteAllText(fileName, content);
+                Console.WriteLine($"Saved {fileName}");
                 return content; // Return the content if saved successfully
             }
             catch (Exception ex)

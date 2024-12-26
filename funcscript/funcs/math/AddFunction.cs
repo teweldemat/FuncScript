@@ -1,4 +1,4 @@
-﻿using funcscript.core;
+using funcscript.core;
 using funcscript.model;
 using System;
 using System.Collections;
@@ -46,7 +46,7 @@ namespace funcscript.funcs.math
             }
         }
     }
-    public class AddFunction : IFsFunction,IFsDref
+    public class AddFunction : IFsFunction
     {
         public int MaxParsCount => -1;
 
@@ -206,7 +206,7 @@ namespace funcscript.funcs.math
                     {
                         doubleTotal+= (double)d;
                     }
-                    else if (d is String)
+                    else if (d is double)
                     {
                         isString = true;
                         isDouble = false;
@@ -303,16 +303,6 @@ namespace funcscript.funcs.math
         public string ParName(int index)
         {
             return $"Op {index + 1}";
-        }
-
-        public object DrefEvaluate(IParameterList pars)
-        {
-            var ret = EvaluateInteral( pars, (i) =>
-            {
-                var ret = FuncScript.Dref(pars.GetParameter(null, i),false);
-                return (true, ret);
-            });
-            return ret;
         }
     }
 }

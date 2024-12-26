@@ -1,10 +1,10 @@
-﻿using funcscript.core;
+using funcscript.core;
 using System;
 using funcscript.model;
 
 namespace funcscript.funcs.strings
 {
-    internal class EndsWithFunction : IFsFunction, IFsDref
+    internal class EndsWithFunction : IFsFunction
     {
         public int MaxParsCount => 2;
 
@@ -41,13 +41,6 @@ namespace funcscript.funcs.strings
             var ending = (string)par1;
 
             return mainString.EndsWith(ending, StringComparison.Ordinal);
-        }
-
-        public object DrefEvaluate(IParameterList pars)
-        {
-            var par0 = FuncScript.Dref(pars.GetParameter(null, 0));
-            var par1 = FuncScript.Dref(pars.GetParameter(null, 1));
-            return EvaluateInternal(par0, par1);
         }
 
         public string ParName(int index)

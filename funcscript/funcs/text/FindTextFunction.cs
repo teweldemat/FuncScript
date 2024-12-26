@@ -3,7 +3,7 @@ using funcscript.model;
 
 namespace funcscript.funcs.text
 {
-    public class FindTextFunction : IFsFunction, IFsDref
+    public class FindTextFunction : IFsFunction
     {
         public const string SYMBOL = "find";
         public int MaxParsCount => 3;
@@ -38,19 +38,6 @@ namespace funcscript.funcs.text
                 startIndex = 0;
             if(startIndex<0||startIndex>=text.Length)
                  return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER,$"{this.Symbol}: index is out of range");
-            return text.IndexOf(search, startIndex);
-        }
-
-        public object DrefEvaluate(IParameterList pars)
-        {
-            var text = FuncScript.Dref(pars.GetParameter(null, 0), false) as string;
-            var search = FuncScript.Dref(pars.GetParameter(null, 1), false) as string;
-            var startIndexObj = FuncScript.Dref(pars.GetParameter(null, 2), false);
-            int startIndex = startIndexObj != null ? (int)startIndexObj : 0;
-
-            if (text == null || search == null)
-                throw new funcscript.error.TypeMismatchError($"{Symbol}: Two strings and optionally an index expected as parameters");
-
             return text.IndexOf(search, startIndex);
         }
 

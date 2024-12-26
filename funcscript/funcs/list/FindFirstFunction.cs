@@ -1,4 +1,4 @@
-﻿using funcscript.core;
+using funcscript.core;
 using funcscript.model;
 
 namespace funcscript.funcs.list

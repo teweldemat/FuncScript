@@ -1,4 +1,4 @@
-﻿using funcscript.core;
+using funcscript.core;
 using System;
 using System.Runtime.Serialization;
 

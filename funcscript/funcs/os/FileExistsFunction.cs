@@ -1,4 +1,4 @@
-﻿using funcscript.core;
+using funcscript.core;
 using System;
 using System.IO;
 using funcscript.model;
@@ -32,8 +32,6 @@ namespace funcscript.funcs.os
             var filePath = (string)par0;
             return File.Exists(filePath);
         }
-
-        
 
         public string ParName(int index)
         {

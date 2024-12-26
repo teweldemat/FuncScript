@@ -1,4 +1,4 @@
-﻿using funcscript.core;
+using funcscript.core;
 using funcscript.model;
 using System;
 using System.Collections.Generic;
@@ -10,7 +10,7 @@ using System.Xml.XPath;
 namespace funcscript.funcs.keyvalue
 {
 
-    public class KvcMemberFunction : IFsFunction,IFsDref
+    public class KvcMemberFunction : IFsFunction
     {
         public int MaxParsCount => 2;
 
@@ -32,7 +32,6 @@ namespace funcscript.funcs.keyvalue
                 throw new error.TypeMismatchError($"{Symbol} function: Can't get member {par1} from a {FuncScript.GetFsDataType(par0)}");
 
             return ((KeyValueCollection)par0).Get(((string)par1).ToLower());
-
         }
         public object Evaluate(IFsDataProvider parent, IParameterList pars)
         {
@@ -64,15 +63,6 @@ namespace funcscript.funcs.keyvalue
                 default:
                     return "";
             }
-        }
-
-        public object DrefEvaluate(IParameterList pars)
-        {
-            var member = FuncScript.Dref(pars.GetParameter(null, 1),false);
-            var kvc = FuncScript.Dref(pars.GetParameter(null, 0),false);
-            var ret= EvaluateInternal(kvc,member);
-            //return FuncScript.Dref(ret);
-            return ret;
         }
     }
 }

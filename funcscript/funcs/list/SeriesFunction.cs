@@ -1,4 +1,4 @@
-﻿using funcscript.core;
+using funcscript.core;
 using funcscript.model;
 
 namespace funcscript.funcs.list
@@ -17,7 +17,7 @@ namespace funcscript.funcs.list
         {
             var parBuilder = new CallRefBuilder(this, parent, pars);
 
-            var par0 = parBuilder.GetParameter( 0);
+            var par0 = parBuilder.GetParameter(0);
 
             if (par0 is ValueReferenceDelegate)
                 return parBuilder.CreateRef();

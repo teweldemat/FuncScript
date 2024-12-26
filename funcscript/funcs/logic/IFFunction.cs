@@ -4,7 +4,7 @@ using funcscript.model;
 
 namespace funcscript.funcs.logic
 {
-    public class IfConditionFunction : IFsFunction, IFsDref
+    public class IfConditionFunction : IFsFunction
     {
         public int MaxParsCount => 3;
 
@@ -33,19 +33,6 @@ namespace funcscript.funcs.logic
             var result = parBuilder.GetParameter(resultIndex);
 
             return result is ValueReferenceDelegate ? parBuilder.CreateRef() : result;
-        }
-
-        public object DrefEvaluate(IParameterList pars)
-        {
-            var condition = FuncScript.Dref(pars.GetParameter(null, 0),false);
-            if (!(condition is bool))
-                return new FsError(FsError.ERROR_TYPE_MISMATCH, $"{this.Symbol}: The first parameter must be a boolean value.");
-
-            bool evalCondition = (bool)condition;
-            int resultIndex = evalCondition ? 1 : 2;
-            var result = FuncScript.Dref(pars.GetParameter(null, resultIndex));
-
-            return result;
         }
 
         public string ParName(int index)

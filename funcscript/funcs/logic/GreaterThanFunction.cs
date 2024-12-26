@@ -1,10 +1,10 @@
-﻿using funcscript.core;
+using funcscript.core;
 using funcscript.model;
 using System;
 
 namespace funcscript.funcs.logic
 {
-    public class GreaterThanFunction : IFsFunction, IFsDref
+    public class GreaterThanFunction : IFsFunction
     {
         public int MaxParsCount => 2;
 
@@ -47,13 +47,6 @@ namespace funcscript.funcs.logic
                 return comparable.CompareTo(par1) > 0;
             return new FsError(FsError.ERROR_TYPE_MISMATCH, $"{this.Symbol} function can't compare these data types: {par0.GetType()}");
 
-        }
-
-        public object DrefEvaluate(IParameterList pars)
-        {
-            var par0 = FuncScript.Dref(pars.GetParameter(null, 0),false);
-            var par1 = FuncScript.Dref(pars.GetParameter(null, 1),false);
-            return EvaluateInternal(par0, par1); // Using EvaluateInternal to handle actual comparison
         }
 
         public string ParName(int index)

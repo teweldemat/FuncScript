@@ -1,10 +1,10 @@
-﻿using funcscript.core;
+using funcscript.core;
 using funcscript.model;
 using System.Text;
 
 namespace funcscript.funcs.text
 {
-    public class JoinTextFunction : IFsFunction, IFsDref
+    public class JoinTextFunction : IFsFunction
     {
         public const string SYMBOL = "join";
         public int MaxParsCount => 2;
@@ -45,30 +45,6 @@ namespace funcscript.funcs.text
                     if (i > 0)
                         sb.Append(separator);
                     sb.Append(item?? "");
-                }
-            }
-            return sb.ToString();
-        }
-
-        
-
-        public object DrefEvaluate(IParameterList pars)
-        {
-            var list = FuncScript.Dref(pars.GetParameter(null, 0),false) as FsList;
-            var separator = FuncScript.Dref(pars.GetParameter(null, 1),false) as string;
-
-            if (list == null || separator == null)
-                throw new funcscript.error.TypeMismatchError($"{Symbol}: List and separator expected as parameters");
-
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < list.Length; i++)
-            {
-                var item = list[i];
-                if (item != null)
-                {
-                    if (i > 0)
-                        sb.Append(separator);
-                    sb.Append(FuncScript.Dref(item,false) ?? "");
                 }
             }
             return sb.ToString();

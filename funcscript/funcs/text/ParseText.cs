@@ -1,11 +1,11 @@
-﻿using funcscript.core;
+using funcscript.core;
 using System;
 using System.Globalization;
 using funcscript.model;
 
 namespace funcscript.funcs.text
 {
-    public class ParseText : IFsFunction, IFsDref,IFsDataProvider
+    public class ParseText : IFsFunction, IFsDataProvider
     {
         public int MaxParsCount => 2;
 
@@ -61,15 +61,6 @@ namespace funcscript.funcs.text
                 default:
                     return str;
             }
-        }
-
-        public object DrefEvaluate(IParameterList pars)
-        {
-            var par0 = FuncScript.Dref(pars.GetParameter(null, 0));
-            var par1 = pars.Count > 1 ? FuncScript.Dref(pars.GetParameter(null, 1)) : null;
-            var str = par0?.ToString();
-            var format = par1?.ToString();
-            return ParseAccordingToFormat(str, format);
         }
 
         public string ParName(int index)

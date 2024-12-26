@@ -1,10 +1,10 @@
-﻿using funcscript.core;
+using funcscript.core;
 using funcscript.model;
 using System.Collections.Generic;
 
 namespace funcscript.funcs.list
 {
-    public class MapListFunction : IFsFunction, IFsDref
+    public class MapListFunction : IFsFunction
     {
         public int MaxParsCount => 2;
 
@@ -48,29 +48,10 @@ namespace funcscript.funcs.list
             {
                 var item = lst[i];
                 var pars = new ArrayParameterList(new object[] { item, i });
-                if (dref)
-                {
-                    if (func is IFsDref fderf)
-                    {
-                        res.Add(fderf.DrefEvaluate(pars));
-                    }
-                    else
-                    {
-                        throw new InvalidOperationException($"{func.GetType()} doesn't implement IFsDref");
-                    }
-                }
-                else
-                    res.Add(func.Evaluate(parent, pars));
+                res.Add(func.Evaluate(parent, pars));
             }
 
             return new ArrayFsList(res);
-        }
-
-        public object DrefEvaluate(IParameterList pars)
-        {
-            var par0 = FuncScript.Dref(pars.GetParameter(null, 0),false);
-            var par1 = FuncScript.Dref(pars.GetParameter(null, 1));
-            return EvaluateInternal(null, par0, par1,true); // Passing `null` for IFsDataProvider since no parent is specified in DrefEvaluate context.
         }
 
         public string ParName(int index)

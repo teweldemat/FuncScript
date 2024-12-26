@@ -1,4 +1,4 @@
-﻿using funcscript.core;
+using funcscript.core;
 using funcscript.model;
 using System;
 using System.Collections.Generic;
@@ -8,8 +8,6 @@ using System.Threading.Tasks;
 
 namespace funcscript.funcs.logic
 {
-    
-
     public class InFunction : IFsFunction
     {
         public int MaxParsCount => 2;

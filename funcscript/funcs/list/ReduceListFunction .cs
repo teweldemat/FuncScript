@@ -1,4 +1,4 @@
-﻿using funcscript.core;
+using funcscript.core;
 using funcscript.model;
 using System;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace funcscript.funcs.list
 {
-    public class ReduceListFunction : IFsFunction,IFsDref
+    public class ReduceListFunction : IFsFunction
     {
         public int MaxParsCount => 3;
 
@@ -80,14 +80,7 @@ namespace funcscript.funcs.list
             {
                 if (dref)
                 {
-                    if (func is IFsDref dreff)
-                    {
-                        total = dreff.DrefEvaluate(new DoListFuncPar { S = total, X = lst[i], I = i });
-                    }
-                    else
-                    {
-                        throw new InvalidOperationException($"{func.GetType()} doesn't implement IFsDref");
-                    }
+                    total = func.Evaluate(parent, new DoListFuncPar { S = total, X = lst[i], I = i });
                 }
                 else
                     total = func.Evaluate(parent, new DoListFuncPar { S = total, X = lst[i], I = i });
@@ -107,15 +100,6 @@ namespace funcscript.funcs.list
                 default:
                     return "";
             }
-        }
-
-        public object DrefEvaluate(IParameterList pars)
-        {
-            var par0 = FuncScript.Dref(pars.GetParameter(null, 0),false);
-            var par1 = FuncScript.Dref(pars.GetParameter(null, 1),false);
-            var par2 = FuncScript.Dref(pars.GetParameter(null, 2));
-            return EvaluateInternal(null, par0, par1,par2,true);
-
         }
     }
 }

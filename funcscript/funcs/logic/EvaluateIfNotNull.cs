@@ -4,7 +4,7 @@ using funcscript.model;
 
 namespace funcscript.funcs.logic
 {
-    public class EvaluateIfNotNull : IFsFunction, IFsDref
+    public class EvaluateIfNotNull : IFsFunction
     {
         public int MaxParsCount => 2; // Set to 2 for consistent parameter handling
 
@@ -31,14 +31,6 @@ namespace funcscript.funcs.logic
             if (val2 is ValueSinkDelegate)
                 return parBuilder.CreateRef();
             return  val2; 
-        }
-
-        public object DrefEvaluate(IParameterList pars)
-        {
-            var val = FuncScript.Dref(pars.GetParameter(null, 0), false);
-            if (val != null)
-                return FuncScript.Dref(pars.GetParameter(null, 1), false);;
-            return null;
         }
 
         public string ParName(int index)

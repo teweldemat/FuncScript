@@ -1,9 +1,9 @@
-﻿using funcscript.core;
+using funcscript.core;
 using funcscript.model;
 
 namespace funcscript.funcs.math
 {
-    public class DivisionFunction : IFsFunction,IFsDref
+    public class DivisionFunction : IFsFunction
     {
         public int MaxParsCount => -1;
 
@@ -138,15 +138,6 @@ namespace funcscript.funcs.math
             return null;
         }
 
-        public object DrefEvaluate(IParameterList pars)
-        {
-            var ret = EvaluateInteral( pars, (i) =>
-            {
-                var ret = FuncScript.Dref(pars.GetParameter(null, i));
-                return (true, ret);
-            });
-            return ret;
-        }
         public string ParName(int index)
         {
             return $"Op {index + 1}";

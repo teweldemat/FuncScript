@@ -4,7 +4,7 @@ using funcscript.model;
 
 namespace funcscript.funcs.logic
 {
-    public class ReplaceIfNull : IFsFunction, IFsDref
+    public class ReplaceIfNull : IFsFunction
     {
         public int MaxParsCount => 2; // Updated to 2 as it seems to be the logical number of parameters expected for this function based on its behavior.
 
@@ -29,16 +29,6 @@ namespace funcscript.funcs.logic
 
             var val2 = parBuilder.GetParameter(1);
             return val2 is ValueReferenceDelegate ? parBuilder.CreateRef() : val2; // Defer if the second parameter is a reference when the first is null.
-        }
-
-        public object DrefEvaluate(IParameterList pars)
-        {
-            var val = FuncScript.Dref(pars.GetParameter(null, 0),false);
-            if (val != null)
-                return val;
-
-            var val2 = FuncScript.Dref(pars.GetParameter(null, 1),false);
-            return val2;
         }
 
         public string ParName(int index)

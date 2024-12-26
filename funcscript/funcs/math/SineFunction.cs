@@ -1,4 +1,4 @@
-﻿using funcscript.core;
+using funcscript.core;
 
 namespace funcscript.funcs.math
 {

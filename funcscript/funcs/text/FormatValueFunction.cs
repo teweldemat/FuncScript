@@ -1,11 +1,11 @@
-﻿using funcscript.core;
+using funcscript.core;
 using System;
 using System.Text;
 using funcscript.model;
 
 namespace funcscript.funcs.text
 {
-    public class FormatValueFunction : IFsFunction, IFsDref
+    public class FormatValueFunction : IFsFunction
     {
         public int MaxParsCount => 2;
         public CallType CallType => CallType.Prefix;
@@ -25,15 +25,6 @@ namespace funcscript.funcs.text
                 return parBuilder.CreateRef();
 
             string format = par1 as string;
-            var sb = new StringBuilder();
-            FuncScript.Format(sb, par0, format);
-            return sb.ToString();
-        }
-
-        public object DrefEvaluate(IParameterList pars)
-        {
-            var par0 = FuncScript.Dref(pars.GetParameter(null, 0));
-            var format = FuncScript.Dref(pars.GetParameter(null, 1)) as string;
             var sb = new StringBuilder();
             FuncScript.Format(sb, par0, format);
             return sb.ToString();

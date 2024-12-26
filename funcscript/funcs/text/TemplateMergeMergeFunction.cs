@@ -1,4 +1,4 @@
-﻿using funcscript.core;
+using funcscript.core;
 using funcscript.model;
 using System;
 using System.Collections;
@@ -21,14 +21,14 @@ namespace funcscript.funcs.math
 
         public int Precidence => 100;
 
-        void MergeList(StringBuilder sb,FsList list) 
+        void MergeList(StringBuilder sb, FsList list) 
         {
             if (list == null || list == null)
                 return;
-            foreach(var o in list)
+            foreach (var o in list)
             {
-                if(o is FsList)
-                    MergeList(sb,(FsList)o);
+                if (o is FsList)
+                    MergeList(sb, (FsList)o);
                 else
                     sb.Append(o == null ? "" : o.ToString());
             }
@@ -40,7 +40,6 @@ namespace funcscript.funcs.math
             var parBuilder = new CallRefBuilder(this, parent, pars);
             for (int i = 0; i < c; i++)
             {
-
                 var o = pars.GetParameter(parent, i);
                 if (o is ValueReferenceDelegate)
                     return parBuilder.CreateRef();

@@ -1,10 +1,10 @@
-﻿using funcscript.core;
+using funcscript.core;
 using System;
 using funcscript.model;
 
 namespace funcscript.funcs.logic
 {
-    public class EqualsFunction : IFsFunction, IFsDref
+    public class EqualsFunction : IFsFunction
     {
         public int MaxParsCount => 2;
 
@@ -44,13 +44,6 @@ namespace funcscript.funcs.logic
             }
 
             return par0?.GetType() == par1?.GetType() && par0.Equals(par1);
-        }
-
-        public object DrefEvaluate(IParameterList pars)
-        {
-            var par0 = FuncScript.Dref(pars.GetParameter(null, 0),false);
-            var par1 = FuncScript.Dref(pars.GetParameter(null, 1),false);
-            return EvaluateInternal(par0, par1);
         }
 
         public string ParName(int index)

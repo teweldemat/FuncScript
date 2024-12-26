@@ -1,10 +1,10 @@
-﻿using funcscript.core;
+using funcscript.core;
 using funcscript.model;
 using System;
 
 namespace funcscript.funcs.keyvalue
 {
-    public class KvcNoneNullMemberFunction : IFsFunction, IFsDref
+    public class KvcNoneNullMemberFunction : IFsFunction
     {
         public int MaxParsCount => 2;
 
@@ -54,14 +54,6 @@ namespace funcscript.funcs.keyvalue
                 1 => "Member key",
                 _ => string.Empty,
             };
-        }
-
-        public object DrefEvaluate(IParameterList pars)
-        {
-            var member = FuncScript.Dref(pars.GetParameter(null, 1),false);
-            var kvc = FuncScript.Dref(pars.GetParameter(null, 0),false);
-            var result = EvaluateInternal(kvc, member);
-            return result;
         }
     }
 }

@@ -1,10 +1,10 @@
-﻿using funcscript.core;
+using funcscript.core;
 using funcscript.model;
 using System.Collections.Generic;
 
 namespace funcscript.funcs.list
 {
-    public class LengthFunction : IFsFunction, IFsDref
+    public class LengthFunction : IFsFunction
     {
         public int MaxParsCount => 1;
 
@@ -36,12 +36,6 @@ namespace funcscript.funcs.list
                 string s => s.Length,
                 _ => throw new error.TypeMismatchError($"{this.Symbol} function doesn't apply to {par0.GetType()}")
             };
-        }
-
-        public object DrefEvaluate(IParameterList pars)
-        {
-            var par0 = FuncScript.Dref(pars.GetParameter(null, 0));
-            return EvaluateInternal(par0);
         }
 
         public string ParName(int index)

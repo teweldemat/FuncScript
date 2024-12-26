@@ -1,4 +1,4 @@
-﻿using funcscript.core;
+using funcscript.core;
 
 namespace funcscript.funcs.math
 {
@@ -26,8 +26,6 @@ namespace funcscript.funcs.math
 
             return string.IsNullOrEmpty(str.Trim());
         }
-
-
 
         public string ParName(int index)
         {
