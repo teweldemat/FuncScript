@@ -1,11 +1,5 @@
-using System;
 using System.ClientModel;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using funcscript.core;
-using funcscript.error;
-using funcscript.funcs.misc;
 using funcscript.model;
 using OpenAI;
 using OpenAI.Chat;
@@ -123,6 +117,5 @@ namespace funcscript.openai
         public int MaxParsCount => 4;
         public CallType CallType => CallType.Prefix;
         public string Symbol => "ChatGPT";
-        public int Precidence => 0;
     }
 }

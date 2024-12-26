@@ -54,8 +54,6 @@ namespace funcscript.core
 
         public string Symbol => null;
 
-        public int Precidence => 0;
-
         public object Evaluate(IFsDataProvider parent, IParameterList pars)
         {
             if (_context == null)

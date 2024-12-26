@@ -53,8 +53,6 @@ namespace funcscript.funcs.math
 
         public string Symbol => "+";
 
-        public int Precidence => 100;
-
         public object Evaluate(IFsDataProvider parent, IParameterList pars)
         {
             var ret = EvaluateInternal(pars, (i) =>

@@ -11,8 +11,6 @@ namespace funcscript.funcs.keyvalue
 
         public string Symbol => "?.";
 
-        public int Precidence => 200;
-
         private object EvaluateInternal(object target, object key)
         {
             if (!(key is string))

@@ -30,8 +30,6 @@ namespace funcscript.model
 
         public string Symbol => throw new NotSupportedException();
 
-        public int Precidence => 0;
-
         public object Evaluate(IFsDataProvider parent, IParameterList pars)
         {
             return this.f.DynamicInvoke(Enumerable.Range(0, pars.Count).Select(x => pars.GetParameter(parent, x)).ToArray());

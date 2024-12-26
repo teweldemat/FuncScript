@@ -5,7 +5,6 @@ namespace funcscript.funcs.math
     public class MultiplyFunction : IFsFunction
     {
         public int MaxParsCount => -1;
-        public int Precidence => 50;
         public CallType CallType => CallType.Infix;
 
         public string Symbol => "*";

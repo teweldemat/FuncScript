@@ -12,8 +12,6 @@ namespace funcscript.funcs.list
 
         public string Symbol => "Reduce";
 
-        public int Precidence => 0;
-
         class DoListFuncPar : IParameterList
         {
             public object S;

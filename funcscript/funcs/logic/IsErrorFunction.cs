@@ -13,8 +13,6 @@ namespace funcscript.funcs.logic
 
         public string Symbol => SYMBOL;
 
-        public int Precidence => 0;
-
         public object Evaluate(IFsDataProvider parent, IParameterList pars)
         {
             if (pars.Count != this.MaxParsCount)

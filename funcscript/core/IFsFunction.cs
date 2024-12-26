@@ -9,7 +9,6 @@ namespace funcscript.core
         int MaxParsCount { get; }
         CallType CallType { get; }
         String Symbol { get; }
-        int Precidence { get; }
     }
 
     public class FunctionAliasAttribute : Attribute

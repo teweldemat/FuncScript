@@ -12,8 +12,6 @@ namespace funcscript.funcs.logic
 
         public string Symbol => "and";
 
-        public int Precidence => 400;
-
         public object Evaluate(IFsDataProvider parent, IParameterList pars)
         {
             int count = pars.Count;

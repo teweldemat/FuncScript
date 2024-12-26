@@ -10,8 +10,6 @@ namespace funcscript.funcs.html
 
         public string Symbol => "HEncode";
 
-        public int Precidence => 0;
-
         public object Evaluate(IFsDataProvider parent, IParameterList pars)
         {
             var str = pars.GetParameter(parent, 0);

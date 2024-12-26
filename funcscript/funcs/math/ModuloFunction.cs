@@ -10,8 +10,6 @@ namespace funcscript.funcs.math
 
         public string Symbol => "%";
 
-        public int Precidence => 50;
-
         public object Evaluate(IFsDataProvider parent, IParameterList pars)
         {
             bool isInt = false, isLong = false, isDouble = false;

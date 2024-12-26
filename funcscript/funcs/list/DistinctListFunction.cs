@@ -1,4 +1,4 @@
-using funcscript.core;
+﻿using funcscript.core;
 using funcscript.model;
 using System.Collections.Generic;
 
@@ -11,8 +11,6 @@ namespace funcscript.funcs.list
         public CallType CallType => CallType.Prefix;
 
         public string Symbol => "Distinct";
-
-        public int Precidence => 0;
 
         public object Evaluate(IFsDataProvider parent, IParameterList pars)
         {

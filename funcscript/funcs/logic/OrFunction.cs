@@ -11,8 +11,6 @@ namespace funcscript.funcs.logic
 
         public string Symbol => "or";
 
-        public int Precidence => 400;
-
         public object Evaluate(IFsDataProvider parent, IParameterList pars)
         {
             for (int i = 0; i < pars.Count; i++)

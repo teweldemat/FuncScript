@@ -1,4 +1,4 @@
-using funcscript.core;
+﻿using funcscript.core;
 using System;
 using funcscript.model;
 
@@ -11,8 +11,6 @@ namespace funcscript.funcs.strings
         public CallType CallType => CallType.Prefix;
 
         public string Symbol => "endswith";
-
-        public int Precidence => 0;
 
         public object Evaluate(IFsDataProvider parent, IParameterList pars)
         {

@@ -1,4 +1,4 @@
-using funcscript.core;
+﻿using funcscript.core;
 using funcscript.model;
 
 namespace funcscript.funcs.list
@@ -11,8 +11,6 @@ namespace funcscript.funcs.list
         public CallType CallType => CallType.Prefix;
 
         public string Symbol => "Skip";
-
-        public int Precidence => 0;
 
         public object Evaluate(IFsDataProvider parent, IParameterList pars)
         {

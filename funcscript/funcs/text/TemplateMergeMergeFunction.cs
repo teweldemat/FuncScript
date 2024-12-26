@@ -14,8 +14,6 @@ namespace funcscript.funcs.math
 
         public string Symbol => SYMBOL;
 
-        public int Precidence => 100;
-
         void MergeList(StringBuilder sb, FsList list) 
         {
             if (list == null)

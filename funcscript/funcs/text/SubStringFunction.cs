@@ -8,7 +8,6 @@ namespace funcscript.funcs.text
         public int MaxParsCount => 3;
         public CallType CallType => CallType.Prefix;
         public string Symbol => "substring";
-        public int Precidence => 0;
 
         public object Evaluate(IFsDataProvider parent, IParameterList pars)
         {

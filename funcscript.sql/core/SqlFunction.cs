@@ -12,8 +12,6 @@ namespace funcscript.sql.core
 
         public string Symbol => "sql";
 
-        public int Precidence => 0;
-
         public object Evaluate(IFsDataProvider parent, IParameterList pars)
         {
             if (pars.GetParameter(parent, 0) is not string connectionStr)

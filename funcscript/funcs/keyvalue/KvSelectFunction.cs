@@ -1,4 +1,4 @@
-using funcscript.core;
+﻿using funcscript.core;
 using funcscript.model;
 
 namespace funcscript.funcs.keyvalue
@@ -10,8 +10,6 @@ namespace funcscript.funcs.keyvalue
         public CallType CallType => CallType.Prefix;
 
         public string Symbol => "Select";
-
-        public int Precidence => 0;
 
         public object Evaluate(IFsDataProvider parent, IParameterList pars)
         {

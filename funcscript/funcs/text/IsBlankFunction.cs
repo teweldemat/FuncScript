@@ -11,8 +11,6 @@ namespace funcscript.funcs.math
 
         public string Symbol => SYMBOL;
 
-        public int Precidence => 100;
-
         public object Evaluate(IFsDataProvider parent, IParameterList pars)
         {
             if (pars.Count < 1)

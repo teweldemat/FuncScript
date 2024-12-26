@@ -10,7 +10,6 @@ namespace funcscript.funcs.text
         public int MaxParsCount => 2;
         public CallType CallType => CallType.Prefix;
         public string Symbol => "format";
-        public int Precidence => 0;
 
         public object Evaluate(IFsDataProvider parent, IParameterList pars)
         {

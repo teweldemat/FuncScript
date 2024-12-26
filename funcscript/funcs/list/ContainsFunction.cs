@@ -12,8 +12,6 @@ namespace funcscript.funcs.list
 
         public string Symbol => "Contains";
 
-        public int Precidence => 0;
-
         public object Evaluate(IFsDataProvider parent, IParameterList pars)
         {
             if (pars.Count != this.MaxParsCount)

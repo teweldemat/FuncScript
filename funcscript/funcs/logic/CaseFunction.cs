@@ -10,8 +10,6 @@ namespace funcscript.funcs.logic
 
         public string Symbol => "Case";
 
-        public int Precidence => 0;
-
         public object Evaluate(IFsDataProvider parent, IParameterList pars)
         {
             int count = pars.Count;

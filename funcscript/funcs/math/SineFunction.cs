@@ -10,8 +10,6 @@ namespace funcscript.funcs.math
 
         public string Symbol => "Sin";
 
-        public int Precidence => 0;
-
         public object Evaluate(IFsDataProvider parent, IParameterList pars)
         {
             var val = pars.GetParameter(parent, 0);
@@ -47,8 +45,6 @@ namespace funcscript.funcs.math
         public CallType CallType => CallType.Prefix;
 
         public string Symbol => "Cos";
-
-        public int Precidence => 0;
 
         public object Evaluate(IFsDataProvider parent, IParameterList pars)
         {
