@@ -5,7 +5,6 @@ namespace funcscript.core
     public interface IFsFunction
     {
         object Evaluate(IFsDataProvider parent, IParameterList pars);
-        String ParName(int index);
         CallType CallType { get; }
         String Symbol { get; }
     }
