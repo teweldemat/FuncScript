@@ -1,11 +1,6 @@
-using System.Linq.Expressions;
 using System.Text.RegularExpressions;
-using fsstudio.server.fileSystem.exec.funcs;
 using funcscript;
 using funcscript.core;
-using funcscript.funcs.misc;
-using funcscript.model;
-using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace fsstudio.server.fileSystem.exec;
 
@@ -15,7 +10,6 @@ public class ExecutionSession : IFsDataProvider
     private IFsDataProvider _provider;
     readonly string fileName;
     public Guid SessionId { get; private set; } = Guid.NewGuid();
-    private ObjectKvc _sessionVars;
     public IFsDataProvider ParentProvider => _provider;
 
    
@@ -35,11 +29,7 @@ public class ExecutionSession : IFsDataProvider
         _nodes =nodes.ToList() ;
         foreach(var n in _nodes)
             n.SetParent(this);
-        _sessionVars = new ObjectKvc(new
-        {
-            markdown=new CreateMarkdownNodeFunction(logger),
-        });
-        this._provider = new KvcProvider(_sessionVars, new DefaultFsDataProvider());
+        this._provider = new DefaultFsDataProvider();
     }
     public ExecutionSession(IEnumerable<ExecutionNode> nodes,RemoteLogger logger)
     {

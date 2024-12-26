@@ -1,8 +1,4 @@
 using funcscript.block;
-using funcscript.model;
-using funcscript.nodes;
-using System.Collections.Generic;
-
 namespace funcscript.core
 {
     public partial class FuncScriptParser
@@ -24,13 +20,11 @@ namespace funcscript.core
             }
 
             var kvs = new List<KvcExpression.KeyValueExpression>();
-            var dataConnections = new List<KvcExpression.ConnectionExpression>();
-            var signalConnections = new List<KvcExpression.ConnectionExpression>();
             var nodeItems = new List<ParseNode>();
             ExpressionBlock retExp = null;
             do
             {
-                if (kvs.Count > 0 || retExp != null || dataConnections.Count > 0 || signalConnections.Count > 0)
+                if (kvs.Count > 0 || retExp != null)
                 {
                     i2 = GetLiteralMatch(exp, i, ",", ";");
                     if (i2 == i)
@@ -38,26 +32,7 @@ namespace funcscript.core
                     i = SkipSpace(exp, i2);
                 }
 
-                i2 = GetConnectionItem(context, exp, i, out var dataConItem, out var datanCodeConItem,
-                    ParseNodeType.DataConnection);
-                if (i2 > i)
-                {
-                    dataConnections.Add(dataConItem);
-                    nodeItems.Add(datanCodeConItem);
-                    i = SkipSpace(exp, i2);
-                    continue;
-                }
 
-
-                i2 = GetConnectionItem(context, exp, i, out var sigConItem, out var signNodeConItem,
-                    ParseNodeType.SignalConnection);
-                if (i2 > i)
-                {
-                    signalConnections.Add(sigConItem);
-                    nodeItems.Add(signNodeConItem);
-                    i = SkipSpace(exp, i2);
-                    continue;
-                }
 
 
                 i2 = GetKvcItem(context, nakdeMode, exp, i, out var otherItem, out var nodeOtherItem);
@@ -95,13 +70,12 @@ namespace funcscript.core
 
             if (nakdeMode)
             {
-                if (kvs.Count == 0 && retExp == null && dataConnections.Count == 0 && signalConnections.Count == 0)
+                if (kvs.Count == 0 && retExp == null)
                     return index;
             }
 
             kvcExpr = new KvcExpression();
-            var error = kvcExpr.SetKeyValues(kvs.ToArray(), retExp, dataConnections.ToArray(),
-                signalConnections.ToArray());
+            var error = kvcExpr.SetKeyValues(kvs.ToArray(), retExp);
             if (error != null)
             {
                 serrors.Add(new SyntaxErrorData(index, i - index, error));

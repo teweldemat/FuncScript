@@ -31,13 +31,11 @@ namespace funcscript.funcs.logic
 
         public string ParName(int index)
         {
-            switch (index)
+            return index switch
             {
-                case 0:
-                    return "Object";
-                default:
-                    return "";
-            }
+                0 => "Object",
+                _ => ""
+            };
         }
     }
 }

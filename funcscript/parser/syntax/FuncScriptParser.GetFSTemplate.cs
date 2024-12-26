@@ -1,7 +1,4 @@
 using System.Text;
-using funcscript.model;
-using funcscript.nodes;
-using System.Collections.Generic;
 using funcscript.block;
 using funcscript.funcs.math;
 

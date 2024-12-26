@@ -20,10 +20,6 @@ namespace funcscript
         List,
         KeyValueCollection,
         Function,
-        ValRef,
-        ValSink,
-        SigSource,
-        SigSink,
         Error
     }
 }

@@ -19,7 +19,10 @@ namespace funcscript.block
             public override int Count => parent.Parameters.Length;
             public override (object,CodeLocation) GetParameterWithLocation(IFsDataProvider provider, int index)
             {
-                var ret = index < 0 || index >= parent.Parameters.Length ? null : parent.Parameters[index].Evaluate(provider,connectionActions).Item1;
+                
+                if(index < 0 || index >= parent.Parameters.Length)
+                    return (null,null); 
+                var ret=parent.Parameters[index].Evaluate(provider,connectionActions).Item1;
                 return (ret,parent.Parameters[index].CodeLocation);
             }
         }
@@ -88,10 +91,6 @@ namespace funcscript.block
                 else
                     ret = null;
                 return (ret,this.CodeLocation);
-            }
-            else if (func is ValueReferenceDelegate r)
-            {
-                return (CallRef.Create(this.CodeLocation, provider, r, paramList),this.CodeLocation);
             }
             throw new EvaluationException(this.Pos, this.Length,
                 new TypeMismatchError($"Function part didn't evaluate to a function or a list. {FuncScript.GetFsDataType(func)}"));

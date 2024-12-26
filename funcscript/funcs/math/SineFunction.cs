@@ -16,19 +16,19 @@ namespace funcscript.funcs.math
         {
             var val = pars.GetParameter(parent, 0);
 
-            if (val is int)
+            if (val is int intValue)
             {
-                return Math.Sin((double)(int)val);
+                return Math.Sin((double)intValue);
             }
 
-            if (val is double)
+            if (val is double doubleValue)
             {
-                return Math.Sin((double)val);
+                return Math.Sin(doubleValue);
             }
 
-            if (val is long)
+            if (val is long longValue)
             {
-                return Math.Sin((double)(long)val);
+                return Math.Sin((double)longValue);
             }
 
             throw new error.TypeMismatchError($"{this.Symbol}: A number was expected.");
@@ -52,18 +52,18 @@ namespace funcscript.funcs.math
 
         public object Evaluate(IFsDataProvider parent, IParameterList pars)
         {
-            var val = pars.GetParameter(parent,0);
-            if (val is int)
+            var val = pars.GetParameter(parent, 0);
+            if (val is int intValue)
             {
-                return Math.Cos((double)(int)val);
+                return Math.Cos((double)intValue);
             }
-            if (val is double)
+            if (val is double doubleValue)
             {
-                return Math.Cos((double)val);
+                return Math.Cos(doubleValue);
             }
-            if (val is long)
+            if (val is long longValue)
             {
-                return Math.Cos((long)val);
+                return Math.Cos((double)longValue);
             }
             throw new error.TypeMismatchError($"{this.Symbol}: number expected");
         }

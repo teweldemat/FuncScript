@@ -1,7 +1,4 @@
-using funcscript.funcs.math;
-using funcscript.funcs.logic;
-using funcscript.model;
-using funcscript.nodes;
+
 
 namespace funcscript.core
 {

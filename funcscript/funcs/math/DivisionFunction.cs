@@ -15,23 +15,15 @@ namespace funcscript.funcs.math
 
         public object Evaluate(IFsDataProvider parent, IParameterList pars)
         {
-            var parBuilder = new CallRefBuilder(this,parent, pars);
-            var doRef = false;
-            var ret = EvaluateInteral(pars, (i) =>
+            var ret = EvaluateInternal(pars, (i) =>
             {
                 var ret = pars.GetParameter(parent, i);
-                if (ret is ValueReferenceDelegate)
-                {
-                    doRef = true;
-                    return (false, null);
-                }
                 return (true, ret);
             });
-            if (doRef)
-                return parBuilder.CreateRef();
             return ret;
         }
-        object EvaluateInteral(IParameterList pars,Func<int,(bool,object)> getPar)
+
+        object EvaluateInternal(IParameterList pars, Func<int, (bool, object)> getPar)
         {
             bool isInt = false, isLong = false, isDouble = false;
             int intTotal = 1;
@@ -70,7 +62,6 @@ namespace funcscript.funcs.math
 
             for (int i = 1; i < count; i++)
             {
-                
                 var p = getPar(i);
                 if (!p.Item1)
                     return null;

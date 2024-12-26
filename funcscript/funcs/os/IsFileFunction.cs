@@ -26,6 +26,7 @@ namespace funcscript.funcs.os
             var path = (string)par0;
             return File.Exists(path) && !Directory.Exists(path);
         }
+
         public string ParName(int index)
         {
             return index == 0 ? "file path" : null;

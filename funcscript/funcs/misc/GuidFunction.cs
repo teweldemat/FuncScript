@@ -1,14 +1,7 @@
 using funcscript.core;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace funcscript.funcs.logic
 {
-
     public class GuidFunction : IFsFunction
     {
         public int MaxParsCount => 1;
@@ -45,13 +38,11 @@ namespace funcscript.funcs.logic
 
         public string ParName(int index)
         {
-            switch(index)
+            return index switch
             {
-                case 0:
-                    return "Guid string";
-                default:
-                    return "";
-            }
+                0 => "Guid string",
+                _ => ""
+            };
         }
     }
 }

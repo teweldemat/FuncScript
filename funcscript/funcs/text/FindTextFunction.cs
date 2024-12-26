@@ -19,13 +19,10 @@ namespace funcscript.funcs.text
             if (pars.Count < 2 || pars.Count > MaxParsCount)
                 throw new funcscript.error.TypeMismatchError($"{this.Symbol}: Two or three parameters expected");
 
-            var parBuilder = new CallRefBuilder(this, parent, pars);
-            var par0 = parBuilder.GetParameter(0);
-            var par1 = parBuilder.GetParameter(1);
-            var par2 = parBuilder.GetParameter(2);
+            var par0 = pars.GetParameter(parent,0);
+            var par1 = pars.GetParameter(parent,1);
+            var par2 = pars.GetParameter(parent,2);
 
-            if (par0 is ValueReferenceDelegate || par1 is ValueReferenceDelegate || par2 is ValueReferenceDelegate)
-                return parBuilder.CreateRef();
 
             if (par0 == null || par1 == null)
                 throw new funcscript.error.TypeMismatchError($"{this.Symbol}: Two strings and optionally an index expected as parameters");

@@ -29,7 +29,6 @@ namespace funcscript.core
 
         private Dictionary<string, int> ParamterNameIndex;
         private String[] _parameters;
-        private ValueReferenceDelegate[] _parameterRefs = null;
         private object _expressionValue = null;
         private IFsDataProvider _context = null;
 

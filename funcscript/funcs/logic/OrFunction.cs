@@ -15,14 +15,9 @@ namespace funcscript.funcs.logic
 
         public object Evaluate(IFsDataProvider parent, IParameterList pars)
         {
-            var parBuilder = new CallRefBuilder(this, parent, pars);
-
             for (int i = 0; i < pars.Count; i++)
             {
-                var par = parBuilder.GetParameter(i);
-
-                if (par is ValueReferenceDelegate)
-                    return parBuilder.CreateRef();
+                var par = pars.GetParameter(parent, i);
 
                 if (!(par is bool b))
                     return new FsError(FsError.ERROR_TYPE_MISMATCH,

@@ -20,12 +20,8 @@ namespace funcscript.funcs.logic
                 return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH,
                     $"{this.Symbol}: expected {this.MaxParsCount} got {pars.Count}");
 
-            var parBuilder = new CallRefBuilder(this,parent, pars);
-            var par0 = parBuilder.GetParameter(0);
-            var par1 = parBuilder.GetParameter(1);
-
-            if (par0 is ValueReferenceDelegate || par1 is ValueReferenceDelegate)
-                return parBuilder.CreateRef();
+            var par0 = pars.GetParameter(parent, 0);
+            var par1 = pars.GetParameter(parent, 1);
 
             return EvaluateInternal(par0, par1);
         }
@@ -46,7 +42,6 @@ namespace funcscript.funcs.logic
             if (par0 is IComparable comparable)
                 return comparable.CompareTo(par1) > 0;
             return new FsError(FsError.ERROR_TYPE_MISMATCH, $"{this.Symbol} function can't compare these data types: {par0.GetType()}");
-
         }
 
         public string ParName(int index)

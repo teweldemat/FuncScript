@@ -1,10 +1,4 @@
 using funcscript.core;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Encodings.Web;
-using System.Threading.Tasks;
 
 namespace funcscript.funcs.html
 {
@@ -21,7 +15,7 @@ namespace funcscript.funcs.html
         public object Evaluate(IFsDataProvider parent, IParameterList pars)
         {
             var str = pars.GetParameter(parent, 0);
-            return str == null ? null : System.Web.HttpUtility.HtmlEncode(str);
+            return str == null ? null : System.Web.HttpUtility.HtmlEncode(str.ToString());
         }
 
         public string ParName(int index)

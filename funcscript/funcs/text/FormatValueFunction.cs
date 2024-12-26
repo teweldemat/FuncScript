@@ -17,12 +17,8 @@ namespace funcscript.funcs.text
             if (pars.Count < 1)
                 throw new error.EvaluationTimeException($"{this.Symbol} requires at least one parameter.");
 
-            var parBuilder = new CallRefBuilder(this, parent, pars);
-            var par0 = parBuilder.GetParameter(0);
-            var par1 = parBuilder.GetParameter(1);
-
-            if (par0 is ValueReferenceDelegate || par1 is ValueReferenceDelegate)
-                return parBuilder.CreateRef();
+            var par0 = pars.GetParameter(parent, 0);
+            var par1 = pars.GetParameter(parent, 1);
 
             string format = par1 as string;
             var sb = new StringBuilder();

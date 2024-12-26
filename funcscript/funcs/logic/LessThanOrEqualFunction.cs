@@ -41,16 +41,12 @@ namespace funcscript.funcs.logic
 
         public string ParName(int index)
         {
-            switch (index)
+            return index switch
             {
-                case 0:
-                    return "Left Value";
-                case 1:
-                    return "Right Value";
-                default:
-                    return "";
-            }
+                0 => "Left Value",
+                1 => "Right Value",
+                _ => ""
+            };
         }
     }
-
 }

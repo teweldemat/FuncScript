@@ -4,9 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace funcscript.funcs.math
 {
@@ -46,6 +44,7 @@ namespace funcscript.funcs.math
             }
         }
     }
+    
     public class AddFunction : IFsFunction
     {
         public int MaxParsCount => -1;
@@ -58,25 +57,17 @@ namespace funcscript.funcs.math
 
         public object Evaluate(IFsDataProvider parent, IParameterList pars)
         {
-            var parBuilder = new CallRefBuilder(this,parent, pars);
-            var doRef = false;
-            var ret = EvaluateInteral(pars, (i) =>
+            var ret = EvaluateInternal(pars, (i) =>
             {
                 var ret = pars.GetParameter(parent, i);
-                if (ret is ValueReferenceDelegate)
-                {
-                    doRef = true;
-                    return (false, null);
-                }
                 return (true, ret);
             });
-            if (doRef)
-                return parBuilder.CreateRef();
             return ret;
         }
-        object EvaluateInteral(IParameterList pars,Func<int,(bool,object)> getPar)
+
+        object EvaluateInternal(IParameterList pars, Func<int, (bool, object)> getPar)
         {
-            bool isNull=true, isInt=false,isLong=false,isDouble=false,isString=false,isList=false;
+            bool isNull = true, isInt = false, isLong = false, isDouble = false, isString = false, isList = false;
             bool isKv = false;
 
             int intTotal = 0;
@@ -84,15 +75,15 @@ namespace funcscript.funcs.math
             double doubleTotal = 0;
             StringBuilder stringTotal = null;
             KeyValueCollection kvTotal = null;
-            List<FsList> listTotal= new List<FsList>();
+            List<FsList> listTotal = new List<FsList>();
             int c = pars.Count;
-            for(int i=0;i<c;i++)
+            for (int i = 0; i < c; i++)
             {
-                var p = getPar( i);
+                var p = getPar(i);
                 if (!p.Item1)
                     return null;
                 var d = p.Item2;
-                if(isNull)
+                if (isNull)
                 {
                     if (d is int)
                     {
@@ -109,7 +100,7 @@ namespace funcscript.funcs.math
                         isNull = false;
                         isDouble = true;
                     }
-                    else if (d is String)
+                    else if (d is string)
                     {
                         isNull = false;
                         isString = true;
@@ -140,10 +131,10 @@ namespace funcscript.funcs.math
                     else if (d is double)
                     {
                         isDouble = true;
-                        isInt = false; 
+                        isInt = false;
                         doubleTotal = intTotal;
                     }
-                    else if (d is String)
+                    else if (d is string)
                     {
                         isString = true;
                         isInt = false;
@@ -153,12 +144,12 @@ namespace funcscript.funcs.math
                     {
                         isList = true;
                         isInt = false;
-                        listTotal = new List<FsList>(new []{ new ArrayFsList(new object[] { intTotal })});
+                        listTotal = new List<FsList>(new[] { new ArrayFsList(new object[] { intTotal }) });
                     }
                 }
                 if (isLong)
                 {
-                    if(d is int)
+                    if (d is int)
                     {
                         longTotal += (long)(int)d;
                     }
@@ -169,32 +160,29 @@ namespace funcscript.funcs.math
                     else if (d is double)
                     {
                         isDouble = true;
-                        isLong= false;
+                        isLong = false;
                         doubleTotal = longTotal;
                     }
-                    else if (d is String)
+                    else if (d is string)
                     {
                         isString = true;
                         isLong = false;
                         stringTotal = new StringBuilder(longTotal.ToString());
                     }
-
                     else if (d is FsList)
                     {
                         isList = true;
                         isLong = false;
-                        listTotal = new List<FsList>(new []{new ArrayFsList(new object[] { longTotal })});
+                        listTotal = new List<FsList>(new[] { new ArrayFsList(new object[] { longTotal }) });
                     }
-
                     else if (d is KeyValueCollection)
                     {
                         throw new error.TypeMismatchError($"{this.Symbol}: Keyvalue collection not expected");
                     }
-
                 }
                 if (isDouble)
                 {
-                    if(d is int)
+                    if (d is int)
                     {
                         doubleTotal += (double)(int)d;
                     }
@@ -204,9 +192,9 @@ namespace funcscript.funcs.math
                     }
                     else if (d is double)
                     {
-                        doubleTotal+= (double)d;
+                        doubleTotal += (double)d;
                     }
-                    else if (d is double)
+                    else if (d is string)
                     {
                         isString = true;
                         isDouble = false;
@@ -214,11 +202,10 @@ namespace funcscript.funcs.math
                     }
                     else if (d is FsList)
                     {
-                        isList= true;
+                        isList = true;
                         isDouble = false;
-                        listTotal = new List<FsList>(new []{new ArrayFsList(new object[] { longTotal})});
+                        listTotal = new List<FsList>(new[] { new ArrayFsList(new object[] { longTotal }) });
                     }
-
                     else if (d is KeyValueCollection)
                     {
                         throw new error.TypeMismatchError($"{this.Symbol}: Keyvalue collection not expected");
@@ -238,10 +225,6 @@ namespace funcscript.funcs.math
                     {
                         stringTotal.Append(d.ToString());
                     }
-                    else if (d is double)
-                    {
-                        stringTotal.Append(d.ToString());
-                    }
                     else if (d is string)
                     {
                         if (stringTotal == null)
@@ -251,18 +234,18 @@ namespace funcscript.funcs.math
                     else if (d is FsList)
                     {
                         isList = true;
-                        isString= false;
-                        listTotal = new List<FsList>(new []{new ArrayFsList(new object[] { stringTotal.ToString()})});
+                        isString = false;
+                        listTotal = new List<FsList>(new[] { new ArrayFsList(new object[] { stringTotal.ToString() }) });
                     }
                     else if (d is KeyValueCollection)
                     {
                         throw new error.TypeMismatchError($"{this.Symbol}: Keyvalue collection not expected");
                     }
                 }
-                if(isKv)
+                if (isKv)
                 {
                     var kv = d as KeyValueCollection;
-                    if(kv==null)
+                    if (kv == null)
                         throw new error.TypeMismatchError("Keyvalue collection expected");
                     if (kvTotal == null)
                         kvTotal = kv;
@@ -276,9 +259,8 @@ namespace funcscript.funcs.math
                         listTotal.Add(lst);
                     }
                     else
-                        listTotal.Add(new ArrayFsList(new []{d}));
+                        listTotal.Add(new ArrayFsList(new[] { d }));
                 }
-
             }
 
             if (isList)

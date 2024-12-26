@@ -20,31 +20,26 @@ namespace funcscript.funcs.text
             if (pars.Count != MaxParsCount)
                 throw new funcscript.error.TypeMismatchError($"{this.Symbol}: Two parameters expected");
 
-            var parBuilder = new CallRefBuilder(this,parent, pars);
-            var par0 = parBuilder.GetParameter(0);
-            var par1 = parBuilder.GetParameter(1);
-
-            if (par0 is ValueReferenceDelegate || par1 is ValueReferenceDelegate)
-                return parBuilder.CreateRef();
+            var par0 = pars.GetParameter(parent, 0);
+            var par1 = pars.GetParameter(parent, 1);
 
             if (par0 == null || par1 == null)
                 throw new funcscript.error.TypeMismatchError($"{this.Symbol}: List and separator expected as parameters");
-            if(!(par0 is FsList list))
-               throw new InvalidOperationException($"{this.Symbol}: first parameter should be list");
-            if(!(par1 is string separator))
+            if (!(par0 is FsList list))
+                throw new InvalidOperationException($"{this.Symbol}: first parameter should be list");
+            if (!(par1 is string separator))
                 throw new InvalidOperationException($"{this.Symbol}: second parameter should be string");
-            
+
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < list.Length; i++)
             {
                 var item = list[i];
-                if (item is ValueReferenceDelegate)
-                    return parBuilder.CreateRef();
+
                 if (item != null)
                 {
                     if (i > 0)
                         sb.Append(separator);
-                    sb.Append(item?? "");
+                    sb.Append(item ?? "");
                 }
             }
             return sb.ToString();

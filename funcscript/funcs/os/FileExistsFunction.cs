@@ -20,11 +20,7 @@ namespace funcscript.funcs.os
             if (pars.Count != this.MaxParsCount)
                 throw new error.EvaluationTimeException($"{this.Symbol} function: invalid parameter count. {this.MaxParsCount} expected, got {pars.Count}");
 
-            var parBuilder = new CallRefBuilder(this, parent, pars);
-            var par0 = parBuilder.GetParameter(0);
-
-            if (par0 is ValueReferenceDelegate)
-                return parBuilder.CreateRef();
+            var par0 = pars.GetParameter(parent, 0);
 
             if (par0 == null || !(par0 is string))
                 throw new error.TypeMismatchError($"Function {this.Symbol}. Invalid parameter type, expected a string");

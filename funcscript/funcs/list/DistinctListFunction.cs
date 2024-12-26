@@ -1,5 +1,6 @@
 using funcscript.core;
 using funcscript.model;
+using System.Collections.Generic;
 
 namespace funcscript.funcs.list
 {
@@ -12,22 +13,6 @@ namespace funcscript.funcs.list
         public string Symbol => "Distinct";
 
         public int Precidence => 0;
-
-        class DistinctListFuncPar : IParameterList
-        {
-            public object X;
-
-            public override int Count => 1;
-
-            public override (object, CodeLocation) GetParameterWithLocation(IFsDataProvider provider, int index)
-            {
-                return index switch
-                {
-                    0 => (X, null),
-                    _ => (null, null),
-                };
-            }
-        }
 
         public object Evaluate(IFsDataProvider parent, IParameterList pars)
         {

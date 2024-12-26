@@ -19,17 +19,13 @@ namespace funcscript.funcs.list
             if (pars.Count != this.MaxParsCount)
                 throw new error.TypeMismatchError($"{this.Symbol} function: Invalid parameter count. Expected {this.MaxParsCount}, but got {pars.Count}");
 
-            var parBuilder = new CallRefBuilder(this,parent, pars);
-            var par0 = parBuilder.GetParameter(0);
-            var par1 = parBuilder.GetParameter(1);
+            var par0 = pars.GetParameter(parent, 0);
+            var par1 = pars.GetParameter(parent, 1);
 
-            if (par0 is ValueReferenceDelegate || par1 is ValueReferenceDelegate)
-                return parBuilder.CreateRef();
-
-            return EvaluateInternal(parent, par0, par1,false);
+            return EvaluateInternal(parent, par0, par1, false);
         }
 
-        private object EvaluateInternal(IFsDataProvider parent, object par0, object par1,bool dref)
+        private object EvaluateInternal(IFsDataProvider parent, object par0, object par1, bool dref)
         {
             if (par0 == null)
                 return null;
@@ -47,8 +43,8 @@ namespace funcscript.funcs.list
             for (int i = 0; i < lst.Length; i++)
             {
                 var item = lst[i];
-                var pars = new ArrayParameterList(new object[] { item, i });
-                res.Add(func.Evaluate(parent, pars));
+                var parsList = new ArrayParameterList(new object[] { item, i });
+                res.Add(func.Evaluate(parent, parsList));
             }
 
             return new ArrayFsList(res);
@@ -56,15 +52,12 @@ namespace funcscript.funcs.list
 
         public string ParName(int index)
         {
-            switch (index)
+            return index switch
             {
-                case 0:
-                    return "List";
-                case 1:
-                    return "Transform Function";
-                default:
-                    return "";
-            }
+                0 => "List",
+                1 => "Transform Function",
+                _ => ""
+            };
         }
     }
 }

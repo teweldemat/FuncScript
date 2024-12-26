@@ -1,5 +1,4 @@
 using funcscript.core;
-using System;
 using funcscript.model;
 
 namespace funcscript.funcs.logic
@@ -19,35 +18,27 @@ namespace funcscript.funcs.logic
             if (pars.Count < MaxParsCount)
                 throw new error.TypeMismatchError("IfConditionFunction requires three parameters: condition, trueResult, and falseResult.");
 
-            var parBuilder = new CallRefBuilder(this,parent, pars);
-            var condition = parBuilder.GetParameter(0);
-
-            if (condition is ValueReferenceDelegate)
-                return parBuilder.CreateRef();
+            var condition = pars.GetParameter(parent, 0);
 
             if (!(condition is bool))
                 return new FsError(FsError.ERROR_TYPE_MISMATCH, $"{this.Symbol}: The first parameter must be a boolean value.");
 
             bool evalCondition = (bool)condition;
             int resultIndex = evalCondition ? 1 : 2;
-            var result = parBuilder.GetParameter(resultIndex);
+            var result = pars.GetParameter(parent, resultIndex);
 
-            return result is ValueReferenceDelegate ? parBuilder.CreateRef() : result;
+            return result;
         }
 
         public string ParName(int index)
         {
-            switch (index)
+            return index switch
             {
-                case 0:
-                    return "Condition";
-                case 1:
-                    return "True Case";
-                case 2:
-                    return "False Case";
-                default:
-                    return "";
-            }
+                0 => "Condition",
+                1 => "True Case",
+                2 => "False Case",
+                _ => ""
+            };
         }
     }
 }

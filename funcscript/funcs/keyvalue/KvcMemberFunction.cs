@@ -1,15 +1,8 @@
 using funcscript.core;
 using funcscript.model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.XPath;
 
 namespace funcscript.funcs.keyvalue
 {
-
     public class KvcMemberFunction : IFsFunction
     {
         public int MaxParsCount => 2;
@@ -33,24 +26,17 @@ namespace funcscript.funcs.keyvalue
 
             return ((KeyValueCollection)par0).Get(((string)par1).ToLower());
         }
+
         public object Evaluate(IFsDataProvider parent, IParameterList pars)
         {
             if (pars.Count != MaxParsCount)
                 throw new error.TypeMismatchError($"{Symbol} function: Invalid parameter count. Expected {MaxParsCount}, but got {pars.Count}");
 
-            var parBuilder = new CallRefBuilder(this,parent, pars);
-            
-            var par1 = parBuilder.GetParameter(1);
-            var par0 = parBuilder.GetParameter(0);
-            
-            if (par0 is ValueReferenceDelegate || par1 is ValueReferenceDelegate)
-            {
-                return parBuilder.CreateRef();
-            }
+            var par0 = pars.GetParameter(parent, 0);
+            var par1 = pars.GetParameter(parent, 1);
 
             return EvaluateInternal(par0, par1);
         }
-
 
         public string ParName(int index)
         {

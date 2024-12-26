@@ -1,10 +1,5 @@
 using funcscript.core;
 using funcscript.model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace funcscript.funcs.keyvalue
 {
@@ -45,17 +40,17 @@ namespace funcscript.funcs.keyvalue
                 }
             }
 
-            return new SimpleKeyValueCollection(parent,second.ToArray());
+            return new SimpleKeyValueCollection(parent, second.ToArray());
         }
 
         public string ParName(int index)
         {
-            switch (index)
+            return index switch
             {
-                case 0: return "Source KVC";
-                case 1: return "Target KVC";
-            }
-            return null;
+                0 => "Source KVC",
+                1 => "Target KVC",
+                _ => null
+            };
         }
     }
 }

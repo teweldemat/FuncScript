@@ -15,20 +15,11 @@ namespace funcscript.funcs.math
 
         public object Evaluate(IFsDataProvider parent, IParameterList pars)
         {
-            var parBuilder = new CallRefBuilder(this, parent, pars);
-            var doRef = false;
             var ret = EvaluateInternal(pars, (i) =>
             {
                 var ret = pars.GetParameter(parent, i);
-                if (ret is ValueReferenceDelegate)
-                {
-                    doRef = true;
-                    return (false, null);
-                }
                 return (true, ret);
             });
-            if (doRef)
-                return parBuilder.CreateRef();
             return ret;
         }
 

@@ -1,12 +1,7 @@
-using funcscript.core;
+﻿using funcscript.core;
 using funcscript.model;
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace funcscript.funcs.math
 {
@@ -23,7 +18,7 @@ namespace funcscript.funcs.math
 
         void MergeList(StringBuilder sb, FsList list) 
         {
-            if (list == null || list == null)
+            if (list == null)
                 return;
             foreach (var o in list)
             {
@@ -33,16 +28,14 @@ namespace funcscript.funcs.math
                     sb.Append(o == null ? "" : o.ToString());
             }
         }
+
         public object Evaluate(IFsDataProvider parent, IParameterList pars)
         {
             StringBuilder sb = new StringBuilder();
             int c = pars.Count;
-            var parBuilder = new CallRefBuilder(this, parent, pars);
             for (int i = 0; i < c; i++)
             {
                 var o = pars.GetParameter(parent, i);
-                if (o is ValueReferenceDelegate)
-                    return parBuilder.CreateRef();
                 if (o is FsList)
                     MergeList(sb, (FsList)o);
                 else

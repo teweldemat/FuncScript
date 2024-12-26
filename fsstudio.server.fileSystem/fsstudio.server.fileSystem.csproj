@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Exec\Funcs\" />
     <Folder Include="wwwroot\" />
   </ItemGroup>
 

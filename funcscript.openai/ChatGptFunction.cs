@@ -69,7 +69,7 @@ namespace funcscript.openai
 
                 messages.Add(ChatMessage.CreateUserMessage(instruction));
 
-                Fslogger.DefaultLogger.WriteLine($"ChatGPT: model:{model}\nSystem instruction:{systemInstruction}\nRequest:\n{instruction}");
+                //Fslogger.DefaultLogger.WriteLine($"ChatGPT: model:{model}\nSystem instruction:{systemInstruction}\nRequest:\n{instruction}");
                 ClientResult<ChatCompletion> response = api.GetChatClient(model).CompleteChat(messages);
                 
 

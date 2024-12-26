@@ -48,13 +48,12 @@ namespace funcscript.funcs.os
 
         public string ParName(int index)
         {
-            switch (index)
+            return index switch
             {
-                case 0: return "file name";
-                case 1: return "content";
-                default:
-                    return null;
-            }
+                0 => "file name",
+                1 => "content",
+                _ => null
+            };
         }
     }
 }

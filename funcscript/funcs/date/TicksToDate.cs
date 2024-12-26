@@ -30,16 +30,13 @@ namespace funcscript.funcs.logic
             return new DateTime(ticks);
         }
 
-
         public string ParName(int index)
         {
-            switch (index)
+            return index switch
             {
-                case 0:
-                    return "Ticks";
-                default:
-                    return "";
-            }
+                0 => "Ticks",
+                _ => ""
+            };
         }
     }
 }

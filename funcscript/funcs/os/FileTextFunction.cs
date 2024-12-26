@@ -1,9 +1,4 @@
 using funcscript.core;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using funcscript.model;
 
 namespace funcscript.funcs.os
@@ -28,15 +23,16 @@ namespace funcscript.funcs.os
                 return null;
 
             if (!(par0 is string))
-                new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, $"Function {this.Symbol}. Type mismatch");
+                return new FsError(FsError.ERROR_TYPE_MISMATCH, $"Function {this.Symbol}. Type mismatch");
+
             var fileName = (string)par0;
             if (!System.IO.File.Exists(fileName))
-                new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, $"Function {this.Symbol}. File '{par0}' doesn't exist");
+                return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, $"Function {this.Symbol}. File '{par0}' doesn't exist");
             if (new System.IO.FileInfo(fileName).Length > 1000000)
-                new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, $"Function {this.Symbol}. File '{par0}' is too big");
+                return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, $"Function {this.Symbol}. File '{par0}' is too big");
             return System.IO.File.ReadAllText(fileName);
-
         }
+
         public string ParName(int index)
         {
             switch (index)

@@ -1,10 +1,5 @@
 using funcscript.core;
 using funcscript.model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace funcscript.funcs.logic
 {
@@ -36,7 +31,7 @@ namespace funcscript.funcs.logic
 
             bool par0Numeric = FuncScript.IsNumeric(par0);
 
-            foreach (var val in ((FsList)par1))
+            foreach (var val in (FsList)par1)
             {
                 if (val == null)
                     continue;
@@ -71,15 +66,12 @@ namespace funcscript.funcs.logic
 
         public string ParName(int index)
         {
-            switch (index)
+            return index switch
             {
-                case 0:
-                    return "Value";
-                case 1:
-                    return "List";
-                default:
-                    return "";
-            }
+                0 => "Value",
+                1 => "List",
+                _ => ""
+            };
         }
     }
 }

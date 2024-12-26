@@ -1,11 +1,5 @@
 using funcscript.block;
-using funcscript.funcs.math;
-using System.Text;
-using System.Text.RegularExpressions;
-using funcscript.funcs.logic;
 using funcscript.model;
-using funcscript.nodes;
-using System.Collections.Generic;
 
 namespace funcscript.core
 {
@@ -119,18 +113,7 @@ namespace funcscript.core
                 return i;
             }
 
-            //get error
-            i = GetLiteralMatch(exp, index, KW_ERROR);
-            if (i > index)
-            {
-                parseNode = new ParseNode(ParseNodeType.ErrorKeyWord, index, i - index);
-                prog = new LiteralBlock(SignalSinkInfo.ErrorDelegate)
-                {
-                    Pos = index,
-                    Length = i - index,
-                };
-                return i;
-            }
+            
 
             //get identifier
             i = GetIdentifier(exp, index, out var ident, out var identLower, out nodeUnit);

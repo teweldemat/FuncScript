@@ -71,7 +71,6 @@ namespace funcscript.funcs.math
                         doubleTotal %= (double)d;
                     }
                 }
-
                 else if (isLong)
                 {
                     if (d is int)
@@ -90,7 +89,6 @@ namespace funcscript.funcs.math
                         doubleTotal %= (double)d;
                     }
                 }
-
                 else if (isDouble)
                 {
                     if (d is int)

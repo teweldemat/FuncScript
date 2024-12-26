@@ -59,7 +59,7 @@ public class FsToDotNet
         Assert.That(res is KeyValueCollection);
         var kvc = (KeyValueCollection)res;
         var m = kvc.ConvertTo<TestModel1>();
-        Assert.That(m.X == "15");
+        Assert.That(m.X,Is.EqualTo("15"));
     }
 
     [Test]

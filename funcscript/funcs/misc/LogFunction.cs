@@ -1,10 +1,6 @@
 using funcscript.core;
 using funcscript.model;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace funcscript.funcs.misc
 {
@@ -13,14 +9,13 @@ namespace funcscript.funcs.misc
         public abstract void WriteLine(string text);
         public abstract void Clear();
         
-        
         private static Fslogger _fslogger;
 
         public static void SetDefaultLogger(Fslogger logger)
         {
             _fslogger = logger;
         }
-        public static Fslogger DefaultLogger =>_fslogger;
+        public static Fslogger DefaultLogger => _fslogger;
 
         static Fslogger()
         {
@@ -33,9 +28,9 @@ namespace funcscript.funcs.misc
         public override void WriteLine(string text) => Console.WriteLine(text);
         public override void Clear() => Console.Clear();
     }
+
     public class LogFunction : IFsFunction
     {
-        
         public int MaxParsCount => 2;
 
         public CallType CallType => CallType.Infix;
@@ -49,8 +44,9 @@ namespace funcscript.funcs.misc
             if (pars.Count == 0)
                 throw new error.EvaluationTimeException($"{this.Symbol} function: {this.ParName(0)} expected");
 
-            var tag = pars.Count > 1 ? $"({pars.GetParameter(parent, 1).ToString()})" : "";
+            var tag = pars.Count > 1 ? $"({pars.GetParameter(parent, 1)?.ToString()})" : "";
             var output = pars.Count > 2 ? (pars.GetParameter(parent, 2) is bool ? (bool)pars.GetParameter(parent, 2) : false) : true;
+
             Fslogger.DefaultLogger.WriteLine($"FuncScript: Evaluating {tag}");
             try
             {
@@ -61,7 +57,9 @@ namespace funcscript.funcs.misc
                     Fslogger.DefaultLogger.WriteLine($"End Result {tag}");
                 }
                 else
+                {
                     Fslogger.DefaultLogger.WriteLine($"Done {tag}");
+                }
                 return res;
             }
             catch (Exception ex)
@@ -77,15 +75,16 @@ namespace funcscript.funcs.misc
                 throw;
             }
         }
+
         public string ParName(int index)
         {
-            switch(index)
+            return index switch
             {
-                case 0: return "expression";
-                case 1: return "tag";
-                case 2: return "output";
-                default:return null;
-            }
+                0 => "expression",
+                1 => "tag",
+                2 => "output",
+                _ => null
+            };
         }
     }
 }

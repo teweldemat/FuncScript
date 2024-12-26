@@ -1,5 +1,4 @@
 using funcscript.core;
-using System;
 using funcscript.model;
 
 namespace funcscript.funcs.logic
@@ -19,31 +18,21 @@ namespace funcscript.funcs.logic
             if (pars.Count != MaxParsCount)
                 throw new error.TypeMismatchError($"{Symbol} function expects exactly two parameters.");
 
-            var parBuilder = new CallRefBuilder(this, parent, pars);
-            var val = parBuilder.GetParameter(0);
-            if (val is ValueReferenceDelegate)
-                return parBuilder.CreateRef(); // Defer if the first parameter is a reference.
-
+            var val = pars.GetParameter(parent, 0);
             if (val == null)
                 return null;
-
-            var val2 = parBuilder.GetParameter(1);
-            if (val2 is ValueSinkDelegate)
-                return parBuilder.CreateRef();
-            return  val2; 
+            var val2 = pars.GetParameter(parent, 1);
+            return val2; 
         }
 
         public string ParName(int index)
         {
-            switch (index)
+            return index switch
             {
-                case 0:
-                    return "Value";
-                case 1:
-                    return "Null Replacement";
-                default:
-                    return "";
-            }
+                0 => "Value",
+                1 => "Null Replacement",
+                _ => ""
+            };
         }
     }
 }

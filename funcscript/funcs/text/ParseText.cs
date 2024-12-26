@@ -19,11 +19,8 @@ namespace funcscript.funcs.text
         {
             if (pars.Count == 0)
                 throw new error.TypeMismatchError($"{this.Symbol} requires at least one parameter");
-            
-            var parBuilder = new CallRefBuilder(this, parent, pars);
-            var par0 = parBuilder.GetParameter(0);
-            if (par0 is ValueReferenceDelegate)
-                return parBuilder.CreateRef();
+
+            var par0 = pars.GetParameter(parent, 0);
             
             if (par0 == null)
                 return null;
@@ -33,9 +30,7 @@ namespace funcscript.funcs.text
             string format = null;
             if (pars.Count > 1)
             {
-                par1 = parBuilder.GetParameter(1);
-                if (par1 is ValueReferenceDelegate)
-                    return parBuilder.CreateRef();
+                par1 = pars.GetParameter(parent, 1);
                 format = par1?.ToString();
             }
 
