@@ -1,10 +1,5 @@
-using System.Collections.Generic;
-using System.Text;
-using funcscript.block;
 using funcscript.funcs.math;
 using funcscript.funcs.logic;
-using funcscript.model;
-using funcscript.nodes;
 
 namespace funcscript.core
 {
@@ -108,5 +103,7 @@ namespace funcscript.core
             s_KeyWords.Add(KW_SWITCH);
             s_KeyWords.Add(KW_SWITCH);
         }
+
+        record ParseResult(ExpressionBlock Expresion, ParseNode Node, int NextIndex);
     }
 }

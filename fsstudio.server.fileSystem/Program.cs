@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using fsstudio.server.fileSystem.exec;
+using funcscript;
 
 
 namespace fsstudio.server.fileSystem;
@@ -8,6 +9,7 @@ internal class Program
 {
     private static void Main(string[] args)
     {
+        InitFuncScript();
         var options = new WebApplicationOptions
         {
             Args = args,
@@ -87,7 +89,12 @@ internal class Program
 
         app.Run();
     }
-    
+
+    private static void InitFuncScript()
+    {
+        DefaultFsDataProvider.LoadFromAssembly(typeof(funcscript.openai.ChatGptFunction).Assembly);
+    }
+
     public static String GetAbsolutePath(string rootPath, string relativePath)
     {
         if (relativePath.StartsWith("/"))

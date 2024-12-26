@@ -1,16 +1,15 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Grid, Typography, Tab, Tabs, Box, Toolbar, IconButton } from '@mui/material';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import SaveIcon from '@mui/icons-material/Save';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import axios from 'axios';
 
 import EvalNodeComponent, { ExpressionType } from './EvalNodeComponent';
-import { SERVER_URL, SERVER_WS_URL } from '../backend';
-import axios from 'axios';
 import TextLogger from './RemoteLogger';
-import { EditorView, useCodeMirror } from '@uiw/react-codemirror';
-import { javascript } from '@codemirror/lang-javascript';
 import ReactMarkdown from 'react-markdown';
+import { SERVER_URL, SERVER_WS_URL } from '../backend';
+import CodeEditor from '../code-editor/CodeEditor';
 
 interface ErrorItem {
   type: string;
@@ -22,22 +21,7 @@ interface ErrorData {
   errors: ErrorItem[];
 }
 
-const CodeEditor: React.FC<{ expression: string | null; setExpression: (exp: string) => void }> = ({
-  expression,
-  setExpression,
-}) => {
-  const editorRef = useRef<HTMLDivElement | null>(null);
-  useCodeMirror({
-    container: editorRef.current,
-    value: expression ?? '',
-    extensions: [javascript(),EditorView.lineWrapping],
-    onChange: (value) => {
-      setExpression(value);
-    },
-  });
 
-  return <div ref={editorRef} style={{ height: '100%', overflow: 'scroll', border: '1px solid #ccc' }} />;
-};
 
 const ExecutionView: React.FC<{
   sessionId: string;
@@ -47,31 +31,94 @@ const ExecutionView: React.FC<{
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
   const [expression, setExpression] = useState<string | null>(null);
   const [lastSavedExpression, setLastSavedExpression] = useState<string | null>(null);
+  const [saveStatus, setSaveStatus] = useState('All changes saved');
   const [resultText, setResultText] = useState('');
   const [tabIndex, setTabIndex] = useState(0);
-  const [saveStatus, setSaveStatus] = useState('All changes saved');
-  const [messages, setMessages] = useState<string[]>([]);
   const [ws, setWs] = useState<WebSocket | null>(null);
-  const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
+  const [messages, setMessages] = useState<string[]>([]);
   const [markdown, setMarkdown] = useState<string>('');
   const [copied, setCopied] = useState(false);
+  const [selectedExpressionType, setSelectedExpressionType] = useState<ExpressionType>(
+    ExpressionType.FuncScript
+  );
+
+  // For debounced auto-save
+  const saveTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const [savingInProgress, setSavingInProgress] = useState(false);
+  const [queuedExpression, setQueuedExpression] = useState<string | null>(null);
 
   useEffect(() => {
-    if (activeSessionId !== null) {
-      if (selectedNode !== null && expression !== lastSavedExpression) {
-        saveExpression(selectedNode!, expression, false);
-      }
-    }
     setSelectedNode(null);
     setExpression(null);
-    setActiveSessionId(sessionId);
-    setMessages([]);
+    setLastSavedExpression(null);
+    setSaveStatus('All changes saved');
     setResultText('');
+    setMessages([]);
+    setMarkdown('');
   }, [sessionId]);
+
+  // Watch expression changes to update save status
+  useEffect(() => {
+    if (expression === lastSavedExpression) {
+      setSaveStatus('All changes saved');
+    } else {
+      setSaveStatus('Unsaved changes');
+    }
+  }, [expression, lastSavedExpression]);
+
+  const executeExpression = useCallback(() => {
+    if (!selectedNode) return;
+    if (expression === lastSavedExpression) {
+      axios
+        .get(`${SERVER_URL}/api/sessions/${sessionId}/node/value`, {
+          params: { nodePath: selectedNode },
+        })
+        .then((response) => {
+          if (typeof response.data === 'string') {
+            setResultText(response.data);
+          } else {
+            setResultText(JSON.stringify(response.data, null, 2));
+          }
+          setTabIndex(1);
+        })
+        .catch((error) => {
+          console.error('Failed to evaluate expression:', error);
+          if (error.response && error.response.data) {
+            setResultText(formatErrorData(error.response.data as ErrorData));
+          } else {
+            setResultText('Failed to evaluate expression');
+          }
+          setTabIndex(1);
+        });
+    }
+  }, [expression, lastSavedExpression, selectedNode, sessionId]);
+
+  const saveExpression = useCallback(
+    async (nodePath: string, newExpression: string | null, thenEvaluate: boolean) => {
+      if (newExpression === null) return;
+      try {
+        setSavingInProgress(true);
+        await axios.post(`${SERVER_URL}/api/sessions/${sessionId}/node/expression/${nodePath}`, {
+          expression: newExpression,
+        });
+        setLastSavedExpression(newExpression);
+        setSaveStatus('All changes saved');
+        if (thenEvaluate) {
+          executeExpression();
+        }
+      } catch (error) {
+        console.error('Failed to save expression:', error);
+        setSaveStatus('Failed to save changes');
+      } finally {
+        setSavingInProgress(false);
+      }
+    },
+    [executeExpression, sessionId]
+  );
 
   const handleNodeSelect = (nodePath: string | null) => {
     if (selectedNode && expression !== lastSavedExpression) {
-      saveExpression(selectedNode!, expression, false);
+      saveExpression(selectedNode, expression, false);
     }
     if (nodePath == null) {
       setSelectedNode(null);
@@ -86,64 +133,24 @@ const ExecutionView: React.FC<{
         setSelectedNode(nodePath);
         setExpression(response.data.expression ?? '');
         setLastSavedExpression(response.data.expression);
+        setSelectedExpressionType(response.data.expressionType); // Capture the expression type
         setSaveStatus('All changes saved');
       })
       .catch((error) => console.error('Failed to fetch node:', error));
     onNodeSelect(nodePath);
   };
 
-  const saveExpression = (nodePath: string, newExpression: string | null, thenEvalute: boolean) => {
-    if (newExpression === null) return;
-    axios
-      .post(`${SERVER_URL}/api/sessions/${activeSessionId}/node/expression/${nodePath}`, {
-        expression: newExpression,
-      })
-      .then(() => {
-        setLastSavedExpression(newExpression);
-        setSaveStatus('All changes saved');
-        if (thenEvalute) executeExpression();
-      })
-      .catch((error) => {
-        console.error('Failed to save expression:', error);
-        setSaveStatus('Failed to save changes');
-      });
-  };
-
   function formatErrorData(errorData: ErrorData): string {
-    const errorsText = errorData.errors
+    return errorData.errors
       .map((error, index) => {
-        return `Error ${index + 1}:\nType: ${error.type}\nMessage: ${error.message}\nStackTrace: ${
-          error.stackTrace || 'N/A'
-        }`;
+        return `Error ${index + 1}:
+Type: ${error.type}
+Message: ${error.message}
+StackTrace: ${error.stackTrace || 'N/A'}
+`;
       })
-      .join('\n\n');
-    return errorsText;
+      .join('\n');
   }
-
-  const executeExpression = () => {
-    if (!selectedNode) return;
-    if (selectedNode && expression === lastSavedExpression) {
-      axios
-        .get(`${SERVER_URL}/api/sessions/${activeSessionId}/node/value`, { params: { nodePath: selectedNode } })
-        .then((response) => {
-          if (typeof response.data === 'string') {
-            setResultText(response.data);
-          } else {
-            setResultText(JSON.stringify(response.data));
-          }
-          setTabIndex(1);
-        })
-        .catch((error) => {
-          console.error('Failed to evaluate expression:', error);
-          if (error.response) {
-            setResultText(formatErrorData(error.response.data as ErrorData));
-          } else {
-            setResultText('Failed to evaluate expression');
-          }
-          setTabIndex(1);
-        });
-    }
-  };
 
   useEffect(() => {
     const websocket = new WebSocket(SERVER_WS_URL);
@@ -155,11 +162,13 @@ const ExecutionView: React.FC<{
           setMessages((prev) => [...prev, msg.data]);
           break;
         case 'clear':
-          setMessages((prev) => []);
+          setMessages([]);
           break;
         case 'markdown':
           setTabIndex(3);
           setMarkdown(msg.data);
+          break;
+        default:
           break;
       }
     };
@@ -170,18 +179,63 @@ const ExecutionView: React.FC<{
     };
   }, []);
 
+  const handleCopy = () => {
+    navigator.clipboard.writeText(resultText);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  // Debounced auto-save on expression changes
+  useEffect(() => {
+    if (!selectedNode || expression == null) return;
+
+    if (saveTimerRef.current) {
+      clearTimeout(saveTimerRef.current);
+    }
+
+    if (expression !== lastSavedExpression) {
+      setSaveStatus('Unsaved changes');
+      setQueuedExpression(expression);
+
+      saveTimerRef.current = setTimeout(() => {
+        const doSave = async () => {
+          if (savingInProgress) {
+            saveTimerRef.current = setTimeout(doSave, 200);
+            return;
+          }
+          if (queuedExpression !== null && queuedExpression !== lastSavedExpression) {
+            await saveExpression(selectedNode, queuedExpression, false);
+            setQueuedExpression(null);
+          }
+        };
+        doSave();
+      }, 1000);
+    }
+
+    return () => {
+      if (saveTimerRef.current) {
+        clearTimeout(saveTimerRef.current);
+      }
+    };
+  }, [
+    expression,
+    selectedNode,
+    lastSavedExpression,
+    queuedExpression,
+    savingInProgress,
+    saveExpression,
+  ]);
+
   const renderTabContent = () => {
     switch (tabIndex) {
       case 0:
         return (
           <CodeEditor
+            key={selectedNode || 'no-node'}
             expression={expression}
-            setExpression={(e) => {
-              setExpression(e);
-              setSaveStatus('Unsaved changes');
-            }}
-          />
-        );
+            setExpression={(value) => setExpression(value)}
+            expressionType={selectedExpressionType} // Pass the expression type here
+          />);
       case 1:
         return (
           <pre
@@ -200,17 +254,13 @@ const ExecutionView: React.FC<{
       case 2:
         return <TextLogger messages={messages} />;
       case 3:
-        return <ReactMarkdown children={markdown} />;
+        return <ReactMarkdown>{markdown}</ReactMarkdown>;
       default:
         return null;
     }
   };
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(resultText);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
+  const isSaveDisabled = expression === lastSavedExpression;
 
   return (
     <Grid container spacing={2} style={{ height: '100vh' }}>
@@ -222,11 +272,12 @@ const ExecutionView: React.FC<{
             </IconButton>
             <IconButton
               onClick={() =>
-                selectedNode &&
-                expression !== lastSavedExpression &&
-                saveExpression(selectedNode!, expression, false)
+                selectedNode && expression && !isSaveDisabled
+                  ? saveExpression(selectedNode, expression, false)
+                  : null
               }
               color="secondary"
+              disabled={isSaveDisabled}
             >
               <SaveIcon />
             </IconButton>
@@ -236,17 +287,25 @@ const ExecutionView: React.FC<{
           </Box>
           <Box sx={{ marginLeft: 'auto', textAlign: 'right' }}>
             <Typography variant="body2" color="textSecondary">
-              {selectedNode ? `${selectedNode} [${saveStatus}]` : `[${saveStatus}]`}
+              {selectedNode
+                ? `${selectedNode} [${saveStatus}]`
+                : `[${saveStatus}]`}
             </Typography>
           </Box>
         </Toolbar>
-        <Tabs value={tabIndex} onChange={(event, newValue) => setTabIndex(newValue)} aria-label="Data tabs">
+        <Tabs
+          value={tabIndex}
+          onChange={(event, newValue) => setTabIndex(newValue)}
+          aria-label="Data tabs"
+        >
           <Tab label="Script" />
           <Tab label="Result" />
           <Tab label="Log" />
           <Tab label="Document" />
         </Tabs>
-        <Box sx={{ flexGrow: 1, borderBottom: 1, borderColor: 'divider', overflow: 'auto' }}>
+        <Box
+          sx={{ flexGrow: 1, borderBottom: 1, borderColor: 'divider', overflow: 'auto' }}
+        >
           {renderTabContent()}
         </Box>
       </Grid>
@@ -261,7 +320,7 @@ const ExecutionView: React.FC<{
             }}
             sessionId={sessionId}
             onSelect={handleNodeSelect}
-            onModify={() => {}}
+            onModify={() => { }}
             selectedNode={selectedNode}
           />
         )}
