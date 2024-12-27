@@ -20,14 +20,6 @@ namespace funcscript.block
 
         public override object Evaluate()
         {
-            if (Value is ExpressionFunction exp)
-            {
-                lock (exp)
-                {
-                    exp.SetContext(Provider);
-                }
-            }
-
             return Value;
         }
         public override IList<ExpressionBlock> GetChilds()
@@ -41,6 +33,18 @@ namespace funcscript.block
             return Value.ToString();
         }
 
+        public override void SetContext(IFsDataProvider provider)
+        {
+            if (Value is ExpressionFunction exp)
+            {
+                exp.SetContext(provider);
+            }
+        }
+
+        public override ExpressionBlock CloneExpression()
+        {
+            return new LiteralBlock(this.Value);
+        }
     }
 
 }

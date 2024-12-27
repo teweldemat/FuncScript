@@ -53,9 +53,9 @@ namespace funcscript.core
             i = i2;
             listExpr = new ListExpression
             {
-                Provider=context,
                 ValueExpressions = listItems.ToArray()
             };
+            listExpr.SetContext(context);
             parseNode = new ParseNode(ParseNodeType.List, index, i - index, nodeListItems);
             return i;
         }

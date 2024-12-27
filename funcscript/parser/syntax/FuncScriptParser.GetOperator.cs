@@ -18,7 +18,7 @@ namespace funcscript.core
                 oper = func as IFsFunction;
                 if (oper != null && oper is ExpressionBlock expressionBlock)
                 {
-                    expressionBlock.Provider = parseContext;
+                    expressionBlock.SetContext(parseContext);
                 }
 
                 parseNode = new ParseNode(ParseNodeType.Operator, index, i - index);

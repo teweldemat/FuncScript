@@ -35,7 +35,8 @@ namespace funcscript.core
                 } while (true);
             }
 
-            listExpr = new ListExpression { Provider = context, ValueExpressions = listItems.ToArray() };
+            listExpr = new ListExpression { ValueExpressions = listItems.ToArray() };
+            listExpr.SetContext(context);
             parseNode = new ParseNode(ParseNodeType.List, index, i - index, nodeListItems);
             return i;
         }

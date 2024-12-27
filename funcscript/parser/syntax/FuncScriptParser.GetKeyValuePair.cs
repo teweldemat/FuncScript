@@ -10,19 +10,34 @@ namespace funcscript.core
             parseNode = null;
             keyValue = null;
             string name;
+            string nameLower;
             var i = GetSimpleString(context, exp, index, out name, out var nodeNeme, new List<SyntaxErrorData>());
             if (i == index)
             {
-                i = GetIdentifier(context,exp, index, out name, out var nameLower, out nodeNeme);
+                i = GetIdentifier(context,exp, index,false, out name, out nameLower, out _,out nodeNeme);
                 if (i == index)
                     return index;
             }
+            else
+                nameLower = name.ToLower();
+            
 
             i = SkipSpace(exp, i);
 
             var i2 = GetLiteralMatch(exp, i, ":");
             if (i2 == i)
-                return index;
+            {
+                keyValue = new KvcExpression.KeyValueExpression
+                {
+                    Key = name,
+                    KeyLower = nameLower,
+                    ValueExpression = new ReferenceBlock(name,nameLower,true)
+                    
+                };
+                nodeNeme.NodeType = ParseNodeType.Key;
+                parseNode = new ParseNode(ParseNodeType.KeyValuePair, index, i - index, new[] { nodeNeme });
+                return i;
+            }
 
             i = i2;
 

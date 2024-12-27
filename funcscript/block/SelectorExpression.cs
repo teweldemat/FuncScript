@@ -1,86 +1,43 @@
 ﻿using funcscript.core;
 using funcscript.model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace funcscript.block
 {
     internal class SelectorExpression: ExpressionBlock
     {
-        class SelectorProvider: IFsDataProvider
-        {
-            public IFsDataProvider Provider;
-            public SelectorExpression Parent;
-            public IFsDataProvider ParentProvider => Provider;
-
-            public object SourceVal
-            {
-                set
-                {
-                    _sourceVal = value as KeyValueCollection;
-                }
-            }
-            KeyValueCollection _sourceVal;
-            public object Get(string name)
-            {
-                if (_sourceVal != null)
-                {
-                    if (_sourceVal.IsDefined(name))
-                        return _sourceVal.Get(name);
-                }
-                return Provider.Get(name);
-            }
-            public bool IsDefined(string key)
-            {
-                if (_sourceVal != null)
-                {
-                    if (_sourceVal.IsDefined(key))
-                        return true;
-                }
-
-                return Provider.IsDefined(key);
-            }
-
-        }
+        
         public ExpressionBlock Source;
         public KvcExpression Selector;
         public override object Evaluate()
         {
             var sourceVal = Source.Evaluate();
-            if (sourceVal is FsList)
+            if (sourceVal is FsList lst)
             {
-                var lst = (FsList)sourceVal;
                 var ret = new object[lst.Length];
                 int i = 0;
                 
                 foreach (var l in lst)
                 {
-                    var sel=new SelectorProvider
+                    if (l is KeyValueCollection e)
                     {
-                        Parent = this,
-                        SourceVal = l
-                    };
-                    sel.Provider = sel;
-                    ret[i] = Selector.Evaluate();
+                        var clone = Selector.CloneExpression();
+                        clone.SetContext(e);
+                        ret[i] = clone.Evaluate();
+                    }
+                    else 
+                        ret[i] = null;
                     i++;
                 }
-
                 return new ArrayFsList(ret);
-
             }
-            else
+            
+            if (sourceVal is KeyValueCollection kvcSource)
             {
-                Selector.Provider = new SelectorProvider
-                {
-                    Parent = this,
-                    SourceVal = sourceVal
-                };
+                Selector.SetContext(kvcSource);
                 return Selector.Evaluate();
             }
+
+            return null;
         }
 
         public override IList<ExpressionBlock> GetChilds()
@@ -94,6 +51,19 @@ namespace funcscript.block
         public override string AsExpString()
         {
             return $"{Source.AsExpString()} {Selector.AsExpString()}";
+        }
+
+        public override void SetContext(IFsDataProvider provider)
+        {
+            
+        }
+        public override ExpressionBlock CloneExpression()
+        {
+            return new SelectorExpression
+            {
+                Source = this.Source.CloneExpression(),
+                Selector = this.Selector.CloneExpression() as KvcExpression,
+            };
         }
     }
 }

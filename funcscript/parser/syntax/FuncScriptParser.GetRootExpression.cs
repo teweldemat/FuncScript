@@ -9,11 +9,20 @@ namespace funcscript.core
             out ParseNode parseNode, List<SyntaxErrorData> serrors)
         {
             var thisErrors = new List<SyntaxErrorData>();
-            var i = GetKvcExpression(parseContext, true, exp, index, out var kvc, out parseNode, thisErrors);
+            var i =  GetExpression(parseContext, exp, index, out prog, out parseNode, serrors);
+            if (i > index)
+            {
+                prog.SetContext(parseContext);
+                serrors.AddRange(thisErrors);
+                return i;
+            }
+            return index;
+            /*var thisErrors = new List<SyntaxErrorData>();
+            var i = GetKvcExpression(parseContext, false, exp, index, out var kvc, out parseNode, thisErrors);
             if (i > index)
             {
                 prog = kvc;
-                prog.Provider = parseContext;
+                prog.SetContext(parseContext);
                 serrors.AddRange(thisErrors);
                 return i;
             }
@@ -22,11 +31,11 @@ namespace funcscript.core
             i = GetExpression(parseContext, exp, index, out prog, out parseNode, serrors);
             if (i > index)
             {
-                prog.Provider = parseContext;
+                prog.SetContext(parseContext);
                 serrors.AddRange(thisErrors);
                 return i;
             }
-            return index;
+            return index;*/
         }
     }
 }

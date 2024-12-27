@@ -6,6 +6,7 @@ namespace funcscript.block
     {
         string _name, _nameLower;
         private bool _fromParent;
+        private IFsDataProvider _context = null;
         public string Name
         {
             get
@@ -45,8 +46,8 @@ namespace funcscript.block
         public override object Evaluate()
         {
             if (_fromParent)
-                return Provider.ParentProvider?.Get(_nameLower);
-            return Provider.Get(_nameLower);
+                return _context.ParentContext?.Get(_nameLower);
+            return _context.Get(_nameLower);
         }
 
         public override IList<ExpressionBlock> GetChilds()
@@ -62,7 +63,19 @@ namespace funcscript.block
         {
             return Name;
         }
-
+        public override void SetContext(IFsDataProvider provider)
+        {
+            _context = provider;
+        }
+        public override ExpressionBlock CloneExpression()
+        {
+            return new ReferenceBlock(_name,_nameLower)
+            {
+                _fromParent = this._fromParent,
+                CodePos = this.CodePos,
+                CodeLength = this.CodeLength,
+            };
+        }
     }
 
 }

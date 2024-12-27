@@ -16,7 +16,7 @@ namespace funcscript
         {
             LoadFromAssembly(Assembly.GetExecutingAssembly()); //always load builtin functions. May be we don't need this
         }
-        public IFsDataProvider ParentProvider => null;
+        public IFsDataProvider ParentContext => null;
         public bool IsDefined(string key)
         {
             return s_funcByName.ContainsKey(key);
@@ -106,7 +106,7 @@ namespace funcscript
                 return null;
             return _parent.Get(name);
         }
-        public IFsDataProvider ParentProvider => _parent;
+        public IFsDataProvider ParentContext => _parent;
         public bool IsDefined(string key)
         {
             if (_kvc.IsDefined(key))

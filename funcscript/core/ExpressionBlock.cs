@@ -14,11 +14,10 @@ namespace funcscript.core
     {
         public int CodePos;
         public int CodeLength;
-
-        public IFsDataProvider Provider;
+        public abstract void SetContext(IFsDataProvider provider);
         public abstract object Evaluate();
         public abstract IList<ExpressionBlock> GetChilds();
-        public abstract String AsExpString();
-
+        public abstract string AsExpString();
+        public abstract ExpressionBlock CloneExpression();
     }
 }

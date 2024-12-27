@@ -41,7 +41,7 @@ namespace funcscript.model
             return _index.GetValueOrDefault(value);
         }
 
-        public IFsDataProvider ParentProvider => _parent;
+        public IFsDataProvider ParentContext => _parent;
 
         public bool IsDefined(string value)
         {

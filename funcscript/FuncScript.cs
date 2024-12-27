@@ -682,7 +682,6 @@ namespace funcscript
             {
                 var ret=exp.Evaluate();
                 return ret;
-                return ret;
             }
             catch (EvaluationException ex)
             {
@@ -695,5 +694,44 @@ namespace funcscript
             }
         }
 
+        public static bool ValueEqual(object val1, object val2)
+        {
+            var t1 = GetFsDataType(val1);
+            var t2 = GetFsDataType(val2);
+            if (t1 != t2)
+                return false;
+            if (val1 == null && val2 == null)
+                return true;
+            if (val1 == null ^ val2 == null)
+                return false;
+            
+            if (val1 is KeyValueCollection kv1 && val2 is KeyValueCollection kv2)
+            {
+                foreach (var k in kv1.GetAll())
+                {
+                    if (!kv2.IsDefined(k.Key.ToLowerInvariant()))
+                        return false;
+                    if (!ValueEqual(kv1.Get(k.Key), kv2.Get(k.Key)))
+                        return false;
+                }
+
+                return true;
+            }
+            if (val1 is FsList lst1 && val2 is FsList lst2)
+            {
+                if (lst1.Length != lst2.Length)
+                    return false;
+                var e1 = lst1.GetEnumerator();
+                var e2 = lst2.GetEnumerator();
+                while (e1.MoveNext())
+                {
+                    e2.MoveNext();
+                    if (!ValueEqual(e1.Current, e2.Current))
+                        return false;
+                }
+                return true;
+            }
+            return val1.Equals(val2);
+        }
     }
 }

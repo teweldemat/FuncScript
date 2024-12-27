@@ -75,7 +75,9 @@ namespace funcscript.core
                 {
                     if (sb.Length > 0)
                     {
-                        parts.Add(new LiteralBlock(sb.ToString()) { Provider = provider });
+                        var lb = new LiteralBlock(sb.ToString());
+                        lb.SetContext(provider);
+                        parts.Add(lb);
                         nodeParts.Add(new ParseNode(ParseNodeType.LiteralString, lastIndex, i - lastIndex));
                         sb = new StringBuilder();
                     }
@@ -115,7 +117,9 @@ namespace funcscript.core
             {
                 if (sb.Length > 0)
                 {
-                    parts.Add(new LiteralBlock(sb.ToString()) { Provider = provider });
+                    var lb = new LiteralBlock(sb.ToString());
+                    lb.SetContext(provider);
+                    parts.Add(lb);
                     nodeParts.Add(new ParseNode(ParseNodeType.LiteralString, lastIndex, i - lastIndex));
                     sb = new StringBuilder();
                 }
@@ -134,7 +138,8 @@ namespace funcscript.core
 
             if (parts.Count == 0)
             {
-                prog = new LiteralBlock("") { Provider = provider };
+                prog = new LiteralBlock("");
+                prog.SetContext(provider);
                 parseNode = new ParseNode(ParseNodeType.LiteralString, index, i - index);
             }
 
@@ -147,10 +152,10 @@ namespace funcscript.core
             {
                 prog = new FunctionCallExpression
                 {
-                    Provider = provider,
-                    Function = new LiteralBlock(provider.Get("+")) { Provider = provider },
+                    Function = new LiteralBlock(provider.Get("+")),
                     Parameters = parts.ToArray()
                 };
+                prog.SetContext(provider);
                 parseNode = new ParseNode(ParseNodeType.StringTemplate, index, i - index, nodeParts);
             }
 

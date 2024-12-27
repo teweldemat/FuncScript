@@ -29,7 +29,7 @@ namespace funcscript.core
 
             if (!nakedKvc)
             {
-                i = GetIdentifier(context, exp, index, out var iden, out var idenLower, out var nodeIden);
+                i = GetIdentifier(context, exp, index,false, out var iden, out var idenLower, out _, out var nodeIden);
 
                 if (i > index)
                 {
@@ -40,10 +40,10 @@ namespace funcscript.core
                         ValueExpression = new ReferenceBlock(iden, idenLower, false)
                         {
                             CodePos = index,
-                            CodeLength = i - index,
-                            Provider = context
+                            CodeLength = i - index
                         }
                     };
+                    item.ValueExpression.SetContext(context);
                     parseNode = nodeIden;
                     return i;
                 }
@@ -59,10 +59,10 @@ namespace funcscript.core
                         ValueExpression = new ReferenceBlock(iden, iden.ToLower(), false)
                         {
                             CodePos = index,
-                            CodeLength = i - index,
-                            Provider = context
+                            CodeLength = i - index
                         }
                     };
+                    item.ValueExpression.SetContext(context);
                     parseNode = nodeIden;
                     return i;
                 }

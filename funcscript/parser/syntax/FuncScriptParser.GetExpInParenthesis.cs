@@ -32,9 +32,8 @@ namespace funcscript.core
 
             i = i2;
             if (expression == null)
-                expression = new NullExpressionBlock { Provider = infixFuncProvider };
-            else
-                expression.Provider = infixFuncProvider;
+                expression = new NullExpressionBlock();
+            expression.SetContext(infixFuncProvider);
 
             parseNode = new ParseNode(ParseNodeType.ExpressionInBrace, index, i - index, new[] { nodeExpression });
             return i;

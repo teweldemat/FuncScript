@@ -18,7 +18,7 @@ namespace funcscript.core
             var parseNodes = new List<ParseNode>();
             //get first identifier
             i = SkipSpace(exp, i);
-            int i2 = GetIdentifier(parseContext, exp, i, out var iden, out var idenLower, out var nodeIden);
+            int i2 = GetIdentifier(parseContext, exp, i,false, out var iden, out var idenLower,out _, out var nodeIden);
             if (i2 > i)
             {
                 parseNodes.Add(nodeIden);
@@ -33,7 +33,7 @@ namespace funcscript.core
                         break;
                     i++;
                     i = SkipSpace(exp, i);
-                    i2 = GetIdentifier(parseContext, exp, i, out iden, out idenLower, out nodeIden);
+                    i2 = GetIdentifier(parseContext, exp, i, false,out iden, out idenLower, out _,out nodeIden);
                     if (i2 == i)
                         return index;
                     parseNodes.Add(nodeIden);

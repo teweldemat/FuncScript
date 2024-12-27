@@ -15,6 +15,16 @@ namespace funcscript.block
             public String Key;
             public String KeyLower;
             public ExpressionBlock ValueExpression;
+
+            public KeyValueExpression Clone()
+            {
+                return new KeyValueExpression
+                {
+                    Key=this.Key, 
+                    KeyLower =this.KeyLower, 
+                    ValueExpression = ValueExpression.CloneExpression()
+                };
+            }
         }
         public IList<KeyValueExpression> _keyValues;
         public ExpressionBlock singleReturn = null;
@@ -25,7 +35,7 @@ namespace funcscript.block
             
             this.singleReturn = retExpression;
             if (retExpression != null)
-                retExpression.Provider = this;
+                retExpression.SetContext(this);
             if (_keyValues == null)
                 index = null;
             else
@@ -33,7 +43,7 @@ namespace funcscript.block
                 index = new Dictionary<string, KeyValueExpression>();
                 foreach (var k in _keyValues)
                 {
-                    k.ValueExpression.Provider = this;
+                    k.ValueExpression.SetContext(this);
                     k.KeyLower = k.Key.ToLower();
                     if (this.index.ContainsKey(k.KeyLower))
                         return $"Key {k.KeyLower} is duplicated";
@@ -48,9 +58,14 @@ namespace funcscript.block
 
         public override object Evaluate()
         {
+            if (singleReturn!=null)
+                return singleReturn.Evaluate();
             return this;
         }
-
+        public override void SetContext(IFsDataProvider provider)
+        {
+            this._context = provider;
+        }
         public override IList<ExpressionBlock> GetChilds()
         {
             var ret = new List<ExpressionBlock>();
@@ -85,9 +100,13 @@ namespace funcscript.block
         {
             if (this.index.TryGetValue(name, out var e))
                 return e.ValueExpression.Evaluate();
+            if(ParentContext!=null)
+                return ParentContext.Get(name);
             return null;
         }
-        public IFsDataProvider ParentProvider => Provider;
+
+        private IFsDataProvider _context;
+        public IFsDataProvider ParentContext => _context;
         public bool IsDefined(string key)
         {
             return this.index.ContainsKey(key);
@@ -100,5 +119,12 @@ namespace funcscript.block
                 .ToList();
         }
 
+        public override ExpressionBlock CloneExpression()
+        {
+            var ret = new KvcExpression();
+            ret.SetKeyValues(this.KeyValues.Select(kv=>
+                kv.Clone()).ToArray(),this.singleReturn==null?null: this.singleReturn.CloneExpression());
+            return ret;
+        }
     }
 }

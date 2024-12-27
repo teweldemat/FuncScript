@@ -50,12 +50,12 @@ namespace funcscript.core
         //
         //     prog = new FunctionCallExpression
         //     {
-        //         Provider = parseContext,
         //         Function = new LiteralBlock(func),
         //         Parameters = new[] { operand },
         //         CodePos = index,
         //         CodeLength = i - index,
         //     };
+        //     prog.SetContext(parseContext);
         //     parseNode = new ParseNode(ParseNodeType.PrefixOperatorExpression, index, i - index);
         //     return i;
         // }
@@ -69,7 +69,7 @@ namespace funcscript.core
             
             if (prog != null)
             {
-                prog.Provider = parseContext;
+                prog.SetContext(parseContext);
             }
 
             return i;

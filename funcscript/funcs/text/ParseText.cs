@@ -69,7 +69,7 @@ namespace funcscript.funcs.text
             return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"The parsed function script should have no variables");
         }
 
-        public IFsDataProvider ParentProvider { get; }
+        public IFsDataProvider ParentContext { get; }
         public bool IsDefined(string key)
         {
             throw new NotImplementedException();

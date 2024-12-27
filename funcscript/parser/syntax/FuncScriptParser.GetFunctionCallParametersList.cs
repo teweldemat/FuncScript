@@ -70,12 +70,12 @@ namespace funcscript.core
 
             prog = new FunctionCallExpression
             {
-                Provider = context,
                 Function = func,
                 Parameters = pars.ToArray(),
                 CodePos = func.CodePos,
                 CodeLength = i - func.CodePos,
             };
+            prog.SetContext(context);
             parseNode = new ParseNode(ParseNodeType.FunctionParameterList, index, i - index, parseNodes);
             return i;
         }

@@ -4,13 +4,14 @@ using funcscript.core;
 
 namespace funcscript.model
 {
-    public interface KeyValueCollection:IFsDataProvider
+    public interface KeyValueCollection : IFsDataProvider
     {
         public object Get(string key);
-        public IFsDataProvider ParentProvider { get; }
+        public IFsDataProvider ParentContext { get; }
         public bool IsDefined(string key);
         public IList<KeyValuePair<string, object>> GetAll();
-        public static KeyValueCollection Merge(KeyValueCollection col1,KeyValueCollection col2)
+
+        public static KeyValueCollection Merge(KeyValueCollection col1, KeyValueCollection col2)
         {
             if (col1 == null && col2 == null)
                 return null;
@@ -23,19 +24,20 @@ namespace funcscript.model
                 dict[kv.Key] = kv.Value;
             foreach (var kv in col2.GetAll())
             {
-                if(dict.Contains(kv.Key))
+                if (dict.Contains(kv.Key))
                 {
                     var left = dict[kv.Key] as KeyValueCollection;
                     if (left != null && kv.Value is KeyValueCollection)
                     {
-                        dict[kv.Key] = KeyValueCollection.Merge(left,(KeyValueCollection)kv.Value);
+                        dict[kv.Key] = KeyValueCollection.Merge(left, (KeyValueCollection)kv.Value);
                     }
                     else
                         dict[kv.Key] = kv.Value;
                 }
                 else
-                    dict.Add(kv.Key,kv.Value);
+                    dict.Add(kv.Key, kv.Value);
             }
+
             var kvs = new KeyValuePair<string, object>[dict.Count];
             var en = (IDictionaryEnumerator)dict.GetEnumerator();
             int k = 0;
@@ -45,47 +47,13 @@ namespace funcscript.model
                 k++;
             }
 
-            if (col1.ParentProvider != col2.ParentProvider)
+            if (col1.ParentContext != col2.ParentContext)
                 throw new error.EvaluationTimeException(
                     "Key value collections from different contexts can't be merged");
-            return new SimpleKeyValueCollection(col1.ParentProvider,kvs);
+            return new SimpleKeyValueCollection(col1.ParentContext, kvs);
         }
+
         
-        /*
-         public override bool Equals(object otherkv)
-           {
-               var other = otherkv as KeyValueCollection;
-               if (other == null)
-                   return false;
-               foreach(var k in other.GetAll())
-               {
-                   if (!this.IsDefined(k.Key.ToLowerInvariant()))
-                       return false;
-                   var thisVal= this.Get(k.Key);
-                   var otherVal= other.Get(k.Key);
-                   if (thisVal == null && otherVal == null)
-                       return true;
-                   if (thisVal == null || otherVal == null)
-                       return false;
-                   if (!thisVal.Equals(otherVal))
-                       return false;
-               }
-               return true;
-           }
-           public override int GetHashCode()
-           {
-               int hash = 0;
-               foreach(var kv in this.GetAll())
-               {
-                   var thisHash = kv.Value == null ? kv.Key.GetHashCode() : HashCode.Combine(kv.Key.GetHashCode(), kv.Value.GetHashCode());
-                   if (hash == 0)
-                       hash = thisHash;
-                   else
-                       hash = HashCode.Combine(hash, thisHash);
-               }
-               return hash;
-           }
-         */
     }
 
     public static class KvcExtensions

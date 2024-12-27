@@ -7,10 +7,10 @@ namespace fsstudio.server.fileSystem.exec;
 public class ExecutionSession : IFsDataProvider
 {
     List<ExecutionNode> _nodes;
-    private IFsDataProvider _provider;
+    private IFsDataProvider _context;
     readonly string fileName;
     public Guid SessionId { get; private set; } = Guid.NewGuid();
-    public IFsDataProvider ParentProvider => _provider;
+    public IFsDataProvider ParentContext => _context;
 
    
 
@@ -29,7 +29,7 @@ public class ExecutionSession : IFsDataProvider
         _nodes =nodes.ToList() ;
         foreach(var n in _nodes)
             n.SetParent(this);
-        this._provider = new DefaultFsDataProvider();
+        this._context = new DefaultFsDataProvider();
     }
     public ExecutionSession(IEnumerable<ExecutionNode> nodes,RemoteLogger logger)
     {
@@ -205,7 +205,7 @@ public class ExecutionSession : IFsDataProvider
     {
         var n = _nodes.FirstOrDefault(c => c.NameLower == name);
         if (n == null)
-            return _provider.Get(name);
+            return _context.Get(name);
         return n.Evaluate(this);
     }
     public bool IsDefined(string name)
@@ -213,7 +213,7 @@ public class ExecutionSession : IFsDataProvider
         var n = _nodes.FirstOrDefault(c => c.NameLower == name);
         if (n != null)
             return true;
-        return _provider.IsDefined(name);
+        return _context.IsDefined(name);
     }
 
     

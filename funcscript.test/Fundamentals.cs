@@ -28,6 +28,22 @@ public class Fundamentals
     }
 
     [Test]
+    public void TestStringLiteral()
+    {
+        const string expStr = "'5'";
+        var p = new DefaultFsDataProvider();
+        var errors = new List<FuncScriptParser.SyntaxErrorData>();
+        var exp = FuncScriptParser.Parse(p, expStr, out var node, errors);
+        Assert.IsNotNull(exp);
+        Assert.That(errors, Is.Empty);
+        Assert.That(node.NodeType, Is.EqualTo(FuncScriptParser.ParseNodeType.LiteralString));
+        AssertLiteralBlock(exp, "5");
+
+        var res = exp.Evaluate();
+        Assert.That(res, Is.EqualTo("5"));
+    }
+
+    [Test]
     public void TestIntOp()
     {
         const string expStr = "5+3";
@@ -36,14 +52,14 @@ public class Fundamentals
         var exp = FuncScriptParser.Parse(p, expStr, out var node, errors);
         Assert.IsNotNull(exp);
         Assert.That(errors, Is.Empty);
-        
+
         Assert.That(node.NodeType, Is.EqualTo(FuncScriptParser.ParseNodeType.InfixExpression));
         AssertLiteralFunctionCallBlock<AddFunction>(
             exp,
             b => AssertLiteralBlock(b, 5),
             b => AssertLiteralBlock(b, 3)
         );
-        
+
         var res = exp.Evaluate();
         Assert.That(res, Is.EqualTo(8));
     }
@@ -55,14 +71,15 @@ public class Fundamentals
         var p = new DefaultFsDataProvider();
         var errors = new List<FuncScriptParser.SyntaxErrorData>();
         var exp = FuncScriptParser.Parse(p, expStr, out var node, errors);
-        
+
         Assert.IsNotNull(exp);
         Assert.That(errors, Is.Empty);
-        
+
         Assert.That(node.NodeType, Is.EqualTo(FuncScriptParser.ParseNodeType.KeyValueCollection));
         Assert.That(exp is KvcExpression);
         var block = (KvcExpression)exp;
         Assert.That(block.KeyValues.Count, Is.EqualTo(1));
+        Assert.IsNull(block.singleReturn);
         var kv = block.KeyValues.First();
         Assert.That(kv.Key, Is.EqualTo("x"));
         AssertLiteralBlock(kv.ValueExpression, 5);
@@ -78,16 +95,119 @@ public class Fundamentals
     }
 
     [Test]
+    public void TestKvReturn()
+    {
+        const string expStr = "{return 5}";
+        var p = new DefaultFsDataProvider();
+        var errors = new List<FuncScriptParser.SyntaxErrorData>();
+        var exp = FuncScriptParser.Parse(p, expStr, out var node, errors);
+
+        Assert.IsNotNull(exp);
+        Assert.That(errors, Is.Empty);
+
+        Assert.That(node.NodeType, Is.EqualTo(FuncScriptParser.ParseNodeType.KeyValueCollection));
+        Assert.That(exp is KvcExpression);
+        var block = (KvcExpression)exp;
+        Assert.That(block.KeyValues.Count, Is.EqualTo(0));
+        Assert.IsNotNull(block.singleReturn);
+        AssertLiteralBlock(block.singleReturn, 5);
+
+        var res = exp.Evaluate();
+        Assert.That(res, Is.EqualTo(5));
+    }
+
+    [Test]
+    public void TestKvReturnRef()
+    {
+        const string expStr = "{a:5;return a}";
+        var p = new DefaultFsDataProvider();
+        var errors = new List<FuncScriptParser.SyntaxErrorData>();
+        var exp = FuncScriptParser.Parse(p, expStr, out var node, errors);
+
+        Assert.IsNotNull(exp);
+        Assert.That(errors, Is.Empty);
+
+        Assert.That(node.NodeType, Is.EqualTo(FuncScriptParser.ParseNodeType.KeyValueCollection));
+        Assert.That(exp is KvcExpression);
+        var block = (KvcExpression)exp;
+        Assert.That(block.KeyValues.Count, Is.EqualTo(1));
+        Assert.IsNotNull(block.singleReturn);
+        AssertReferenceBlock(block.singleReturn, "a");
+
+        var res = exp.Evaluate();
+        Assert.That(res, Is.EqualTo(5));
+    }
+
+    [Test]
+    public void TestKvcIndex()
+    {
+        const string expStr = "{a:5,b:3}['a']";
+        var p = new DefaultFsDataProvider();
+        var errors = new List<FuncScriptParser.SyntaxErrorData>();
+        var exp = FuncScriptParser.Parse(p, expStr, out var node, errors);
+
+        Assert.IsNotNull(exp);
+        Assert.That(errors, Is.Empty);
+        Assert.That(exp is FunctionCallExpression);
+        var fblock = (FunctionCallExpression)exp;
+        Assert.That(fblock.Function is KeyValueCollection);
+        Assert.That(fblock.Parameters.Length,Is.EqualTo(1));
+        Assert.That(fblock.Parameters[0] is LiteralBlock);
+        
+        var res = exp.Evaluate();
+        Assert.That(res, Is.EqualTo(5));
+    }
+    [Test]
+    public void TestKvcSelector()
+    {
+        const string expStr = "{a:5,b:3}{a}";
+        var p = new DefaultFsDataProvider();
+        var errors = new List<FuncScriptParser.SyntaxErrorData>();
+        var exp = FuncScriptParser.Parse(p, expStr, out var node, errors);
+
+        Assert.IsNotNull(exp);
+        Assert.That(errors, Is.Empty);
+
+
+        var res = exp.Evaluate();
+        Assert.That(res is KeyValueCollection);
+        var kvc = ((KvcExpression)res).GetAll();
+        Assert.That(kvc.Count, Is.EqualTo(1));
+        Assert.That(kvc[0].Key, Is.EqualTo("a"));
+        Assert.That(kvc[0].Value, Is.EqualTo(5));
+    }
+
+    [Test]
+    public void TestKvcSelectorWithTransformName()
+    {
+        const string expStr = "{a:5,b:3}{c:^a}";
+        var p = new DefaultFsDataProvider();
+        var errors = new List<FuncScriptParser.SyntaxErrorData>();
+        var exp = FuncScriptParser.Parse(p, expStr, out var node, errors);
+
+        Assert.IsNotNull(exp);
+        Assert.That(errors, Is.Empty, errors.FirstOrDefault()?.Message);
+
+
+        var res = exp.Evaluate();
+        Assert.That(res is KeyValueCollection);
+        var kvc = ((KvcExpression)res).GetAll();
+        Assert.That(kvc.Count, Is.EqualTo(1));
+        Assert.That(kvc[0].Key, Is.EqualTo("c"));
+        Assert.That(kvc[0].Value, Is.EqualTo(5));
+    }
+
+    [Test]
     public void TestList()
     {
         const string expStr = "[5]";
         var p = new DefaultFsDataProvider();
         var errors = new List<FuncScriptParser.SyntaxErrorData>();
         var exp = FuncScriptParser.Parse(p, expStr, out var node, errors);
-        
+
         Assert.IsNotNull(exp);
         Assert.That(errors, Is.Empty);
-        
+
         Assert.That(node.NodeType, Is.EqualTo(FuncScriptParser.ParseNodeType.List));
         Assert.That(exp is ListExpression);
         var listBlock = (ListExpression)exp;
@@ -101,7 +221,7 @@ public class Fundamentals
         var item = resList.First();
         Assert.That(item, Is.EqualTo(5));
     }
-    
+
     [Test]
     public void TestKvRef()
     {
@@ -138,7 +258,27 @@ public class Fundamentals
         Assert.That(kvResult.Get("y"), Is.EqualTo(7));
     }
 
-    void AssertLiteralBlock(ExpressionBlock block, object expectedValueOrType)
+    [Test]
+    public void TestLambda()
+    {
+        const string expStr = "{x:(a)=>a+3,y:x(4)}";
+        var p = new DefaultFsDataProvider();
+        var errors = new List<FuncScriptParser.SyntaxErrorData>();
+        var exp = FuncScriptParser.Parse(p, expStr, out var node, errors);
+
+        Assert.IsNotNull(exp);
+        Assert.That(errors, Is.Empty);
+
+        
+
+        var result = exp.Evaluate();
+        Assert.That(result is KeyValueCollection);
+        var kvResult = (KeyValueCollection)result;
+        Assert.That(kvResult.Get("y"), Is.EqualTo(7));
+    }
+
+
+void AssertLiteralBlock(ExpressionBlock block, object expectedValueOrType)
     {
         Assert.That(block is LiteralBlock);
         var literal = (LiteralBlock)block;
@@ -172,5 +312,6 @@ public class Fundamentals
             a(f.Parameters[i]);
         }
     }
+    
 
 }

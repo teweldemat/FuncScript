@@ -16,6 +16,19 @@ namespace funcscript.block
         {
             return "null";
         }
+        public override void SetContext(IFsDataProvider provider)
+        {
+            
+        }
+
+        public override ExpressionBlock CloneExpression()
+        {
+            return new NullExpressionBlock()
+            {
+                CodePos = this.CodePos,
+                CodeLength = this.CodeLength
+            };
+        }
     }
 
 }

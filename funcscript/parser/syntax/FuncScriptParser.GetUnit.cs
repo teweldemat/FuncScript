@@ -19,7 +19,7 @@ namespace funcscript.core
             {
                 parseNode = nodeUnit;
                 prog = template;
-                prog.Provider = provider;
+                prog.SetContext(provider);
                 prog.CodePos = index;
                 prog.CodeLength = i - index;
                 return i;
@@ -30,7 +30,8 @@ namespace funcscript.core
             if (i > index)
             {
                 parseNode = nodeUnit;
-                prog = new LiteralBlock(str) { Provider = provider };
+                prog = new LiteralBlock(str);
+                prog.SetContext(provider);
                 prog.CodePos = index;
                 prog.CodeLength = i - index;
                 return i;
@@ -41,7 +42,8 @@ namespace funcscript.core
             if (i > index)
             {
                 parseNode = nodeUnit;
-                prog = new LiteralBlock(numberVal) { Provider = provider };
+                prog = new LiteralBlock(numberVal);
+                prog.SetContext(provider);
                 prog.CodePos = index;
                 prog.CodeLength = i - index;
                 return i;
@@ -53,7 +55,7 @@ namespace funcscript.core
             {
                 parseNode = nodeUnit;
                 prog = lst;
-                prog.Provider = provider;
+                prog.SetContext(provider);
                 prog.CodePos = index;
                 prog.CodeLength = i - index;
                 return i;
@@ -65,7 +67,7 @@ namespace funcscript.core
             {
                 parseNode = nodeUnit;
                 prog = json;
-                prog.Provider = provider;
+                prog.SetContext(provider);
                 prog.CodePos = index;
                 prog.CodeLength = i - index;
                 return i;
@@ -76,7 +78,7 @@ namespace funcscript.core
             {
                 parseNode = caseNode;
                 prog = caseExp;
-                prog.Provider = provider;
+                prog.SetContext(provider);
                 prog.CodePos = index;
                 prog.CodeLength = i - index;
                 return i;
@@ -87,7 +89,7 @@ namespace funcscript.core
             {
                 parseNode = switchNode;
                 prog = switchExp;
-                prog.Provider = provider;
+                prog.SetContext(provider);
                 prog.CodePos = index;
                 prog.CodeLength = i - index;
                 return i;
@@ -98,7 +100,8 @@ namespace funcscript.core
             if (i > index)
             {
                 parseNode = nodeUnit;
-                prog = new LiteralBlock(ef) { Provider = provider };
+                prog = new LiteralBlock(ef);
+                prog.SetContext(provider);
                 prog.CodePos = index;
                 prog.CodeLength = i - index;
                 return i;
@@ -109,18 +112,20 @@ namespace funcscript.core
             if (i > index)
             {
                 parseNode = nodeUnit;
-                prog = new LiteralBlock(kw) { Provider = provider };
+                prog = new LiteralBlock(kw);
+                prog.SetContext(provider);
                 prog.CodePos = index;
                 prog.CodeLength = i - index;
                 return i;
             }
 
             //get identifier
-            i = GetIdentifier(provider, exp, index, out var ident, out var identLower, out nodeUnit);
+            i = GetIdentifier(provider, exp, index,true, out var ident, out var identLower,out var parentRef, out nodeUnit);
             if (i > index)
             {
                 parseNode = nodeUnit;
-                prog = new ReferenceBlock(ident) { Provider = provider };
+                prog = new ReferenceBlock(ident,identLower,parentRef);
+                prog.SetContext(provider);
                 prog.CodePos = index;
                 prog.CodeLength = i - index;
                 return i;
@@ -130,7 +135,7 @@ namespace funcscript.core
             if (i > index)
             {
                 parseNode = nodeUnit;
-                prog.Provider = provider;
+                prog.SetContext(provider);
                 prog.CodePos = index;
                 prog.CodeLength = i - index;
                 return i;

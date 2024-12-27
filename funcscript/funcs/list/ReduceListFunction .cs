@@ -6,7 +6,6 @@ namespace funcscript.funcs.list
 {
     public class ReduceListFunction : IFsFunction
     {
-        private const int MaxParameters = 3;
 
         public CallType CallType => CallType.Dual;
 
@@ -14,9 +13,9 @@ namespace funcscript.funcs.list
 
         public object EvaluateList(FsList pars)
         {
-            if (pars.Length != MaxParameters)
+            if (pars.Length < 2)
                 return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH,
-                    $"{this.Symbol}: expected {MaxParameters} got {pars.Length}");
+                    $"{this.Symbol}: expected at least 2 got {pars.Length}");
 
             var par0 = pars[0];
             if (par0 is null) return null;

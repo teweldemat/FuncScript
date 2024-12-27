@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Linq.Expressions;
 using System.Runtime.InteropServices;
 using funcscript.core;
 using funcscript.error;
@@ -12,14 +13,15 @@ namespace funcscript.block
         public ExpressionBlock Function;
         public ExpressionBlock[] Parameters;
 
-        
+
         class FuncParameterList : FsList
         {
             public FunctionCallExpression parent;
 
 
-            public object this[int index] =>index<0||index>=parent.Parameters.Length?null: 
-                parent.Parameters[index].Evaluate();
+            public object this[int index] => index < 0 || index >= parent.Parameters.Length
+                ? null
+                : parent.Parameters[index].Evaluate();
 
             public int Length => parent.Parameters.Length;
 
@@ -41,21 +43,35 @@ namespace funcscript.block
 
         public int Count => Parameters.Length;
 
-        
+
+        private IFsDataProvider _context = null;
+
+        public override void SetContext(IFsDataProvider provider)
+        {
+            _context = provider;
+            this.Function.SetContext(provider);
+            foreach (var p in Parameters)
+                p.SetContext(provider);
+        }
+
+
         public override object Evaluate()
         {
             var func = Function.Evaluate();
-            var paramList=new FuncParameterList
+            var paramList = new FuncParameterList
             {
                 parent = this
             };
-            if (func is IFsFunction)
+            if (func is IFsFunction fn)
             {
-                string fn = null;
                 try
                 {
-                    var ret = ((IFsFunction)func).EvaluateList(paramList);
-                    return ret;
+                    if (func is ExpressionFunction expfn)
+                    {
+                        return expfn.EvaluateWithContext(_context, paramList);
+                    }
+
+                    return fn.EvaluateList(paramList);
                 }
                 catch (error.EvaluationException)
                 {
@@ -89,23 +105,22 @@ namespace funcscript.block
             {
                 var index = paramList[0];
 
-                object ret;
                 if (index is string key)
                 {
                     var kvc = collection;
                     var value = kvc.Get(key.ToLower());
                     return value;
                 }
-                else
-                    ret = null;
 
-                return ret;
+                return null;
             }
+
             throw new EvaluationException(this.CodePos, this.CodeLength,
-                new TypeMismatchError($"Function part didn't evaluate to a function or a list. {FuncScript.GetFsDataType(func)}"));
+                new TypeMismatchError(
+                    $"Function part didn't evaluate to a function or a list. {FuncScript.GetFsDataType(func)}"));
         }
 
-        
+
 
         public override IList<ExpressionBlock> GetChilds()
         {
@@ -114,29 +129,21 @@ namespace funcscript.block
             ret.AddRange(this.Parameters);
             return ret;
         }
+
         public override string ToString()
         {
             return "function";
         }
+
         public override string AsExpString()
         {
             string infix = null;
-            if (this.Function is ReferenceBlock)
+            var f = this.Function.Evaluate() as IFsFunction;
+            if (f != null && f.CallType == CallType.Prefix)
             {
-                var f = Provider.Get(((ExpressionBlock)this.Function).ToString().ToLower()) as IFsFunction;
-                if (f != null && f.CallType == CallType.Infix)
-                {
-                    infix = f.Symbol;
-                }
+                infix = f.Symbol;
             }
-            else if (this.Function is LiteralBlock)
-            {
-                var f = ((LiteralBlock)this.Function).Value as IFsFunction;
-                if (f != null && f.CallType == CallType.Infix)
-                {
-                    infix = f.Symbol;
-                }
-            }
+
             var sb = new StringBuilder();
             if (infix == null)
             {
@@ -151,6 +158,7 @@ namespace funcscript.block
                         sb.Append(this.Parameters[i].AsExpString());
                     }
                 }
+
                 sb.Append(")");
             }
             else
@@ -165,8 +173,20 @@ namespace funcscript.block
                     }
                 }
             }
+
             return sb.ToString();
         }
 
+        public override ExpressionBlock CloneExpression()
+        {
+            return new FunctionCallExpression
+            {
+                Function = this.Function.CloneExpression(),
+                Parameters = this.Parameters.Select(p => p.CloneExpression()).ToArray()
+
+            };
+        }
+
+        
     }
 }

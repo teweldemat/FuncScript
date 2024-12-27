@@ -3,7 +3,7 @@
     public interface IFsDataProvider        
     {
         object Get(String name);
-        public IFsDataProvider ParentProvider { get; }
+        public IFsDataProvider ParentContext { get; }
         bool IsDefined(string key);
     }
 }

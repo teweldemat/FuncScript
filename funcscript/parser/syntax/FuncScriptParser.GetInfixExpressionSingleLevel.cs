@@ -85,12 +85,11 @@ namespace funcscript.core
 
                         prog = new ListExpression
                         {
-                            Provider = parseContext,
                             ValueExpressions = operands.ToArray(),
                             CodePos = prog.CodePos,
                             CodeLength = operands[^1].CodePos + operands[^1].CodeLength - prog.CodeLength
                         };
-
+                        prog.SetContext(parseContext);
                         parseNode = new ParseNode(ParseNodeType.InfixExpression, parseNode!.Pos,
                             operandNodes[^1].Pos + operandNodes[^1].Length - parseNode.Length);
                     }
@@ -98,12 +97,12 @@ namespace funcscript.core
                     {
                         prog = new FunctionCallExpression
                         {
-                            Provider = parseContext,
                             Function = new LiteralBlock(func),
                             Parameters = operands.ToArray(),
                             CodePos = prog.CodePos,
                             CodeLength = operands[^1].CodePos + operands[^1].CodeLength - prog.CodeLength
                         };
+                        prog.SetContext(parseContext);
                         parseNode = new ParseNode(ParseNodeType.InfixExpression, parseNode!.Pos,
                             operandNodes[^1].Pos + operandNodes[^1].Length - parseNode.Length);
                     }

@@ -45,12 +45,12 @@ namespace funcscript.core
                     i = i2;
                     theUnit = new SelectorExpression
                     {
-                        Provider = parseContext,
                         Source = theUnit,
                         Selector = kvc,
                         CodePos = i,
                         CodeLength = i2 - i
                     };
+                    theUnit.SetContext(parseContext);
                     parseNode = new ParseNode(ParseNodeType.Selection, index, i - index, new[] { parseNode, nodeKvc });
                     continue;
                 }

@@ -15,8 +15,7 @@ namespace funcscript.block
        
         public override object Evaluate( )
         {
-            var lst = ValueExpressions.Select(x => x.Evaluate()).ToArray();
-            return new ArrayFsList(lst);
+            return this;
         }
         public override IList<ExpressionBlock> GetChilds()
         {
@@ -25,7 +24,10 @@ namespace funcscript.block
             return ret;
         }
 
-        public object this[int index] =>index<0 || index>=this.ValueExpressions.Length?null:this.ValueExpressions[index].Evaluate();
+        public object this[int index] 
+            =>index<0 || index>=this.ValueExpressions.Length?
+                null
+                :this.ValueExpressions[index].Evaluate();
 
         public int Length => this.ValueExpressions.Length;
         public IEnumerator<object> GetEnumerator()
@@ -36,7 +38,13 @@ namespace funcscript.block
             }
         }
 
-        
+        public override void SetContext(IFsDataProvider provider)
+        {
+            foreach (var val in this.ValueExpressions)
+            {
+                val.SetContext(provider);
+            }
+        }
 
         public override string ToString()
         {
@@ -61,5 +69,15 @@ namespace funcscript.block
             sb.Append("]");
             return sb.ToString();
         }
+        public override ExpressionBlock CloneExpression()
+        {
+            var ret = new ListExpression
+            {
+                ValueExpressions = this.ValueExpressions.Select(l => l.CloneExpression()).ToArray()
+            };
+            
+            return ret;
+        }
+
     }
 }

@@ -25,7 +25,7 @@ namespace funcscript.core
             childNodes.Add(firstPramNode);
             i = SkipSpace(exp, i);
 
-            var i2 = GetIdentifier(parseContext, exp, i, out var iden, out var idenLower, out var idenNode);
+            var i2 = GetIdentifier(parseContext, exp, i,false, out var iden, out var idenLower, out _,out var idenNode);
             if (i2 == i)
             {
                 return i;
@@ -83,10 +83,10 @@ namespace funcscript.core
 
             prog = new FunctionCallExpression
             {
-                Provider = parseContext,
                 Function = new LiteralBlock(func),
                 Parameters = allOperands.ToArray()
             };
+            prog.SetContext(parseContext);
             parseNode = new ParseNode(ParseNodeType.GeneralInfixExpression, childNodes[0].Pos,
                 childNodes[^1].Pos + childNodes[^1].Length + childNodes[0].Pos);
 

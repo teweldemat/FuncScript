@@ -63,12 +63,12 @@ namespace funcscript.core
 
             prog = new FunctionCallExpression
             {
-                Provider = context,
                 Function = new LiteralBlock(context.Get(KW_SWITCH)),
                 CodePos = index,
                 CodeLength = i - index,
                 Parameters = pars.ToArray(),
             };
+            prog.SetContext(context);
             parseNode = new ParseNode(ParseNodeType.Case, index, index - i);
             parseNode.Childs = childNodes;
             return i;

@@ -5,23 +5,26 @@ namespace funcscript.core
 {
     public class ExpressionFunction : IFsFunction
     {
+        
         private class ParameterDataProvider : IFsDataProvider
         {
             public FsList pars;
-            public IFsDataProvider parentSymbolProvider;
+            public IFsDataProvider EvaluationContext;
             public ExpressionFunction expressionFunction;
-            public IFsDataProvider ParentProvider => parentSymbolProvider;
+            public IFsDataProvider ParentContext => EvaluationContext;
             public bool IsDefined(string key)
             {
                 return expressionFunction.ParamterNameIndex.ContainsKey(key)
-                       || parentSymbolProvider.IsDefined(key);
+                       || EvaluationContext.IsDefined(key);
             }
 
             public object Get(string name)
             {
                 if (expressionFunction.ParamterNameIndex.TryGetValue(name, out var index))
                     return pars[index];
-                return parentSymbolProvider.Get(name);
+                if (expressionFunction._context!=null & expressionFunction._context.IsDefined(name))
+                    return expressionFunction._context.Get(name);
+                return EvaluationContext.Get(name);
             }
         }
 
@@ -55,22 +58,28 @@ namespace funcscript.core
         {
             if (_context == null)
                 throw new error.EvaluationTimeException("Context not set to expression function");
-            List<Action> connectionActions=new List<Action>();
-            Expression.Provider = new ParameterDataProvider
+            var clone = this.Expression.CloneExpression();
+            clone.SetContext( new ParameterDataProvider
             {
                 expressionFunction = this,
-                parentSymbolProvider = _context,
+                EvaluationContext = _context,
                 pars = pars
-            };
-            var ret= Expression.Evaluate();
-            foreach (var con in connectionActions)
-            {
-                con.Invoke();
-            }
-
+            });
+            var ret= clone.Evaluate();
             return ret;
         }
-
+        public object EvaluateWithContext(IFsDataProvider context, FsList pars)
+        {
+            var clone = this.Expression.CloneExpression();
+            clone.SetContext( new ParameterDataProvider
+            {
+                expressionFunction = this,
+                EvaluationContext = context,
+                pars = pars
+            });
+            var ret= clone.Evaluate();
+            return ret;
+        }
         
 
         public string ParName(int index)
@@ -97,6 +106,4 @@ namespace funcscript.core
             return sb.ToString();
         }
     }
-
-    
 }

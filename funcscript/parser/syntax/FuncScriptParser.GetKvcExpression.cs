@@ -71,10 +71,8 @@ namespace funcscript.core
                     return index;
             }
 
-            kvcExpr = new KvcExpression
-            {
-                Provider = context
-            };
+            kvcExpr = new KvcExpression();
+            kvcExpr.SetContext(context);
             var error = kvcExpr.SetKeyValues(kvs.ToArray(), retExp);
             if (error != null)
             {

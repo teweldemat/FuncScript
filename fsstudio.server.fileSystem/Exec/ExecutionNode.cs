@@ -31,7 +31,7 @@ public class ExecutionNode : KeyValueCollection
     private string _nameLower;
     private string _name;
     private IFsDataProvider _prentNode = null;
-    public IFsDataProvider ParentProvider => _prentNode;
+    public IFsDataProvider ParentContext => _prentNode;
     public object Get(string name)
     {
         var ch = Children.FirstOrDefault(c => c._nameLower.Equals(name));

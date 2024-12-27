@@ -24,7 +24,7 @@ namespace funcscript.core
                 return index;
             i = i2;
             i = SkipSpace(exp, i);
-            i2 = GetIdentifier(context, exp, i, out var member, out var memberLower, out parseNode);
+            i2 = GetIdentifier(context, exp, i,false, out var member, out var memberLower,out _,  out parseNode);
             if (i2 == i)
             {
                 serrors.Add(new SyntaxErrorData(i, 0, "member identifier expected"));
@@ -34,12 +34,12 @@ namespace funcscript.core
             i = i2;
             prog = new FunctionCallExpression
             {
-                Provider=context,
                 Function = new LiteralBlock(context.Get(oper)),
                 Parameters = new ExpressionBlock[] { source, new LiteralBlock(member) },
                 CodePos = source.CodePos,
                 CodeLength = i - source.CodePos
             };
+            prog.SetContext(context);
             return i;
         }
     }
