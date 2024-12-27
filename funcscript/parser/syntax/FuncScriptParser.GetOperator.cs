@@ -6,7 +6,7 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetOperator(KeyValueCollection parseContext, string[] candidates, string exp, int index,
+        static int GetOperator(KeyValueCollection provider, string[] candidates, string exp, int index,
             out string matechedOp, out IFsFunction oper,
             out ParseNode parseNode)
         {
@@ -15,11 +15,11 @@ namespace funcscript.core
                 var i = GetLiteralMatch(exp, index, op);
                 if (i <= index) continue;
 
-                var func = parseContext.Get(op);
+                var func = provider.Get(op);
                 oper = func as IFsFunction;
                 if (oper != null && oper is ExpressionBlock expressionBlock)
                 {
-                    expressionBlock.SetContext(parseContext);
+                    expressionBlock.SetContext(provider);
                 }
 
                 parseNode = new ParseNode(ParseNodeType.Operator, index, i - index);

@@ -6,15 +6,15 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetRootExpression(KeyValueCollection parseContext, string exp, int index, out ExpressionBlock prog,
-            out ParseNode parseNode, List<SyntaxErrorData> serrors)
+        static int GetRootExpression(KeyValueCollection provider, string exp, int index, out ExpressionBlock prog,
+            out ParseNode parseNode, List<SyntaxErrorData> syntaxErrors)
         {
             var thisErrors = new List<SyntaxErrorData>();
-            var i =  GetExpression(parseContext, exp, index, out prog, out parseNode, serrors);
+            var i =  GetExpression(provider, exp, index, out prog, out parseNode, syntaxErrors);
             if (i > index)
             {
-                prog.SetContext(parseContext);
-                serrors.AddRange(thisErrors);
+                prog.SetContext(provider);
+                syntaxErrors.AddRange(thisErrors);
                 return i;
             }
             return index;

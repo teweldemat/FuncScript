@@ -4,9 +4,9 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetKvcExpression(KeyValueCollection context, bool nakdeMode, String exp, int index,
+        static int GetKvcExpression(KeyValueCollection provider, bool nakdeMode, String exp, int index,
             out KvcExpression kvcExpr,
-            out ParseNode parseNode, List<SyntaxErrorData> serrors)
+            out ParseNode parseNode, List<SyntaxErrorData> syntaxErrors)
         {
             parseNode = null;
             kvcExpr = null;
@@ -33,14 +33,14 @@ namespace funcscript.core
                     i = SkipSpace(exp, i2);
                 }
 
-                i2 = GetKvcItem(context, nakdeMode, exp, i, out var otherItem, out var nodeOtherItem);
+                i2 = GetKvcItem(provider, nakdeMode, exp, i, out var otherItem, out var nodeOtherItem);
                 if (i2 == i)
                     break;
                 if (otherItem.Key == null)
                 {
                     if (retExp != null)
                     {
-                        serrors.Add(new SyntaxErrorData(nodeOtherItem.Pos, nodeItems.Count,
+                        syntaxErrors.Add(new SyntaxErrorData(nodeOtherItem.Pos, nodeItems.Count,
                             "Duplicate return statement"));
                         return index;
                     }
@@ -59,7 +59,7 @@ namespace funcscript.core
                 i2 = GetLiteralMatch(exp, i, "}");
                 if (i2 == i)
                 {
-                    serrors.Add(new SyntaxErrorData(i, 0, "'}' expected"));
+                    syntaxErrors.Add(new SyntaxErrorData(i, 0, "'}' expected"));
                     return index;
                 }
 
@@ -73,11 +73,11 @@ namespace funcscript.core
             }
 
             kvcExpr = new KvcExpression();
-            kvcExpr.SetContext(context);
+            kvcExpr.SetContext(provider);
             var error = kvcExpr.SetKeyValues(kvs.ToArray(), retExp);
             if (error != null)
             {
-                serrors.Add(new SyntaxErrorData(index, i - index, error));
+                syntaxErrors.Add(new SyntaxErrorData(index, i - index, error));
                 return index;
             }
 

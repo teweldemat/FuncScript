@@ -4,24 +4,23 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetKeyValuePair(KeyValueCollection context, string exp, int index,
-            out KvcExpression.KeyValueExpression keyValue, out ParseNode parseNode, List<SyntaxErrorData> serrors)
+        static int GetKeyValuePair(KeyValueCollection provider, string exp, int index,
+            out KvcExpression.KeyValueExpression keyValue, out ParseNode parseNode, List<SyntaxErrorData> syntaxErrors)
         {
             parseNode = null;
             keyValue = null;
             string name;
             string nameLower;
-            var i = GetSimpleString(context, exp, index, out name, out var nodeNeme, new List<SyntaxErrorData>());
+            var i = GetSimpleString(provider, exp, index, out name, out var nodeNeme, new List<SyntaxErrorData>());
             if (i == index)
             {
-                i = GetIdentifier(context,exp, index,false, out name, out nameLower, out _,out nodeNeme);
+                i = GetIdentifier(provider, exp, index, false, out name, out nameLower, out _, out nodeNeme);
                 if (i == index)
                     return index;
             }
             else
                 nameLower = name.ToLower();
             
-
             i = SkipSpace(exp, i);
 
             var i2 = GetLiteralMatch(exp, i, ":");
@@ -31,7 +30,7 @@ namespace funcscript.core
                 {
                     Key = name,
                     KeyLower = nameLower,
-                    ValueExpression = new ReferenceBlock(name,nameLower,true)
+                    ValueExpression = new ReferenceBlock(name, nameLower, true)
                     
                 };
                 nodeNeme.NodeType = ParseNodeType.Key;
@@ -42,10 +41,10 @@ namespace funcscript.core
             i = i2;
 
             i = SkipSpace(exp, i);
-            i2 = GetExpression(context, exp, i, out var expBlock, out var nodeExpBlock, serrors);
+            i2 = GetExpression(provider, exp, i, out var expBlock, out var nodeExpBlock, syntaxErrors);
             if (i2 == i)
             {
-                serrors.Add(new SyntaxErrorData(i, 0, "value expression expected"));
+                syntaxErrors.Add(new SyntaxErrorData(i, 0, "value expression expected"));
                 return index;
             }
 

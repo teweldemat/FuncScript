@@ -5,7 +5,7 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetIdentifierList(KeyValueCollection parseContext, string exp, int index, out List<string> idenList, out ParseNode parseNode)
+        static int GetIdentifierList(KeyValueCollection provider, string exp, int index, out List<string> idenList, out ParseNode parseNode)
         {
             parseNode = null;
             idenList = null;
@@ -18,7 +18,7 @@ namespace funcscript.core
             var parseNodes = new List<ParseNode>();
             //get first identifier
             i = SkipSpace(exp, i);
-            int i2 = GetIdentifier(parseContext, exp, i,false, out var iden, out var idenLower,out _, out var nodeIden);
+            int i2 = GetIdentifier(provider, exp, i, false, out var iden, out var idenLower, out _, out var nodeIden);
             if (i2 > i)
             {
                 parseNodes.Add(nodeIden);
@@ -33,7 +33,7 @@ namespace funcscript.core
                         break;
                     i++;
                     i = SkipSpace(exp, i);
-                    i2 = GetIdentifier(parseContext, exp, i, false,out iden, out idenLower, out _,out nodeIden);
+                    i2 = GetIdentifier(provider, exp, i, false, out iden, out idenLower, out _, out nodeIden);
                     if (i2 == i)
                         return index;
                     parseNodes.Add(nodeIden);

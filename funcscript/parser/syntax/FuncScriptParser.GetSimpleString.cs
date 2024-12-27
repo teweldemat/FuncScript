@@ -5,17 +5,17 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetSimpleString(KeyValueCollection parseContext, string exp, int index, out String str, out ParseNode pareNode,
-            List<SyntaxErrorData> serrors)
+        static int GetSimpleString(KeyValueCollection provider, string exp, int index, out String str, out ParseNode parseNode,
+            List<SyntaxErrorData> syntaxErrors)
         {
-            var i = GetSimpleString(parseContext, exp, "\"", index, out str, out pareNode, serrors);
+            var i = GetSimpleString(provider, exp, "\"", index, out str, out parseNode, syntaxErrors);
             if (i > index)
                 return i;
-            return GetSimpleString(parseContext, exp, "'", index, out str, out pareNode, serrors);
+            return GetSimpleString(provider, exp, "'", index, out str, out parseNode, syntaxErrors);
         }
 
-        static int GetSimpleString(KeyValueCollection parseContext, string exp, string delimator, int index, out String str, out ParseNode parseNode,
-            List<SyntaxErrorData> serrors)
+        static int GetSimpleString(KeyValueCollection provider, string exp, string delimator, int index, out String str, out ParseNode parseNode,
+            List<SyntaxErrorData> syntaxErrors)
         {
             parseNode = null;
             str = null;
@@ -83,7 +83,7 @@ namespace funcscript.core
             i2 = GetLiteralMatch(exp, i, delimator);
             if (i2 == i)
             {
-                serrors.Add(new SyntaxErrorData(i, 0, $"'{delimator}' expected"));
+                syntaxErrors.Add(new SyntaxErrorData(i, 0, $"'{delimator}' expected"));
                 return index;
             }
 

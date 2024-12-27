@@ -7,7 +7,7 @@ namespace funcscript.core
     public partial class FuncScriptParser
     {
         public static int GetFSTemplate(KeyValueCollection provider, string exp, int index, out ExpressionBlock prog,
-            out ParseNode parseNode, List<SyntaxErrorData> serrors)
+            out ParseNode parseNode, List<SyntaxErrorData> syntaxErrors)
         {
             parseNode = null;
             prog = null;
@@ -40,10 +40,10 @@ namespace funcscript.core
                     i = i2;
 
                     i = SkipSpace(exp, i);
-                    i2 = GetExpression(provider, exp, i, out var expr, out var nodeExpr, serrors);
+                    i2 = GetExpression(provider, exp, i, out var expr, out var nodeExpr, syntaxErrors);
                     if (i2 == i)
                     {
-                        serrors.Add(new SyntaxErrorData(i, 0, "expression expected"));
+                        syntaxErrors.Add(new SyntaxErrorData(i, 0, "expression expected"));
                         return index;
                     }
 
@@ -57,7 +57,7 @@ namespace funcscript.core
                     i2 = GetLiteralMatch(exp, i, "}");
                     if (i2 == i)
                     {
-                        serrors.Add(new SyntaxErrorData(i, 0, "'}' expected"));
+                        syntaxErrors.Add(new SyntaxErrorData(i, 0, "'}' expected"));
                         return index;
                     }
 

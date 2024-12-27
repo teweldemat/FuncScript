@@ -5,10 +5,10 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetCaseExpression(KeyValueCollection context, string exp, int index, out ExpressionBlock prog,
-            out ParseNode parseNode, List<SyntaxErrorData> serrors)
+        static int GetCaseExpression(KeyValueCollection provider, string exp, int index, out ExpressionBlock expBlock,
+            out ParseNode parseNode, List<SyntaxErrorData> syntaxErrors)
         {
-            prog = null;
+            expBlock = null;
             parseNode = null;
             var i = index;
             var i2 = GetLiteralMatch(exp, i, KW_CASE);
@@ -21,10 +21,10 @@ namespace funcscript.core
             {
                 if (pars.Count == 0)
                 {
-                    i2 = GetExpression(context, exp, i, out var part1, out var part1Node, serrors);
+                    i2 = GetExpression(provider, exp, i, out var part1, out var part1Node, syntaxErrors);
                     if (i2 == i)
                     {
-                        serrors.Add(new SyntaxErrorData(i, 1, "Case condition expected"));
+                        syntaxErrors.Add(new SyntaxErrorData(i, 1, "Case condition expected"));
                         return index;
                     }
 
@@ -38,7 +38,7 @@ namespace funcscript.core
                     if (i2 == i)
                         break;
                     i = SkipSpace(exp, i2);
-                    i2 = GetExpression(context, exp, i, out var part1, out var part1Node, serrors);
+                    i2 = GetExpression(provider, exp, i, out var part1, out var part1Node, syntaxErrors);
                     if (i2 == i)
                         break;
                     pars.Add(part1);
@@ -53,10 +53,10 @@ namespace funcscript.core
                 }
 
                 i = SkipSpace(exp, i2);
-                i2 = GetExpression(context, exp, i, out var part2, out var part2Node, serrors);
+                i2 = GetExpression(provider, exp, i, out var part2, out var part2Node, syntaxErrors);
                 if (i2 == i)
                 {
-                    serrors.Add(new SyntaxErrorData(i, 1, "Case value expected"));
+                    syntaxErrors.Add(new SyntaxErrorData(i, 1, "Case value expected"));
                     return index;
                 }
 
@@ -65,14 +65,14 @@ namespace funcscript.core
                 i = SkipSpace(exp, i2);
             } while (true);
 
-            prog = new FunctionCallExpression
+            expBlock = new FunctionCallExpression
             {
-                Function = new LiteralBlock(context.Get(KW_CASE)),
+                Function = new LiteralBlock(provider.Get(KW_CASE)),
                 CodePos = index,
                 CodeLength = i - index,
                 Parameters = pars.ToArray(),
             };
-            prog.SetContext(context);
+            expBlock.SetContext(provider);
             parseNode = new ParseNode(ParseNodeType.Case, index, index - i);
             parseNode.Childs = childNodes;
             return i;

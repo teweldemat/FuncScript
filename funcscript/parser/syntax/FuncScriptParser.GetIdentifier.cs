@@ -4,7 +4,7 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetIdentifier(KeyValueCollection parseContext, string exp, int index, bool supportParentRef, out String iden, out String idenLower, out bool parentRef, out ParseNode parseNode)
+        static int GetIdentifier(KeyValueCollection provider, string exp, int index, bool supportParentRef, out String iden, out String idenLower, out bool parentRef, out ParseNode parseNode)
         {
             parseNode = null;
             iden = null;
@@ -33,7 +33,7 @@ namespace funcscript.core
             {
                 i++;
             }
-
+            
             iden = exp.Substring(i1, i - i1);
             idenLower = iden.ToLower();
             if (s_KeyWords.Contains(idenLower))

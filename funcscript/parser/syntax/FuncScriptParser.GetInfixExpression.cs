@@ -5,71 +5,16 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        // static int GetPrefixOperator(KeyValueCollection parseContext, string exp, int index, out ExpressionBlock prog,
-        //     out ParseNode parseNode, List<SyntaxErrorData> serrors)
-        // {
-        //     int i = 0;
-        //     string oper = null;
-        //     foreach (var op in s_prefixOp)
-        //     {
-        //         i = GetLiteralMatch(exp, index, op[0]);
-        //         if (i > index)
-        //         {
-        //             oper = op[1];
-        //             break;
-        //         }
-        //     }
-        //
-        //     if (i == index)
-        //     {
-        //         prog = null;
-        //         parseNode = null;
-        //         return index;
-        //     }
-        //
-        //     i = SkipSpace(exp, i);
-        //     var func = parseContext.Get(oper);
-        //     if (func == null)
-        //     {
-        //         serrors.Add(new SyntaxErrorData(index, i - index, $"Prefix operator {oper} not defined"));
-        //         prog = null;
-        //         parseNode = null;
-        //         return index;
-        //     }
-        //
-        //     var i2 = GetCallAndMemberAccess(parseContext, exp, i, out var operand, out var operandNode, serrors);
-        //     if (i2 == i)
-        //     {
-        //         serrors.Add(new SyntaxErrorData(i, 0, $"Operant for {oper} expected"));
-        //         prog = null;
-        //         parseNode = null;
-        //         return index;
-        //     }
-        //
-        //     i = SkipSpace(exp, i2);
-        //
-        //     prog = new FunctionCallExpression
-        //     {
-        //         Function = new LiteralBlock(func),
-        //         Parameters = new[] { operand },
-        //         CodePos = index,
-        //         CodeLength = i - index,
-        //     };
-        //     prog.SetContext(parseContext);
-        //     parseNode = new ParseNode(ParseNodeType.PrefixOperatorExpression, index, i - index);
-        //     return i;
-        // }
-
-        static int GetInfixExpression(KeyValueCollection parseContext, string exp, int index, out ExpressionBlock prog,
-            out ParseNode parseNode, List<SyntaxErrorData> serrors)
+        static int GetInfixExpression(KeyValueCollection provider, string exp, int index, out ExpressionBlock expBlock,
+            out ParseNode parseNode, List<SyntaxErrorData> syntaxErrors)
         {
-            var i = GetInfixExpressionSingleLevel(parseContext, s_operatorSymols.Length - 1, s_operatorSymols[^1], exp,
-                index, out prog,
-                out parseNode, serrors);
+            var i = GetInfixExpressionSingleLevel(provider, s_operatorSymols.Length - 1, s_operatorSymols[^1], exp,
+                index, out expBlock,
+                out parseNode, syntaxErrors);
             
-            if (prog != null)
+            if (expBlock != null)
             {
-                prog.SetContext(parseContext);
+                expBlock.SetContext(provider);
             }
 
             return i;

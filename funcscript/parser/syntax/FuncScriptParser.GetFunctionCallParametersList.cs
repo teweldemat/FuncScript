@@ -4,20 +4,20 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetFunctionCallParametersList(KeyValueCollection context, ExpressionBlock func, String exp, int index,
-            out ExpressionBlock prog, out ParseNode parseNode, List<SyntaxErrorData> serrors)
+        static int GetFunctionCallParametersList(KeyValueCollection provider, ExpressionBlock func, String exp, int index,
+            out ExpressionBlock prog, out ParseNode parseNode, List<SyntaxErrorData> syntaxErrors)
         {
-            var i = GetFunctionCallParametersList(context, "(", ")", func, exp, index, out prog, out parseNode,
-                serrors);
+            var i = GetFunctionCallParametersList(provider, "(", ")", func, exp, index, out prog, out parseNode,
+                syntaxErrors);
             if (i == index)
-                return GetFunctionCallParametersList(context, "[", "]", func, exp, index, out prog, out parseNode,
-                    serrors);
+                return GetFunctionCallParametersList(provider, "[", "]", func, exp, index, out prog, out parseNode,
+                    syntaxErrors);
             return i;
         }
 
-        static int GetFunctionCallParametersList(KeyValueCollection context, String openBrance, String closeBrance,
+        static int GetFunctionCallParametersList(KeyValueCollection provider, String openBrance, String closeBrance,
             ExpressionBlock func, String exp, int index, out ExpressionBlock prog, out ParseNode parseNode,
-            List<SyntaxErrorData> serrors)
+            List<SyntaxErrorData> syntaxErrors)
         {
             parseNode = null;
             prog = null;
@@ -32,7 +32,7 @@ namespace funcscript.core
             var parseNodes = new List<ParseNode>();
             //lets get first parameter
             i = SkipSpace(exp, i);
-            i2 = GetExpression(context, exp, i, out var par1, out var parseNode1, serrors);
+            i2 = GetExpression(provider, exp, i, out var par1, out var parseNode1, syntaxErrors);
             if (i2 > i)
             {
                 i = i2;
@@ -41,14 +41,14 @@ namespace funcscript.core
                 do
                 {
                     i2 = SkipSpace(exp, i);
-                    if (i2 >= exp.Length || exp[i2++] != ',') //stop collection of paramters if there is no ','
+                    if (i2 >= exp.Length || exp[i2++] != ',') //stop collection of parameters if there is no ','
                         break;
                     i = i2;
                     i = SkipSpace(exp, i);
-                    i2 = GetExpression(context, exp, i, out var par2, out var parseNode2, serrors);
+                    i2 = GetExpression(provider, exp, i, out var par2, out var parseNode2, syntaxErrors);
                     if (i2 == i)
                     {
-                        serrors.Add(new SyntaxErrorData(i, 0, "Parameter for call expected"));
+                        syntaxErrors.Add(new SyntaxErrorData(i, 0, "Parameter for call expected"));
                         return index;
                     }
 
@@ -62,7 +62,7 @@ namespace funcscript.core
             i2 = GetLiteralMatch(exp, i, closeBrance);
             if (i2 == i)
             {
-                serrors.Add(new SyntaxErrorData(i, 0, $"'{closeBrance}' expected"));
+                syntaxErrors.Add(new SyntaxErrorData(i, 0, $"'{closeBrance}' expected"));
                 return index;
             }
 
@@ -75,7 +75,7 @@ namespace funcscript.core
                 CodePos = func.CodePos,
                 CodeLength = i - func.CodePos,
             };
-            prog.SetContext(context);
+            prog.SetContext(provider);
             parseNode = new ParseNode(ParseNodeType.FunctionParameterList, index, i - index, parseNodes);
             return i;
         }

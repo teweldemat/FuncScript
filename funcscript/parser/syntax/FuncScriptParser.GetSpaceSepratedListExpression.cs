@@ -5,8 +5,8 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetSpaceSepratedListExpression(KeyValueCollection context, string exp, int index,
-            out ListExpression listExpr, out ParseNode parseNode, List<SyntaxErrorData> serrors)
+        static int GetSpaceSepratedListExpression(KeyValueCollection provider, string exp, int index,
+            out ListExpression listExpr, out ParseNode parseNode, List<SyntaxErrorData> syntaxErrors)
         {
             parseNode = null;
             listExpr = null;
@@ -14,7 +14,7 @@ namespace funcscript.core
 
             var listItems = new List<ExpressionBlock>();
             var nodeListItems = new List<ParseNode>();
-            var i2 = GetExpression(context, exp, i, out var firstItem, out var nodeFirstItem, serrors);
+            var i2 = GetExpression(provider, exp, i, out var firstItem, out var nodeFirstItem, syntaxErrors);
             if (i2 > i)
             {
                 listItems.Add(firstItem);
@@ -27,7 +27,7 @@ namespace funcscript.core
                         break;
                     i = i2;
                     i = SkipSpace(exp, i);
-                    i2 = GetExpression(context, exp, i, out var otherItem, out var nodeOtherItem, serrors);
+                    i2 = GetExpression(provider, exp, i, out var otherItem, out var nodeOtherItem, syntaxErrors);
                     if (i2 == i)
                         break;
                     listItems.Add(otherItem);
@@ -37,7 +37,7 @@ namespace funcscript.core
             }
 
             listExpr = new ListExpression { ValueExpressions = listItems.ToArray() };
-            listExpr.SetContext(context);
+            listExpr.SetContext(provider);
             parseNode = new ParseNode(ParseNodeType.List, index, i - index, nodeListItems);
             return i;
         }

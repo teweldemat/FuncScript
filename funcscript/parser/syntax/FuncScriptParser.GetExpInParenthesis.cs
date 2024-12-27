@@ -4,11 +4,11 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetExpInParenthesis(KeyValueCollection infixFuncProvider, String exp, int index,
-            out ExpressionBlock expression, out ParseNode parseNode, List<SyntaxErrorData> serrors)
+        static int GetExpInParenthesis(KeyValueCollection provider, String exp, int index,
+            out ExpressionBlock expBlock, out ParseNode parseNode, List<SyntaxErrorData> syntaxErrors)
         {
             parseNode = null;
-            expression = null;
+            expBlock = null;
             var i = index;
             i = SkipSpace(exp, i);
             var i2 = GetLiteralMatch(exp, i, "(");
@@ -17,23 +17,23 @@ namespace funcscript.core
             i = i2;
 
             i = SkipSpace(exp, i);
-            i2 = GetExpression(infixFuncProvider, exp, i, out expression, out var nodeExpression, serrors);
+            i2 = GetExpression(provider, exp, i, out expBlock, out var nodeExpression, syntaxErrors);
             if (i2 == i)
-                expression = null;
+                expBlock = null;
             else
                 i = i2;
             i = SkipSpace(exp, i);
             i2 = GetLiteralMatch(exp, i, ")");
             if (i == i2)
             {
-                serrors.Add(new SyntaxErrorData(i, 0, "')' expected"));
+                syntaxErrors.Add(new SyntaxErrorData(i, 0, "')' expected"));
                 return index;
             }
 
             i = i2;
-            if (expression == null)
-                expression = new NullExpressionBlock();
-            expression.SetContext(infixFuncProvider);
+            if (expBlock == null)
+                expBlock = new NullExpressionBlock();
+            expBlock.SetContext(provider);
 
             parseNode = new ParseNode(ParseNodeType.ExpressionInBrace, index, i - index, new[] { nodeExpression });
             return i;

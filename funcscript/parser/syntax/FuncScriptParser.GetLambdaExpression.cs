@@ -5,13 +5,13 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetLambdaExpression(KeyValueCollection context, string exp, int index, out ExpressionFunction func,
-            out ParseNode parseNode, List<SyntaxErrorData> serrors)
+        static int GetLambdaExpression(KeyValueCollection provider, string exp, int index, out ExpressionFunction func,
+            out ParseNode parseNode, List<SyntaxErrorData> syntaxErrors)
         {
             parseNode = null;
             func = null;
 
-            var i = GetIdentifierList(context, exp, index, out var parms, out var nodesParams);
+            var i = GetIdentifierList(provider, exp, index, out var parms, out var nodesParams);
             if (i == index)
                 return index;
 
@@ -21,7 +21,7 @@ namespace funcscript.core
             var i2 = GetLiteralMatch(exp, i, "=>");
             if (i2 == i)
             {
-                serrors.Add(new SyntaxErrorData(i, 0, "'=>' expected"));
+                syntaxErrors.Add(new SyntaxErrorData(i, 0, "'=>' expected"));
                 return index;
             }
 
@@ -33,15 +33,15 @@ namespace funcscript.core
                 parmsSet.Add(p);
             }
 
-            i2 = GetExpression(context, exp, i, out var defination, out var nodeDefination, serrors);
+            i2 = GetExpression(provider, exp, i, out var defination, out var nodeDefination, syntaxErrors);
             if (i2 == i)
             {
-                serrors.Add(new SyntaxErrorData(i, 0, "defination of lambda expression expected"));
+                syntaxErrors.Add(new SyntaxErrorData(i, 0, "defination of lambda expression expected"));
                 return index;
             }
 
             func = new ExpressionFunction(parms.ToArray(), defination);
-            func.SetContext(context);
+            func.SetContext(provider);
             i = i2;
             parseNode = new ParseNode(ParseNodeType.LambdaExpression, index, i - index,
                 new[] { nodesParams, nodeDefination });

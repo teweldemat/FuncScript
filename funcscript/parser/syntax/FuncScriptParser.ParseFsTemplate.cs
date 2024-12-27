@@ -6,18 +6,18 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        public static ExpressionBlock ParseFsTemplate(KeyValueCollection context, String exp, out ParseNode parseNode,
-            List<SyntaxErrorData> serrors)
+        public static ExpressionBlock ParseFsTemplate(KeyValueCollection provider, String exp, out ParseNode parseNode,
+            List<SyntaxErrorData> syntaxErrors)
         {
-            var i = GetFSTemplate(context, exp, 0, out var block, out parseNode, serrors);
-            block.SetContext(context);
-            return block;
+            var i = GetFSTemplate(provider, exp, 0, out var expBlock, out parseNode, syntaxErrors);
+            expBlock.SetContext(provider);
+            return expBlock;
         }
 
-        public static ExpressionBlock ParseFsTemplate(KeyValueCollection context, String exp,
-            List<SyntaxErrorData> serrors)
+        public static ExpressionBlock ParseFsTemplate(KeyValueCollection provider, String exp,
+            List<SyntaxErrorData> syntaxErrors)
         {
-            return ParseFsTemplate(context, exp, out var node, serrors);
+            return ParseFsTemplate(provider, exp, out var parseNode, syntaxErrors);
         }
     }
 }

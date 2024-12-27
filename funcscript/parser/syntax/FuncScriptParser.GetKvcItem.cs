@@ -4,18 +4,18 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetKvcItem(KeyValueCollection context, bool nakedKvc, string exp, int index,
+        static int GetKvcItem(KeyValueCollection provider, bool nakedKvc, string exp, int index,
             out KvcExpression.KeyValueExpression item,
             out ParseNode parseNode)
         {
             item = null;
-            var e1 = new List<SyntaxErrorData>();
-            var i = GetKeyValuePair(context, exp, index, out item, out parseNode, e1);
+            var syntaxErrors = new List<SyntaxErrorData>();
+            var i = GetKeyValuePair(provider, exp, index, out item, out parseNode, syntaxErrors);
             if (i > index)
                 return i;
 
-            var e2 = new List<SyntaxErrorData>();
-            i = GetReturnDefinition(context, exp, index, out var retExp, out var nodeRetExp, e2);
+            syntaxErrors = new List<SyntaxErrorData>();
+            i = GetReturnDefinition(provider, exp, index, out var retExp, out var nodeRetExp, syntaxErrors);
             if (i > index)
             {
                 item = new KvcExpression.KeyValueExpression
@@ -29,7 +29,7 @@ namespace funcscript.core
 
             if (!nakedKvc)
             {
-                i = GetIdentifier(context, exp, index,false, out var iden, out var idenLower, out _, out var nodeIden);
+                i = GetIdentifier(provider, exp, index, false, out var iden, out var idenLower, out _, out var nodeIden);
 
                 if (i > index)
                 {
@@ -43,13 +43,13 @@ namespace funcscript.core
                             CodeLength = i - index
                         }
                     };
-                    item.ValueExpression.SetContext(context);
+                    item.ValueExpression.SetContext(provider);
                     parseNode = nodeIden;
                     return i;
                 }
 
-                var e3 = new List<SyntaxErrorData>();
-                i = GetSimpleString(context, exp, index, out iden, out nodeIden, e3);
+                syntaxErrors = new List<SyntaxErrorData>();
+                i = GetSimpleString(provider, exp, index, out iden, out nodeIden, syntaxErrors);
                 if (i > index)
                 {
                     item = new KvcExpression.KeyValueExpression
@@ -62,7 +62,7 @@ namespace funcscript.core
                             CodeLength = i - index
                         }
                     };
-                    item.ValueExpression.SetContext(context);
+                    item.ValueExpression.SetContext(provider);
                     parseNode = nodeIden;
                     return i;
                 }

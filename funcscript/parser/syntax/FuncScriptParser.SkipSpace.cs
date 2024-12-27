@@ -13,7 +13,7 @@ namespace funcscript.core
                 }
                 else
                 {
-                    i = GetCommentBlock(exp, index, out var nodeComment);
+                    i = GetCommentBlock(exp, index, out var parseNode);
                     if (i == index)
                         break;
                     index = i;

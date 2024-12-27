@@ -6,19 +6,19 @@ namespace funcscript.core
     public partial class FuncScriptParser
     {
 
-        static public int GetLiteralMatch(string exp, int index, params string[] keyWord)
+        static public int GetLiteralMatch(string exp, int index, params string[] provider)
         {
-            return GetLiteralMatch(exp, index, keyWord, out var matched);
+            return GetLiteralMatch(exp, index, provider, out var matched);
         }
 
-        static public int GetLiteralMatch(string exp, int index, string[] keyWord, out string matched)
+        static public int GetLiteralMatch(string exp, int index, string[] provider, out string matched)
         {
             if (exp == null)
             {
                 throw new ArgumentNullException(nameof(exp), "The input expression cannot be null.");
             }
 
-            foreach (var k in keyWord)
+            foreach (var k in provider)
             {
                 bool matchFound = true;
                 if (index + k.Length <= exp.Length)

@@ -5,21 +5,21 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetCallAndMemberAccess(KeyValueCollection parseContext, string exp, int index, out ExpressionBlock prog,
-            out ParseNode parseNode, List<SyntaxErrorData> serrors)
+        static int GetCallAndMemberAccess(KeyValueCollection provider, string exp, int index, out ExpressionBlock prog,
+            out ParseNode parseNode, List<SyntaxErrorData> syntaxErrors)
         {
             parseNode = null;
             prog = null;
             var i1 = SkipSpace(exp, index);
-            var i = GetUnit(parseContext, exp, i1, out var theUnit, out parseNode, serrors);
+            var i = GetUnit(provider, exp, i1, out var theUnit, out parseNode, syntaxErrors);
             if (i == index)
                 return index;
 
             do
             {
                 //lets see if this is part of a function call
-                var i2 = GetFunctionCallParametersList(parseContext, theUnit, exp, i, out var funcCall,
-                    out var nodeParList, serrors);
+                var i2 = GetFunctionCallParametersList(provider, theUnit, exp, i, out var funcCall,
+                    out var nodeParList, syntaxErrors);
                 if (i2 > i)
                 {
                     i = i2;
@@ -29,8 +29,8 @@ namespace funcscript.core
                     continue;
                 }
 
-                i2 = GetMemberAccess(parseContext, theUnit, exp, i, out var memberAccess, out var nodeMemberAccess,
-                    serrors);
+                i2 = GetMemberAccess(provider, theUnit, exp, i, out var memberAccess, out var nodeMemberAccess,
+                    syntaxErrors);
                 if (i2 > i)
                 {
                     i = i2;
@@ -40,7 +40,7 @@ namespace funcscript.core
                     continue;
                 }
 
-                i2 = GetKvcExpression(parseContext, false, exp, i, out var kvc, out var nodeKvc, serrors);
+                i2 = GetKvcExpression(provider, false, exp, i, out var kvc, out var nodeKvc, syntaxErrors);
                 if (i2 > i)
                 {
                     i = i2;
@@ -51,7 +51,7 @@ namespace funcscript.core
                         CodePos = i,
                         CodeLength = i2 - i
                     };
-                    theUnit.SetContext(parseContext);
+                    theUnit.SetContext(provider);
                     parseNode = new ParseNode(ParseNodeType.Selection, index, i - index, new[] { parseNode, nodeKvc });
                     continue;
                 }

@@ -5,8 +5,8 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetListExpression(KeyValueCollection context, String exp, int index, out ListExpression listExpr,
-            out ParseNode parseNode, List<SyntaxErrorData> serrors)
+        static int GetListExpression(KeyValueCollection provider, String exp, int index, out ListExpression listExpr,
+            out ParseNode parseNode, List<SyntaxErrorData> syntaxErrors)
         {
             parseNode = null;
             listExpr = null;
@@ -19,7 +19,7 @@ namespace funcscript.core
             var listItems = new List<ExpressionBlock>();
             var nodeListItems = new List<ParseNode>();
             i = SkipSpace(exp, i);
-            i2 = GetExpression(context, exp, i, out var firstItem, out var nodeFirstItem, serrors);
+            i2 = GetExpression(provider, exp, i, out var firstItem, out var nodeFirstItem, syntaxErrors);
             if (i2 > i)
             {
                 listItems.Add(firstItem);
@@ -34,7 +34,7 @@ namespace funcscript.core
                     i = i2;
 
                     i = SkipSpace(exp, i);
-                    i2 = GetExpression(context, exp, i, out var otherItem, out var nodeOtherItem, serrors);
+                    i2 = GetExpression(provider, exp, i, out var otherItem, out var nodeOtherItem, syntaxErrors);
                     if (i2 == i)
                         break;
                     listItems.Add(otherItem);
@@ -47,7 +47,7 @@ namespace funcscript.core
             i2 = GetLiteralMatch(exp, i, "]");
             if (i2 == i)
             {
-                serrors.Add(new SyntaxErrorData(i, 0, "']' expected"));
+                syntaxErrors.Add(new SyntaxErrorData(i, 0, "']' expected"));
                 return index;
             }
 
@@ -56,7 +56,7 @@ namespace funcscript.core
             {
                 ValueExpressions = listItems.ToArray()
             };
-            listExpr.SetContext(context);
+            listExpr.SetContext(provider);
             parseNode = new ParseNode(ParseNodeType.List, index, i - index, nodeListItems);
             return i;
         }

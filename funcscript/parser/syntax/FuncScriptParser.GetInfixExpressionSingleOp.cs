@@ -4,8 +4,8 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetInfixExpressionSingleOp(KeyValueCollection parseContext, int level, string[] candidates, string exp, int index,
-            out ExpressionBlock prog, out ParseNode parseNode, List<SyntaxErrorData> serrors)
+        static int GetInfixExpressionSingleOp(KeyValueCollection provider, int level, string[] candidates, string exp, int index,
+            out ExpressionBlock prog, out ParseNode parseNode, List<SyntaxErrorData> syntaxErrors)
         {
             prog = null;
             parseNode = null;
@@ -22,11 +22,11 @@ namespace funcscript.core
                     //get an infix with one level higher or call expression when we are parsing for highest precedence operators
                     if (level == 0)
                     {
-                        i2 = GetCallAndMemberAccess(parseContext, exp, i, out prog, out parseNode, serrors);
+                        i2 = GetCallAndMemberAccess(provider, exp, i, out prog, out parseNode, syntaxErrors);
                     }
                     else
                     {
-                        i2 = GetInfixExpressionSingleOp(parseContext, level - 1, s_operatorSymols[level - 1], exp, i, out prog, out parseNode, serrors);
+                        i2 = GetInfixExpressionSingleOp(provider, level - 1, s_operatorSymols[level - 1], exp, i, out prog, out parseNode, syntaxErrors);
                     }
 
                     if (i2 == i)
@@ -37,7 +37,7 @@ namespace funcscript.core
                 }
 
                 var indexBeforeOperator = i;
-                i2 = GetOperator(parseContext, candidates, exp, i, out symbol, out oper, out operatorNode);
+                i2 = GetOperator(provider, candidates, exp, i, out symbol, out oper, out operatorNode);
                 if (i2 == i)
                     break;
 
@@ -52,9 +52,9 @@ namespace funcscript.core
                     ExpressionBlock nextOperand;
                     ParseNode nextOperandNode;
                     if (level == 0)
-                        i2 = GetCallAndMemberAccess(parseContext, exp, i, out nextOperand, out nextOperandNode, serrors);
+                        i2 = GetCallAndMemberAccess(provider, exp, i, out nextOperand, out nextOperandNode, syntaxErrors);
                     else
-                        i2 = GetInfixExpressionSingleOp(parseContext, level - 1, s_operatorSymols[level - 1], exp, i, out nextOperand, out nextOperandNode, serrors);
+                        i2 = GetInfixExpressionSingleOp(provider, level - 1, s_operatorSymols[level - 1], exp, i, out nextOperand, out nextOperandNode, syntaxErrors);
                     if (i2 == i)
                         return indexBeforeOperator;
                     operands.Add(nextOperand);
@@ -69,12 +69,12 @@ namespace funcscript.core
 
                 if (operands.Count > 1)
                 {
-                    var func = parseContext.Get(symbol);
+                    var func = provider.Get(symbol);
                     if (symbol == "|")
                     {
                         if (operands.Count > 2)
                         {
-                            serrors.Add(new SyntaxErrorData(i, 0, "Only two parameters expected for | "));
+                            syntaxErrors.Add(new SyntaxErrorData(i, 0, "Only two parameters expected for | "));
                             return i;
                         }
 
@@ -84,7 +84,7 @@ namespace funcscript.core
                             CodePos = prog.CodePos,
                             CodeLength = operands[^1].CodePos + operands[^1].CodeLength - prog.CodeLength
                         };
-                        prog.SetContext(parseContext);
+                        prog.SetContext(provider);
 
                         parseNode = new ParseNode(ParseNodeType.InfixExpression, parseNode!.Pos,
                             operandNodes[^1].Pos + operandNodes[^1].Length - parseNode.Length);
@@ -98,7 +98,7 @@ namespace funcscript.core
                             CodePos = prog.CodePos,
                             CodeLength = operands[^1].CodePos + operands[^1].CodeLength - prog.CodeLength
                         };
-                        prog.SetContext(parseContext);
+                        prog.SetContext(provider);
                         parseNode = new ParseNode(ParseNodeType.InfixExpression, parseNode!.Pos,
                             operandNodes[^1].Pos + operandNodes[^1].Length - parseNode.Length);
                     }

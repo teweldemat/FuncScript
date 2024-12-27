@@ -3,7 +3,7 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetSpaceLessString(KeyValueCollection parseContext, String exp, int index, out String text, out ParseNode parseNode)
+        static int GetSpaceLessString(KeyValueCollection provider, String exp, int index, out String text, out ParseNode parseNode)
         {
             parseNode = null;
             text = null;

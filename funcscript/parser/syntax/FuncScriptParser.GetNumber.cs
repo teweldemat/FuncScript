@@ -5,8 +5,8 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetNumber(KeyValueCollection parseContext, string exp, int index, out object number, out ParseNode parseNode,
-            List<SyntaxErrorData> serros)
+        static int GetNumber(KeyValueCollection provider, string exp, int index, out object number, out ParseNode parseNode,
+            List<SyntaxErrorData> syntaxErrors)
         {
             parseNode = null;
             var hasDecimal = false;
@@ -14,7 +14,7 @@ namespace funcscript.core
             var hasLong = false;
             number = null;
             int i = index;
-            var i2 = GetInt(parseContext, exp, true, i, out var intDigits, out var nodeDigits);
+            var i2 = GetInt(provider, exp, true, i, out var intDigits, out var nodeDigits);
             if (i2 == i)
                 return index;
             i = i2;
@@ -25,7 +25,7 @@ namespace funcscript.core
             i = i2;
             if (hasDecimal)
             {
-                i = GetInt(parseContext, exp, false, i, out var decimalDigits, out var nodeDecimlaDigits);
+                i = GetInt(provider, exp, false, i, out var decimalDigits, out var nodeDecimlaDigits);
             }
 
             i2 = GetLiteralMatch(exp, i, "E");
@@ -35,7 +35,7 @@ namespace funcscript.core
             String expDigits = null;
             ParseNode nodeExpDigits;
             if (hasExp)
-                i = GetInt(parseContext, exp, true, i, out expDigits, out nodeExpDigits);
+                i = GetInt(provider, exp, true, i, out expDigits, out nodeExpDigits);
 
             if (!hasDecimal) //if no decimal we check if there is the 'l' suffix
             {
@@ -49,7 +49,7 @@ namespace funcscript.core
             {
                 if (!double.TryParse(exp.Substring(index, i - index), out var dval))
                 {
-                    serros.Add(new SyntaxErrorData(index, i - index,
+                    syntaxErrors.Add(new SyntaxErrorData(index, i - index,
                         $"{exp.Substring(index, i - index)} couldn't be parsed as floating point"));
                     return index; //we don't expect this to happen
                 }
@@ -63,7 +63,7 @@ namespace funcscript.core
             {
                 if (!int.TryParse(expDigits, out var e) || e < 0)
                 {
-                    serros.Add(new SyntaxErrorData(index, expDigits == null ? 0 : expDigits.Length,
+                    syntaxErrors.Add(new SyntaxErrorData(index, expDigits == null ? 0 : expDigits.Length,
                         $"Invalid exponentional {expDigits}"));
                     return index;
                 }
@@ -71,7 +71,7 @@ namespace funcscript.core
                 var maxLng = long.MaxValue.ToString();
                 if (maxLng.Length + 1 < intDigits.Length + e) //check overflow by length
                 {
-                    serros.Add(new SyntaxErrorData(index, expDigits.Length,
+                    syntaxErrors.Add(new SyntaxErrorData(index, expDigits.Length,
                         $"Exponential {expDigits} is out of range"));
                     return index;
                 }
@@ -85,7 +85,7 @@ namespace funcscript.core
             {
                 if (!long.TryParse(intDigits, out longVal))
                 {
-                    serros.Add(new SyntaxErrorData(index, expDigits.Length,
+                    syntaxErrors.Add(new SyntaxErrorData(index, expDigits.Length,
                         $"{intDigits} couldn't be parsed to 64bit integer"));
                     return index;
                 }

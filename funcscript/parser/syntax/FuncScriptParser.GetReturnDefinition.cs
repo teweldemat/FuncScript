@@ -5,8 +5,8 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetReturnDefinition(KeyValueCollection context, String exp, int index, out ExpressionBlock retExp,
-            out ParseNode parseNode, List<SyntaxErrorData> serrors)
+        static int GetReturnDefinition(KeyValueCollection provider, String exp, int index, out ExpressionBlock retExp,
+            out ParseNode parseNode, List<SyntaxErrorData> syntaxErrors)
         {
             parseNode = null;
             retExp = null;
@@ -15,16 +15,16 @@ namespace funcscript.core
                 return index;
             var nodeReturn = new ParseNode(ParseNodeType.KeyWord, index, i - index);
             i = SkipSpace(exp, i);
-            var i2 = GetExpression(context, exp, i, out var expBlock, out var nodeExpBlock, serrors);
+            var i2 = GetExpression(provider, exp, i, out var expBlock, out var nodeExpBlock, syntaxErrors);
             if (i2 == i)
             {
-                serrors.Add(new SyntaxErrorData(i, 0, "return expression expected"));
+                syntaxErrors.Add(new SyntaxErrorData(i, 0, "return expression expected"));
                 return index;
             }
 
             i = i2;
             retExp = expBlock;
-            retExp.SetContext(context);
+            retExp.SetContext(provider);
             retExp.CodePos = index;
             retExp.CodeLength = i - index;
             parseNode = new ParseNode(ParseNodeType.ExpressionInBrace, index, i - index,
