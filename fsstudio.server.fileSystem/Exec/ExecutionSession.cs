@@ -1,16 +1,17 @@
 using System.Text.RegularExpressions;
 using funcscript;
 using funcscript.core;
+using funcscript.model;
 
 namespace fsstudio.server.fileSystem.exec;
 
-public class ExecutionSession : IFsDataProvider
+public class ExecutionSession : KeyValueCollection
 {
     List<ExecutionNode> _nodes;
-    private IFsDataProvider _context;
+    private KeyValueCollection _context;
     readonly string fileName;
     public Guid SessionId { get; private set; } = Guid.NewGuid();
-    public IFsDataProvider ParentContext => _context;
+    public KeyValueCollection ParentContext => _context;
 
    
 
@@ -216,12 +217,17 @@ public class ExecutionSession : IFsDataProvider
         return _context.IsDefined(name);
     }
 
-    
+    public IList<KeyValuePair<string, object>> GetAll()
+    {
+        return this._nodes.Select(x => KeyValuePair.Create(x.Name, x.Evaluate(this))).ToList();
+    }
+
+
     public object EvaluateNode(string nodePath)
     {
         var segments = nodePath.Split('.');
         var parentNodePath = string.Join(".", segments.Take(segments.Length - 1));
-        var provider = (segments.Length > 1) ? (IFsDataProvider)FindNodeByPath(parentNodePath)! : this;
+        var provider = (segments.Length > 1) ? (KeyValueCollection)FindNodeByPath(parentNodePath)! : this;
         var res=provider.Get(segments.Last());
         return res;
     }

@@ -1,12 +1,12 @@
 using System.Text;
 using funcscript.block;
 using funcscript.funcs.math;
-
+using funcscript.model;
 namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        public static int GetFSTemplate(IFsDataProvider provider, string exp, int index, out ExpressionBlock prog,
+        public static int GetFSTemplate(KeyValueCollection provider, string exp, int index, out ExpressionBlock prog,
             out ParseNode parseNode, List<SyntaxErrorData> serrors)
         {
             parseNode = null;

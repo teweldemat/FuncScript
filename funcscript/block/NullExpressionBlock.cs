@@ -1,4 +1,5 @@
 ﻿using funcscript.core;
+using funcscript.model;
 
 namespace funcscript.block
 {
@@ -16,7 +17,7 @@ namespace funcscript.block
         {
             return "null";
         }
-        public override void SetContext(IFsDataProvider provider)
+        public override void SetContext(KeyValueCollection provider)
         {
             
         }

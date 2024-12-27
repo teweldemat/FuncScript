@@ -5,7 +5,7 @@ namespace funcscript.model
 {
     public class SimpleKeyValueCollection: KeyValueCollection
     {
-        private IFsDataProvider _parent;
+        private KeyValueCollection _parent;
         KeyValuePair<String, object>[] _data;
         Dictionary<String, object> _index;
         public SimpleKeyValueCollection(KeyValuePair<string, object>[] kv)
@@ -14,7 +14,7 @@ namespace funcscript.model
 
         }
         
-        public SimpleKeyValueCollection(IFsDataProvider parent, KeyValuePair<string, object>[] kv)
+        public SimpleKeyValueCollection(KeyValueCollection parent, KeyValuePair<string, object>[] kv)
         {
             this.Data = kv;
             this._parent = parent;
@@ -41,7 +41,7 @@ namespace funcscript.model
             return _index.GetValueOrDefault(value);
         }
 
-        public IFsDataProvider ParentContext => _parent;
+        public KeyValueCollection ParentContext => _parent;
 
         public bool IsDefined(string value)
         {

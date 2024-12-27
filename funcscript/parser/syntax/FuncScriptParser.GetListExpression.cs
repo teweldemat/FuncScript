@@ -1,10 +1,11 @@
 using funcscript.block;
+using funcscript.model;
 
 namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetListExpression(IFsDataProvider context, String exp, int index, out ListExpression listExpr,
+        static int GetListExpression(KeyValueCollection context, String exp, int index, out ListExpression listExpr,
             out ParseNode parseNode, List<SyntaxErrorData> serrors)
         {
             parseNode = null;

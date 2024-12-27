@@ -1,10 +1,10 @@
 using funcscript.block;
-
+using funcscript.model;
 namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetInfixExpressionSingleOp(IFsDataProvider parseContext, int level, string[] candidates, string exp, int index,
+        static int GetInfixExpressionSingleOp(KeyValueCollection parseContext, int level, string[] candidates, string exp, int index,
             out ExpressionBlock prog, out ParseNode parseNode, List<SyntaxErrorData> serrors)
         {
             prog = null;

@@ -1,11 +1,12 @@
 using funcscript.block;
 using funcscript.funcs.math;
+using funcscript.model;
 
 namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetRootExpression(IFsDataProvider parseContext, string exp, int index, out ExpressionBlock prog,
+        static int GetRootExpression(KeyValueCollection parseContext, string exp, int index, out ExpressionBlock prog,
             out ParseNode parseNode, List<SyntaxErrorData> serrors)
         {
             var thisErrors = new List<SyntaxErrorData>();

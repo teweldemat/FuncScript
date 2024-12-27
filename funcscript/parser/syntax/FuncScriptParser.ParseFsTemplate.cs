@@ -1,11 +1,12 @@
 using funcscript.block;
 using funcscript.funcs.math;
+using funcscript.model;
 
 namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        public static ExpressionBlock ParseFsTemplate(IFsDataProvider context, String exp, out ParseNode parseNode,
+        public static ExpressionBlock ParseFsTemplate(KeyValueCollection context, String exp, out ParseNode parseNode,
             List<SyntaxErrorData> serrors)
         {
             var i = GetFSTemplate(context, exp, 0, out var block, out parseNode, serrors);
@@ -13,7 +14,7 @@ namespace funcscript.core
             return block;
         }
 
-        public static ExpressionBlock ParseFsTemplate(IFsDataProvider context, String exp,
+        public static ExpressionBlock ParseFsTemplate(KeyValueCollection context, String exp,
             List<SyntaxErrorData> serrors)
         {
             return ParseFsTemplate(context, exp, out var node, serrors);

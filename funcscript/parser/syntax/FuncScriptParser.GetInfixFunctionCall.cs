@@ -1,10 +1,10 @@
 using funcscript.block;
-
+using funcscript.model;
 namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetInfixFunctionCall(IFsDataProvider parseContext, string exp, int index, out ExpressionBlock prog,
+        static int GetInfixFunctionCall(KeyValueCollection parseContext, string exp, int index, out ExpressionBlock prog,
             out ParseNode parseNode, List<SyntaxErrorData> serrors)
         {
             var childNodes = new List<ParseNode>();

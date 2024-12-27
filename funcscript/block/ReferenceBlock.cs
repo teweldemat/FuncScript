@@ -1,4 +1,5 @@
 ﻿using funcscript.core;
+using funcscript.model;
 
 namespace funcscript.block
 {
@@ -6,7 +7,7 @@ namespace funcscript.block
     {
         string _name, _nameLower;
         private bool _fromParent;
-        private IFsDataProvider _context = null;
+        private KeyValueCollection _context = null;
         public string Name
         {
             get
@@ -63,7 +64,7 @@ namespace funcscript.block
         {
             return Name;
         }
-        public override void SetContext(IFsDataProvider provider)
+        public override void SetContext(KeyValueCollection provider)
         {
             _context = provider;
         }

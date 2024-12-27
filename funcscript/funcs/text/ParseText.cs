@@ -3,8 +3,9 @@ using funcscript.model;
 
 namespace funcscript.funcs.text
 {
-    public class ParseText : IFsFunction, IFsDataProvider
+    public class ParseText : IFsFunction, KeyValueCollection
     {
+        private KeyValueCollection _parentContext;
         private const int MaxParameters = 2;
 
         public CallType CallType => CallType.Prefix;
@@ -69,8 +70,14 @@ namespace funcscript.funcs.text
             return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"The parsed function script should have no variables");
         }
 
-        public IFsDataProvider ParentContext { get; }
+
+        public KeyValueCollection ParentContext { get; }
         public bool IsDefined(string key)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IList<KeyValuePair<string, object>> GetAll()
         {
             throw new NotImplementedException();
         }

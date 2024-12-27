@@ -1,10 +1,10 @@
 using funcscript.block;
-
+using funcscript.model;
 namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetFunctionCallParametersList(IFsDataProvider context, ExpressionBlock func, String exp, int index,
+        static int GetFunctionCallParametersList(KeyValueCollection context, ExpressionBlock func, String exp, int index,
             out ExpressionBlock prog, out ParseNode parseNode, List<SyntaxErrorData> serrors)
         {
             var i = GetFunctionCallParametersList(context, "(", ")", func, exp, index, out prog, out parseNode,
@@ -15,7 +15,7 @@ namespace funcscript.core
             return i;
         }
 
-        static int GetFunctionCallParametersList(IFsDataProvider context, String openBrance, String closeBrance,
+        static int GetFunctionCallParametersList(KeyValueCollection context, String openBrance, String closeBrance,
             ExpressionBlock func, String exp, int index, out ExpressionBlock prog, out ParseNode parseNode,
             List<SyntaxErrorData> serrors)
         {

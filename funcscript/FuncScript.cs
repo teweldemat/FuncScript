@@ -639,7 +639,7 @@ namespace funcscript
         {
             return Evaluate(expression, new DefaultFsDataProvider(), vars, ParseMode.Standard);
         }
-        public static object Evaluate(IFsDataProvider providers, string expression)
+        public static object Evaluate(KeyValueCollection providers, string expression)
         {
             return Evaluate(expression, providers, null, ParseMode.Standard);
         }
@@ -649,7 +649,7 @@ namespace funcscript
             SpaceSeparatedList,
             FsTemplate
         }
-        public static object Evaluate(string expression, IFsDataProvider provider, object vars, ParseMode mode)
+        public static object Evaluate(string expression, KeyValueCollection provider, object vars, ParseMode mode)
         {
             if (vars != null)
             {
@@ -676,7 +676,7 @@ namespace funcscript
                 throw new error.SyntaxError(expression,serrors);
             return Evaluate(exp, expression, provider, vars);
         }
-        public static object Evaluate(ExpressionBlock exp, string expression, IFsDataProvider provider, object vars)
+        public static object Evaluate(ExpressionBlock exp, string expression, KeyValueCollection provider, object vars)
         {
             try
             {

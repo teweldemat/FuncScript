@@ -1,9 +1,10 @@
 using funcscript.block;
+using funcscript.model;
 namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetKvcExpression(IFsDataProvider context, bool nakdeMode, String exp, int index,
+        static int GetKvcExpression(KeyValueCollection context, bool nakdeMode, String exp, int index,
             out KvcExpression kvcExpr,
             out ParseNode parseNode, List<SyntaxErrorData> serrors)
         {

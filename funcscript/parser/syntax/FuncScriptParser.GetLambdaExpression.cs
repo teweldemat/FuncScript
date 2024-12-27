@@ -1,11 +1,11 @@
 using funcscript.block;
 using funcscript.funcs.math;
-
+using funcscript.model;
 namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetLambdaExpression(IFsDataProvider context, string exp, int index, out ExpressionFunction func,
+        static int GetLambdaExpression(KeyValueCollection context, string exp, int index, out ExpressionFunction func,
             out ParseNode parseNode, List<SyntaxErrorData> serrors)
         {
             parseNode = null;

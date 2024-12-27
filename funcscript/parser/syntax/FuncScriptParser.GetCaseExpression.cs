@@ -1,10 +1,11 @@
 using funcscript.block;
+using funcscript.model;
 
 namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetCaseExpression(IFsDataProvider context, string exp, int index, out ExpressionBlock prog,
+        static int GetCaseExpression(KeyValueCollection context, string exp, int index, out ExpressionBlock prog,
             out ParseNode parseNode, List<SyntaxErrorData> serrors)
         {
             prog = null;

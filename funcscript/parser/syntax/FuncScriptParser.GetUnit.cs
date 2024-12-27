@@ -1,11 +1,11 @@
 using funcscript.block;
 using funcscript.model;
-
+using funcscript.model;
 namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetUnit(IFsDataProvider provider, string exp, int index, out ExpressionBlock prog,
+        static int GetUnit(KeyValueCollection provider, string exp, int index, out ExpressionBlock prog,
             out ParseNode parseNode, List<SyntaxErrorData> serrors)
         {
             ParseNode nodeUnit;

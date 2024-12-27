@@ -1,9 +1,9 @@
 ﻿namespace funcscript.core
 {
-    public interface IFsDataProvider        
+    /*public interface KeyValueCollection        
     {
         object Get(String name);
-        public IFsDataProvider ParentContext { get; }
+        public KeyValueCollection ParentContext { get; }
         bool IsDefined(string key);
-    }
+    }*/
 }

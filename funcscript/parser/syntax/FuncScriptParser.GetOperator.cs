@@ -1,11 +1,12 @@
 using funcscript.block;
 using funcscript.funcs.math;
+using funcscript.model;
 
 namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetOperator(IFsDataProvider parseContext, string[] candidates, string exp, int index,
+        static int GetOperator(KeyValueCollection parseContext, string[] candidates, string exp, int index,
             out string matechedOp, out IFsFunction oper,
             out ParseNode parseNode)
         {

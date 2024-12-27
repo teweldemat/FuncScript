@@ -1,11 +1,12 @@
 using funcscript.block;
 using funcscript.funcs.math;
+using funcscript.model;
 
 namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetPrefixOperator(IFsDataProvider parseContext, string exp, int index, out ExpressionBlock prog,
+        static int GetPrefixOperator(KeyValueCollection parseContext, string exp, int index, out ExpressionBlock prog,
             out ParseNode parseNode, List<SyntaxErrorData> serrors)
         {
             int i = 0;

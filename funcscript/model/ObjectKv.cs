@@ -76,7 +76,7 @@ namespace funcscript.model
             return FuncScript.NormalizeDataType(val.Field.GetValue(_val));
         }
 
-        public IFsDataProvider ParentContext => null;
+        public KeyValueCollection ParentContext => null;
 
         public IList<KeyValuePair<string, object>> GetAll()
         {

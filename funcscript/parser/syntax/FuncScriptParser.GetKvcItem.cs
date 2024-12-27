@@ -1,10 +1,10 @@
 using funcscript.block;
-
+using funcscript.model;
 namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetKvcItem(IFsDataProvider context, bool nakedKvc, string exp, int index,
+        static int GetKvcItem(KeyValueCollection context, bool nakedKvc, string exp, int index,
             out KvcExpression.KeyValueExpression item,
             out ParseNode parseNode)
         {

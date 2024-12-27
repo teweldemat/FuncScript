@@ -4,7 +4,6 @@ using System;
 using System.Linq;
 using System.Text;
 using funcscript.block;
-using NUnit.Framework.Internal.Execution;
 
 namespace funcscript.test
 {

@@ -1,10 +1,10 @@
 using funcscript.block;
-
+using funcscript.model;
 namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetSwitchExpression(IFsDataProvider context, String exp, int index, out ExpressionBlock prog,
+        static int GetSwitchExpression(KeyValueCollection context, String exp, int index, out ExpressionBlock prog,
             out ParseNode parseNode, List<SyntaxErrorData> serrors)
         {
             prog = null;

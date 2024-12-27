@@ -30,8 +30,8 @@ public class ExecutionNode : KeyValueCollection
 {
     private string _nameLower;
     private string _name;
-    private IFsDataProvider _prentNode = null;
-    public IFsDataProvider ParentContext => _prentNode;
+    private KeyValueCollection _prentNode = null;
+    public KeyValueCollection ParentContext => _prentNode;
     public object Get(string name)
     {
         var ch = Children.FirstOrDefault(c => c._nameLower.Equals(name));
@@ -39,7 +39,7 @@ public class ExecutionNode : KeyValueCollection
             return _prentNode.Get(name);
         return ch.Evaluate(this);
     }
-    public void SetParent(IFsDataProvider parent)
+    public void SetParent(KeyValueCollection parent)
     {
         this._prentNode = parent;
         foreach (var ch in Children)
@@ -64,7 +64,7 @@ public class ExecutionNode : KeyValueCollection
     public string? Expression { get; set; }
     public IList<ExecutionNode> Children { get; set; }= new List<ExecutionNode>();
 
-    public object Evaluate(IFsDataProvider provider)
+    public object Evaluate(KeyValueCollection provider)
     {
         if (Children.Count > 0)
         {

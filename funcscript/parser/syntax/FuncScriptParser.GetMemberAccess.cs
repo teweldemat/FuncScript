@@ -1,10 +1,11 @@
 using funcscript.block;
+using funcscript.model;
 
 namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetMemberAccess(IFsDataProvider context, ExpressionBlock source, String exp, int index,
+        static int GetMemberAccess(KeyValueCollection context, ExpressionBlock source, String exp, int index,
             out ExpressionBlock prog, out ParseNode parseNode, List<SyntaxErrorData> serrors)
         {
             var i2 = GetMemberAccess(context, ".", source, exp, index, out prog, out parseNode, serrors);
@@ -13,7 +14,7 @@ namespace funcscript.core
             return i2;
         }
 
-        static int GetMemberAccess(IFsDataProvider context, string oper, ExpressionBlock source, String exp, int index,
+        static int GetMemberAccess(KeyValueCollection context, string oper, ExpressionBlock source, String exp, int index,
             out ExpressionBlock prog, out ParseNode parseNode, List<SyntaxErrorData> serrors)
         {
             parseNode = null;

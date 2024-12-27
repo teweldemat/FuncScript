@@ -1,10 +1,10 @@
 using funcscript.core;
-
+using funcscript.model;
 namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetIdentifier(IFsDataProvider parseContext, string exp, int index, bool supportParentRef, out String iden, out String idenLower, out bool parentRef, out ParseNode parseNode)
+        static int GetIdentifier(KeyValueCollection parseContext, string exp, int index, bool supportParentRef, out String iden, out String idenLower, out bool parentRef, out ParseNode parseNode)
         {
             parseNode = null;
             iden = null;

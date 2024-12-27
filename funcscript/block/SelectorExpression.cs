@@ -53,7 +53,7 @@ namespace funcscript.block
             return $"{Source.AsExpString()} {Selector.AsExpString()}";
         }
 
-        public override void SetContext(IFsDataProvider provider)
+        public override void SetContext(KeyValueCollection provider)
         {
             
         }

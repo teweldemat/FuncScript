@@ -1,10 +1,11 @@
 using funcscript.block;
+using funcscript.model;
 
 namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetSpaceSepratedListExpression(IFsDataProvider context, string exp, int index,
+        static int GetSpaceSepratedListExpression(KeyValueCollection context, string exp, int index,
             out ListExpression listExpr, out ParseNode parseNode, List<SyntaxErrorData> serrors)
         {
             parseNode = null;

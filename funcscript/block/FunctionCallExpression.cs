@@ -44,9 +44,9 @@ namespace funcscript.block
         public int Count => Parameters.Length;
 
 
-        private IFsDataProvider _context = null;
+        private KeyValueCollection _context = null;
 
-        public override void SetContext(IFsDataProvider provider)
+        public override void SetContext(KeyValueCollection provider)
         {
             _context = provider;
             this.Function.SetContext(provider);

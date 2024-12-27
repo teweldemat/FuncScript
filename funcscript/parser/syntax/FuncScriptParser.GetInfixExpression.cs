@@ -1,11 +1,11 @@
 using funcscript.block;
 using funcscript.funcs.math;
-
+using funcscript.model;
 namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        // static int GetPrefixOperator(IFsDataProvider parseContext, string exp, int index, out ExpressionBlock prog,
+        // static int GetPrefixOperator(KeyValueCollection parseContext, string exp, int index, out ExpressionBlock prog,
         //     out ParseNode parseNode, List<SyntaxErrorData> serrors)
         // {
         //     int i = 0;
@@ -60,7 +60,7 @@ namespace funcscript.core
         //     return i;
         // }
 
-        static int GetInfixExpression(IFsDataProvider parseContext, string exp, int index, out ExpressionBlock prog,
+        static int GetInfixExpression(KeyValueCollection parseContext, string exp, int index, out ExpressionBlock prog,
             out ParseNode parseNode, List<SyntaxErrorData> serrors)
         {
             var i = GetInfixExpressionSingleLevel(parseContext, s_operatorSymols.Length - 1, s_operatorSymols[^1], exp,

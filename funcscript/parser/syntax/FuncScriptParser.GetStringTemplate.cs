@@ -1,11 +1,11 @@
 using System.Text;
 using funcscript.block;
-
+using funcscript.model;
 namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetStringTemplate(IFsDataProvider provider, string exp, int index, out ExpressionBlock prog,
+        static int GetStringTemplate(KeyValueCollection provider, string exp, int index, out ExpressionBlock prog,
             out ParseNode parseNode, List<SyntaxErrorData> serrors)
         {
             var i = GetStringTemplate(provider, "\"", exp, index, out prog, out parseNode, serrors);
@@ -14,7 +14,7 @@ namespace funcscript.core
             return GetStringTemplate(provider, "'", exp, index, out prog, out parseNode, serrors);
         }
 
-        static int GetStringTemplate(IFsDataProvider provider, String delimator, string exp, int index,
+        static int GetStringTemplate(KeyValueCollection provider, String delimator, string exp, int index,
             out ExpressionBlock prog, out ParseNode parseNode, List<SyntaxErrorData> serrors)
         {
             parseNode = null;

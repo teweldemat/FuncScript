@@ -38,7 +38,7 @@ namespace funcscript.block
             }
         }
 
-        public override void SetContext(IFsDataProvider provider)
+        public override void SetContext(KeyValueCollection provider)
         {
             foreach (var val in this.ValueExpressions)
             {

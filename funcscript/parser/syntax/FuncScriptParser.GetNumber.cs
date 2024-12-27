@@ -1,11 +1,11 @@
 using funcscript.block;
 using funcscript.funcs.math;
-
+using funcscript.model;
 namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetNumber(IFsDataProvider parseContext, string exp, int index, out object number, out ParseNode parseNode,
+        static int GetNumber(KeyValueCollection parseContext, string exp, int index, out object number, out ParseNode parseNode,
             List<SyntaxErrorData> serros)
         {
             parseNode = null;

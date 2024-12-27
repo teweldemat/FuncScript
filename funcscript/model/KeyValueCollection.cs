@@ -4,10 +4,10 @@ using funcscript.core;
 
 namespace funcscript.model
 {
-    public interface KeyValueCollection : IFsDataProvider
+    public interface KeyValueCollection 
     {
         public object Get(string key);
-        public IFsDataProvider ParentContext { get; }
+        public KeyValueCollection ParentContext { get; }
         public bool IsDefined(string key);
         public IList<KeyValuePair<string, object>> GetAll();
 

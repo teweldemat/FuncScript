@@ -1,11 +1,11 @@
 using funcscript.block;
 using funcscript.funcs.math;
-
+using funcscript.model;
 namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetReturnDefinition(IFsDataProvider context, String exp, int index, out ExpressionBlock retExp,
+        static int GetReturnDefinition(KeyValueCollection context, String exp, int index, out ExpressionBlock retExp,
             out ParseNode parseNode, List<SyntaxErrorData> serrors)
         {
             parseNode = null;

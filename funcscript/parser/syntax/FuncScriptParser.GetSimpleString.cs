@@ -1,10 +1,11 @@
 using System.Text;
+using funcscript.model;
 
 namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetSimpleString(IFsDataProvider parseContext, string exp, int index, out String str, out ParseNode pareNode,
+        static int GetSimpleString(KeyValueCollection parseContext, string exp, int index, out String str, out ParseNode pareNode,
             List<SyntaxErrorData> serrors)
         {
             var i = GetSimpleString(parseContext, exp, "\"", index, out str, out pareNode, serrors);
@@ -13,7 +14,7 @@ namespace funcscript.core
             return GetSimpleString(parseContext, exp, "'", index, out str, out pareNode, serrors);
         }
 
-        static int GetSimpleString(IFsDataProvider parseContext, string exp, string delimator, int index, out String str, out ParseNode parseNode,
+        static int GetSimpleString(KeyValueCollection parseContext, string exp, string delimator, int index, out String str, out ParseNode parseNode,
             List<SyntaxErrorData> serrors)
         {
             parseNode = null;

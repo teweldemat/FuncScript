@@ -6,16 +6,21 @@ namespace funcscript.core
     public class ExpressionFunction : IFsFunction
     {
         
-        private class ParameterDataProvider : IFsDataProvider
+        private class ParameterDataProvider : KeyValueCollection
         {
             public FsList pars;
-            public IFsDataProvider EvaluationContext;
+            public KeyValueCollection EvaluationContext;
             public ExpressionFunction expressionFunction;
-            public IFsDataProvider ParentContext => EvaluationContext;
+            public KeyValueCollection ParentContext => EvaluationContext;
             public bool IsDefined(string key)
             {
                 return expressionFunction.ParamterNameIndex.ContainsKey(key)
                        || EvaluationContext.IsDefined(key);
+            }
+
+            public IList<KeyValuePair<string, object>> GetAll()
+            {
+                throw new InvalidOperationException();
             }
 
             public object Get(string name)
@@ -33,9 +38,9 @@ namespace funcscript.core
         private Dictionary<string, int> ParamterNameIndex;
         private String[] _parameters;
         private object _expressionValue = null;
-        private IFsDataProvider _context = null;
+        private KeyValueCollection _context = null;
 
-        public void SetContext(IFsDataProvider context)
+        public void SetContext(KeyValueCollection context)
         {
             _context = context;
         }
@@ -68,7 +73,7 @@ namespace funcscript.core
             var ret= clone.Evaluate();
             return ret;
         }
-        public object EvaluateWithContext(IFsDataProvider context, FsList pars)
+        public object EvaluateWithContext(KeyValueCollection context, FsList pars)
         {
             var clone = this.Expression.CloneExpression();
             clone.SetContext( new ParameterDataProvider

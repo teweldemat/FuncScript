@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using funcscript.core;
+using funcscript.model;
 
 namespace funcscript.block
 {
@@ -33,7 +34,7 @@ namespace funcscript.block
             return Value.ToString();
         }
 
-        public override void SetContext(IFsDataProvider provider)
+        public override void SetContext(KeyValueCollection provider)
         {
             if (Value is ExpressionFunction exp)
             {

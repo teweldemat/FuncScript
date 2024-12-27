@@ -1,10 +1,10 @@
 using funcscript.block;
-
+using funcscript.model;
 namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetExpInParenthesis(IFsDataProvider infixFuncProvider, String exp, int index,
+        static int GetExpInParenthesis(KeyValueCollection infixFuncProvider, String exp, int index,
             out ExpressionBlock expression, out ParseNode parseNode, List<SyntaxErrorData> serrors)
         {
             parseNode = null;

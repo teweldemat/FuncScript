@@ -1,10 +1,11 @@
 using funcscript.block;
+using funcscript.model;
 
 namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetCallAndMemberAccess(IFsDataProvider parseContext, string exp, int index, out ExpressionBlock prog,
+        static int GetCallAndMemberAccess(KeyValueCollection parseContext, string exp, int index, out ExpressionBlock prog,
             out ParseNode parseNode, List<SyntaxErrorData> serrors)
         {
             parseNode = null;

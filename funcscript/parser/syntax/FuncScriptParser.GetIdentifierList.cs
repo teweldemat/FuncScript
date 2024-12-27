@@ -1,11 +1,11 @@
 using funcscript.block;
 using funcscript.funcs.math;
-
+using funcscript.model;
 namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetIdentifierList(IFsDataProvider parseContext, string exp, int index, out List<string> idenList, out ParseNode parseNode)
+        static int GetIdentifierList(KeyValueCollection parseContext, string exp, int index, out List<string> idenList, out ParseNode parseNode)
         {
             parseNode = null;
             idenList = null;

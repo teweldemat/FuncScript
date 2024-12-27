@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using funcscript.model;
 
 namespace funcscript.core
 {
@@ -14,7 +15,7 @@ namespace funcscript.core
     {
         public int CodePos;
         public int CodeLength;
-        public abstract void SetContext(IFsDataProvider provider);
+        public abstract void SetContext(KeyValueCollection provider);
         public abstract object Evaluate();
         public abstract IList<ExpressionBlock> GetChilds();
         public abstract string AsExpString();

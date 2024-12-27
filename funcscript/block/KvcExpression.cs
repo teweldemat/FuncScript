@@ -62,7 +62,7 @@ namespace funcscript.block
                 return singleReturn.Evaluate();
             return this;
         }
-        public override void SetContext(IFsDataProvider provider)
+        public override void SetContext(KeyValueCollection provider)
         {
             this._context = provider;
         }
@@ -105,8 +105,8 @@ namespace funcscript.block
             return null;
         }
 
-        private IFsDataProvider _context;
-        public IFsDataProvider ParentContext => _context;
+        private KeyValueCollection _context;
+        public KeyValueCollection ParentContext => _context;
         public bool IsDefined(string key)
         {
             return this.index.ContainsKey(key);
