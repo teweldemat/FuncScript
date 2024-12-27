@@ -105,7 +105,7 @@ namespace funcscript.core
             s_KeyWords.Add(KW_SWITCH);
             s_KeyWords.Add(KW_SWITCH);
         }
-        record ParseResult(ExpressionBlock Expresion, ParseNode Node, int NextIndex);
-        record ParseContext(KeyValueCollection Provider, string Expression, List<SyntaxErrorData> Serrors);
+        public record ParseResult(ExpressionBlock Expresion, ParseNode Node, int NextIndex);
+        public record ParseContext(KeyValueCollection Provider, string Expression, List<SyntaxErrorData> Serrors);
     }
 }
