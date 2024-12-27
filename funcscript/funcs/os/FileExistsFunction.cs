@@ -13,12 +13,12 @@ namespace funcscript.funcs.os
 
         public string Symbol => "fileexists";
 
-        public object Evaluate(IFsDataProvider parent, IParameterList pars)
+        public object EvaluateList(FsList pars)
         {
-            if (pars.Count != MaxParameters)
-                throw new error.EvaluationTimeException($"{this.Symbol} function: invalid parameter count. {MaxParameters} expected, got {pars.Count}");
+            if (pars.Length != MaxParameters)
+                throw new error.EvaluationTimeException($"{this.Symbol} function: invalid parameter count. {MaxParameters} expected, got {pars.Length}");
 
-            var par0 = pars.GetParameter(parent, 0);
+            var par0 = pars[0];
 
             if (par0 == null || !(par0 is string))
                 throw new error.TypeMismatchError($"Function {this.Symbol}. Invalid parameter type, expected a string");

@@ -8,13 +8,12 @@ using funcscript.error;
 
 namespace funcscript.block
 {
-    public class KvcExpression : ExpressionBlock
+    public class KvcExpression : ExpressionBlock,KeyValueCollection
     {
         private class KvcExpressionProvider : IFsDataProvider
         {
             private readonly KvcExpression _parent;
             private readonly Dictionary<string, object> _valCache = new Dictionary<string, object>();
-            private readonly List<Action> _connectionActions;
             public IFsDataProvider ParentProvider { get; }
 
             public bool IsDefined(string key)
@@ -22,11 +21,10 @@ namespace funcscript.block
                 return _parent.index.ContainsKey(key);
             }
 
-            public KvcExpressionProvider(IFsDataProvider provider, KvcExpression parent, List<Action> connectionActions)
+            public KvcExpressionProvider(IFsDataProvider provider, KvcExpression parent)
             {
                 this.ParentProvider = provider;
                 _parent = parent;
-                this._connectionActions = connectionActions;
             }
             String _evaluating = null;
             public object Get(string name)
@@ -38,7 +36,7 @@ namespace funcscript.block
                     if (_parent.index.TryGetValue(name, out var exp) && exp.ValueExpression != null)
                     {
                         _evaluating = name;
-                        var v = exp.ValueExpression.Evaluate(this,_connectionActions).Item1;
+                        var v = exp.ValueExpression.Evaluate();
                         _evaluating = null;
                         _valCache[name] = v;
                         return v;
@@ -54,26 +52,16 @@ namespace funcscript.block
             public String KeyLower;
             public ExpressionBlock ValueExpression;
         }
-
-        
-
-
         public IList<KeyValueExpression> _keyValues;
         public ExpressionBlock singleReturn = null;
-
         private Dictionary<string, KeyValueExpression> index;
-
-        
-
-        
-
-        
-
         public String SetKeyValues(IList<KeyValueExpression> kv, ExpressionBlock retExpression)
         {
             _keyValues = kv;
+            
             this.singleReturn = retExpression;
-
+            if (retExpression != null)
+                retExpression.Provider = this;
             if (_keyValues == null)
                 index = null;
             else
@@ -81,6 +69,7 @@ namespace funcscript.block
                 index = new Dictionary<string, KeyValueExpression>();
                 foreach (var k in _keyValues)
                 {
+                    k.ValueExpression.Provider = this;
                     k.KeyLower = k.Key.ToLower();
                     if (this.index.ContainsKey(k.KeyLower))
                         return $"Key {k.KeyLower} is duplicated";
@@ -93,9 +82,10 @@ namespace funcscript.block
 
         public IList<KeyValueExpression> KeyValues => _keyValues;
 
-        public override (object, CodeLocation) Evaluate(IFsDataProvider provider, List<Action> connectionActions)
+        public override object Evaluate()
         {
-            var evalProvider = new KvcExpressionProvider(provider, this, connectionActions);
+            return this;
+            var evalProvider = new KvcExpressionProvider(Provider, this);
 
             var kvc = new SimpleKeyValueCollection(null, this._keyValues
                 .Select(kv => KeyValuePair.Create<string, object>(kv.Key,
@@ -103,9 +93,9 @@ namespace funcscript.block
 
             if (singleReturn != null)
             {
-                return singleReturn.Evaluate(evalProvider, connectionActions);
+                return singleReturn.Evaluate();
             }
-            return (kvc, this.CodeLocation);
+            return kvc;
         }
 
         public override IList<ExpressionBlock> GetChilds()
@@ -120,22 +110,42 @@ namespace funcscript.block
             return "Key-values";
         }
 
-        public override string AsExpString(IFsDataProvider provider)
+        public override string AsExpString()
         {
             var sb = new StringBuilder();
             sb.Append("{\n");
             foreach (var kv in this.KeyValues)
             {
-                sb.Append($"\t\n{kv.Key}: {kv.ValueExpression.AsExpString(provider)},");
+                sb.Append($"\t\n{kv.Key}: {kv.ValueExpression.AsExpString()},");
             }
 
             if (this.singleReturn != null)
             {
-                sb.Append($"return {this.singleReturn.AsExpString(provider)}");
+                sb.Append($"return {this.singleReturn.AsExpString()}");
             }
 
             sb.Append("}");
             return sb.ToString();
         }
+
+        public object Get(string name)
+        {
+            if (this.index.TryGetValue(name, out var e))
+                return e.ValueExpression.Evaluate();
+            return null;
+        }
+        public IFsDataProvider ParentProvider => Provider;
+        public bool IsDefined(string key)
+        {
+            return this.index.ContainsKey(key);
+        }
+
+        public IList<KeyValuePair<string, object>> GetAll()
+        {
+            return this.KeyValues
+                .Select(kv => KeyValuePair.Create(kv.Key, kv.ValueExpression.Evaluate()))
+                .ToList();
+        }
+
     }
 }

@@ -12,12 +12,12 @@ namespace funcscript.funcs.math
 
         public string Symbol => SYMBOL;
 
-        public object Evaluate(IFsDataProvider parent, IParameterList pars)
+        public object EvaluateList(FsList pars)
         {
-            if (pars.Count != MAX_PARS_COUNT)
+            if (pars.Length != MAX_PARS_COUNT)
                 return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, "One parameter expected");
 
-            var param = pars.GetParameter(parent, 0);
+            var param = pars[0];
 
             if (param is int intValue)
                 return -intValue;

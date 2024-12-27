@@ -25,13 +25,13 @@ namespace funcscript.funcs.keyvalue
             return ((KeyValueCollection)target).Get(((string)key).ToLower());
         }
 
-        public object Evaluate(IFsDataProvider parent, IParameterList pars)
+        public object EvaluateList(FsList pars)
         {
-            if (pars.Count != MaxParametersCount)
-                throw new error.TypeMismatchError($"{Symbol} function: Expected {MaxParametersCount} parameters, received {pars.Count}.");
+            if (pars.Length != MaxParametersCount)
+                throw new error.TypeMismatchError($"{Symbol} function: Expected {MaxParametersCount} parameters, received {pars.Length}.");
 
-            var key = pars.GetParameter(parent, 1);
-            var target = pars.GetParameter(parent, 0);
+            var key = pars[1];
+            var target = pars[0];
 
             return EvaluateInternal(target, key);
         }

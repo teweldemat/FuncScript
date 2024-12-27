@@ -52,8 +52,8 @@ namespace funcscript.core
             {
                 Function = new LiteralBlock(func),
                 Parameters = new[] { operand },
-                Pos = index,
-                Length = i - index,
+                CodePos = index,
+                CodeLength = i - index,
             };
             parseNode = new ParseNode(ParseNodeType.PrefixOperatorExpression, index, i - index);
             return i;

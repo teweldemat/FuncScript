@@ -18,7 +18,7 @@ namespace funcscript.funcs.math
             this._length = lists.Sum(l => l.Length);
         }
 
-        public override object this[int index]
+        public object this[int index]
         {
             get
             {
@@ -35,14 +35,19 @@ namespace funcscript.funcs.math
             }
         }
 
-        public override int Length => _length;
-        public override IEnumerator<object> GetEnumerator()
+        public int Length => _length;
+        public IEnumerator<object> GetEnumerator()
         {
             for (int i = 0; i < _length; i++)
             {
                 yield return this[i];
             }
         }
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
     }
     
     public class AddFunction : IFsFunction
@@ -52,17 +57,17 @@ namespace funcscript.funcs.math
         public CallType CallType => CallType.Infix;
         public string Symbol => "+";
 
-        public object Evaluate(IFsDataProvider parent, IParameterList pars)
+        public object EvaluateList(FsList pars)
         {
             var ret = EvaluateInternal(pars, (i) =>
             {
-                var ret = pars.GetParameter(parent, i);
+                var ret = pars[i];
                 return (true, ret);
             });
             return ret;
         }
 
-        object EvaluateInternal(IParameterList pars, Func<int, (bool, object)> getPar)
+        object EvaluateInternal(FsList pars, Func<int, (bool, object)> getPar)
         {
             bool isNull = true, isInt = false, isLong = false, isDouble = false, isString = false, isList = false;
             bool isKv = false;
@@ -73,7 +78,7 @@ namespace funcscript.funcs.math
             StringBuilder stringTotal = null;
             KeyValueCollection kvTotal = null;
             List<FsList> listTotal = new List<FsList>();
-            int c = Math.Min(pars.Count, MaxParameters); // Use the constant instead of MaxParsCount
+            int c = Math.Min(pars.Length, MaxParameters); // Use the constant instead of MaxParsCount
             for (int i = 0; i < c; i++)
             {
                 var p = getPar(i);

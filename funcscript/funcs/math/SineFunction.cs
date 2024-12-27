@@ -1,4 +1,5 @@
 using funcscript.core;
+using funcscript.model;
 
 namespace funcscript.funcs.math
 {
@@ -10,9 +11,13 @@ namespace funcscript.funcs.math
 
         public string Symbol => "Sin";
 
-        public object Evaluate(IFsDataProvider parent, IParameterList pars)
+        public object EvaluateList(FsList pars)
         {
-            var val = pars.GetParameter(parent, 0);
+            if (pars.Length != MaxParameters)
+                return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH,
+                    $"{this.Symbol}: expected {MaxParameters} got {pars.Length}");
+
+            var val = pars[0];
 
             if (val is int intValue)
             {
@@ -46,9 +51,13 @@ namespace funcscript.funcs.math
 
         public string Symbol => "Cos";
 
-        public object Evaluate(IFsDataProvider parent, IParameterList pars)
+        public object EvaluateList(FsList pars)
         {
-            var val = pars.GetParameter(parent, 0);
+            if (pars.Length != MaxParameters)
+                return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH,
+                    $"{this.Symbol}: expected {MaxParameters} got {pars.Length}");
+
+            var val = pars[0];
             if (val is int intValue)
             {
                 return Math.Cos((double)intValue);

@@ -15,12 +15,12 @@ namespace funcscript.funcs.os
 
         public string Symbol => "dirlist";
 
-        public object Evaluate(IFsDataProvider parent, IParameterList pars)
+        public object EvaluateList(FsList pars)
         {
-            if (pars.Count != ExpectedParameterCount)
-                throw new error.EvaluationTimeException($"{this.Symbol} function: invalid parameter count. {ExpectedParameterCount} expected, got {pars.Count}");
+            if (pars.Length != ExpectedParameterCount)
+                throw new error.EvaluationTimeException($"{this.Symbol} function: invalid parameter count. {ExpectedParameterCount} expected, got {pars.Length}");
 
-            var par0 = pars.GetParameter(parent, 0);
+            var par0 = pars[0];
             if (par0 == null || !(par0 is string))
                 throw new error.TypeMismatchError($"Function {this.Symbol}. Invalid parameter type, expected a string");
 

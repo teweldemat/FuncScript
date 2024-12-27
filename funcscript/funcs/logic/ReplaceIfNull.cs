@@ -11,17 +11,17 @@ namespace funcscript.funcs.logic
 
         public string Symbol => "??";
 
-        public object Evaluate(IFsDataProvider parent, IParameterList pars)
+        public object EvaluateList(FsList pars)
         {
-            if (pars.Count != MaxParameters)
+            if (pars.Length != MaxParameters)
                 throw new error.TypeMismatchError($"{Symbol} function expects exactly {MaxParameters} parameters.");
 
-            var val = pars.GetParameter(parent, 0);
+            var val = pars[0];
 
             if (val != null)
                 return val;
 
-            var val2 = pars.GetParameter(parent, 1);
+            var val2 = pars[1];
             return val2;
         }
 

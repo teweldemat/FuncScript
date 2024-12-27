@@ -1,4 +1,5 @@
 using funcscript.core;
+using funcscript.model;
 
 namespace funcscript.funcs.math
 {
@@ -11,12 +12,12 @@ namespace funcscript.funcs.math
 
         public string Symbol => SYMBOL;
 
-        public object Evaluate(IFsDataProvider parent, IParameterList pars)
+        public object EvaluateList(FsList pars)
         {
-            if (pars.Count < MAX_PARS_COUNT)
+            if (pars.Length < MAX_PARS_COUNT)
                 throw new error.TypeMismatchError($"{this.Symbol}: argument expected");
 
-            var parameter = pars.GetParameter(parent, 0);
+            var parameter = pars[0];
 
             if (parameter == null)
                 return true;

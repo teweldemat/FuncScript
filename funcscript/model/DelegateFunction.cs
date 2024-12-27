@@ -30,9 +30,9 @@ namespace funcscript.model
 
         public string Symbol => throw new NotSupportedException();
 
-        public object Evaluate(IFsDataProvider parent, IParameterList pars)
+        public object EvaluateList(FsList pars)
         {
-            return this.f.DynamicInvoke(Enumerable.Range(0, pars.Count).Select(x => pars.GetParameter(parent, x)).ToArray());
+            return this.f.DynamicInvoke(pars.ToArray());
         }
 
         public string ParName(int index)

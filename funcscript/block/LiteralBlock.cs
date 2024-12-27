@@ -11,20 +11,20 @@ namespace funcscript.block
             Value = val;
         }
 
-        public override string AsExpString(IFsDataProvider provider)
+        public override string AsExpString()
         {
             var sb = new StringBuilder();
             FuncScript.Format(sb, Value, null, true, false);
             return sb.ToString();
         }
 
-        public override (object,CodeLocation) Evaluate(IFsDataProvider provider,List<Action> connectionActions)
+        public override object Evaluate()
         {
             if (Value is ExpressionFunction exp)
             {
                 lock (exp)
                 {
-                    exp.SetContext(provider);
+                    exp.SetContext(Provider);
                 }
             }
             return (Value,this.CodeLocation);

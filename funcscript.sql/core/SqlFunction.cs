@@ -12,12 +12,12 @@ namespace funcscript.sql.core
 
         public string Symbol => "sql";
 
-        public object Evaluate(IFsDataProvider parent, IParameterList pars)
+        public object EvaluateList(FsList pars)
         {
-            if (pars.GetParameter(parent, 0) is not string connectionStr)
+            if (pars[0] is not string connectionStr)
                 throw new InvalidOperationException($"{Symbol} - {ParName(0)} is required");
 
-            if (pars.GetParameter(parent, 1) is not string query)
+            if (pars[1] is not string query)
                 throw new InvalidOperationException($"{Symbol} - {ParName(1)} is required");
 
             using var conn = new SqlConnection(connectionStr);
@@ -26,9 +26,9 @@ namespace funcscript.sql.core
             using var cmd = new SqlCommand(query, conn);
             cmd.CommandTimeout = 0;
 
-            if (pars.Count > 2 && pars.GetParameter(parent, 2) is not null)
+            if (pars.Length > 2 && pars[2] is not null)
             {
-                cmd.Parameters.AddWithValue("@param", pars.GetParameter(parent, 2));
+                cmd.Parameters.AddWithValue("@param", pars[2]);
             }
 
             using var reader = cmd.ExecuteReader();

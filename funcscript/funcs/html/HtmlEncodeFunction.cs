@@ -1,4 +1,5 @@
 using funcscript.core;
+using funcscript.model;
 
 namespace funcscript.funcs.html
 {
@@ -10,9 +11,9 @@ namespace funcscript.funcs.html
 
         public string Symbol => "HEncode";
 
-        public object Evaluate(IFsDataProvider parent, IParameterList pars)
+        public object EvaluateList(FsList pars)
         {
-            var str = pars.GetParameter(parent, 0);
+            var str = pars.Length > 0 ? pars[0] : null;
             return str == null ? null : System.Web.HttpUtility.HtmlEncode(str.ToString());
         }
 
@@ -20,7 +21,7 @@ namespace funcscript.funcs.html
         {
             switch(index)
             {
-                case 0:return "text";
+                case 0: return "text";
                 default:
                     return "";
             }

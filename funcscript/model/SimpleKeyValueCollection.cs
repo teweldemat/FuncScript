@@ -36,19 +36,19 @@ namespace funcscript.model
             }
         }
 
-        public override object Get(string value)
+        public object Get(string value)
         {
             return _index.GetValueOrDefault(value);
         }
 
-        public override IFsDataProvider ParentProvider => _parent;
+        public IFsDataProvider ParentProvider => _parent;
 
-        public override bool IsDefined(string value)
+        public bool IsDefined(string value)
         {
             return _index.ContainsKey(value);
         }
 
-        public override IList<KeyValuePair<string, object>> GetAll()
+        public IList<KeyValuePair<string, object>> GetAll()
         {
             return this._data;
         }

@@ -11,11 +11,11 @@ namespace funcscript.funcs.logic
 
         public string Symbol => "or";
 
-        public object Evaluate(IFsDataProvider parent, IParameterList pars)
+        public object EvaluateList(FsList pars)
         {
-            for (int i = 0; i < pars.Count; i++)
+            for (int i = 0; i < pars.Length; i++)
             {
-                var par = pars.GetParameter(parent, i);
+                var par = pars[i];
 
                 if (!(par is bool b))
                     return new FsError(FsError.ERROR_TYPE_MISMATCH,

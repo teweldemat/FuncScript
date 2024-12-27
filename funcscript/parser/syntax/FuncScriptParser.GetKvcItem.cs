@@ -39,8 +39,8 @@ namespace funcscript.core
                         KeyLower = idenLower,
                         ValueExpression = new ReferenceBlock(iden, idenLower, false)
                         {
-                            Pos = index,
-                            Length = i - index
+                            CodePos = index,
+                            CodeLength = i - index
                         }
                     };
                     parseNode = nodeIden;
@@ -57,8 +57,8 @@ namespace funcscript.core
                         KeyLower = idenLower,
                         ValueExpression = new ReferenceBlock(iden, iden.ToLower(), false)
                         {
-                            Pos = index,
-                            Length = i - index
+                            CodePos = index,
+                            CodeLength = i - index
                         }
                     };
                     parseNode = nodeIden;

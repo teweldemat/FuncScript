@@ -67,8 +67,8 @@ namespace funcscript.core
             prog = new FunctionCallExpression
             {
                 Function = new LiteralBlock(context.Get(KW_CASE)),
-                Pos = index,
-                Length = i - index,
+                CodePos = index,
+                CodeLength = i - index,
                 Parameters = pars.ToArray(),
             };
             parseNode = new ParseNode(ParseNodeType.Case, index, index - i);

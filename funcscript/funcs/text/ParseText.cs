@@ -1,6 +1,4 @@
 using funcscript.core;
-using System;
-using System.Globalization;
 using funcscript.model;
 
 namespace funcscript.funcs.text
@@ -13,12 +11,12 @@ namespace funcscript.funcs.text
 
         public string Symbol => "parse";
 
-        public object Evaluate(IFsDataProvider parent, IParameterList pars)
+        public object EvaluateList(FsList pars)
         {
-            if (pars.Count == 0)
+            if (pars.Length == 0)
                 throw new error.TypeMismatchError($"{this.Symbol} requires at least one parameter");
 
-            var par0 = pars.GetParameter(parent, 0);
+            var par0 = pars[0];
             
             if (par0 == null)
                 return null;
@@ -26,9 +24,9 @@ namespace funcscript.funcs.text
             var str = par0.ToString();
             object par1;
             string format = null;
-            if (pars.Count > 1)
+            if (pars.Length > 1)
             {
-                par1 = pars.GetParameter(parent, 1);
+                par1 = pars[1];
                 format = par1?.ToString();
             }
 

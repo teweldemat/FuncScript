@@ -12,18 +12,18 @@ namespace funcscript.funcs.list
 
         public string Symbol => "Filter";
 
-        public object Evaluate(IFsDataProvider parent, IParameterList pars)
+        public object EvaluateList(FsList pars)
         {
-            if (pars.Count != MaxParameters)
-                throw new error.TypeMismatchError($"{this.Symbol} function: Invalid parameter count. Expected {MaxParameters}, but got {pars.Count}");
+            if (pars.Length != MaxParameters)
+                throw new error.TypeMismatchError($"{this.Symbol} function: Invalid parameter count. Expected {MaxParameters}, but got {pars.Length}");
 
-            var par0 = pars.GetParameter(parent, 0);
-            var par1 = pars.GetParameter(parent, 1);
+            var par0 = pars[0];
+            var par1 = pars[1];
 
-            return EvaluateInternal(parent, par0, par1);
+            return EvaluateInternal(par0, par1);
         }
 
-        private object EvaluateInternal(IFsDataProvider parent, object par0, object par1)
+        private object EvaluateInternal(object par0, object par1)
         {
             if (par0 == null)
                 return null;
@@ -40,7 +40,7 @@ namespace funcscript.funcs.list
 
             for (int i = 0; i < lst.Length; i++)
             {
-                var val = func.Evaluate(parent, new ArrayParameterList(new object[] { lst[i], i }));
+                var val = func.EvaluateList(new ArrayFsList(new object[] { lst[i], i }));
                 if (val is bool && (bool)val)
                 {
                     res.Add(lst[i]);

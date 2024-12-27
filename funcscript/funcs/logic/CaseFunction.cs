@@ -1,4 +1,5 @@
 using funcscript.core;
+using funcscript.model;
 
 namespace funcscript.funcs.logic
 {
@@ -8,23 +9,23 @@ namespace funcscript.funcs.logic
 
         public string Symbol => "Case";
 
-        public object Evaluate(IFsDataProvider parent, IParameterList pars)
+        public object EvaluateList(FsList pars)
         {
-            int count = pars.Count;
+            int count = pars.Length;
 
             for (int i = 0; i < count / 2; i++)
             {
-                var cond = pars.GetParameter(parent, 2 * i);
+                var cond = pars[i * 2];
 
                 if (cond is bool && (bool)cond)
                 {
-                    return pars.GetParameter(parent, 2 * i + 1);
+                    return pars[i * 2 + 1];
                 }
             }
 
             if (count % 2 == 1)
             {
-                return pars.GetParameter(parent, count - 1);
+                return pars[count - 1];
             }
 
             return null;

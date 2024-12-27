@@ -7,7 +7,7 @@ namespace funcscript.core
     {
         private class ParameterDataProvider : IFsDataProvider
         {
-            public IParameterList pars;
+            public FsList pars;
             public IFsDataProvider parentSymbolProvider;
             public ExpressionFunction expressionFunction;
             public IFsDataProvider ParentProvider => parentSymbolProvider;
@@ -20,7 +20,7 @@ namespace funcscript.core
             public object Get(string name)
             {
                 if (expressionFunction.ParamterNameIndex.TryGetValue(name, out var index))
-                    return pars.GetParameter(parentSymbolProvider, index);
+                    return pars[index];
                 return parentSymbolProvider.Get(name);
             }
         }
@@ -34,9 +34,6 @@ namespace funcscript.core
 
         public void SetContext(IFsDataProvider context)
         {
-            //REVIEW: this is commented because it was being triggered but why was it triggered?
-            //if (_context != null)
-             //   throw new EvaluationTimeException("Context for expression function already set");
             _context = context;
         }
         public ExpressionFunction(String[] pars, ExpressionBlock exp)
@@ -54,17 +51,18 @@ namespace funcscript.core
 
         public string Symbol => null;
 
-        public object Evaluate(IFsDataProvider parent, IParameterList pars)
+        public object EvaluateList(FsList pars)
         {
             if (_context == null)
                 throw new error.EvaluationTimeException("Context not set to expression function");
             List<Action> connectionActions=new List<Action>();
-            var (ret,_)= Expression.Evaluate(new ParameterDataProvider
+            Expression.Provider = new ParameterDataProvider
             {
                 expressionFunction = this,
-                parentSymbolProvider = new KvcProvider(_context,parent),
+                parentSymbolProvider = _context,
                 pars = pars
-            },connectionActions);
+            };
+            var ret= Expression.Evaluate();
             foreach (var con in connectionActions)
             {
                 con.Invoke();
@@ -95,7 +93,7 @@ namespace funcscript.core
 
             sb.Append(')');
             sb.Append("=>");
-            sb.Append(this.Expression.AsExpString(new DefaultFsDataProvider()));
+            sb.Append(this.Expression.AsExpString());
             return sb.ToString();
         }
     }

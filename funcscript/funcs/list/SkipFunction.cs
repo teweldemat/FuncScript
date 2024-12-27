@@ -3,7 +3,6 @@ using funcscript.model;
 
 namespace funcscript.funcs.list
 {
-    //Optimization: it is not necessary to dereference skipped elements
     public class SkipFunction : IFsFunction
     {
         private const int MaxParameters = 2;
@@ -12,13 +11,13 @@ namespace funcscript.funcs.list
 
         public string Symbol => "Skip";
 
-        public object Evaluate(IFsDataProvider parent, IParameterList pars)
+        public object EvaluateList(FsList pars)
         {
-            if (pars.Count != MaxParameters)
-                throw new error.TypeMismatchError($"{this.Symbol} function: Invalid parameter count. Expected {MaxParameters}, but got {pars.Count}");
+            if (pars.Length != MaxParameters)
+                throw new error.TypeMismatchError($"{this.Symbol} function: Invalid parameter count. Expected {MaxParameters}, but got {pars.Length}");
 
-            var par0 = pars.GetParameter(parent, 0);
-            var par1 = pars.GetParameter(parent, 1);
+            var par0 = pars[0];
+            var par1 = pars[1];
 
             return EvaluateInternal(par0, par1);
         }

@@ -12,40 +12,14 @@ namespace funcscript.core
     /// </summary>
     public abstract class ExpressionBlock
     {
-        /// <summary>
-        ///The position in the parsed exprssion string where the block starts
-        /// </summary>
-        public int Pos;
-        /// <summary>
-        ///The the number of charadcters in the parsed exprssion string block consists of
-        /// </summary>
-        public int Length;
+        public int CodePos;
+        public int CodeLength;
 
-        public CodeLocation CodeLocation => new CodeLocation(Pos, Length);
-
-        /// <summary>
-        /// Evaluates the expression block
-        /// </summary>
-        /// <param name="provider">Source data for variables references in the expression block</param>
-        /// <returns></returns>
-        public abstract (object,CodeLocation) Evaluate(IFsDataProvider provider,List<Action> connectActions);
-
-
-        
-        
-        /// <summary>
-        /// Gets list of child expression blocks
-        /// </summary>
-        /// <returns></returns>
+        public IFsDataProvider Provider;
+        public CodeLocation CodeLocation => new CodeLocation(CodePos, CodeLength);
+        public abstract object Evaluate();
         public abstract IList<ExpressionBlock> GetChilds();
-        /// <summary>
-        /// Builds a string expression representing the expression block.
-        /// The string that is built will not neccessarily be identical 
-        /// to the epxression that is parsed
-        /// </summary>
-        /// <param name="provider"></param>
-        /// <returns></returns>
-        public abstract String AsExpString(IFsDataProvider provider);
+        public abstract String AsExpString();
 
     }
 }

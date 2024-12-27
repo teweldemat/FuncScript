@@ -22,8 +22,8 @@ namespace funcscript.core
 
             i = i2;
             retExp = expBlock;
-            retExp.Pos = index;
-            retExp.Length = i - index;
+            retExp.CodePos = index;
+            retExp.CodeLength = i - index;
             parseNode = new ParseNode(ParseNodeType.ExpressionInBrace, index, i - index,
                 new[] { nodeReturn, nodeExpBlock });
 

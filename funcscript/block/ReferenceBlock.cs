@@ -42,11 +42,11 @@ namespace funcscript.block
             _nameLower = nameLower;
             _fromParent =fromParent;
         }
-        public override (object,CodeLocation) Evaluate(IFsDataProvider provider,List<Action> connectionActions)
+        public override object Evaluate()
         {
             if (_fromParent)
-                return (provider.ParentProvider?.Get(_nameLower),this.CodeLocation);
-            return (provider.Get(_nameLower), this.CodeLocation);
+                return (Provider.ParentProvider?.Get(_nameLower),this.CodeLocation);
+            return (Provider.Get(_nameLower), this.CodeLocation);
         }
 
         public override IList<ExpressionBlock> GetChilds()
@@ -58,7 +58,7 @@ namespace funcscript.block
             return Name;
         }
 
-        public override string AsExpString(IFsDataProvider provider)
+        public override string AsExpString()
         {
             return Name;
         }

@@ -82,12 +82,7 @@ public class ExecutionNode : KeyValueCollection
                 var exp = FuncScriptParser.ParseFsTemplate(provider, this.Expression, serrors);
                 if (exp == null)
                     throw new SyntaxError(this.Expression,serrors);
-                var connctionActions = new List<Action>();
-                var ret=exp.Evaluate(provider,connctionActions);
-                foreach (var con in connctionActions)
-                {
-                    con.Invoke();
-                }
+                var ret=exp.Evaluate();
 
                 return ret;
             default:

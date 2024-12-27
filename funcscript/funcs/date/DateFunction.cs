@@ -1,6 +1,7 @@
 using funcscript.core;
 using System;
 using System.Runtime.Serialization;
+using funcscript.model;
 
 namespace funcscript.funcs.logic
 {
@@ -12,12 +13,12 @@ namespace funcscript.funcs.logic
 
         public string Symbol => "Date";
 
-        public object Evaluate(IFsDataProvider parent, IParameterList pars)
+        public object EvaluateList(FsList pars)
         {
-            if (pars.Count > MaxParameters)
-                throw new error.EvaluationTimeException($"{this.Symbol} function: invalid parameter count. Max of {MaxParameters} expected, got {pars.Count}");
+            if (pars.Length > MaxParameters)
+                throw new error.EvaluationTimeException($"{this.Symbol} function: invalid parameter count. Max of {MaxParameters} expected, got {pars.Length}");
 
-            var par0 = pars.GetParameter(parent, 0);
+            var par0 = pars[0];
 
             if (par0 == null)
                 return null;
@@ -28,7 +29,7 @@ namespace funcscript.funcs.logic
             var str = (string)par0;
             DateTime date;
 
-            var par1 = pars.GetParameter(parent, 1) as string;
+            var par1 = pars.Length > 1 ? pars[1] as string : null;
 
             if (par1 == null)
             {

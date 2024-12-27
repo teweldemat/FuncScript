@@ -1,10 +1,12 @@
 ﻿using System.Text;
+using funcscript.model;
 
 namespace funcscript.core
 {
     public interface IFsFunction
     {
-        object Evaluate(IFsDataProvider parent, IParameterList pars);
+        //object Evaluate(IFsDataProvider parent, IParameterList pars);
+        object EvaluateList(FsList pars);
         CallType CallType { get; }
         String Symbol { get; }
     }

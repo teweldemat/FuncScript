@@ -73,8 +73,8 @@ namespace funcscript.core
             {
                 Function = func,
                 Parameters = pars.ToArray(),
-                Pos = func.Pos,
-                Length = i - func.Pos,
+                CodePos = func.CodePos,
+                CodeLength = i - func.CodePos,
             };
             parseNode = new ParseNode(ParseNodeType.FunctionParameterList, index, i - index, parseNodes);
             return i;

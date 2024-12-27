@@ -12,12 +12,12 @@ namespace funcscript.funcs.list
 
         public string Symbol => "Distinct";
 
-        public object Evaluate(IFsDataProvider parent, IParameterList pars)
+        public object EvaluateList(FsList pars)
         {
-            if (pars.Count != MaxParameters)
-                throw new error.EvaluationTimeException($"{this.Symbol} function: Invalid parameter count. Expected {MaxParameters}, but got {pars.Count}");
+            if (pars.Length != MaxParameters)
+                throw new error.EvaluationTimeException($"{this.Symbol} function: Invalid parameter count. Expected {MaxParameters}, but got {pars.Length}");
 
-            var par0 = pars.GetParameter(parent, 0);
+            var par0 = pars[0];
 
             if (par0 == null)
                 return null;

@@ -680,10 +680,8 @@ namespace funcscript
         {
             try
             {
-                List<Action> connectionActions = new List<Action>();
-                var (ret,_)=exp.Evaluate(provider,connectionActions);
-                foreach(var con in connectionActions)
-                    con.Invoke();
+                var ret=exp.Evaluate();
+                return ret;
                 return ret;
             }
             catch (EvaluationException ex)

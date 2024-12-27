@@ -11,14 +11,14 @@ namespace funcscript.funcs.logic
 
         public string Symbol => "in";
 
-        public object Evaluate(IFsDataProvider parent, IParameterList pars)
+        public object EvaluateList(FsList pars)
         {
-            if (pars.Count != MaxParameterCount)
+            if (pars.Length != MaxParameterCount)
                 throw new error.EvaluationTimeException(
-                    $"{Symbol} function: Invalid parameter count. Expected {MaxParameterCount}, but got {pars.Count}");
+                    $"{Symbol} function: Invalid parameter count. Expected {MaxParameterCount}, but got {pars.Length}");
 
-            var par0 = pars.GetParameter(parent, 0);
-            var par1 = pars.GetParameter(parent, 1);
+            var par0 = pars[0];
+            var par1 = pars[1];
 
             if (par1 == null)
                 return null;

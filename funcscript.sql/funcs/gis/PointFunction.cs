@@ -1,4 +1,5 @@
 ﻿using funcscript.core;
+using funcscript.model;
 using NetTopologySuite.Geometries;
 
 namespace funcscript.sql.funcs.gis
@@ -11,13 +12,13 @@ namespace funcscript.sql.funcs.gis
 
         public string Symbol => "point";
 
-        public object Evaluate(IFsDataProvider parent, IParameterList pars)
+        public object EvaluateList(FsList pars)
         {
-            if (pars.Count != this.MaxParsCount)
-                throw new error.EvaluationTimeException($"{this.Symbol} function: invalid parameter count. {this.MaxParsCount} expected, got {pars.Count}");
+            if (pars.Length != this.MaxParsCount)
+                throw new error.EvaluationTimeException($"{this.Symbol} function: invalid parameter count. {this.MaxParsCount} expected, got {pars.Length}");
 
-            var x = Convert.ToDouble(pars.GetParameter(parent, 0));
-            var y = Convert.ToDouble(pars.GetParameter(parent, 1));
+            var x = Convert.ToDouble(pars[0]);
+            var y = Convert.ToDouble(pars[1]);
 
             return new Point(x, y);
         }

@@ -86,8 +86,8 @@ namespace funcscript.core
                         prog = new ListExpression
                         {
                             ValueExpressions = operands.ToArray(),
-                            Pos = prog.Pos,
-                            Length = operands[^1].Pos + operands[^1].Length - prog.Length
+                            CodePos = prog.CodePos,
+                            CodeLength = operands[^1].CodePos + operands[^1].CodeLength - prog.CodeLength
                         };
 
                         parseNode = new ParseNode(ParseNodeType.InfixExpression, parseNode!.Pos,
@@ -99,8 +99,8 @@ namespace funcscript.core
                         {
                             Function = new LiteralBlock(func),
                             Parameters = operands.ToArray(),
-                            Pos = prog.Pos,
-                            Length = operands[^1].Pos + operands[^1].Length - prog.Length
+                            CodePos = prog.CodePos,
+                            CodeLength = operands[^1].CodePos + operands[^1].CodeLength - prog.CodeLength
                         };
                         parseNode = new ParseNode(ParseNodeType.InfixExpression, parseNode!.Pos,
                             operandNodes[^1].Pos + operandNodes[^1].Length - parseNode.Length);

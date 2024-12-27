@@ -48,9 +48,9 @@ namespace funcscript.block
         }
         public ExpressionBlock Source;
         public KvcExpression Selector;
-        public override (object,CodeLocation) Evaluate(IFsDataProvider provider,List<Action> connectionActions)
+        public override object Evaluate()
         {
-            var (sourceVal,_) = Source.Evaluate(provider,connectionActions);
+            var sourceVal = Source.Evaluate();
             if (sourceVal is FsList)
             {
                 var lst = (FsList)sourceVal;
@@ -62,10 +62,10 @@ namespace funcscript.block
                     var sel=new SelectorProvider
                     {
                         Parent = this,
-                        Provider = provider,
                         SourceVal = l
                     };
-                    ret[i] = Selector.Evaluate(sel,connectionActions).Item1;
+                    sel.Provider = sel;
+                    ret[i] = Selector.Evaluate();
                     i++;
                 }
                 return (new ArrayFsList(ret),this.CodeLocation);
@@ -73,12 +73,12 @@ namespace funcscript.block
             }
             else
             {
-                return Selector.Evaluate(new SelectorProvider
+                Selector.Provider = new SelectorProvider
                 {
                     Parent = this,
-                    Provider = provider,
-                    SourceVal=sourceVal
-                },connectionActions);
+                    SourceVal = sourceVal
+                };
+                return Selector.Evaluate();
             }
         }
 
@@ -90,9 +90,9 @@ namespace funcscript.block
         {
             return "selector";
         }
-        public override string AsExpString(IFsDataProvider provider)
+        public override string AsExpString()
         {
-            return $"{Source.AsExpString(provider)} {Selector.AsExpString(provider)}";
+            return $"{Source.AsExpString()} {Selector.AsExpString()}";
         }
     }
 }

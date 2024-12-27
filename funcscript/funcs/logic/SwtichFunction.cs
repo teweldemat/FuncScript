@@ -11,24 +11,24 @@ namespace funcscript.funcs.logic
 
         public string Symbol => "switch";
 
-        public object Evaluate(IFsDataProvider parent, IParameterList pars)
+        public object EvaluateList(FsList pars)
         {
-            var selector = pars.GetParameter(parent, 0);
+            var selector = pars[0];
 
-            for (var i = 1; i < pars.Count - 1; i += 2)
+            for (var i = 1; i < pars.Length - 1; i += 2)
             {
-                var val = pars.GetParameter(parent, i);
+                var val = pars[i];
 
                 if ((val == null && selector == null) ||
                     (val != null && selector != null && selector.Equals(val)))
                 {
-                    return pars.GetParameter(parent, i + 1);
+                    return pars[i + 1];
                 }
             }
 
-            if (pars.Count % 2 == 0)
+            if (pars.Length % 2 == 0)
             {
-                return pars.GetParameter(parent, pars.Count - 1);
+                return pars[pars.Length - 1];
             }
 
             return null;

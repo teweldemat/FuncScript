@@ -20,8 +20,8 @@ namespace funcscript.core
             {
                 parseNode = nodeUnit;
                 prog = template;
-                prog.Pos = index;
-                prog.Length = i - index;
+                prog.CodePos = index;
+                prog.CodeLength = i - index;
                 return i;
             }
 
@@ -31,8 +31,8 @@ namespace funcscript.core
             {
                 parseNode = nodeUnit;
                 prog = new LiteralBlock(str);
-                prog.Pos = index;
-                prog.Length = i - index;
+                prog.CodePos = index;
+                prog.CodeLength = i - index;
                 return i;
             }
 
@@ -42,8 +42,8 @@ namespace funcscript.core
             {
                 parseNode = nodeUnit;
                 prog = new LiteralBlock(numberVal);
-                prog.Pos = index;
-                prog.Length = i - index;
+                prog.CodePos = index;
+                prog.CodeLength = i - index;
                 return i;
             }
 
@@ -53,8 +53,8 @@ namespace funcscript.core
             {
                 parseNode = nodeUnit;
                 prog = lst;
-                prog.Pos = index;
-                prog.Length = i - index;
+                prog.CodePos = index;
+                prog.CodeLength = i - index;
                 return i;
             }
 
@@ -65,8 +65,8 @@ namespace funcscript.core
             {
                 parseNode = nodeUnit;
                 prog = json;
-                prog.Pos = index;
-                prog.Length = i - index;
+                prog.CodePos = index;
+                prog.CodeLength = i - index;
                 return i;
             }
 
@@ -75,8 +75,8 @@ namespace funcscript.core
             {
                 parseNode = caseNode;
                 prog = caseExp;
-                prog.Pos = index;
-                prog.Length = i - index;
+                prog.CodePos = index;
+                prog.CodeLength = i - index;
                 return i;
             }
 
@@ -85,8 +85,8 @@ namespace funcscript.core
             {
                 parseNode = switchNode;
                 prog = switchExp;
-                prog.Pos = index;
-                prog.Length = i - index;
+                prog.CodePos = index;
+                prog.CodeLength = i - index;
                 return i;
             }
 
@@ -96,8 +96,8 @@ namespace funcscript.core
             {
                 parseNode = nodeUnit;
                 prog = new LiteralBlock(ef);
-                prog.Pos = index;
-                prog.Length = i - index;
+                prog.CodePos = index;
+                prog.CodeLength = i - index;
                 return i;
             }
 
@@ -108,8 +108,8 @@ namespace funcscript.core
             {
                 parseNode = nodeUnit;
                 prog = new LiteralBlock(kw);
-                prog.Pos = index;
-                prog.Length = i - index;
+                prog.CodePos = index;
+                prog.CodeLength = i - index;
                 return i;
             }
 
@@ -121,8 +121,8 @@ namespace funcscript.core
             {
                 parseNode = nodeUnit;
                 prog = new ReferenceBlock(ident);
-                prog.Pos = index;
-                prog.Length = i - index;
+                prog.CodePos = index;
+                prog.CodeLength = i - index;
                 return i;
             }
 
@@ -130,8 +130,8 @@ namespace funcscript.core
             if (i > index)
             {
                 parseNode = nodeUnit;
-                prog.Pos = index;
-                prog.Length = i - index;
+                prog.CodePos = index;
+                prog.CodeLength = i - index;
                 return i;
             }
 
@@ -141,8 +141,8 @@ namespace funcscript.core
             {
                 prog = prefixOp;
                 parseNode = prefixOpNode;
-                prog.Pos = index;
-                prog.Length = i - index;
+                prog.CodePos = index;
+                prog.CodeLength = i - index;
                 return i;
             }
 

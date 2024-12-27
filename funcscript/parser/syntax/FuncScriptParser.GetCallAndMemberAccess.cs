@@ -47,8 +47,8 @@ namespace funcscript.core
                     {
                         Source = theUnit,
                         Selector = kvc,
-                        Pos = i,
-                        Length = i2 - i
+                        CodePos = i,
+                        CodeLength = i2 - i
                     };
                     parseNode = new ParseNode(ParseNodeType.Selection, index, i - index, new[] { parseNode, nodeKvc });
                     continue;

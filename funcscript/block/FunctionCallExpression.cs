@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Collections;
+using System.Runtime.InteropServices;
 using funcscript.core;
 using funcscript.error;
 using funcscript.model;
@@ -12,18 +13,27 @@ namespace funcscript.block
         public ExpressionBlock[] Parameters;
 
         
-        class FuncParameterList : IParameterList
+        class FuncParameterList : FsList
         {
             public FunctionCallExpression parent;
-            public List<Action> connectionActions;
-            public override int Count => parent.Parameters.Length;
-            public override (object,CodeLocation) GetParameterWithLocation(IFsDataProvider provider, int index)
+
+
+            public object this[int index] =>index<0||index>=parent.Parameters.Length?null: parent.Parameters[index];
+
+            public int Length => parent.Parameters.Length;
+
+            // Implementing the GetEnumerator method to return an enumerator for the parameters
+            public IEnumerator<object> GetEnumerator()
             {
-                
-                if(index < 0 || index >= parent.Parameters.Length)
-                    return (null,null); 
-                var ret=parent.Parameters[index].Evaluate(provider,connectionActions).Item1;
-                return (ret,parent.Parameters[index].CodeLocation);
+                foreach (var parameter in parent.Parameters)
+                {
+                    yield return parameter.Evaluate();
+                }
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return GetEnumerator();
             }
         }
 
@@ -31,23 +41,19 @@ namespace funcscript.block
         public int Count => Parameters.Length;
 
         
-        public override (object,CodeLocation) Evaluate(IFsDataProvider provider,List<Action> connectionActions)
+        public override object Evaluate()
         {
-            
-            var (func,_) = Function.Evaluate(provider,connectionActions);
+            var func = Function.Evaluate();
             var paramList=new FuncParameterList
             {
-                parent = this,
-                connectionActions=connectionActions
+                parent = this
             };
             if (func is IFsFunction)
             {
                 string fn = null;
-                
                 try
                 {
-                   
-                    var ret = ((IFsFunction)func).Evaluate(provider, paramList);
+                    var ret = ((IFsFunction)func).EvaluateList(paramList);
                     return (ret,this.CodeLocation);
                 }
                 catch (error.EvaluationException)
@@ -56,13 +62,13 @@ namespace funcscript.block
                 }
                 catch (Exception ex)
                 {
-                    throw new error.EvaluationException(this.Pos, this.Length, ex);
+                    throw new error.EvaluationException(this.CodePos, this.CodeLength, ex);
                 }
 
             }
             else if (func is FsList)
             {
-                var index = paramList.GetParameter(provider, 0);
+                var index = paramList[0];
                 object ret;
                 if (index is int)
                 {
@@ -79,7 +85,7 @@ namespace funcscript.block
             }
             else if (func is KeyValueCollection collection)
             {
-                var index = paramList.GetParameter(provider, 0);
+                var index = paramList[0];
 
                 object ret;
                 if (index is string key)
@@ -92,7 +98,7 @@ namespace funcscript.block
                     ret = null;
                 return (ret,this.CodeLocation);
             }
-            throw new EvaluationException(this.Pos, this.Length,
+            throw new EvaluationException(this.CodePos, this.CodeLength,
                 new TypeMismatchError($"Function part didn't evaluate to a function or a list. {FuncScript.GetFsDataType(func)}"));
         }
 
@@ -109,12 +115,12 @@ namespace funcscript.block
         {
             return "function";
         }
-        public override string AsExpString(IFsDataProvider provider)
+        public override string AsExpString()
         {
             string infix = null;
             if (this.Function is ReferenceBlock)
             {
-                var f = provider.Get(((ExpressionBlock)this.Function).ToString().ToLower()) as IFsFunction;
+                var f = Provider.Get(((ExpressionBlock)this.Function).ToString().ToLower()) as IFsFunction;
                 if (f != null && f.CallType == CallType.Infix)
                 {
                     infix = f.Symbol;
@@ -131,15 +137,15 @@ namespace funcscript.block
             var sb = new StringBuilder();
             if (infix == null)
             {
-                sb.Append(this.Function.AsExpString(provider));
+                sb.Append(this.Function.AsExpString());
                 sb.Append("(");
                 if (Parameters.Length > 0)
                 {
-                    sb.Append(this.Parameters[0].AsExpString(provider));
+                    sb.Append(this.Parameters[0].AsExpString());
                     for (int i = 1; i < Parameters.Length; i++)
                     {
                         sb.Append(",");
-                        sb.Append(this.Parameters[i].AsExpString(provider));
+                        sb.Append(this.Parameters[i].AsExpString());
                     }
                 }
                 sb.Append(")");
@@ -148,11 +154,11 @@ namespace funcscript.block
             {
                 if (Parameters.Length > 0)
                 {
-                    sb.Append(this.Parameters[0].AsExpString(provider));
+                    sb.Append(this.Parameters[0].AsExpString());
                     for (int i = 1; i < Parameters.Length; i++)
                     {
                         sb.Append($" {infix} ");
-                        sb.Append(this.Parameters[i].AsExpString(provider));
+                        sb.Append(this.Parameters[i].AsExpString());
                     }
                 }
             }

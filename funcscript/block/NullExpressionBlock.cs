@@ -4,19 +4,18 @@ namespace funcscript.block
 {
     public class NullExpressionBlock : ExpressionBlock
     {
-        public override (object,CodeLocation) Evaluate(IFsDataProvider provider,List<Action> connectionActions)
+        public override object Evaluate()
         {
-            return (null,this.CodeLocation);
+            return null;
         }
         public override IList<ExpressionBlock> GetChilds()
         {
             return new ExpressionBlock[0];
         }
-        public override string AsExpString(IFsDataProvider provider)
+        public override string AsExpString()
         {
             return "null";
         }
-
     }
 
 }

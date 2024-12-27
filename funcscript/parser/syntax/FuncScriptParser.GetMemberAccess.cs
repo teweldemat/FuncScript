@@ -36,8 +36,8 @@ namespace funcscript.core
             {
                 Function = new LiteralBlock(context.Get(oper)),
                 Parameters = new ExpressionBlock[] { source, new LiteralBlock(member) },
-                Pos = source.Pos,
-                Length = i - source.Pos
+                CodePos = source.CodePos,
+                CodeLength = i - source.CodePos
             };
             return i;
         }

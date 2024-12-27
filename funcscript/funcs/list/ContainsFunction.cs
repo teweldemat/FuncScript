@@ -1,6 +1,5 @@
 using funcscript.core;
 using funcscript.model;
-using System;
 
 namespace funcscript.funcs.list
 {
@@ -12,13 +11,13 @@ namespace funcscript.funcs.list
 
         public string Symbol => "Contains";
 
-        public object Evaluate(IFsDataProvider parent, IParameterList pars)
+        public object EvaluateList(FsList pars)
         {
-            if (pars.Count != MaxParsCountValue)
-                throw new error.TypeMismatchError($"{this.Symbol} function: Invalid parameter count. Expected {MaxParsCountValue}, but got {pars.Count}");
+            if (pars.Length != MaxParsCountValue)
+                throw new error.TypeMismatchError($"{this.Symbol} function: Invalid parameter count. Expected {MaxParsCountValue}, but got {pars.Length}");
 
-            var container = pars.GetParameter(parent, 0);
-            var item = pars.GetParameter(parent, 1);
+            var container = pars[0];
+            var item = pars[1];
 
             return EvaluateInternal(container, item);
         }

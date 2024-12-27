@@ -1,3 +1,4 @@
+using System.Collections;
 using funcscript.core;
 using funcscript.model;
 
@@ -11,13 +12,13 @@ namespace funcscript.funcs.list
 
         public string Symbol => "First";
 
-        public object Evaluate(IFsDataProvider parent, IParameterList pars)
+        public object EvaluateList(FsList pars)
         {
-            if (pars.Count != MaxParameterCount)
-                throw new error.EvaluationTimeException($"{this.Symbol} function: Invalid parameter count. Expected {MaxParameterCount}, but got {pars.Count}");
+            if (pars.Length != MaxParameterCount)
+                throw new error.EvaluationTimeException($"{this.Symbol} function: Invalid parameter count. Expected {MaxParameterCount}, but got {pars.Length}");
 
-            var par0 = pars.GetParameter(parent, 0);
-            var par1 = pars.GetParameter(parent, 1);
+            var par0 = pars[0];
+            var par1 = pars[1];
 
             if (par0 == null)
                 return null;
@@ -32,7 +33,7 @@ namespace funcscript.funcs.list
 
             for (int i = 0; i < lst.Length; i++)
             {
-                var result = func.Evaluate(parent, new ParameterList { X = lst[i], I = i });
+                var result = func.EvaluateList(new ParameterList { X = lst[i], I = i });
 
                 if (result is bool && (bool)result)
                     return lst[i];
@@ -54,22 +55,28 @@ namespace funcscript.funcs.list
             }
         }
         
-        class ParameterList : IParameterList
+        class ParameterList : FsList
         {
             public object X;
             public object I;
 
-            public override int Count => 2;
-
-            public override (object, CodeLocation) GetParameterWithLocation(IFsDataProvider provider, int index)
+            public int Length => 2;
+            public IEnumerator<object> GetEnumerator()
             {
-                return index switch
-                {
-                    0 => (X, null),
-                    1 => (I, null),
-                    _ => (null, null),
-                };
+                throw new NotImplementedException();
             }
+
+            public object this[int index] => index switch
+            {
+                0 => X,
+                1 => I,
+                _ => null,
+            };
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return GetEnumerator();
+            }
+            
         }
     }
 }

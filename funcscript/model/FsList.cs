@@ -5,14 +5,15 @@ using System.Text;
 
 namespace funcscript.model
 {
-    public abstract class FsList:IEnumerable<object>
+    public interface FsList : IEnumerable<object>
     {
         //public abstract  IEnumerable<object> Data { get; }
         public abstract object this[int index] { get; }
         public abstract int Length { get; }
         public abstract IEnumerator<object> GetEnumerator();
+    }
 
-        public override bool Equals(object obj)
+    /*public override bool Equals(object obj)
         {
             if (obj == null || GetType() != obj.GetType())
             {
@@ -74,7 +75,7 @@ namespace funcscript.model
                 || t.GetGenericTypeDefinition().IsAssignableTo(typeof(List<>)));
         }
         
-    }
+    */
 
     public class ArrayFsList : FsList
     {
@@ -112,9 +113,14 @@ namespace funcscript.model
             return this.GetHashCode();
         }
 
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
 
-        public override object this[int index] => (index<0||index>=_data.Length)?null:_data[index];
-        public override int Length =>_data.Length;
-        public override IEnumerator<object> GetEnumerator() => ((System.Collections.Generic.IEnumerable<object>)_data).GetEnumerator();
+
+        public object this[int index] => (index<0||index>=_data.Length)?null:_data[index];
+        public int Length =>_data.Length;
+        public IEnumerator<object> GetEnumerator() => ((System.Collections.Generic.IEnumerable<object>)_data).GetEnumerator();
     }
 }
