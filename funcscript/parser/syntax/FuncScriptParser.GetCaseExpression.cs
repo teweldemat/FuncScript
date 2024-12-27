@@ -4,7 +4,7 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetCaseExpression(IFsDataProvider context, String exp, int index, out ExpressionBlock prog,
+        static int GetCaseExpression(IFsDataProvider context, string exp, int index, out ExpressionBlock prog,
             out ParseNode parseNode, List<SyntaxErrorData> serrors)
         {
             prog = null;
@@ -66,6 +66,7 @@ namespace funcscript.core
 
             prog = new FunctionCallExpression
             {
+                Provider = context,
                 Function = new LiteralBlock(context.Get(KW_CASE)),
                 CodePos = index,
                 CodeLength = i - index,

@@ -51,7 +51,11 @@ namespace funcscript.core
             }
 
             i = i2;
-            listExpr = new ListExpression { ValueExpressions = listItems.ToArray() };
+            listExpr = new ListExpression
+            {
+                Provider=context,
+                ValueExpressions = listItems.ToArray()
+            };
             parseNode = new ParseNode(ParseNodeType.List, index, i - index, nodeListItems);
             return i;
         }

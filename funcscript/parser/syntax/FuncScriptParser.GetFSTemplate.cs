@@ -49,6 +49,7 @@ namespace funcscript.core
 
                     i = SkipSpace(exp, i);
 
+                    expr.Provider = provider; // Assign provider
                     parts.Add(expr);
                     nodeParts.Add(nodeExpr);
                     i = i2;
@@ -95,6 +96,7 @@ namespace funcscript.core
             {
                 prog = new FunctionCallExpression
                 {
+                    Provider = provider, // Assign provider
                     Function = new LiteralBlock(provider.Get(TemplateMergeMergeFunction.SYMBOL)),
                     Parameters = parts.ToArray()
                 };

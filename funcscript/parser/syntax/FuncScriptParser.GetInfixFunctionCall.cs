@@ -21,12 +21,11 @@ namespace funcscript.core
             prog = firstParam;
             parseNode = firstPramNode;
 
-
             allOperands.Add(firstParam);
             childNodes.Add(firstPramNode);
             i = SkipSpace(exp, i);
 
-            var i2 = GetIdentifier(exp, i, out var iden, out var idenLower, out var idenNode);
+            var i2 = GetIdentifier(parseContext, exp, i, out var iden, out var idenLower, out var idenNode);
             if (i2 == i)
             {
                 return i;
@@ -36,15 +35,14 @@ namespace funcscript.core
             {
                 prog = null;
                 parseNode = null;
-                serrors.Add(new SyntaxErrorData(i,i2-i,"A function expected"));
+                serrors.Add(new SyntaxErrorData(i, i2 - i, "A function expected"));
                 return index;
             }
-            if (inf.CallType!=CallType.Dual)
+            if (inf.CallType != CallType.Dual)
             {
                 return i;
             }
 
-            
             childNodes.Add(idenNode);
             i = SkipSpace(exp, i2);
 
@@ -61,7 +59,6 @@ namespace funcscript.core
             childNodes.Add(secondParamNode);
             i = SkipSpace(exp, i2);
 
-
             while (true)
             {
                 i2 = GetLiteralMatch(exp, i, "~");
@@ -77,7 +74,6 @@ namespace funcscript.core
                 childNodes.Add(morePrseNode);
             }
 
-
             if (allOperands.Count < 2)
             {
                 prog = null;
@@ -87,6 +83,7 @@ namespace funcscript.core
 
             prog = new FunctionCallExpression
             {
+                Provider = parseContext,
                 Function = new LiteralBlock(func),
                 Parameters = allOperands.ToArray()
             };

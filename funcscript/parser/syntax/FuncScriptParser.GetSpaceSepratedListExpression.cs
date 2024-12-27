@@ -4,7 +4,7 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetSpaceSepratedListExpression(IFsDataProvider context, String exp, int index,
+        static int GetSpaceSepratedListExpression(IFsDataProvider context, string exp, int index,
             out ListExpression listExpr, out ParseNode parseNode, List<SyntaxErrorData> serrors)
         {
             parseNode = null;
@@ -35,7 +35,7 @@ namespace funcscript.core
                 } while (true);
             }
 
-            listExpr = new ListExpression { ValueExpressions = listItems.ToArray() };
+            listExpr = new ListExpression { Provider = context, ValueExpressions = listItems.ToArray() };
             parseNode = new ParseNode(ParseNodeType.List, index, i - index, nodeListItems);
             return i;
         }

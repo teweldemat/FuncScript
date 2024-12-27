@@ -10,42 +10,6 @@ namespace funcscript.block
 {
     public class KvcExpression : ExpressionBlock,KeyValueCollection
     {
-        private class KvcExpressionProvider : IFsDataProvider
-        {
-            private readonly KvcExpression _parent;
-            private readonly Dictionary<string, object> _valCache = new Dictionary<string, object>();
-            public IFsDataProvider ParentProvider { get; }
-
-            public bool IsDefined(string key)
-            {
-                return _parent.index.ContainsKey(key);
-            }
-
-            public KvcExpressionProvider(IFsDataProvider provider, KvcExpression parent)
-            {
-                this.ParentProvider = provider;
-                _parent = parent;
-            }
-            String _evaluating = null;
-            public object Get(string name)
-            {
-                if (_valCache.TryGetValue(name, out var val))
-                    return val;
-                if (_evaluating == null || name != _evaluating)
-                {
-                    if (_parent.index.TryGetValue(name, out var exp) && exp.ValueExpression != null)
-                    {
-                        _evaluating = name;
-                        var v = exp.ValueExpression.Evaluate();
-                        _evaluating = null;
-                        _valCache[name] = v;
-                        return v;
-                    }
-                }
-                return ParentProvider.Get(name);
-            }
-        }
-
         public class KeyValueExpression
         {
             public String Key;
@@ -55,7 +19,7 @@ namespace funcscript.block
         public IList<KeyValueExpression> _keyValues;
         public ExpressionBlock singleReturn = null;
         private Dictionary<string, KeyValueExpression> index;
-        public String SetKeyValues(IList<KeyValueExpression> kv, ExpressionBlock retExpression)
+        public string SetKeyValues(IList<KeyValueExpression> kv, ExpressionBlock retExpression)
         {
             _keyValues = kv;
             
@@ -85,17 +49,6 @@ namespace funcscript.block
         public override object Evaluate()
         {
             return this;
-            var evalProvider = new KvcExpressionProvider(Provider, this);
-
-            var kvc = new SimpleKeyValueCollection(null, this._keyValues
-                .Select(kv => KeyValuePair.Create<string, object>(kv.Key,
-                    evalProvider.Get(kv.KeyLower))).ToArray());
-
-            if (singleReturn != null)
-            {
-                return singleReturn.Evaluate();
-            }
-            return kvc;
         }
 
         public override IList<ExpressionBlock> GetChilds()

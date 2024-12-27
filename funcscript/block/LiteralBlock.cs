@@ -27,7 +27,8 @@ namespace funcscript.block
                     exp.SetContext(Provider);
                 }
             }
-            return (Value,this.CodeLocation);
+
+            return Value;
         }
         public override IList<ExpressionBlock> GetChilds()
         {

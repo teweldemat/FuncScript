@@ -63,6 +63,7 @@ namespace funcscript.core
 
             prog = new FunctionCallExpression
             {
+                Provider = context,
                 Function = new LiteralBlock(context.Get(KW_SWITCH)),
                 CodePos = index,
                 CodeLength = i - index,

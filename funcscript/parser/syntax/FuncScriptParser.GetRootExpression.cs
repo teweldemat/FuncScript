@@ -1,8 +1,11 @@
+using funcscript.block;
+using funcscript.funcs.math;
+
 namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetRootExpression(IFsDataProvider parseContext, String exp, int index, out ExpressionBlock prog,
+        static int GetRootExpression(IFsDataProvider parseContext, string exp, int index, out ExpressionBlock prog,
             out ParseNode parseNode, List<SyntaxErrorData> serrors)
         {
             var thisErrors = new List<SyntaxErrorData>();
@@ -10,6 +13,7 @@ namespace funcscript.core
             if (i > index)
             {
                 prog = kvc;
+                prog.Provider = parseContext;
                 serrors.AddRange(thisErrors);
                 return i;
             }
@@ -18,6 +22,7 @@ namespace funcscript.core
             i = GetExpression(parseContext, exp, index, out prog, out parseNode, serrors);
             if (i > index)
             {
+                prog.Provider = parseContext;
                 serrors.AddRange(thisErrors);
                 return i;
             }

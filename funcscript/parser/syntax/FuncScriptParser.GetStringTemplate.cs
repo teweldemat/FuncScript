@@ -22,7 +22,6 @@ namespace funcscript.core
             var parts = new List<ExpressionBlock>();
             var nodeParts = new List<ParseNode>();
 
-
             var i = GetLiteralMatch(exp, index, $"f{delimator}");
             if (i == index)
                 return index;
@@ -76,7 +75,7 @@ namespace funcscript.core
                 {
                     if (sb.Length > 0)
                     {
-                        parts.Add(new LiteralBlock(sb.ToString()));
+                        parts.Add(new LiteralBlock(sb.ToString()) { Provider = provider });
                         nodeParts.Add(new ParseNode(ParseNodeType.LiteralString, lastIndex, i - lastIndex));
                         sb = new StringBuilder();
                     }
@@ -116,7 +115,7 @@ namespace funcscript.core
             {
                 if (sb.Length > 0)
                 {
-                    parts.Add(new LiteralBlock(sb.ToString()));
+                    parts.Add(new LiteralBlock(sb.ToString()) { Provider = provider });
                     nodeParts.Add(new ParseNode(ParseNodeType.LiteralString, lastIndex, i - lastIndex));
                     sb = new StringBuilder();
                 }
@@ -135,7 +134,7 @@ namespace funcscript.core
 
             if (parts.Count == 0)
             {
-                prog = new LiteralBlock("");
+                prog = new LiteralBlock("") { Provider = provider };
                 parseNode = new ParseNode(ParseNodeType.LiteralString, index, i - index);
             }
 
@@ -148,7 +147,8 @@ namespace funcscript.core
             {
                 prog = new FunctionCallExpression
                 {
-                    Function = new LiteralBlock(provider.Get("+")),
+                    Provider = provider,
+                    Function = new LiteralBlock(provider.Get("+")) { Provider = provider },
                     Parameters = parts.ToArray()
                 };
                 parseNode = new ParseNode(ParseNodeType.StringTemplate, index, i - index, nodeParts);

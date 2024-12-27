@@ -1,4 +1,5 @@
-
+using funcscript.block;
+using funcscript.funcs.math;
 
 namespace funcscript.core
 {
@@ -14,10 +15,12 @@ namespace funcscript.core
                 if (i <= index) continue;
 
                 var func = parseContext.Get(op);
-//                if (func is not IFsFunction f) 
-//                    continue;
-
                 oper = func as IFsFunction;
+                if (oper != null && oper is ExpressionBlock expressionBlock)
+                {
+                    expressionBlock.Provider = parseContext;
+                }
+
                 parseNode = new ParseNode(ParseNodeType.Operator, index, i - index);
                 matechedOp = op;
                 return i;

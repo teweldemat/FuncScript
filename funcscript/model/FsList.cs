@@ -11,6 +11,15 @@ namespace funcscript.model
         public abstract object this[int index] { get; }
         public abstract int Length { get; }
         public abstract IEnumerator<object> GetEnumerator();
+        
+        public static bool IsListType(Type t) =>
+            t.IsAssignableTo(typeof(System.Collections.IEnumerable)) || t.IsAssignableTo(typeof(System.Collections.IList)) || IsGenericList(t);
+        static bool IsGenericList(Type t)
+        {
+            return t != typeof(byte[]) && t.IsGenericType && (t.GetGenericTypeDefinition().IsAssignableTo(typeof(IList<>))
+                                                              || t.GetGenericTypeDefinition().IsAssignableTo(typeof(List<>)));
+        }
+
     }
 
     /*public override bool Equals(object obj)
@@ -67,13 +76,6 @@ namespace funcscript.model
         }
 
         // override object.GetHashCode
-        public static bool IsListType(Type t) =>
-            t.IsAssignableTo(typeof(System.Collections.IEnumerable)) || t.IsAssignableTo(typeof(System.Collections.IList)) || IsGenericList(t);
-        static bool IsGenericList(Type t)
-        {
-            return t != typeof(byte[]) && t.IsGenericType && (t.GetGenericTypeDefinition().IsAssignableTo(typeof(IList<>))
-                || t.GetGenericTypeDefinition().IsAssignableTo(typeof(List<>)));
-        }
         
     */
 

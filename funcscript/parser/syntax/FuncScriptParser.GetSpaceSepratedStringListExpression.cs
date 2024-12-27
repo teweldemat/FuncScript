@@ -1,24 +1,27 @@
+using funcscript.block;
+using funcscript.funcs.math;
+
 namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetSpaceSepratedStringListExpression(IFsDataProvider context, String exp, int index,
+        static int GetSpaceSepratedStringListExpression(IFsDataProvider context, string exp, int index,
             out List<string> stringList, out ParseNode parseNode, List<SyntaxErrorData> serrors)
         {
             parseNode = null;
             stringList = null;
             var i = SkipSpace(exp, index);
 
-            var listItems = new List<String>();
+            var listItems = new List<string>();
             var nodeListItems = new List<ParseNode>();
-            String firstItem;
+            string firstItem;
             ParseNode firstNode;
 
-            String otherItem;
+            string otherItem;
             ParseNode otherNode;
-            var i2 = GetSimpleString(exp, i, out firstItem, out firstNode, serrors);
+            var i2 = GetSimpleString(context, exp, i, out firstItem, out firstNode, serrors);
             if (i2 == i)
-                i2 = GetSpaceLessString(exp, i, out firstItem, out firstNode);
+                i2 = GetSpaceLessString(context, exp, i, out firstItem, out firstNode);
             if (i2 > i)
             {
                 listItems.Add(firstItem);
@@ -31,9 +34,9 @@ namespace funcscript.core
                         break;
                     i = i2;
                     i = SkipSpace(exp, i);
-                    i2 = GetSimpleString(exp, i, out otherItem, out otherNode, serrors);
+                    i2 = GetSimpleString(context, exp, i, out otherItem, out otherNode, serrors);
                     if (i2 == i)
-                        i2 = GetSpaceLessString(exp, i, out otherItem, out otherNode);
+                        i2 = GetSpaceLessString(context, exp, i, out otherItem, out otherNode);
 
                     if (i2 == i)
                         break;

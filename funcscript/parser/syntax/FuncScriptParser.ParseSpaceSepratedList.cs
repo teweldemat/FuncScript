@@ -1,3 +1,6 @@
+using funcscript.block;
+using funcscript.funcs.math;
+
 namespace funcscript.core
 {
     public partial class FuncScriptParser

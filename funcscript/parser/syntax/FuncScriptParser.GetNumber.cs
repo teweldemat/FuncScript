@@ -1,8 +1,11 @@
+using funcscript.block;
+using funcscript.funcs.math;
+
 namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetNumber(String exp, int index, out object number, out ParseNode parseNode,
+        static int GetNumber(IFsDataProvider parseContext, string exp, int index, out object number, out ParseNode parseNode,
             List<SyntaxErrorData> serros)
         {
             parseNode = null;
@@ -11,7 +14,7 @@ namespace funcscript.core
             var hasLong = false;
             number = null;
             int i = index;
-            var i2 = GetInt(exp, true, i, out var intDigits, out var nodeDigits);
+            var i2 = GetInt(parseContext, exp, true, i, out var intDigits, out var nodeDigits);
             if (i2 == i)
                 return index;
             i = i2;
@@ -22,7 +25,7 @@ namespace funcscript.core
             i = i2;
             if (hasDecimal)
             {
-                i = GetInt(exp, false, i, out var decimalDigits, out var nodeDecimlaDigits);
+                i = GetInt(parseContext, exp, false, i, out var decimalDigits, out var nodeDecimlaDigits);
             }
 
             i2 = GetLiteralMatch(exp, i, "E");
@@ -32,7 +35,7 @@ namespace funcscript.core
             String expDigits = null;
             ParseNode nodeExpDigits;
             if (hasExp)
-                i = GetInt(exp, true, i, out expDigits, out nodeExpDigits);
+                i = GetInt(parseContext, exp, true, i, out expDigits, out nodeExpDigits);
 
             if (!hasDecimal) //if no decimal we check if there is the 'l' suffix
             {

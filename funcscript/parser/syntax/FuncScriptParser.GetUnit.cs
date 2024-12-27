@@ -5,7 +5,7 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetUnit(IFsDataProvider provider, String exp, int index, out ExpressionBlock prog,
+        static int GetUnit(IFsDataProvider provider, string exp, int index, out ExpressionBlock prog,
             out ParseNode parseNode, List<SyntaxErrorData> serrors)
         {
             ParseNode nodeUnit;
@@ -13,35 +13,35 @@ namespace funcscript.core
             prog = null;
             int i;
 
-
             //get string
             i = GetStringTemplate(provider, exp, index, out var template, out nodeUnit, serrors);
             if (i > index)
             {
                 parseNode = nodeUnit;
                 prog = template;
+                prog.Provider = provider;
                 prog.CodePos = index;
                 prog.CodeLength = i - index;
                 return i;
             }
 
             //get string 
-            i = GetSimpleString(exp, index, out var str, out nodeUnit, serrors);
+            i = GetSimpleString(provider, exp, index, out var str, out nodeUnit, serrors);
             if (i > index)
             {
                 parseNode = nodeUnit;
-                prog = new LiteralBlock(str);
+                prog = new LiteralBlock(str) { Provider = provider };
                 prog.CodePos = index;
                 prog.CodeLength = i - index;
                 return i;
             }
 
             //get number
-            i = GetNumber(exp, index, out var numberVal, out nodeUnit, serrors);
+            i = GetNumber(provider, exp, index, out var numberVal, out nodeUnit, serrors);
             if (i > index)
             {
                 parseNode = nodeUnit;
-                prog = new LiteralBlock(numberVal);
+                prog = new LiteralBlock(numberVal) { Provider = provider };
                 prog.CodePos = index;
                 prog.CodeLength = i - index;
                 return i;
@@ -53,11 +53,11 @@ namespace funcscript.core
             {
                 parseNode = nodeUnit;
                 prog = lst;
+                prog.Provider = provider;
                 prog.CodePos = index;
                 prog.CodeLength = i - index;
                 return i;
             }
-
 
             //kvc expression
             i = GetKvcExpression(provider, false, exp, index, out var json, out nodeUnit, serrors);
@@ -65,6 +65,7 @@ namespace funcscript.core
             {
                 parseNode = nodeUnit;
                 prog = json;
+                prog.Provider = provider;
                 prog.CodePos = index;
                 prog.CodeLength = i - index;
                 return i;
@@ -75,6 +76,7 @@ namespace funcscript.core
             {
                 parseNode = caseNode;
                 prog = caseExp;
+                prog.Provider = provider;
                 prog.CodePos = index;
                 prog.CodeLength = i - index;
                 return i;
@@ -85,6 +87,7 @@ namespace funcscript.core
             {
                 parseNode = switchNode;
                 prog = switchExp;
+                prog.Provider = provider;
                 prog.CodePos = index;
                 prog.CodeLength = i - index;
                 return i;
@@ -95,32 +98,29 @@ namespace funcscript.core
             if (i > index)
             {
                 parseNode = nodeUnit;
-                prog = new LiteralBlock(ef);
+                prog = new LiteralBlock(ef) { Provider = provider };
                 prog.CodePos = index;
                 prog.CodeLength = i - index;
                 return i;
             }
-
 
             //null, true, false
-            i = GetKeyWordLiteral(exp, index, out var kw, out nodeUnit);
+            i = GetKeyWordLiteral(provider, exp, index, out var kw, out nodeUnit);
             if (i > index)
             {
                 parseNode = nodeUnit;
-                prog = new LiteralBlock(kw);
+                prog = new LiteralBlock(kw) { Provider = provider };
                 prog.CodePos = index;
                 prog.CodeLength = i - index;
                 return i;
             }
 
-            
-
             //get identifier
-            i = GetIdentifier(exp, index, out var ident, out var identLower, out nodeUnit);
+            i = GetIdentifier(provider, exp, index, out var ident, out var identLower, out nodeUnit);
             if (i > index)
             {
                 parseNode = nodeUnit;
-                prog = new ReferenceBlock(ident);
+                prog = new ReferenceBlock(ident) { Provider = provider };
                 prog.CodePos = index;
                 prog.CodeLength = i - index;
                 return i;
@@ -130,6 +130,7 @@ namespace funcscript.core
             if (i > index)
             {
                 parseNode = nodeUnit;
+                prog.Provider = provider;
                 prog.CodePos = index;
                 prog.CodeLength = i - index;
                 return i;
@@ -145,7 +146,6 @@ namespace funcscript.core
                 prog.CodeLength = i - index;
                 return i;
             }
-
 
             return index;
         }

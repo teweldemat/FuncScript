@@ -1,3 +1,5 @@
+using funcscript.block;
+using funcscript.funcs.math;
 
 namespace funcscript.core
 {
@@ -7,6 +9,7 @@ namespace funcscript.core
             List<SyntaxErrorData> serrors)
         {
             var i = GetFSTemplate(context, exp, 0, out var block, out parseNode, serrors);
+            block.Provider = context;
             return block;
         }
 

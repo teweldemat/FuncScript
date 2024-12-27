@@ -31,8 +31,8 @@ public class ExecutionNode : KeyValueCollection
     private string _nameLower;
     private string _name;
     private IFsDataProvider _prentNode = null;
-    public override IFsDataProvider ParentProvider => _prentNode;
-    public override object Get(string name)
+    public IFsDataProvider ParentProvider => _prentNode;
+    public object Get(string name)
     {
         var ch = Children.FirstOrDefault(c => c._nameLower.Equals(name));
         if (ch == null)
@@ -92,12 +92,12 @@ public class ExecutionNode : KeyValueCollection
 
     
     
-    public override bool IsDefined(string key)
+    public bool IsDefined(string key)
     {
         return Children.Any(c => c._nameLower == key);
     }
 
-    public override IList<KeyValuePair<string, object>> GetAll()
+    public IList<KeyValuePair<string, object>> GetAll()
     {
         return this.Children.Select(c => KeyValuePair.Create(c._name, c.Evaluate(this))).ToList();
     }

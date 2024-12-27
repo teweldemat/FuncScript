@@ -68,9 +68,9 @@ namespace funcscript.core
 
             i = i2;
 
-
             prog = new FunctionCallExpression
             {
+                Provider = context,
                 Function = func,
                 Parameters = pars.ToArray(),
                 CodePos = func.CodePos,

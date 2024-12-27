@@ -1,9 +1,8 @@
-
 namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetInt(String exp, bool allowNegative, int index, out string intVal, out ParseNode parseNode)
+        static int GetInt(IFsDataProvider parseContext, string exp, bool allowNegative, int index, out string intVal, out ParseNode parseNode)
         {
             parseNode = null;
             int i = index;

@@ -4,7 +4,7 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetCallAndMemberAccess(IFsDataProvider parseContext, String exp, int index, out ExpressionBlock prog,
+        static int GetCallAndMemberAccess(IFsDataProvider parseContext, string exp, int index, out ExpressionBlock prog,
             out ParseNode parseNode, List<SyntaxErrorData> serrors)
         {
             parseNode = null;
@@ -45,6 +45,7 @@ namespace funcscript.core
                     i = i2;
                     theUnit = new SelectorExpression
                     {
+                        Provider = parseContext,
                         Source = theUnit,
                         Selector = kvc,
                         CodePos = i,

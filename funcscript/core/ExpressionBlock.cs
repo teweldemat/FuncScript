@@ -16,7 +16,6 @@ namespace funcscript.core
         public int CodeLength;
 
         public IFsDataProvider Provider;
-        public CodeLocation CodeLocation => new CodeLocation(CodePos, CodeLength);
         public abstract object Evaluate();
         public abstract IList<ExpressionBlock> GetChilds();
         public abstract String AsExpString();

@@ -1,3 +1,5 @@
+using funcscript.block;
+using funcscript.funcs.math;
 
 namespace funcscript.core
 {
@@ -22,6 +24,7 @@ namespace funcscript.core
 
             i = i2;
             retExp = expBlock;
+            retExp.Provider = context;
             retExp.CodePos = index;
             retExp.CodeLength = i - index;
             parseNode = new ParseNode(ParseNodeType.ExpressionInBrace, index, i - index,

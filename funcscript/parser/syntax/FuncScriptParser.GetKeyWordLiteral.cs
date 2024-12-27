@@ -2,7 +2,7 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetKeyWordLiteral(String exp, int index, out object literal, out ParseNode parseNode)
+        static int GetKeyWordLiteral(IFsDataProvider parseContext, string exp, int index, out object literal, out ParseNode parseNode)
         {
             parseNode = null;
             var i = GetLiteralMatch(exp, index, "null");

@@ -68,8 +68,9 @@ namespace funcscript.block
                     ret[i] = Selector.Evaluate();
                     i++;
                 }
-                return (new ArrayFsList(ret),this.CodeLocation);
-            
+
+                return new ArrayFsList(ret);
+
             }
             else
             {

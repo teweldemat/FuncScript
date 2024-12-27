@@ -18,7 +18,8 @@ namespace funcscript.block
             public FunctionCallExpression parent;
 
 
-            public object this[int index] =>index<0||index>=parent.Parameters.Length?null: parent.Parameters[index];
+            public object this[int index] =>index<0||index>=parent.Parameters.Length?null: 
+                parent.Parameters[index].Evaluate();
 
             public int Length => parent.Parameters.Length;
 
@@ -54,7 +55,7 @@ namespace funcscript.block
                 try
                 {
                     var ret = ((IFsFunction)func).EvaluateList(paramList);
-                    return (ret,this.CodeLocation);
+                    return ret;
                 }
                 catch (error.EvaluationException)
                 {
@@ -81,7 +82,8 @@ namespace funcscript.block
                 }
                 else
                     ret = null;
-                return (ret,this.CodeLocation);
+
+                return ret;
             }
             else if (func is KeyValueCollection collection)
             {
@@ -92,11 +94,12 @@ namespace funcscript.block
                 {
                     var kvc = collection;
                     var value = kvc.Get(key.ToLower());
-                    return (value,this.CodeLocation);
+                    return value;
                 }
                 else
                     ret = null;
-                return (ret,this.CodeLocation);
+
+                return ret;
             }
             throw new EvaluationException(this.CodePos, this.CodeLength,
                 new TypeMismatchError($"Function part didn't evaluate to a function or a list. {FuncScript.GetFsDataType(func)}"));

@@ -4,16 +4,16 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetSimpleString(string exp, int index, out String str, out ParseNode pareNode,
+        static int GetSimpleString(IFsDataProvider parseContext, string exp, int index, out String str, out ParseNode pareNode,
             List<SyntaxErrorData> serrors)
         {
-            var i = GetSimpleString(exp, "\"", index, out str, out pareNode, serrors);
+            var i = GetSimpleString(parseContext, exp, "\"", index, out str, out pareNode, serrors);
             if (i > index)
                 return i;
-            return GetSimpleString(exp, "'", index, out str, out pareNode, serrors);
+            return GetSimpleString(parseContext, exp, "'", index, out str, out pareNode, serrors);
         }
 
-        static int GetSimpleString(string exp, string delimator, int index, out String str, out ParseNode parseNode,
+        static int GetSimpleString(IFsDataProvider parseContext, string exp, string delimator, int index, out String str, out ParseNode parseNode,
             List<SyntaxErrorData> serrors)
         {
             parseNode = null;
@@ -91,7 +91,5 @@ namespace funcscript.core
             parseNode = new ParseNode(ParseNodeType.LiteralString, index, i - index);
             return i;
         }
-
-
     }
 }

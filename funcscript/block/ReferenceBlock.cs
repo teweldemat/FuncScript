@@ -45,8 +45,8 @@ namespace funcscript.block
         public override object Evaluate()
         {
             if (_fromParent)
-                return (Provider.ParentProvider?.Get(_nameLower),this.CodeLocation);
-            return (Provider.Get(_nameLower), this.CodeLocation);
+                return Provider.ParentProvider?.Get(_nameLower);
+            return Provider.Get(_nameLower);
         }
 
         public override IList<ExpressionBlock> GetChilds()

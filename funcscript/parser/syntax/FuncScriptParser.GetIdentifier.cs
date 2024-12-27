@@ -4,7 +4,7 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetIdentifier(String exp, int index, out String iden, out String idenLower, out ParseNode parseNode)
+        static int GetIdentifier(IFsDataProvider parseContext, String exp, int index, out String iden, out String idenLower, out ParseNode parseNode)
         {
             parseNode = null;
             iden = null;

@@ -32,9 +32,6 @@ namespace funcscript.core
                     i = SkipSpace(exp, i2);
                 }
 
-
-
-
                 i2 = GetKvcItem(context, nakdeMode, exp, i, out var otherItem, out var nodeOtherItem);
                 if (i2 == i)
                     break;
@@ -74,7 +71,10 @@ namespace funcscript.core
                     return index;
             }
 
-            kvcExpr = new KvcExpression();
+            kvcExpr = new KvcExpression
+            {
+                Provider = context
+            };
             var error = kvcExpr.SetKeyValues(kvs.ToArray(), retExp);
             if (error != null)
             {

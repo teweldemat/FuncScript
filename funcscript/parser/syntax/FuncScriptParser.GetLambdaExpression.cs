@@ -1,15 +1,17 @@
+using funcscript.block;
+using funcscript.funcs.math;
 
 namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetLambdaExpression(IFsDataProvider context, String exp, int index, out ExpressionFunction func,
+        static int GetLambdaExpression(IFsDataProvider context, string exp, int index, out ExpressionFunction func,
             out ParseNode parseNode, List<SyntaxErrorData> serrors)
         {
             parseNode = null;
             func = null;
 
-            var i = GetIdentifierList(exp, index, out var parms, out var nodesParams);
+            var i = GetIdentifierList(context, exp, index, out var parms, out var nodesParams);
             if (i == index)
                 return index;
 
@@ -39,6 +41,7 @@ namespace funcscript.core
             }
 
             func = new ExpressionFunction(parms.ToArray(), defination);
+            func.SetContext(context);
             i = i2;
             parseNode = new ParseNode(ParseNodeType.LambdaExpression, index, i - index,
                 new[] { nodesParams, nodeDefination });

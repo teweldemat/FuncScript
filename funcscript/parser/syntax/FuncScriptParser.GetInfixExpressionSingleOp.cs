@@ -4,7 +4,7 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetInfixExpressionSingleOp(IFsDataProvider parseContext, int level, string[] candidates, String exp, int index,
+        static int GetInfixExpressionSingleOp(IFsDataProvider parseContext, int level, string[] candidates, string exp, int index,
             out ExpressionBlock prog, out ParseNode parseNode, List<SyntaxErrorData> serrors)
         {
             prog = null;
@@ -17,9 +17,9 @@ namespace funcscript.core
                 ParseNode operatorNode = null;
                 string symbol = null;
 
-                if (prog == null) //if we parsing the first operaand
+                if (prog == null) //if we parsing the first operand
                 {
-                    //get an infix with one level higher or call expression when we are parsing for highest precidence operators
+                    //get an infix with one level higher or call expression when we are parsing for highest precedence operators
                     if (level == 0)
                     {
                         i2 = GetCallAndMemberAccess(parseContext, exp, i, out prog, out parseNode, serrors);
@@ -80,6 +80,7 @@ namespace funcscript.core
 
                         prog = new ListExpression
                         {
+                            Provider = parseContext,
                             ValueExpressions = operands.ToArray(),
                             CodePos = prog.CodePos,
                             CodeLength = operands[^1].CodePos + operands[^1].CodeLength - prog.CodeLength
@@ -92,6 +93,7 @@ namespace funcscript.core
                     {
                         prog = new FunctionCallExpression
                         {
+                            Provider = parseContext,
                             Function = new LiteralBlock(func),
                             Parameters = operands.ToArray(),
                             CodePos = prog.CodePos,

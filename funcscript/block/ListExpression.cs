@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Runtime.CompilerServices;
 using funcscript.core;
 using funcscript.model;
 using System.Text;
@@ -15,7 +16,7 @@ namespace funcscript.block
         public override object Evaluate( )
         {
             var lst = ValueExpressions.Select(x => x.Evaluate()).ToArray();
-            return (new ArrayFsList(lst),this.CodeLocation);
+            return new ArrayFsList(lst);
         }
         public override IList<ExpressionBlock> GetChilds()
         {
@@ -24,12 +25,15 @@ namespace funcscript.block
             return ret;
         }
 
-        public object this[int index] => throw new NotImplementedException();
+        public object this[int index] =>index<0 || index>=this.ValueExpressions.Length?null:this.ValueExpressions[index].Evaluate();
 
-        public int Length { get; }
+        public int Length => this.ValueExpressions.Length;
         public IEnumerator<object> GetEnumerator()
         {
-            throw new NotImplementedException();
+            foreach (var expr in ValueExpressions)
+            {
+                yield return expr.Evaluate();
+            }
         }
 
         

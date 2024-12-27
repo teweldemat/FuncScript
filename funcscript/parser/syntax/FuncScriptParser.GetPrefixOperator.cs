@@ -50,6 +50,7 @@ namespace funcscript.core
 
             prog = new FunctionCallExpression
             {
+                Provider = parseContext,
                 Function = new LiteralBlock(func),
                 Parameters = new[] { operand },
                 CodePos = index,

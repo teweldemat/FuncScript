@@ -1,4 +1,3 @@
-using funcscript.core;
 using funcscript.model;
 using funcscript.error;
 using NUnit.Framework;
@@ -8,7 +7,6 @@ using System.Text;
 
 namespace funcscript.test
 {
-
     public class TestSet2
     {
         

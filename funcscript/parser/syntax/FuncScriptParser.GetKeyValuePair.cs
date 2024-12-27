@@ -10,10 +10,10 @@ namespace funcscript.core
             parseNode = null;
             keyValue = null;
             string name;
-            var i = GetSimpleString(exp, index, out name, out var nodeNeme, new List<SyntaxErrorData>());
+            var i = GetSimpleString(context, exp, index, out name, out var nodeNeme, new List<SyntaxErrorData>());
             if (i == index)
             {
-                i = GetIdentifier(exp, index, out name, out var nameLower, out nodeNeme);
+                i = GetIdentifier(context,exp, index, out name, out var nameLower, out nodeNeme);
                 if (i == index)
                     return index;
             }

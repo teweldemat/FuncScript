@@ -4,7 +4,7 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetKvcItem(IFsDataProvider context, bool nakedKvc, String exp, int index,
+        static int GetKvcItem(IFsDataProvider context, bool nakedKvc, string exp, int index,
             out KvcExpression.KeyValueExpression item,
             out ParseNode parseNode)
         {
@@ -29,7 +29,7 @@ namespace funcscript.core
 
             if (!nakedKvc)
             {
-                i = GetIdentifier(exp, index, out var iden, out var idenLower, out var nodeIden);
+                i = GetIdentifier(context, exp, index, out var iden, out var idenLower, out var nodeIden);
 
                 if (i > index)
                 {
@@ -40,7 +40,8 @@ namespace funcscript.core
                         ValueExpression = new ReferenceBlock(iden, idenLower, false)
                         {
                             CodePos = index,
-                            CodeLength = i - index
+                            CodeLength = i - index,
+                            Provider = context
                         }
                     };
                     parseNode = nodeIden;
@@ -48,7 +49,7 @@ namespace funcscript.core
                 }
 
                 var e3 = new List<SyntaxErrorData>();
-                i = GetSimpleString(exp, index, out iden, out nodeIden, e3);
+                i = GetSimpleString(context, exp, index, out iden, out nodeIden, e3);
                 if (i > index)
                 {
                     item = new KvcExpression.KeyValueExpression
@@ -58,7 +59,8 @@ namespace funcscript.core
                         ValueExpression = new ReferenceBlock(iden, iden.ToLower(), false)
                         {
                             CodePos = index,
-                            CodeLength = i - index
+                            CodeLength = i - index,
+                            Provider = context
                         }
                     };
                     parseNode = nodeIden;
