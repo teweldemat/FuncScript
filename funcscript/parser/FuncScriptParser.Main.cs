@@ -1,6 +1,7 @@
 using funcscript.block;
 using funcscript.funcs.math;
 using funcscript.funcs.logic;
+using funcscript.model;
 
 namespace funcscript.core
 {
@@ -104,8 +105,7 @@ namespace funcscript.core
             s_KeyWords.Add(KW_SWITCH);
             s_KeyWords.Add(KW_SWITCH);
         }
-
         record ParseResult(ExpressionBlock Expresion, ParseNode Node, int NextIndex);
-
+        record ParseContext(KeyValueCollection Provider, string Expression, List<SyntaxErrorData> Serrors);
     }
 }
