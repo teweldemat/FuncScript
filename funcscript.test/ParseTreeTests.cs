@@ -33,7 +33,8 @@ namespace funcscript.test
             var g = new DefaultFsDataProvider();
             var expText = "{a,b,c}";
             var list = new List<FuncScriptParser.SyntaxErrorData>();
-            var exp= funcscript.core.FuncScriptParser.Parse(g, expText,out var node,list);
+            var context = new ParseContext(g, expText, list);
+            var (exp,node,_)= funcscript.core.FuncScriptParser.Parse(context);
             Assert.IsNotNull(exp);
             Assert.IsNotNull(node);
             node = Flatten(node);

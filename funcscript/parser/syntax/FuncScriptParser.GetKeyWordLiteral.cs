@@ -3,30 +3,33 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetKeyWordLiteral(KeyValueCollection provider, string exp, int index, out object literal, out ParseNode parseNode)
+        public record GetKeyWordLiteralResult(object Literal, ParseNode ParseNode, int NextIndex);
+
+        public static GetKeyWordLiteralResult GetKeyWordLiteral(ParseContext context, int index)
         {
-            parseNode = null;
-            var i = GetLiteralMatch(exp, index, "null");
+            ParseNode parseNode = null;
+            int i = GetLiteralMatch(context, index, "null").NextIndex;
+            object literal;
+
             if (i > index)
             {
                 literal = null;
             }
-            else if ((i = GetLiteralMatch(exp, index, "true")) > index)
+            else if ((i = GetLiteralMatch(context, index, "true").NextIndex) > index)
             {
                 literal = true;
             }
-            else if ((i = GetLiteralMatch(exp, index, "false")) > index)
+            else if ((i = GetLiteralMatch(context, index, "false").NextIndex) > index)
             {
                 literal = false;
             }
             else
             {
-                literal = null;
-                return index;
+                return new GetKeyWordLiteralResult(null, null, index);
             }
 
             parseNode = new ParseNode(ParseNodeType.KeyWord, index, i - index);
-            return i;
+            return new GetKeyWordLiteralResult(literal, parseNode, i);
         }
     }
 }

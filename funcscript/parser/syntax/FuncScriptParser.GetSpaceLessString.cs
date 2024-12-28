@@ -3,23 +3,25 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetSpaceLessString(KeyValueCollection provider, String exp, int index, out String text, out ParseNode parseNode)
+        public record GetSpaceLessStringResult(string Text, ParseNode ParseNode, int NextIndex);
+
+        static GetSpaceLessStringResult GetSpaceLessString(ParseContext context, int index)
         {
-            parseNode = null;
-            text = null;
-            if (index >= exp.Length)
-                return index;
+            if (index >= context.Expression.Length)
+                return new GetSpaceLessStringResult(null, null, index);
+
             var i = index;
 
-            if (i >= exp.Length || isCharWhiteSpace(exp[i]))
-                return index;
+            if (i >= context.Expression.Length || isCharWhiteSpace(context.Expression[i]))
+                return new GetSpaceLessStringResult(null, null, index);
+
             i++;
-            while (i < exp.Length && !isCharWhiteSpace(exp[i]))
+            while (i < context.Expression.Length && !isCharWhiteSpace(context.Expression[i]))
                 i++;
 
-            text = exp.Substring(index, i - index);
-            parseNode = new ParseNode(ParseNodeType.Identifier, index, i - index);
-            return i;
+            var text = context.Expression.Substring(index, i - index);
+            var parseNode = new ParseNode(ParseNodeType.Identifier, index, i - index);
+            return new GetSpaceLessStringResult(text, parseNode, i);
         }
     }
 }

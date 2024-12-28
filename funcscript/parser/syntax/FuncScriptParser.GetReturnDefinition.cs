@@ -5,32 +5,33 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetReturnDefinition(KeyValueCollection provider, String exp, int index, out ExpressionBlock retExp,
-            out ParseNode parseNode, List<SyntaxErrorData> syntaxErrors)
+        static ParseResult GetReturnDefinition(ParseContext context, int index)
         {
-            parseNode = null;
-            retExp = null;
-            var i = GetLiteralMatch(exp, index, KW_RETURN);
+            ParseNode parseNode = null;
+            ExpressionBlock retExp = null;
+            var i = GetLiteralMatch(context, index, KW_RETURN).NextIndex;
             if (i == index)
-                return index;
+                return new ParseResult(retExp, parseNode, index);
+
             var nodeReturn = new ParseNode(ParseNodeType.KeyWord, index, i - index);
-            i = SkipSpace(exp, i);
-            var i2 = GetExpression(provider, exp, i, out var expBlock, out var nodeExpBlock, syntaxErrors);
-            if (i2 == i)
+            i = SkipSpace(context, i).NextIndex;
+            
+            var exprResult = GetExpression(context, i);
+            if (exprResult.NextIndex == i)
             {
-                syntaxErrors.Add(new SyntaxErrorData(i, 0, "return expression expected"));
-                return index;
+                context.Serrors.Add(new SyntaxErrorData(i, 0, "return expression expected"));
+                return new ParseResult(retExp, parseNode, index);
             }
 
-            i = i2;
-            retExp = expBlock;
-            retExp.SetContext(provider);
+            i = exprResult.NextIndex;
+            retExp = exprResult.Expression;
+            retExp.SetContext(context.Provider);
             retExp.CodePos = index;
             retExp.CodeLength = i - index;
             parseNode = new ParseNode(ParseNodeType.ExpressionInBrace, index, i - index,
-                new[] { nodeReturn, nodeExpBlock });
+                new[] { nodeReturn, exprResult.Node });
 
-            return i;
+            return new ParseResult(retExp, parseNode, i);
         }
     }
 }

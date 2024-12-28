@@ -4,20 +4,24 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetIdentifier(KeyValueCollection provider, string exp, int index, bool supportParentRef, out String iden, out String idenLower, out bool parentRef, out ParseNode parseNode)
+        public record GetIdentifierResult(string Iden, string IdenLower, bool ParentRef, ParseNode ParseNode, int NextIndex);
+
+        static GetIdentifierResult GetIdentifier(ParseContext context, int index, bool supportParentRef)
         {
-            parseNode = null;
-            iden = null;
-            idenLower = null;
-            parentRef = false;
+            string iden = null;
+            string idenLower = null;
+            bool parentRef = false;
+            ParseNode parseNode = null;
+
+            var exp = context.Expression;
 
             if (index >= exp.Length)
-                return index;
+                return new GetIdentifierResult(iden, idenLower, parentRef, parseNode, index);
             var i1 = index;
             var i = i1;
             if (supportParentRef)
             {
-                var i2 = GetLiteralMatch(exp, i, "^");
+                var i2 = GetLiteralMatch(context, i, "^").NextIndex;
                 if (i2 > i)
                 {
                     parentRef = true;
@@ -27,19 +31,20 @@ namespace funcscript.core
             }
 
             if (!IsIdentfierFirstChar(exp[i]))
-                return index;
+                return new GetIdentifierResult(iden, idenLower, parentRef, parseNode, index);
             i++;
             while (i < exp.Length && IsIdentfierOtherChar(exp[i]))
             {
                 i++;
             }
-            
+
             iden = exp.Substring(i1, i - i1);
             idenLower = iden.ToLower();
             if (s_KeyWords.Contains(idenLower))
-                return index;
+                return new GetIdentifierResult(iden, idenLower, parentRef, parseNode, index);
+
             parseNode = new ParseNode(ParseNodeType.Identifier, index, i - index);
-            return i;
+            return new GetIdentifierResult(iden, idenLower, parentRef, parseNode, i);
         }
     }
 }

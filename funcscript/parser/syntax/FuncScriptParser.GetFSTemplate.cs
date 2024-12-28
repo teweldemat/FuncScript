@@ -6,11 +6,10 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        public static int GetFSTemplate(KeyValueCollection provider, string exp, int index, out ExpressionBlock prog,
-            out ParseNode parseNode, List<SyntaxErrorData> syntaxErrors)
+        public static ParseResult GetFSTemplate(ParseContext context, int index)
         {
-            parseNode = null;
-            prog = null;
+            var parseNode = (ParseNode)null;
+            var prog = (ExpressionBlock)null;
             var parts = new List<ExpressionBlock>();
             var nodeParts = new List<ParseNode>();
 
@@ -20,14 +19,14 @@ namespace funcscript.core
             var lastIndex = i;
             while (true)
             {
-                i2 = GetLiteralMatch(exp, i, "$${");
+                i2 = GetLiteralMatch(context, i, "$${").NextIndex;
                 if (i2 > i)
                 {
                     sb.Append("${");
                     i = i2;
                 }
 
-                i2 = GetLiteralMatch(exp, i, "${");
+                i2 = GetLiteralMatch(context, i, "${").NextIndex;
                 if (i2 > i)
                 {
                     if (sb.Length > 0)
@@ -39,39 +38,43 @@ namespace funcscript.core
 
                     i = i2;
 
-                    i = SkipSpace(exp, i);
-                    i2 = GetExpression(provider, exp, i, out var expr, out var nodeExpr, syntaxErrors);
+                    i = SkipSpace(context, i).NextIndex;
+                    var resultExpr = GetExpression(context, i);
+                    var expr = resultExpr.Expression;
+                    var nodeExpr = resultExpr.Node;
+                    i2 = resultExpr.NextIndex;
+
                     if (i2 == i)
                     {
-                        syntaxErrors.Add(new SyntaxErrorData(i, 0, "expression expected"));
-                        return index;
+                        context.Serrors.Add(new SyntaxErrorData(i, 0, "expression expected"));
+                        return new ParseResult(null, null, index);
                     }
 
-                    i = SkipSpace(exp, i);
+                    i = SkipSpace(context, i).NextIndex;
 
-                    expr.SetContext(provider); // Assign provider using SetContext
+                    expr.SetContext(context.Provider);
                     parts.Add(expr);
                     nodeParts.Add(nodeExpr);
                     i = i2;
 
-                    i2 = GetLiteralMatch(exp, i, "}");
+                    i2 = GetLiteralMatch(context, i, "}").NextIndex;
                     if (i2 == i)
                     {
-                        syntaxErrors.Add(new SyntaxErrorData(i, 0, "'}' expected"));
-                        return index;
+                        context.Serrors.Add(new SyntaxErrorData(i, 0, "'}' expected"));
+                        return new ParseResult(null, null, index);
                     }
 
                     i = i2;
                     lastIndex = i;
-                    if (i < exp.Length)
+                    if (i < context.Expression.Length)
                         continue;
                     else
                         break;
                 }
 
-                sb.Append(exp[i]);
+                sb.Append(context.Expression[i]);
                 i++;
-                if (i == exp.Length)
+                if (i == context.Expression.Length)
                     break;
             }
 
@@ -96,14 +99,14 @@ namespace funcscript.core
             {
                 prog = new FunctionCallExpression
                 {
-                    Function = new LiteralBlock(provider.Get(TemplateMergeMergeFunction.SYMBOL)),
+                    Function = new LiteralBlock(context.Provider.Get(TemplateMergeMergeFunction.SYMBOL)),
                     Parameters = parts.ToArray()
                 };
-                prog.SetContext(provider); // Assign provider using SetContext
+                prog.SetContext(context.Provider);
                 parseNode = new ParseNode(ParseNodeType.StringTemplate, index, i - index, nodeParts);
             }
 
-            return i;
+            return new ParseResult(prog, parseNode, i);
         }
     }
 }

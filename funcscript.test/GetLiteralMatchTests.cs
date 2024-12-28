@@ -12,7 +12,7 @@ namespace funcscript.test
         public void TestExactMatch()
         {
             string exp = "Hello, world!";
-            int index = FuncScriptParser.GetLiteralMatch(exp, 0, "Hello");
+            int index = FuncScriptParser.GetLiteralMatch(exp, 0, "Hello").NextIndex;
             Assert.AreEqual(5, index);
         }
 
@@ -20,7 +20,7 @@ namespace funcscript.test
         public void TestNoMatch()
         {
             string exp = "Hello, world!";
-            int index = FuncScriptParser.GetLiteralMatch(exp, 0, "Goodbye");
+            int index = FuncScriptParser.GetLiteralMatch(exp, 0, "Goodbye").NextIndex;
             Assert.AreEqual(0, index);
         }
 
@@ -28,7 +28,7 @@ namespace funcscript.test
         public void TestCaseInsensitive()
         {
             string exp = "Hello, world!";
-            int index = FuncScriptParser.GetLiteralMatch(exp, 0, "HELLO");
+            int index = FuncScriptParser.GetLiteralMatch(exp, 0, "HELLO").NextIndex;
             Assert.AreEqual(5, index);
         }
 
@@ -36,7 +36,7 @@ namespace funcscript.test
         public void TestMultipleKeywords()
         {
             string exp = "Hello, world!";
-            int index = FuncScriptParser.GetLiteralMatch(exp, 0, "Goodbye", "Hello", "Hi");
+            int index = FuncScriptParser.GetLiteralMatch(exp, 0, "Goodbye", "Hello", "Hi").NextIndex;
             Assert.AreEqual(5, index);
         }
 
@@ -44,7 +44,7 @@ namespace funcscript.test
         public void TestIndexOutOfBounds()
         {
             string exp = "Hello, world!";
-            int index = FuncScriptParser.GetLiteralMatch(exp, 20, "Hello");
+            int index = FuncScriptParser.GetLiteralMatch(exp, 20, "Hello").NextIndex;
             Assert.AreEqual(20, index);
         }
 
@@ -52,7 +52,7 @@ namespace funcscript.test
         public void TestEmptyString()
         {
             string exp = "";
-            int index = FuncScriptParser.GetLiteralMatch(exp, 0, "Hello");
+            int index = FuncScriptParser.GetLiteralMatch(exp, 0, "Hello").NextIndex;
             Assert.AreEqual(0, index);
         }
 
@@ -60,7 +60,7 @@ namespace funcscript.test
         public void TestStartIndexWithinSubstring()
         {
             string exp = "Hello, world!";
-            int index = FuncScriptParser.GetLiteralMatch(exp, 7, "world");
+            int index = FuncScriptParser.GetLiteralMatch(exp, 7, "world").NextIndex;
             Assert.AreEqual(12, index);
         }
 
@@ -68,7 +68,7 @@ namespace funcscript.test
         public void TestKeywordAtEndOfSubstring()
         {
             string exp = "Hello, world!";
-            int index = FuncScriptParser.GetLiteralMatch(exp, 12, "!");
+            int index = FuncScriptParser.GetLiteralMatch(exp, 12, "!").NextIndex;
             Assert.AreEqual(13, index);
         }
 
@@ -100,7 +100,7 @@ namespace funcscript.test
 
             // Measure execution time
             var timer = System.Diagnostics.Stopwatch.StartNew();
-            int index = FuncScriptParser.GetLiteralMatch(exp, prefixLength, keywords);
+            int index = FuncScriptParser.GetLiteralMatch(exp, prefixLength, keywords).NextIndex;
             timer.Stop();
 
             // Check if the result is correct

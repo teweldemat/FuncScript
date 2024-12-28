@@ -6,14 +6,13 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetPrefixOperator(KeyValueCollection provider, string exp, int index, out ExpressionBlock expBlock,
-            out ParseNode parseNode, List<SyntaxErrorData> syntaxErrors)
+        static ParseResult GetPrefixOperator(ParseContext context, int index)
         {
             int i = 0;
             string oper = null;
             foreach (var op in s_prefixOp)
             {
-                i = GetLiteralMatch(exp, index, op[0]);
+                i = GetLiteralMatch(context, index, op[0]).NextIndex;
                 if (i > index)
                 {
                     oper = op[1];
@@ -23,42 +22,37 @@ namespace funcscript.core
 
             if (i == index)
             {
-                expBlock = null;
-                parseNode = null;
-                return index;
+                return new ParseResult(null, null, index);
             }
 
-            i = SkipSpace(exp, i);
-            var func = provider.Get(oper);
+            i = SkipSpace(context, i).NextIndex;
+            var func = context.Provider.Get(oper);
             if (func == null)
             {
-                syntaxErrors.Add(new SyntaxErrorData(index, i - index, $"Prefix operator {oper} not defined"));
-                expBlock = null;
-                parseNode = null;
-                return index;
+                context.Serrors.Add(new SyntaxErrorData(index, i - index, $"Prefix operator {oper} not defined"));
+                return new ParseResult(null, null, index);
             }
 
-            var i2 = GetCallAndMemberAccess(provider, exp, i, out var operand, out var operandNode, syntaxErrors);
-            if (i2 == i)
+            var callResult = GetCallAndMemberAccess(context, i);
+            if (callResult.NextIndex == i)
             {
-                syntaxErrors.Add(new SyntaxErrorData(i, 0, $"Operant for {oper} expected"));
-                expBlock = null;
-                parseNode = null;
-                return index;
+                context.Serrors.Add(new SyntaxErrorData(i, 0, $"Operant for {oper} expected"));
+                return new ParseResult(null, null, index);
             }
 
-            i = SkipSpace(exp, i2);
+            i = SkipSpace(context, callResult.NextIndex).NextIndex;
 
-            expBlock = new FunctionCallExpression
+            var expBlock = new FunctionCallExpression
             {
                 Function = new LiteralBlock(func),
-                Parameters = new[] { operand },
+                Parameters = new[] { callResult.Expression },
                 CodePos = index,
                 CodeLength = i - index,
             };
-            expBlock.SetContext(provider);
-            parseNode = new ParseNode(ParseNodeType.PrefixOperatorExpression, index, i - index);
-            return i;
+            expBlock.SetContext(context.Provider);
+            var parseNode = new ParseNode(ParseNodeType.PrefixOperatorExpression, index, i - index);
+            
+            return new ParseResult(expBlock, parseNode, i);
         }
     }
 }

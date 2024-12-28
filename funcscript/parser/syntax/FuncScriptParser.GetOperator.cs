@@ -6,31 +6,28 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetOperator(KeyValueCollection provider, string[] candidates, string exp, int index,
-            out string matechedOp, out IFsFunction oper,
-            out ParseNode parseNode)
+        public record GetOperatorResult(string MatchedOp, IFsFunction Oper, ParseNode ParseNode, int NextIndex);
+
+        static GetOperatorResult GetOperator(ParseContext context, string[] candidates, int index)
         {
             foreach (var op in candidates)
             {
-                var i = GetLiteralMatch(exp, index, op);
+                var literalMatchResult = GetLiteralMatch(context, index, op);
+                var i = literalMatchResult.NextIndex;
                 if (i <= index) continue;
 
-                var func = provider.Get(op);
-                oper = func as IFsFunction;
+                var func = context.Provider.Get(op);
+                var oper = func as IFsFunction;
                 if (oper != null && oper is ExpressionBlock expressionBlock)
                 {
-                    expressionBlock.SetContext(provider);
+                    expressionBlock.SetContext(context.Provider);
                 }
 
-                parseNode = new ParseNode(ParseNodeType.Operator, index, i - index);
-                matechedOp = op;
-                return i;
+                var parseNode = new ParseNode(ParseNodeType.Operator, index, i - index);
+                return new GetOperatorResult(op, oper, parseNode, i);
             }
 
-            oper = null;
-            parseNode = null;
-            matechedOp = null;
-            return index;
+            return new GetOperatorResult(null, null, null, index);
         }
     }
 }

@@ -10,7 +10,7 @@ namespace funcscript.core
                ch == '\t' ||
                ch == '\n';
 
-        static void SomeParserMethod(KeyValueCollection provider, ParseNode parseNode, ExpressionBlock expBlock, List<SyntaxErrorData> syntaxErrors)
+        static void SomeParserMethod(ParseContext context)
         {
             // Method implementation
         }

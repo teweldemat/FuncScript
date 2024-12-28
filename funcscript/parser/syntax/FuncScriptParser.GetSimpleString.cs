@@ -5,28 +5,27 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetSimpleString(KeyValueCollection provider, string exp, int index, out String str, out ParseNode parseNode,
-            List<SyntaxErrorData> syntaxErrors)
+        record GetStringResult(string Str, ParseNode Node,int NextIndex);
+        static GetStringResult GetSimpleString(ParseContext context, int index)
         {
-            var i = GetSimpleString(provider, exp, "\"", index, out str, out parseNode, syntaxErrors);
-            if (i > index)
-                return i;
-            return GetSimpleString(provider, exp, "'", index, out str, out parseNode, syntaxErrors);
+            var res = GetSimpleString(context,  "\"", index);
+            if (res.NextIndex > index)
+                return res;
+            return GetSimpleString(context,  "'", index);
         }
 
-        static int GetSimpleString(KeyValueCollection provider, string exp, string delimator, int index, out String str, out ParseNode parseNode,
-            List<SyntaxErrorData> syntaxErrors)
+        static GetStringResult GetSimpleString(ParseContext context,  string delimator, int index)
         {
-            parseNode = null;
-            str = null;
-            var i = GetLiteralMatch(exp, index, delimator);
+            ParseNode parseNode = null;
+            String str = null;
+            var i = GetLiteralMatch(context, index, delimator).NextIndex;
             if (i == index)
-                return index;
+                return new GetStringResult(null,null,index);
             int i2;
             var sb = new StringBuilder();
             while (true)
             {
-                i2 = GetLiteralMatch(exp, i, @"\n");
+                i2 = GetLiteralMatch(context, i, @"\n").NextIndex;
                 if (i2 > i)
                 {
                     i = i2;
@@ -34,7 +33,7 @@ namespace funcscript.core
                     continue;
                 }
 
-                i2 = GetLiteralMatch(exp, i, @"\t");
+                i2 = GetLiteralMatch(context, i, @"\t").NextIndex;
                 if (i2 > i)
                 {
                     i = i2;
@@ -42,7 +41,7 @@ namespace funcscript.core
                     continue;
                 }
 
-                i2 = GetLiteralMatch(exp, i, @"\\");
+                i2 = GetLiteralMatch(context, i, @"\\").NextIndex;
                 if (i2 > i)
                 {
                     i = i2;
@@ -50,12 +49,12 @@ namespace funcscript.core
                     continue;
                 }
 
-                i2 = GetLiteralMatch(exp, i, @"\u");
+                i2 = GetLiteralMatch(context, i, @"\u").NextIndex;
                 if (i2 > i)
                 {
-                    if (i + 6 <= exp.Length) // Checking if there is enough room for 4 hex digits
+                    if (i + 6 <= context.Expression.Length) // Checking if there is enough room for 4 hex digits
                     {
-                        var unicodeStr = exp.Substring(i + 2, 4);
+                        var unicodeStr = context.Expression.Substring(i + 2, 4);
                         if (int.TryParse(unicodeStr, System.Globalization.NumberStyles.HexNumber, null,
                                 out int charValue))
                         {
@@ -66,7 +65,7 @@ namespace funcscript.core
                     }
                 }
 
-                i2 = GetLiteralMatch(exp, i, $@"\{delimator}");
+                i2 = GetLiteralMatch(context, i, $@"\{delimator}").NextIndex;
                 if (i2 > i)
                 {
                     sb.Append(delimator);
@@ -74,23 +73,23 @@ namespace funcscript.core
                     continue;
                 }
 
-                if (i >= exp.Length || GetLiteralMatch(exp, i, delimator) > i)
+                if (i >= context.Expression.Length || GetLiteralMatch(context, i, delimator).NextIndex > i)
                     break;
-                sb.Append(exp[i]);
+                sb.Append(context.Expression[i]);
                 i++;
             }
 
-            i2 = GetLiteralMatch(exp, i, delimator);
+            i2 = GetLiteralMatch(context, i, delimator).NextIndex;
             if (i2 == i)
             {
-                syntaxErrors.Add(new SyntaxErrorData(i, 0, $"'{delimator}' expected"));
-                return index;
+                context.Serrors.Add(new SyntaxErrorData(i, 0, $"'{delimator}' expected"));
+                return new GetStringResult(null,null,index);
             }
 
             i = i2;
             str = sb.ToString();
             parseNode = new ParseNode(ParseNodeType.LiteralString, index, i - index);
-            return i;
+            return new GetStringResult(str,parseNode,i);
         }
     }
 }

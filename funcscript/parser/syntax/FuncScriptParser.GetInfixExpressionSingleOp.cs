@@ -4,11 +4,12 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetInfixExpressionSingleOp(KeyValueCollection provider, int level, string[] candidates, string exp, int index,
-            out ExpressionBlock prog, out ParseNode parseNode, List<SyntaxErrorData> syntaxErrors)
+        public record GetInfixExpressionSingleOpResult(ExpressionBlock Prog, ParseNode ParseNode, int NextIndex);
+
+        static GetInfixExpressionSingleOpResult GetInfixExpressionSingleOp(ParseContext context, int level, string[] candidates, int index)
         {
-            prog = null;
-            parseNode = null;
+            ExpressionBlock prog = null;
+            ParseNode parseNode = null;
             var i = index;
             while (true)
             {
@@ -17,31 +18,42 @@ namespace funcscript.core
                 ParseNode operatorNode = null;
                 string symbol = null;
 
-                if (prog == null) //if we parsing the first operand
+                if (prog == null) //if we are parsing the first operand
                 {
                     //get an infix with one level higher or call expression when we are parsing for highest precedence operators
                     if (level == 0)
                     {
-                        i2 = GetCallAndMemberAccess(provider, exp, i, out prog, out parseNode, syntaxErrors);
+                        var result = GetCallAndMemberAccess(context, i);
+                        prog = result.Expression;
+                        parseNode = result.Node;
+                        i2 = result.NextIndex;
                     }
                     else
                     {
-                        i2 = GetInfixExpressionSingleOp(provider, level - 1, s_operatorSymols[level - 1], exp, i, out prog, out parseNode, syntaxErrors);
+                        var result = GetInfixExpressionSingleOp(context, level - 1, s_operatorSymols[level - 1], i);
+                        prog = result.Prog;
+                        parseNode = result.ParseNode;
+                        i2 = result.NextIndex;
                     }
 
                     if (i2 == i)
-                        return i;
+                        return new GetInfixExpressionSingleOpResult(null, null, i);
 
-                    i = SkipSpace(exp, i2);
+                    i = SkipSpace(context, i2).NextIndex;
                     continue;
                 }
 
                 var indexBeforeOperator = i;
-                i2 = GetOperator(provider, candidates, exp, i, out symbol, out oper, out operatorNode);
+                var operatorResult = GetOperator(context, candidates, i);
+                symbol = operatorResult.MatchedOp;
+                oper = operatorResult.Oper;
+                operatorNode = operatorResult.ParseNode;
+                i2 = operatorResult.NextIndex;
+                
                 if (i2 == i)
                     break;
 
-                i = SkipSpace(exp, i2);
+                i = SkipSpace(context, i2).NextIndex;
 
                 var operands = new List<ExpressionBlock>();
                 var operandNodes = new List<ParseNode>();
@@ -52,30 +64,42 @@ namespace funcscript.core
                     ExpressionBlock nextOperand;
                     ParseNode nextOperandNode;
                     if (level == 0)
-                        i2 = GetCallAndMemberAccess(provider, exp, i, out nextOperand, out nextOperandNode, syntaxErrors);
+                    {
+                        var nextOperandResult = GetCallAndMemberAccess(context, i);
+                        nextOperand = nextOperandResult.Expression;
+                        nextOperandNode = nextOperandResult.Node;
+                        i2 = nextOperandResult.NextIndex;
+                    }
                     else
-                        i2 = GetInfixExpressionSingleOp(provider, level - 1, s_operatorSymols[level - 1], exp, i, out nextOperand, out nextOperandNode, syntaxErrors);
+                    {
+                        var nextOperandResult = GetInfixExpressionSingleOp(context, level - 1, s_operatorSymols[level - 1], i);
+                        nextOperand = nextOperandResult.Prog;
+                        nextOperandNode = nextOperandResult.ParseNode;
+                        i2 = nextOperandResult.NextIndex;
+                    }
+                    
                     if (i2 == i)
-                        return indexBeforeOperator;
+                        return new GetInfixExpressionSingleOpResult(null, null, indexBeforeOperator);
+                    
                     operands.Add(nextOperand);
                     operandNodes.Add(nextOperandNode);
-                    i = SkipSpace(exp, i2);
+                    i = SkipSpace(context, i2).NextIndex;
 
-                    i2 = GetLiteralMatch(exp, i, symbol);
+                    i2 = GetLiteralMatch(context, i, symbol).NextIndex;
                     if (i2 == i)
                         break;
-                    i = SkipSpace(exp, i2);
+                    i = SkipSpace(context, i2).NextIndex;
                 }
 
                 if (operands.Count > 1)
                 {
-                    var func = provider.Get(symbol);
+                    var func = context.Provider.Get(symbol);
                     if (symbol == "|")
                     {
                         if (operands.Count > 2)
                         {
-                            syntaxErrors.Add(new SyntaxErrorData(i, 0, "Only two parameters expected for | "));
-                            return i;
+                            context.Serrors.Add(new SyntaxErrorData(i, 0, "Only two parameters expected for | "));
+                            return new GetInfixExpressionSingleOpResult(null, null, i);
                         }
 
                         prog = new ListExpression
@@ -84,7 +108,7 @@ namespace funcscript.core
                             CodePos = prog.CodePos,
                             CodeLength = operands[^1].CodePos + operands[^1].CodeLength - prog.CodeLength
                         };
-                        prog.SetContext(provider);
+                        prog.SetContext(context.Provider);
 
                         parseNode = new ParseNode(ParseNodeType.InfixExpression, parseNode!.Pos,
                             operandNodes[^1].Pos + operandNodes[^1].Length - parseNode.Length);
@@ -98,13 +122,13 @@ namespace funcscript.core
                             CodePos = prog.CodePos,
                             CodeLength = operands[^1].CodePos + operands[^1].CodeLength - prog.CodeLength
                         };
-                        prog.SetContext(provider);
+                        prog.SetContext(context.Provider);
                         parseNode = new ParseNode(ParseNodeType.InfixExpression, parseNode!.Pos,
                             operandNodes[^1].Pos + operandNodes[^1].Length - parseNode.Length);
                     }
                 }
             }
-            return i;
+            return new GetInfixExpressionSingleOpResult(prog, parseNode, i);
         }
     }
 }

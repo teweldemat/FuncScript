@@ -5,47 +5,46 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetLambdaExpression(KeyValueCollection provider, string exp, int index, out ExpressionFunction func,
-            out ParseNode parseNode, List<SyntaxErrorData> syntaxErrors)
+        static ParseLambdaExpressionResult GetLambdaExpression(ParseContext context, int index)
         {
-            parseNode = null;
-            func = null;
-
-            var i = GetIdentifierList(provider, exp, index, out var parms, out var nodesParams);
+            ParseNode parseNode = null;
+            ExpressionFunction func = null;
+            
+            var (parms,nodesParams,  i) = GetIdentifierList(context, index);
             if (i == index)
-                return index;
+                return new ParseLambdaExpressionResult(func, parseNode, index);
 
-            i = SkipSpace(exp, i);
-            if (i >= exp.Length - 1) // we need two characters
-                return index;
-            var i2 = GetLiteralMatch(exp, i, "=>");
+            i = SkipSpace(context, i).NextIndex;
+            if (i >= context.Expression.Length - 1) // we need two characters
+                return new ParseLambdaExpressionResult(func, parseNode, index);
+
+            var i2 = GetLiteralMatch(context, i, "=>").NextIndex;
             if (i2 == i)
             {
-                syntaxErrors.Add(new SyntaxErrorData(i, 0, "'=>' expected"));
-                return index;
+                context.Serrors.Add(new SyntaxErrorData(i, 0, "'=>' expected"));
+                return new ParseLambdaExpressionResult(func, parseNode, index);
             }
 
             i += 2;
-            i = SkipSpace(exp, i);
-            var parmsSet = new HashSet<string>();
-            foreach (var p in parms)
-            {
-                parmsSet.Add(p);
-            }
+            i = SkipSpace(context, i).NextIndex;
+            var parmsSet = new HashSet<string>(parms);
 
-            i2 = GetExpression(provider, exp, i, out var defination, out var nodeDefination, syntaxErrors);
+
+           (var defination,var nodeDefination, i2) = GetExpression(context, i);
             if (i2 == i)
             {
-                syntaxErrors.Add(new SyntaxErrorData(i, 0, "defination of lambda expression expected"));
-                return index;
+                context.Serrors.Add(new SyntaxErrorData(i, 0, "definition of lambda expression expected"));
+                return new ParseLambdaExpressionResult(func, parseNode, index);
             }
 
             func = new ExpressionFunction(parms.ToArray(), defination);
-            func.SetContext(provider);
+            func.SetContext(context.Provider);
             i = i2;
             parseNode = new ParseNode(ParseNodeType.LambdaExpression, index, i - index,
                 new[] { nodesParams, nodeDefination });
-            return i;
+            return new ParseLambdaExpressionResult(func, parseNode, i);
         }
     }
+
+    public record ParseLambdaExpressionResult(ExpressionFunction ExpressionFunction, FuncScriptParser.ParseNode Node, int NextIndex);
 }

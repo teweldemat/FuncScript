@@ -79,10 +79,11 @@ public class ExecutionNode : KeyValueCollection
                 return FuncScript.Evaluate(provider, Expression);
             case ExpressionType.FuncScriptTextTemplate:
                 var serrors = new List<FuncScriptParser.SyntaxErrorData>();
-                var exp = FuncScriptParser.ParseFsTemplate(provider, this.Expression, serrors);
-                if (exp == null)
+                
+                var result = FuncScriptParser.ParseFsTemplate(new FuncScriptParser.ParseContext(provider, this.Expression, serrors));
+                if (result == null)
                     throw new SyntaxError(this.Expression,serrors);
-                var ret=exp.Evaluate();
+                var ret=result.Expression .Evaluate();
 
                 return ret;
             default:

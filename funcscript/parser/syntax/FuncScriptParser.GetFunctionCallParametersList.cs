@@ -4,66 +4,65 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetFunctionCallParametersList(KeyValueCollection provider, ExpressionBlock func, String exp, int index,
-            out ExpressionBlock prog, out ParseNode parseNode, List<SyntaxErrorData> syntaxErrors)
+        static ParseResult GetFunctionCallParametersList(ParseContext context, ExpressionBlock func, int index)
         {
-            var i = GetFunctionCallParametersList(provider, "(", ")", func, exp, index, out prog, out parseNode,
-                syntaxErrors);
-            if (i == index)
-                return GetFunctionCallParametersList(provider, "[", "]", func, exp, index, out prog, out parseNode,
-                    syntaxErrors);
-            return i;
+            var result = GetFunctionCallParametersList(context, "(", ")", func, index);
+            if (result.NextIndex == index)
+                return GetFunctionCallParametersList(context, "[", "]", func, index);
+            return result;
         }
 
-        static int GetFunctionCallParametersList(KeyValueCollection provider, String openBrance, String closeBrance,
-            ExpressionBlock func, String exp, int index, out ExpressionBlock prog, out ParseNode parseNode,
-            List<SyntaxErrorData> syntaxErrors)
-        {
-            parseNode = null;
-            prog = null;
+        public record FunctionCallParametersResult(ExpressionBlock Prog, ParseNode Node, int NextIndex) : ParseResult(Prog, Node, NextIndex);
 
-            //make sure we have open brace
-            var i = SkipSpace(exp, index);
-            var i2 = GetLiteralMatch(exp, i, openBrance);
+        static FunctionCallParametersResult GetFunctionCallParametersList(ParseContext context, string openBrace, string closeBrace,
+            ExpressionBlock func, int index)
+        {
+            ParseNode parseNode = null;
+            ExpressionBlock prog = null;
+
+            var i = SkipSpace(context, index).NextIndex;
+            var i2 = GetLiteralMatch(context, i, openBrace).NextIndex;
             if (i == i2)
-                return index; //we didn't find '('
+                return new FunctionCallParametersResult(null, null, index);
+
             i = i2;
             var pars = new List<ExpressionBlock>();
             var parseNodes = new List<ParseNode>();
-            //lets get first parameter
-            i = SkipSpace(exp, i);
-            i2 = GetExpression(provider, exp, i, out var par1, out var parseNode1, syntaxErrors);
-            if (i2 > i)
+
+            i = SkipSpace(context, i).NextIndex;
+            var exprResult = GetExpression(context, i);
+
+            if (exprResult.NextIndex > i)
             {
-                i = i2;
-                pars.Add(par1);
-                parseNodes.Add(parseNode1);
+                i = exprResult.NextIndex;
+                pars.Add(exprResult.Expression);
+                parseNodes.Add(exprResult.Node);
                 do
                 {
-                    i2 = SkipSpace(exp, i);
-                    if (i2 >= exp.Length || exp[i2++] != ',') //stop collection of parameters if there is no ','
+                    i2 = SkipSpace(context, i).NextIndex;
+                    if (i2 >= context.Expression.Length || context.Expression[i2++] != ',')
                         break;
                     i = i2;
-                    i = SkipSpace(exp, i);
-                    i2 = GetExpression(provider, exp, i, out var par2, out var parseNode2, syntaxErrors);
-                    if (i2 == i)
+                    i = SkipSpace(context, i).NextIndex;
+                    exprResult = GetExpression(context, i);
+                    if (exprResult.NextIndex == i)
                     {
-                        syntaxErrors.Add(new SyntaxErrorData(i, 0, "Parameter for call expected"));
-                        return index;
+                        context.Serrors.Add(new SyntaxErrorData(i, 0, "Parameter for call expected"));
+                        return new FunctionCallParametersResult(null, null, index);
                     }
 
-                    i = i2;
-                    pars.Add(par2);
-                    parseNodes.Add(parseNode2);
+                    i = exprResult.NextIndex;
+                    pars.Add(exprResult.Expression);
+                    parseNodes.Add(exprResult.Node);
                 } while (true);
             }
 
-            i = SkipSpace(exp, i);
-            i2 = GetLiteralMatch(exp, i, closeBrance);
+            i = SkipSpace(context, i).NextIndex;
+            i2 = GetLiteralMatch(context, i, closeBrace).NextIndex;
             if (i2 == i)
             {
-                syntaxErrors.Add(new SyntaxErrorData(i, 0, $"'{closeBrance}' expected"));
-                return index;
+                context.Serrors.Add(new SyntaxErrorData(i, 0, $"'{closeBrace}' expected"));
+                return new FunctionCallParametersResult(null, null, index);
             }
 
             i = i2;
@@ -75,9 +74,9 @@ namespace funcscript.core
                 CodePos = func.CodePos,
                 CodeLength = i - func.CodePos,
             };
-            prog.SetContext(provider);
+            prog.SetContext(context.Provider);
             parseNode = new ParseNode(ParseNodeType.FunctionParameterList, index, i - index, parseNodes);
-            return i;
+            return new FunctionCallParametersResult(prog, parseNode, i);
         }
     }
 }

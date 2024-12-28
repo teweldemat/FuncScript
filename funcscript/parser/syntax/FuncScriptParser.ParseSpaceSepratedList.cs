@@ -6,10 +6,9 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        public static List<string> ParseSpaceSepratedList(KeyValueCollection provider, String exp,
-            List<SyntaxErrorData> syntaxErrors)
+        public static List<string> ParseSpaceSepratedList(ParseContext context)
         {
-            var i = GetSpaceSepratedStringListExpression(provider, exp, 0, out var prog, out var parseNode, syntaxErrors);
+            var (prog, parseNode, i) = GetSpaceSeparatedStringListExpression(context,  0);
             return prog;
         }
     }

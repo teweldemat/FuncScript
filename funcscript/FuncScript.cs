@@ -655,17 +655,19 @@ namespace funcscript
             {
                 provider = new KvcProvider(new ObjectKvc(vars), provider);
             }
-            var serrors = new List<FuncScriptParser.SyntaxErrorData>();
+
+            var context =
+                new FuncScriptParser.ParseContext(provider, expression, new List<FuncScriptParser.SyntaxErrorData>());
             ExpressionBlock exp;
             switch (mode)
             {
                 case ParseMode.Standard:
-                    exp = core.FuncScriptParser.Parse(provider, expression, serrors);
+                    exp = core.FuncScriptParser.Parse(context).Expression;
                     break;
                 case ParseMode.SpaceSeparatedList:
-                    return core.FuncScriptParser.ParseSpaceSepratedList(provider, expression, serrors);
+                    return core.FuncScriptParser.ParseSpaceSepratedList(context);
                 case ParseMode.FsTemplate:
-                    exp = core.FuncScriptParser.ParseFsTemplate(provider, expression, serrors);
+                    exp = core.FuncScriptParser.ParseFsTemplate(context).Expression;
                     break;
                 default:    
                     exp = null;
@@ -673,7 +675,7 @@ namespace funcscript
             }
 
             if (exp == null)
-                throw new error.SyntaxError(expression,serrors);
+                throw new error.SyntaxError(context.Expression, context.Serrors);
             return Evaluate(exp, expression, provider, vars);
         }
         public static object Evaluate(ExpressionBlock exp, string expression, KeyValueCollection provider, object vars)

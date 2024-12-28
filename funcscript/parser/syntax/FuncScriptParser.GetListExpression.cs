@@ -5,60 +5,63 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetListExpression(KeyValueCollection provider, String exp, int index, out ListExpression listExpr,
-            out ParseNode parseNode, List<SyntaxErrorData> syntaxErrors)
+        public record GetListExpressionResult(ListExpression ListExpr, ParseNode ParseNode, int NextIndex);
+
+        static GetListExpressionResult GetListExpression(ParseContext context, int index)
         {
-            parseNode = null;
-            listExpr = null;
-            var i = SkipSpace(exp, index);
-            var i2 = GetLiteralMatch(exp, i, "[");
+            var exp = context.Expression;
+            var provider = context.Provider;
+            var syntaxErrors = context.Serrors;
+
+            var i = SkipSpace(context, index).NextIndex;
+            var i2 = GetLiteralMatch(context, i, "[").NextIndex;
             if (i2 == i)
-                return index; //we didn't find '['
+                return new GetListExpressionResult(null, null, index); // we didn't find '['
             i = i2;
 
             var listItems = new List<ExpressionBlock>();
             var nodeListItems = new List<ParseNode>();
-            i = SkipSpace(exp, i);
-            i2 = GetExpression(provider, exp, i, out var firstItem, out var nodeFirstItem, syntaxErrors);
-            if (i2 > i)
+            i = SkipSpace(context, i).NextIndex;
+            var expressionResult = GetExpression(context, i);
+            if (expressionResult.NextIndex > i)
             {
-                listItems.Add(firstItem);
-                nodeListItems.Add(nodeFirstItem);
-                i = i2;
+                listItems.Add(expressionResult.Expression);
+                nodeListItems.Add(expressionResult.Node);
+                i = expressionResult.NextIndex;
                 do
                 {
-                    i = SkipSpace(exp, i);
-                    i2 = GetLiteralMatch(exp, i, ",");
+                    i = SkipSpace(context, i).NextIndex;
+                    i2 = GetLiteralMatch(context, i, ",").NextIndex;
                     if (i2 == i)
                         break;
                     i = i2;
 
-                    i = SkipSpace(exp, i);
-                    i2 = GetExpression(provider, exp, i, out var otherItem, out var nodeOtherItem, syntaxErrors);
-                    if (i2 == i)
+                    i = SkipSpace(context, i).NextIndex;
+                    expressionResult = GetExpression(context, i);
+                    if (expressionResult.NextIndex == i)
                         break;
-                    listItems.Add(otherItem);
-                    nodeListItems.Add(nodeOtherItem);
-                    i = i2;
+                    listItems.Add(expressionResult.Expression);
+                    nodeListItems.Add(expressionResult.Node);
+                    i = expressionResult.NextIndex;
                 } while (true);
             }
 
-            i = SkipSpace(exp, i);
-            i2 = GetLiteralMatch(exp, i, "]");
+            i = SkipSpace(context, i).NextIndex;
+            i2 = GetLiteralMatch(context, i, "]").NextIndex;
             if (i2 == i)
             {
                 syntaxErrors.Add(new SyntaxErrorData(i, 0, "']' expected"));
-                return index;
+                return new GetListExpressionResult(null, null, index);
             }
 
             i = i2;
-            listExpr = new ListExpression
+            var listExpr = new ListExpression
             {
                 ValueExpressions = listItems.ToArray()
             };
             listExpr.SetContext(provider);
-            parseNode = new ParseNode(ParseNodeType.List, index, i - index, nodeListItems);
-            return i;
+            var parseNode = new ParseNode(ParseNodeType.List, index, i - index, nodeListItems);
+            return new GetListExpressionResult(listExpr, parseNode, i);
         }
     }
 }

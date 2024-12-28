@@ -4,81 +4,73 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetInfixFunctionCall(KeyValueCollection provider, string exp, int index, out ExpressionBlock prog,
-            out ParseNode parseNode, List<SyntaxErrorData> syntaxErrors)
+        public record GetInfixFunctionCallResult(ExpressionBlock Program, ParseNode ParseNode, int NextIndex);
+
+        static GetInfixFunctionCallResult GetInfixFunctionCall(ParseContext context, int index)
         {
             var childNodes = new List<ParseNode>();
             var allOperands = new List<ExpressionBlock>();
 
-            var i = GetCallAndMemberAccess(provider, exp, index, out var firstParam, out var firstPramNode,
-                syntaxErrors);
-            if (i == index)
+            var result = GetCallAndMemberAccess(context, index);
+            if (result.NextIndex == index)
             {
-                prog = null;
-                parseNode = null;
-                return index;
+                return new GetInfixFunctionCallResult(null, null, index);
             }
-            prog = firstParam;
-            parseNode = firstPramNode;
+            var prog = result.Expression;
+            var parseNode = result.Node;
 
-            allOperands.Add(firstParam);
-            childNodes.Add(firstPramNode);
-            i = SkipSpace(exp, i);
+            allOperands.Add(prog);
+            childNodes.Add(parseNode);
+            var i = SkipSpace(context, result.NextIndex).NextIndex;
 
-            var i2 = GetIdentifier(provider, exp, i, false, out var iden, out var idenLower, out _, out var idenNode);
-            if (i2 == i)
+            var identifierResult = GetIdentifier(context, i, false);
+            if (identifierResult.NextIndex == i)
             {
-                return i;
+                return new GetInfixFunctionCallResult(prog, parseNode, i);
             }
-            var func = provider.Get(idenLower);
+            var func = context.Provider.Get(identifierResult.IdenLower);
             if (!(func is IFsFunction inf))
             {
-                prog = null;
-                parseNode = null;
-                syntaxErrors.Add(new SyntaxErrorData(i, i2 - i, "A function expected"));
-                return index;
+                context.Serrors.Add(new SyntaxErrorData(i, identifierResult.NextIndex - i, "A function expected"));
+                return new GetInfixFunctionCallResult(null, null, index);
             }
             if (inf.CallType != CallType.Dual)
             {
-                return i;
+                return new GetInfixFunctionCallResult(prog, parseNode, i);
             }
 
-            childNodes.Add(idenNode);
-            i = SkipSpace(exp, i2);
+            childNodes.Add(identifierResult.ParseNode);
+            i = SkipSpace(context, identifierResult.NextIndex).NextIndex;
 
-            i2 = GetCallAndMemberAccess(provider, exp, i, out var secondParam, out var secondParamNode, syntaxErrors);
-            if (i2 == i)
+            var secondParamResult = GetCallAndMemberAccess(context, i);
+            if (secondParamResult.NextIndex == i)
             {
-                syntaxErrors.Add(new SyntaxErrorData(i, 0, $"Right side operand expected for {iden}"));
-                prog = null;
-                parseNode = null;
-                return index;
+                context.Serrors.Add(new SyntaxErrorData(i, 0, $"Right side operand expected for {identifierResult.Iden}"));
+                return new GetInfixFunctionCallResult(null, null, index);
             }
 
-            allOperands.Add(secondParam);
-            childNodes.Add(secondParamNode);
-            i = SkipSpace(exp, i2);
+            allOperands.Add(secondParamResult.Expression);
+            childNodes.Add(secondParamResult.Node);
+            i = SkipSpace(context, secondParamResult.NextIndex).NextIndex;
 
             while (true)
             {
-                i2 = GetLiteralMatch(exp, i, "~");
-                if (i2 == i)
+                var literalMatchResult = GetLiteralMatch(context, i, new string[] { "~" });
+                if (literalMatchResult.NextIndex == i)
                     break;
-                i = SkipSpace(exp, i2);
-                i2 = GetCallAndMemberAccess(provider, exp, i, out var moreOperand, out var morePrseNode, syntaxErrors);
-                if (i2 == i)
+                i = SkipSpace(context, literalMatchResult.NextIndex).NextIndex;
+                var moreOperandResult = GetCallAndMemberAccess(context, i);
+                if (moreOperandResult.NextIndex == i)
                     break;
-                i = SkipSpace(exp, i2);
+                i = SkipSpace(context, moreOperandResult.NextIndex).NextIndex;
 
-                allOperands.Add(moreOperand);
-                childNodes.Add(morePrseNode);
+                allOperands.Add(moreOperandResult.Expression);
+                childNodes.Add(moreOperandResult.Node);
             }
 
             if (allOperands.Count < 2)
             {
-                prog = null;
-                parseNode = null;
-                return index;
+                return new GetInfixFunctionCallResult(null, null, index);
             }
 
             prog = new FunctionCallExpression
@@ -86,11 +78,11 @@ namespace funcscript.core
                 Function = new LiteralBlock(func),
                 Parameters = allOperands.ToArray()
             };
-            prog.SetContext(provider);
+            prog.SetContext(context.Provider);
             parseNode = new ParseNode(ParseNodeType.GeneralInfixExpression, childNodes[0].Pos,
                 childNodes[^1].Pos + childNodes[^1].Length + childNodes[0].Pos);
 
-            return i;
+            return new GetInfixFunctionCallResult(prog, parseNode, i);
         }
     }
 }

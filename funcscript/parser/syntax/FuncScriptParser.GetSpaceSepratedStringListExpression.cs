@@ -6,23 +6,19 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetSpaceSepratedStringListExpression(KeyValueCollection provider, string exp, int index,
-            out List<string> stringList, out ParseNode parseNode, List<SyntaxErrorData> syntaxErrors)
-        {
-            parseNode = null;
-            stringList = null;
-            var i = SkipSpace(exp, index);
+        public record GetSpaceSeparatedStringListExpressionResult(List<string> StringList, ParseNode ParseNode, int NextIndex);
 
+        static GetSpaceSeparatedStringListExpressionResult GetSpaceSeparatedStringListExpression(ParseContext context, int index)
+        {
+            var i = SkipSpace(context, index).NextIndex;
             var listItems = new List<string>();
             var nodeListItems = new List<ParseNode>();
-            string firstItem;
-            ParseNode firstNode;
-
+            
             string otherItem;
             ParseNode otherNode;
-            var i2 = GetSimpleString(provider, exp, i, out firstItem, out firstNode, syntaxErrors);
+            var (firstItem, firstNode, i2) = GetSimpleString(context,i);
             if (i2 == i)
-                i2 = GetSpaceLessString(provider, exp, i, out firstItem, out firstNode);
+                (firstItem,firstNode, i2) = GetSpaceLessString(context,i);
             if (i2 > i)
             {
                 listItems.Add(firstItem);
@@ -30,14 +26,14 @@ namespace funcscript.core
                 i = i2;
                 do
                 {
-                    i2 = GetLiteralMatch(exp, i, " ");
+                    i2 = GetLiteralMatch(context, i, " ").NextIndex;
                     if (i2 == i)
                         break;
                     i = i2;
-                    i = SkipSpace(exp, i);
-                    i2 = GetSimpleString(provider, exp, i, out otherItem, out otherNode, syntaxErrors);
+                    i = SkipSpace(context, i).NextIndex;
+                    (otherItem,otherNode, i2) = GetSimpleString(context, i);
                     if (i2 == i)
-                        i2 = GetSpaceLessString(provider, exp, i, out otherItem, out otherNode);
+                        (otherItem,otherNode,i2) = GetSpaceLessString(context,i);
 
                     if (i2 == i)
                         break;
@@ -47,9 +43,8 @@ namespace funcscript.core
                 } while (true);
             }
 
-            stringList = listItems;
-            parseNode = new ParseNode(ParseNodeType.List, index, i - index, nodeListItems);
-            return i;
+            var parseNode = new ParseNode(ParseNodeType.List, index, i - index, nodeListItems);
+            return new GetSpaceSeparatedStringListExpressionResult(listItems, parseNode, i);
         }
     }
 }

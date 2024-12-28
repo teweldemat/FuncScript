@@ -5,154 +5,165 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetUnit(KeyValueCollection provider, string exp, int index, out ExpressionBlock expBlock,
-            out ParseNode parseNode, List<SyntaxErrorData> syntaxErrors)
+        static ParseResult GetUnit(ParseContext context, int index)
         {
-            ParseNode nodeUnit;
-            parseNode = null;
-            expBlock = null;
+            ParseNode parseNode = null;
+            ExpressionBlock expBlock = null;
             int i;
 
             //get string
-            i = GetStringTemplate(provider, exp, index, out var template, out nodeUnit, syntaxErrors);
+            var templateResult = GetStringTemplate(context, index);
+            i = templateResult.NextIndex;
             if (i > index)
             {
-                parseNode = nodeUnit;
-                expBlock = template;
-                expBlock.SetContext(provider);
+                parseNode = templateResult.Node;
+                expBlock = templateResult.Expression;
+                expBlock.SetContext(context.Provider);
                 expBlock.CodePos = index;
                 expBlock.CodeLength = i - index;
-                return i;
+                return new ParseResult(expBlock, parseNode, i);
             }
 
             //get string 
-            i = GetSimpleString(provider, exp, index, out var str, out nodeUnit, syntaxErrors);
+            var simpleStrResult = GetSimpleString(context, index);
+            i = simpleStrResult.NextIndex;
             if (i > index)
             {
-                parseNode = nodeUnit;
-                expBlock = new LiteralBlock(str);
-                expBlock.SetContext(provider);
+                parseNode = simpleStrResult.Node;
+                expBlock = new LiteralBlock(simpleStrResult.Str);
+                expBlock.SetContext(context.Provider);
                 expBlock.CodePos = index;
                 expBlock.CodeLength = i - index;
-                return i;
+                return new ParseResult(expBlock, parseNode, i);
             }
 
             //get number
-            i = GetNumber(provider, exp, index, out var numberVal, out nodeUnit, syntaxErrors);
+            var numberResult = GetNumber(context, index);
+            i = numberResult.NextIndex;
             if (i > index)
             {
-                parseNode = nodeUnit;
-                expBlock = new LiteralBlock(numberVal);
-                expBlock.SetContext(provider);
+                parseNode = numberResult.ParseNode;
+                expBlock = new LiteralBlock(numberResult.Number);
+                expBlock.SetContext(context.Provider);
                 expBlock.CodePos = index;
                 expBlock.CodeLength = i - index;
-                return i;
+                return new ParseResult(expBlock, parseNode, i);
             }
 
             //list expression
-            i = GetListExpression(provider, exp, index, out var lst, out nodeUnit, syntaxErrors);
+            var listExprResult = GetListExpression(context, index);
+            i = listExprResult.NextIndex;
             if (i > index)
             {
-                parseNode = nodeUnit;
-                expBlock = lst;
-                expBlock.SetContext(provider);
+                parseNode = listExprResult.ParseNode;
+                expBlock = listExprResult.ListExpr;
+                expBlock.SetContext(context.Provider);
                 expBlock.CodePos = index;
                 expBlock.CodeLength = i - index;
-                return i;
+                return new ParseResult(expBlock, parseNode, i);
             }
 
             //kvc expression
-            i = GetKvcExpression(provider, false, exp, index, out var json, out nodeUnit, syntaxErrors);
+            var kvcExprResult = GetKvcExpression(context, false, index);
+            i = kvcExprResult.NextIndex;
             if (i > index)
             {
-                parseNode = nodeUnit;
-                expBlock = json;
-                expBlock.SetContext(provider);
+                parseNode = kvcExprResult.ParseNode;
+                expBlock = kvcExprResult.KvcExpr;
+                expBlock.SetContext(context.Provider);
                 expBlock.CodePos = index;
                 expBlock.CodeLength = i - index;
-                return i;
+                return new ParseResult(expBlock, parseNode, i);
             }
 
-            i = GetCaseExpression(provider, exp, i, out var caseExp, out var caseNode, syntaxErrors);
+            var caseExprResult = GetCaseExpression(context, i);
+            i = caseExprResult.NextIndex;
             if (i > index)
             {
-                parseNode = caseNode;
-                expBlock = caseExp;
-                expBlock.SetContext(provider);
+                parseNode = caseExprResult.Node;
+                expBlock = caseExprResult.Expression;
+                expBlock.SetContext(context.Provider);
                 expBlock.CodePos = index;
                 expBlock.CodeLength = i - index;
-                return i;
+                return new ParseResult(expBlock, parseNode, i);
             }
 
-            i = GetSwitchExpression(provider, exp, i, out var switchExp, out var switchNode, syntaxErrors);
+            var switchExprResult = GetSwitchExpression(context, i);
+            i = switchExprResult.NextIndex;
             if (i > index)
             {
-                parseNode = switchNode;
-                expBlock = switchExp;
-                expBlock.SetContext(provider);
+                parseNode = switchExprResult.ParseNode;
+                expBlock = switchExprResult.Prog;
+                expBlock.SetContext(context.Provider);
                 expBlock.CodePos = index;
                 expBlock.CodeLength = i - index;
-                return i;
+                return new ParseResult(expBlock, parseNode, i);
             }
 
             //expression function
-            i = GetLambdaExpression(provider, exp, index, out var ef, out nodeUnit, syntaxErrors);
+            var lambdaExprResult = GetLambdaExpression(context, index);
+            i = lambdaExprResult.NextIndex;
             if (i > index)
             {
-                parseNode = nodeUnit;
-                expBlock = new LiteralBlock(ef);
-                expBlock.SetContext(provider);
+                parseNode = lambdaExprResult.Node;
+                expBlock = new LiteralBlock(lambdaExprResult.ExpressionFunction);
+                expBlock.SetContext(context.Provider);
                 expBlock.CodePos = index;
                 expBlock.CodeLength = i - index;
-                return i;
+                return new ParseResult(expBlock, parseNode, i);
             }
 
             //null, true, false
-            i = GetKeyWordLiteral(provider, exp, index, out var kw, out nodeUnit);
+            var keywordLiteralResult = GetKeyWordLiteral(context, index);
+            i = keywordLiteralResult.NextIndex;
             if (i > index)
             {
-                parseNode = nodeUnit;
-                expBlock = new LiteralBlock(kw);
-                expBlock.SetContext(provider);
+                parseNode = keywordLiteralResult.ParseNode;
+                expBlock = new LiteralBlock(keywordLiteralResult.Literal);
+                expBlock.SetContext(context.Provider);
                 expBlock.CodePos = index;
                 expBlock.CodeLength = i - index;
-                return i;
+                return new ParseResult(expBlock, parseNode, i);
             }
 
             //get identifier
-            i = GetIdentifier(provider, exp, index,true, out var ident, out var identLower,out var parentRef, out nodeUnit);
+            var identResult = GetIdentifier(context, index, true);
+            i = identResult.NextIndex;
             if (i > index)
             {
-                parseNode = nodeUnit;
-                expBlock = new ReferenceBlock(ident,identLower,parentRef);
-                expBlock.SetContext(provider);
+                parseNode = identResult.ParseNode;
+                expBlock = new ReferenceBlock(identResult.Iden, identResult.IdenLower, identResult.ParentRef);
+                expBlock.SetContext(context.Provider);
                 expBlock.CodePos = index;
                 expBlock.CodeLength = i - index;
-                return i;
+                return new ParseResult(expBlock, parseNode, i);
             }
 
-            i = GetExpInParenthesis(provider, exp, index, out expBlock, out nodeUnit, syntaxErrors);
+            var expInParenResult = GetExpInParenthesis(context, index);
+            i = expInParenResult.NextIndex;
             if (i > index)
             {
-                parseNode = nodeUnit;
-                expBlock.SetContext(provider);
+                parseNode = expInParenResult.Node;
+                expBlock = expInParenResult.Expression;
+                expBlock.SetContext(context.Provider);
                 expBlock.CodePos = index;
                 expBlock.CodeLength = i - index;
-                return i;
+                return new ParseResult(expBlock, parseNode, i);
             }
 
             //get prefix operator
-            i = GetPrefixOperator(provider, exp, index, out var prefixOp, out var prefixOpNode, syntaxErrors);
+            var prefixOpResult = GetPrefixOperator(context, index);
+            i = prefixOpResult.NextIndex;
             if (i > index)
             {
-                expBlock = prefixOp;
-                parseNode = prefixOpNode;
+                parseNode = prefixOpResult.Node;
+                expBlock = prefixOpResult.Expression;
                 expBlock.CodePos = index;
                 expBlock.CodeLength = i - index;
-                return i;
+                return new ParseResult(expBlock, parseNode, i);
             }
 
-            return index;
+            return new ParseResult(expBlock, parseNode, index);
         }
     }
 }

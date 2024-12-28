@@ -3,28 +3,29 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetInt(KeyValueCollection provider, string exp, bool allowNegative, int index, out string intVal, out ParseNode parseNode)
+        public record GetIntResult(string IntVal, ParseNode ParseNode, int NextIndex);
+
+        static GetIntResult GetInt(ParseContext context, bool allowNegative, int index)
         {
-            parseNode = null;
+            ParseNode parseNode = null;
             int i = index;
             if (allowNegative)
-                i = GetLiteralMatch(exp, i, "-");
+                i = GetLiteralMatch(context, i, "-").NextIndex;
 
             var i2 = i;
-            while (i2 < exp.Length && char.IsDigit(exp[i2]))
+            while (i2 < context.Expression.Length && char.IsDigit(context.Expression[i2]))
                 i2++;
 
             if (i == i2)
             {
-                intVal = null;
-                return index;
+                return new GetIntResult(null, parseNode, index);
             }
 
             i = i2;
 
-            intVal = exp.Substring(index, i - index);
+            string intVal = context.Expression.Substring(index, i - index);
             parseNode = new ParseNode(ParseNodeType.LiteralInteger, index, index - i);
-            return i;
+            return new GetIntResult(intVal, parseNode, i);
         }
     }
 }

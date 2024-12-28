@@ -5,49 +5,52 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetIdentifierList(KeyValueCollection provider, string exp, int index, out List<string> idenList, out ParseNode parseNode)
-        {
-            parseNode = null;
-            idenList = null;
-            int i = SkipSpace(exp, index);
-            //get open brace
-            if (i >= exp.Length || exp[i++] != '(')
-                return index;
+        public record GetIdentifierListResult(List<string> IdenList, ParseNode ParseNode, int NextIndex);
 
-            idenList = new List<string>();
+        static GetIdentifierListResult GetIdentifierList(ParseContext context, int index)
+        {
+            int i = SkipSpace(context, index).NextIndex;
+
+            if (i >= context.Expression.Length || context.Expression[i++] != '(')
+                return new GetIdentifierListResult(null, null, index);
+
+            var idenList = new List<string>();
             var parseNodes = new List<ParseNode>();
-            //get first identifier
-            i = SkipSpace(exp, i);
-            int i2 = GetIdentifier(provider, exp, i, false, out var iden, out var idenLower, out _, out var nodeIden);
+
+            i = SkipSpace(context, i).NextIndex;
+            var (iden, idenLower, _, nodeIden, i2) = GetIdentifier(context, i, false);
+
             if (i2 > i)
             {
                 parseNodes.Add(nodeIden);
                 idenList.Add(iden);
                 i = i2;
 
-                //get additional identifiers separated by commas
-                i = SkipSpace(exp, i);
-                while (i < exp.Length)
+                i = SkipSpace(context, i).NextIndex;
+                while (i < context.Expression.Length)
                 {
-                    if (exp[i] != ',')
+                    if (context.Expression[i] != ',')
                         break;
+
                     i++;
-                    i = SkipSpace(exp, i);
-                    i2 = GetIdentifier(provider, exp, i, false, out iden, out idenLower, out _, out nodeIden);
+                    i = SkipSpace(context, i).NextIndex;
+                    (iden,  idenLower, _, nodeIden,i2) = GetIdentifier(context, i, false);
+
                     if (i2 == i)
-                        return index;
+                        return new GetIdentifierListResult(null, null, index);
+
                     parseNodes.Add(nodeIden);
                     idenList.Add(iden);
                     i = i2;
-                    i = SkipSpace(exp, i);
+                    i = SkipSpace(context, i).NextIndex;
                 }
             }
 
-            //get close brace
-            if (i >= exp.Length || exp[i++] != ')')
-                return index;
-            parseNode = new ParseNode(ParseNodeType.IdentiferList, index, i - index, parseNodes);
-            return i;
+            if (i >= context.Expression.Length || context.Expression[i++] != ')')
+                return new GetIdentifierListResult(null, null, index);
+
+            var parseNode = new ParseNode(ParseNodeType.IdentiferList, index, i - index, parseNodes);
+            return new GetIdentifierListResult(idenList, parseNode, i);
         }
     }
 }

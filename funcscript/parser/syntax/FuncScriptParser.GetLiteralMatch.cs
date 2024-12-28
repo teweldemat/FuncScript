@@ -1,3 +1,4 @@
+using ArgumentNullException = System.ArgumentNullException;
 using funcscript.block;
 using funcscript.funcs.math;
 
@@ -6,26 +7,28 @@ namespace funcscript.core
     public partial class FuncScriptParser
     {
 
-        static public int GetLiteralMatch(string exp, int index, params string[] provider)
-        {
-            return GetLiteralMatch(exp, index, provider, out var matched);
-        }
+        public record GetLiteralMatchResult(string Matched, int NextIndex);
 
-        static public int GetLiteralMatch(string exp, int index, string[] provider, out string matched)
+        static public GetLiteralMatchResult GetLiteralMatch(ParseContext context, int index, params string[] provider)
         {
-            if (exp == null)
+            return GetLiteralMatch(context.Expression, index, provider);
+        }
+        static public GetLiteralMatchResult GetLiteralMatch(String expression, int index, params string[] provider)
+        {
+            if (expression == null)
             {
-                throw new ArgumentNullException(nameof(exp), "The input expression cannot be null.");
+                throw new ArgumentNullException(nameof(expression), "The input expression cannot be null.");
             }
 
+            string matched = null;
             foreach (var k in provider)
             {
                 bool matchFound = true;
-                if (index + k.Length <= exp.Length)
+                if (index + k.Length <= expression.Length)
                 {
                     for (int i = 0; i < k.Length; i++)
                     {
-                        if (char.ToLowerInvariant(exp[index + i]) != char.ToLowerInvariant(k[i]))
+                        if (char.ToLowerInvariant(expression[index + i]) != char.ToLowerInvariant(k[i]))
                         {
                             matchFound = false;
                             break;
@@ -35,13 +38,12 @@ namespace funcscript.core
                     if (matchFound)
                     {
                         matched = k.ToLowerInvariant();
-                        return index + k.Length;
+                        return new GetLiteralMatchResult(matched, index + k.Length);
                     }
                 }
             }
 
-            matched = null;
-            return index;
+            return new GetLiteralMatchResult(matched, index);
         }
     }
 }

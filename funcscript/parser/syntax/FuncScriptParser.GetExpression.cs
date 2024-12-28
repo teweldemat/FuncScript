@@ -3,14 +3,13 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetExpression(KeyValueCollection provider, String exp, int index, out ExpressionBlock expBlock,
-            out ParseNode parseNode, List<SyntaxErrorData> syntaxErrors)
+        static ParseResult GetExpression(ParseContext context, int index)
         {
-            var i = GetInfixExpression(provider, exp, index, out expBlock, out parseNode, syntaxErrors);
-            if (i > index)
-                return i;
+            var result = GetInfixExpression(context, index);
+            if (result.NextIndex > index)
+                return result;
 
-            return index;
+            return new ParseResult(null, null, index);
         }
     }
 }

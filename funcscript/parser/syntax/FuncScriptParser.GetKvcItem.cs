@@ -4,71 +4,68 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetKvcItem(KeyValueCollection provider, bool nakedKvc, string exp, int index,
-            out KvcExpression.KeyValueExpression item,
-            out ParseNode parseNode)
-        {
-            item = null;
-            var syntaxErrors = new List<SyntaxErrorData>();
-            var i = GetKeyValuePair(provider, exp, index, out item, out parseNode, syntaxErrors);
-            if (i > index)
-                return i;
+        public record GetKvcItemResult(KvcExpression.KeyValueExpression Item, ParseNode ParseNode, int NextIndex);
 
-            syntaxErrors = new List<SyntaxErrorData>();
-            i = GetReturnDefinition(provider, exp, index, out var retExp, out var nodeRetExp, syntaxErrors);
-            if (i > index)
+        static GetKvcItemResult GetKvcItem(ParseContext context, bool nakedKvc, int index)
+        {
+            KvcExpression.KeyValueExpression item = null;
+            var result = GetKeyValuePair(context, index);
+
+            if (result.NextIndex > index)
+                return new GetKvcItemResult(result.KeyValue, result.ParseNode, result.NextIndex);
+
+            var returnDefResult = GetReturnDefinition(context, index);
+
+            if (returnDefResult.NextIndex > index)
             {
                 item = new KvcExpression.KeyValueExpression
                 {
                     Key = null,
-                    ValueExpression = retExp
+                    ValueExpression = returnDefResult.Expression
                 };
-                parseNode = nodeRetExp;
-                return i;
+                return new GetKvcItemResult(item, returnDefResult.Node, returnDefResult.NextIndex);
             }
 
             if (!nakedKvc)
             {
-                i = GetIdentifier(provider, exp, index, false, out var iden, out var idenLower, out _, out var nodeIden);
+                var identifierResult = GetIdentifier(context, index, false);
 
-                if (i > index)
+                if (identifierResult.NextIndex > index)
                 {
                     item = new KvcExpression.KeyValueExpression
                     {
-                        Key = iden,
-                        KeyLower = idenLower,
-                        ValueExpression = new ReferenceBlock(iden, idenLower, false)
+                        Key = identifierResult.Iden,
+                        KeyLower = identifierResult.IdenLower,
+                        ValueExpression = new ReferenceBlock(identifierResult.Iden, identifierResult.IdenLower, false)
                         {
                             CodePos = index,
-                            CodeLength = i - index
+                            CodeLength = identifierResult.NextIndex - index
                         }
                     };
-                    item.ValueExpression.SetContext(provider);
-                    parseNode = nodeIden;
-                    return i;
+                    item.ValueExpression.SetContext(context.Provider);
+                    return new GetKvcItemResult(item, identifierResult.ParseNode, identifierResult.NextIndex);
                 }
 
-                syntaxErrors = new List<SyntaxErrorData>();
-                i = GetSimpleString(provider, exp, index, out iden, out nodeIden, syntaxErrors);
-                if (i > index)
+                var simpleStringResult = GetSimpleString(context, index);
+
+                if (simpleStringResult.NextIndex > index)
                 {
                     item = new KvcExpression.KeyValueExpression
                     {
-                        Key = iden,
-                        KeyLower = idenLower,
-                        ValueExpression = new ReferenceBlock(iden, iden.ToLower(), false)
+                        Key = simpleStringResult.Str,
+                        KeyLower = simpleStringResult.Str.ToLower(),
+                        ValueExpression = new ReferenceBlock(simpleStringResult.Str, simpleStringResult.Str.ToLower(), false)
                         {
                             CodePos = index,
-                            CodeLength = i - index
+                            CodeLength = simpleStringResult.NextIndex - index
                         }
                     };
-                    item.ValueExpression.SetContext(provider);
-                    parseNode = nodeIden;
-                    return i;
+                    item.ValueExpression.SetContext(context.Provider);
+                    return new GetKvcItemResult(item, simpleStringResult.Node, simpleStringResult.NextIndex);
                 }
             }
 
-            return index;
+            return new GetKvcItemResult(item, null, index);
         }
     }
 }

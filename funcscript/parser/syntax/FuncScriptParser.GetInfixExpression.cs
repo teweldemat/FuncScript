@@ -5,19 +5,16 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetInfixExpression(KeyValueCollection provider, string exp, int index, out ExpressionBlock expBlock,
-            out ParseNode parseNode, List<SyntaxErrorData> syntaxErrors)
+        static ParseResult GetInfixExpression(ParseContext context, int index)
         {
-            var i = GetInfixExpressionSingleLevel(provider, s_operatorSymols.Length - 1, s_operatorSymols[^1], exp,
-                index, out expBlock,
-                out parseNode, syntaxErrors);
+            var result = GetInfixExpressionSingleLevel(context, s_operatorSymols.Length - 1, s_operatorSymols[^1], index);
             
-            if (expBlock != null)
+            if (result.Expression != null)
             {
-                expBlock.SetContext(provider);
+                result.Expression.SetContext(context.Provider);
             }
 
-            return i;
+            return result;
         }
     }
 }
