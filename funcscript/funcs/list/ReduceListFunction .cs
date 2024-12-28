@@ -39,7 +39,7 @@ namespace funcscript.funcs.list
             
             for (int i = 0; i < lst.Length; i++)
             {
-                total = func.EvaluateList(new ArrayFsList(new object[] { total, lst[i], i }));
+                total = func.EvaluateList(new ArrayFsList(new object[] { lst[i], total,  i }));
             }
 
             return FuncScript.NormalizeDataType(total);

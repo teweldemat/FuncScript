@@ -4,7 +4,6 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-
         static ExpressionBlockResult GetInfixExpressionSingleLevel(ParseContext context, int level, string[] candidates, int index)
         {
             ExpressionBlock prog = null;
