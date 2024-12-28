@@ -110,11 +110,6 @@ namespace funcscript.model
                 }
             }
         }
-        public override int GetHashCode()
-        {
-            return this.GetHashCode();
-        }
-
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();

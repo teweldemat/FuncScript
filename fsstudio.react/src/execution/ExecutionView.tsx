@@ -3,6 +3,7 @@ import { Grid, Typography, Tab, Tabs, Box, Toolbar, IconButton } from '@mui/mate
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import SaveIcon from '@mui/icons-material/Save';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import ClearAllIcon from '@mui/icons-material/ClearAll';
 import axios from 'axios';
 
 import EvalNodeComponent, { ExpressionType } from './EvalNodeComponent';
@@ -20,8 +21,6 @@ interface ErrorItem {
 interface ErrorData {
   errors: ErrorItem[];
 }
-
-
 
 const ExecutionView: React.FC<{
   sessionId: string;
@@ -42,7 +41,6 @@ const ExecutionView: React.FC<{
     ExpressionType.FuncScript
   );
 
-  // For debounced auto-save
   const saveTimerRef = useRef<NodeJS.Timeout | null>(null);
   const [savingInProgress, setSavingInProgress] = useState(false);
   const [queuedExpression, setQueuedExpression] = useState<string | null>(null);
@@ -57,7 +55,6 @@ const ExecutionView: React.FC<{
     setMarkdown('');
   }, [sessionId]);
 
-  // Watch expression changes to update save status
   useEffect(() => {
     if (expression === lastSavedExpression) {
       setSaveStatus('All changes saved');
@@ -82,7 +79,6 @@ const ExecutionView: React.FC<{
           setTabIndex(1);
         })
         .catch((error) => {
-          console.error('Failed to evaluate expression:', error);
           if (error.response && error.response.data) {
             setResultText(formatErrorData(error.response.data as ErrorData));
           } else {
@@ -106,8 +102,7 @@ const ExecutionView: React.FC<{
         if (thenEvaluate) {
           executeExpression();
         }
-      } catch (error) {
-        console.error('Failed to save expression:', error);
+      } catch {
         setSaveStatus('Failed to save changes');
       } finally {
         setSavingInProgress(false);
@@ -133,10 +128,9 @@ const ExecutionView: React.FC<{
         setSelectedNode(nodePath);
         setExpression(response.data.expression ?? '');
         setLastSavedExpression(response.data.expression);
-        setSelectedExpressionType(response.data.expressionType); // Capture the expression type
+        setSelectedExpressionType(response.data.expressionType);
         setSaveStatus('All changes saved');
-      })
-      .catch((error) => console.error('Failed to fetch node:', error));
+      });
     onNodeSelect(nodePath);
   };
 
@@ -185,14 +179,15 @@ StackTrace: ${error.stackTrace || 'N/A'}
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // Debounced auto-save on expression changes
+  const handleClearLog = () => {
+    setMessages([]);
+  };
+
   useEffect(() => {
     if (!selectedNode || expression == null) return;
-
     if (saveTimerRef.current) {
       clearTimeout(saveTimerRef.current);
     }
-
     if (expression !== lastSavedExpression) {
       setSaveStatus('Unsaved changes');
       setQueuedExpression(expression);
@@ -234,8 +229,9 @@ StackTrace: ${error.stackTrace || 'N/A'}
             key={selectedNode || 'no-node'}
             expression={expression}
             setExpression={(value) => setExpression(value)}
-            expressionType={selectedExpressionType} // Pass the expression type here
-          />);
+            expressionType={selectedExpressionType}
+          />
+        );
       case 1:
         return (
           <pre
@@ -284,6 +280,9 @@ StackTrace: ${error.stackTrace || 'N/A'}
             <IconButton onClick={handleCopy} color="primary">
               {copied ? 'Copied' : <ContentCopyIcon />}
             </IconButton>
+            <IconButton onClick={handleClearLog} color="primary">
+              <ClearAllIcon />
+            </IconButton>
           </Box>
           <Box sx={{ marginLeft: 'auto', textAlign: 'right' }}>
             <Typography variant="body2" color="textSecondary">
@@ -320,7 +319,7 @@ StackTrace: ${error.stackTrace || 'N/A'}
             }}
             sessionId={sessionId}
             onSelect={handleNodeSelect}
-            onModify={() => { }}
+            onModify={() => {}}
             selectedNode={selectedNode}
           />
         )}

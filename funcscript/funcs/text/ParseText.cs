@@ -77,7 +77,7 @@ namespace funcscript.funcs.text
             throw new NotImplementedException();
         }
 
-        public IList<KeyValuePair<string, object>> GetAll()
+        public IList<string> GetAllKeys()
         {
             throw new NotImplementedException();
         }

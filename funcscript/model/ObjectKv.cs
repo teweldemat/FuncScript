@@ -78,9 +78,9 @@ namespace funcscript.model
 
         public KeyValueCollection ParentContext => null;
 
-        public IList<KeyValuePair<string, object>> GetAll()
+        public IList<string> GetAllKeys()
         {
-            var list = new List<KeyValuePair<string, object>>();
+            var list = new List<string>();
             if (_val == null)
                 return list;
             var t = _val.GetType();
@@ -90,7 +90,7 @@ namespace funcscript.model
                 var val = prop.Value.Field == null ?
                         prop.Value.Prop.GetValue(_val) : prop.Value.Field.GetValue(_val);
                 val = FuncScript.NormalizeDataType(val);
-                list.Add(KeyValuePair.Create(prop.Value.Name, val));
+                list.Add(prop.Value.Name);
             }
             return list;
         }

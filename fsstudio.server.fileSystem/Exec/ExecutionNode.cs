@@ -98,9 +98,9 @@ public class ExecutionNode : KeyValueCollection
         return Children.Any(c => c._nameLower == key);
     }
 
-    public IList<KeyValuePair<string, object>> GetAll()
+    public IList<string> GetAllKeys()
     {
-        return this.Children.Select(c => KeyValuePair.Create(c._name, c.Evaluate(this))).ToList();
+        return this.Children.Select(c => c._name).ToList();
     }
 
   

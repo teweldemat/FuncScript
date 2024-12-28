@@ -112,6 +112,13 @@ namespace funcscript.block
             return this.index.ContainsKey(key);
         }
 
+        public IList<string> GetAllKeys()
+        {
+            return this.KeyValues
+                .Select(kv => kv.Key).ToList();
+
+        }
+
         public IList<KeyValuePair<string, object>> GetAll()
         {
             return this.KeyValues

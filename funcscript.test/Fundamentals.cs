@@ -87,11 +87,11 @@ public class Fundamentals
         var res = exp.Evaluate();
         Assert.That(res is KeyValueCollection);
         var resKv = (KeyValueCollection)res;
-        var all = resKv.GetAll();
+        var all = resKv.GetAllKeys();
         Assert.That(all.Count(), Is.EqualTo(1));
-        var pair = all.First();
-        Assert.That(pair.Key, Is.EqualTo("x"));
-        Assert.That(pair.Value, Is.EqualTo(5));
+        var key = all.First();
+        Assert.That(key, Is.EqualTo("x"));
+        Assert.That(resKv.Get(key), Is.EqualTo(5));
     }
 
     [Test]

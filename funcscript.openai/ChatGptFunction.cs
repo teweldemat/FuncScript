@@ -11,6 +11,7 @@ namespace funcscript.openai
         private static readonly string[] SupportedModels = new[] { "gpt-4o", "gpt-4o-mini" };
         public object EvaluateList(FsList pars)
         {
+            Console.WriteLine("ChatGPT request");
             if (pars.Length < 3)
                 return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH,
                     $"{this.Symbol}: too few parameters. Expected at least 3, got {pars.Length}.");

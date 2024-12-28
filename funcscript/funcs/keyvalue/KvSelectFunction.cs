@@ -26,7 +26,11 @@ namespace funcscript.funcs.keyvalue
                 throw new error.TypeMismatchError($"{Symbol} function: The second parameter should be {ParName(1)}");
 
             var first = (KeyValueCollection)par0;
-            var second = ((KeyValueCollection)par1).GetAll();
+            var secondKvc = ((KeyValueCollection)par1);
+            var second = secondKvc
+                .GetAllKeys()
+                .Select(k=>KeyValuePair.Create(k,secondKvc.Get(k)))
+                .ToList();
 
             for (int i = 0; i < second.Count; i++)
             {

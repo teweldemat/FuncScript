@@ -391,7 +391,7 @@ return j;
             var exp = "{}";
             var res = FuncScript.Evaluate(exp) as KeyValueCollection;
             Assert.IsNotNull(res);
-            Assert.That(res.GetAll().Count,Is.EqualTo(0));
+            Assert.That(res.GetAllKeys().Count,Is.EqualTo(0));
         }
 
         [Test]

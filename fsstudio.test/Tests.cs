@@ -1,4 +1,6 @@
 using fsstudio.server.fileSystem.exec;
+using funcscript.host;
+using funcscript.model;
 
 namespace fsstudio.test;
 
@@ -73,5 +75,34 @@ public class Tests
         var res = session.EvaluateNode("x");
         Assert.That(res is int);
         Assert.That((int)res, Is.EqualTo(11));
+    }
+    
+    [Test]
+    public void TestLogger()
+    {
+        var logger = new StringLogger();
+        Fslogger.SetDefaultLogger(logger);
+        var exp = @"{
+  f:(c)=>c;
+  return [f(log(""x"",'start'))]
+}";
+        var nodes = new[]
+        {
+            new ExecutionNode
+            {
+                Name = "x",
+                Expression = exp,
+                ExpressionType = ExpressionType.FuncScript,
+                Children = new ExecutionNode[0]
+            }                   
+        };
+        var session = new ExecutionSession(nodes, null);
+        var res = session.EvaluateNode("x");
+        Assert.That(res is FsList);
+        var l = (FsList)res;
+        Assert.That(l.Length,Is.EqualTo(1));
+        Assert.That(l[0],Is.EqualTo("x"));
+        Assert.That(logger.GetLogContent().Trim(),Is.EqualTo("start"));
+
     }
 }

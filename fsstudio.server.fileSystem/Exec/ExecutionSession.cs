@@ -217,9 +217,10 @@ public class ExecutionSession : KeyValueCollection
         return _context.IsDefined(name);
     }
 
-    public IList<KeyValuePair<string, object>> GetAll()
+
+    public IList<string> GetAllKeys()
     {
-        return this._nodes.Select(x => KeyValuePair.Create(x.Name, x.Evaluate(this))).ToList();
+        return this._nodes.Select(x => x.Name).ToList();
     }
 
 

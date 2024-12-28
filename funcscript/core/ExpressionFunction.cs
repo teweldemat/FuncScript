@@ -18,7 +18,7 @@ namespace funcscript.core
                        || EvaluationContext.IsDefined(key);
             }
 
-            public IList<KeyValuePair<string, object>> GetAll()
+            public IList<string> GetAllKeys()
             {
                 throw new InvalidOperationException();
             }

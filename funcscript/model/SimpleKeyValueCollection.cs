@@ -48,9 +48,9 @@ namespace funcscript.model
             return _index.ContainsKey(value);
         }
 
-        public IList<KeyValuePair<string, object>> GetAll()
+        public IList<string> GetAllKeys()
         {
-            return this._data;
+            return this._data.Select(x=>x.Key).ToList();
         }
     }
 }

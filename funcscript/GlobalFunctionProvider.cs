@@ -22,7 +22,7 @@ namespace funcscript
             return s_funcByName.ContainsKey(key);
         }
 
-        public IList<KeyValuePair<string, object>> GetAll()
+        public IList<string> GetAllKeys()
         {
             throw new NotImplementedException();
         }
@@ -121,7 +121,7 @@ namespace funcscript
             return false;
         }
 
-        public IList<KeyValuePair<string, object>> GetAll()
+        public IList<string> GetAllKeys()
         {
             throw new NotImplementedException();
         }

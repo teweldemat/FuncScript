@@ -9,8 +9,8 @@ namespace funcscript.model
         public object Get(string key);
         public KeyValueCollection ParentContext { get; }
         public bool IsDefined(string key);
-        public IList<KeyValuePair<string, object>> GetAll();
-
+        //public IList<KeyValuePair<string, object>> GetAll();
+        public IList<String> GetAllKeys();
         public static KeyValueCollection Merge(KeyValueCollection col1, KeyValueCollection col2)
         {
             if (col1 == null && col2 == null)
@@ -20,22 +20,23 @@ namespace funcscript.model
             if (col2 == null)
                 return col1;
             var dict = new OrderedDictionary();
-            foreach (var kv in col1.GetAll())
-                dict[kv.Key] = kv.Value;
-            foreach (var kv in col2.GetAll())
+            foreach (var key in col1.GetAllKeys())
+                dict[key] = col1.Get(key);
+            foreach (var key in col2.GetAllKeys())
             {
-                if (dict.Contains(kv.Key))
+                var val = col2.Get(key);
+                if (dict.Contains(key))
                 {
-                    var left = dict[kv.Key] as KeyValueCollection;
-                    if (left != null && kv.Value is KeyValueCollection)
+                    var left = dict[key] as KeyValueCollection;
+                    if (left != null && val is KeyValueCollection)
                     {
-                        dict[kv.Key] = KeyValueCollection.Merge(left, (KeyValueCollection)kv.Value);
+                        dict[key] = KeyValueCollection.Merge(left, (KeyValueCollection)val);
                     }
                     else
-                        dict[kv.Key] = kv.Value;
+                        dict[key] = val;
                 }
                 else
-                    dict.Add(kv.Key, kv.Value);
+                    dict.Add(key, val);
             }
 
             var kvs = new KeyValuePair<string, object>[dict.Count];
@@ -60,7 +61,8 @@ namespace funcscript.model
     {
         public static T ConvertTo<T>(this KeyValueCollection kvc)
         {
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<T>(FuncScript.FormatToJson(kvc));
+            var json = FuncScript.FormatToJson(kvc);
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<T>(json);
         }
         public static object ConvertTo(this KeyValueCollection kvc,Type t)
         {

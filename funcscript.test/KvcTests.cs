@@ -434,7 +434,9 @@ d";
         {
             var res = FuncScript.FromJson(json);
             var expected = FuncScript.Evaluate(fs);
-            Assert.AreEqual(FuncScript.FormatToJson(expected), FuncScript.FormatToJson(res));
+            var jsonExpected = FuncScript.FormatToJson(expected);
+            var jsonActual = FuncScript.FormatToJson(res);
+            Assert.AreEqual(jsonExpected, jsonActual);
         }
 
         [Test]
