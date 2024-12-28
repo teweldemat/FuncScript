@@ -6,8 +6,9 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        public record GetSpaceSeparatedStringListExpressionResult(List<string> StringList, ParseNode ParseNode, int NextIndex);
 
+        record GetSpaceSeparatedStringListExpressionResult(List<string> StringList, ParseNode ParseNode, int NextIndex)
+            :ParseResult(ParseNode,NextIndex);
         static GetSpaceSeparatedStringListExpressionResult GetSpaceSeparatedStringListExpression(ParseContext context, int index)
         {
             var i = SkipSpace(context, index).NextIndex;

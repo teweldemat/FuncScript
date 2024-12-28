@@ -4,7 +4,8 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        public record GetKvcItemResult(KvcExpression.KeyValueExpression Item, ParseNode ParseNode, int NextIndex);
+        record GetKvcItemResult(KvcExpression.KeyValueExpression Item, ParseNode ParseNode, int NextIndex)
+            :ParseResult(ParseNode,NextIndex);
 
         static GetKvcItemResult GetKvcItem(ParseContext context, bool nakedKvc, int index)
         {
@@ -21,9 +22,9 @@ namespace funcscript.core
                 item = new KvcExpression.KeyValueExpression
                 {
                     Key = null,
-                    ValueExpression = returnDefResult.Expression
+                    ValueExpression = returnDefResult.Block
                 };
-                return new GetKvcItemResult(item, returnDefResult.Node, returnDefResult.NextIndex);
+                return new GetKvcItemResult(item, returnDefResult.ParseNode, returnDefResult.NextIndex);
             }
 
             if (!nakedKvc)
@@ -42,7 +43,7 @@ namespace funcscript.core
                             CodeLength = identifierResult.NextIndex - index
                         }
                     };
-                    item.ValueExpression.SetContext(context.Provider);
+                    item.ValueExpression.SetContext(context.ReferenceProvider);
                     return new GetKvcItemResult(item, identifierResult.ParseNode, identifierResult.NextIndex);
                 }
 
@@ -60,8 +61,8 @@ namespace funcscript.core
                             CodeLength = simpleStringResult.NextIndex - index
                         }
                     };
-                    item.ValueExpression.SetContext(context.Provider);
-                    return new GetKvcItemResult(item, simpleStringResult.Node, simpleStringResult.NextIndex);
+                    item.ValueExpression.SetContext(context.ReferenceProvider);
+                    return new GetKvcItemResult(item, simpleStringResult.ParseNode, simpleStringResult.NextIndex);
                 }
             }
 

@@ -12,7 +12,7 @@ namespace funcscript.core
             var result = GetExpression(context, index);
             if (result.NextIndex > index)
             {
-                result.Expression.SetContext(context.Provider);
+                result.Block.SetContext(context.ReferenceProvider);
                 context.SyntaxErrors.AddRange(thisErrors);
                 return result;
             }

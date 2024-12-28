@@ -3,7 +3,9 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        public record GetIntResult(string IntVal, ParseNode ParseNode, int NextIndex);
+
+        record GetIntResult(string IntVal, ParseNode ParseNode, int NextIndex)
+            :ParseResult(ParseNode,NextIndex);
 
         static GetIntResult GetInt(ParseContext context, bool allowNegative, int index)
         {
@@ -24,7 +26,7 @@ namespace funcscript.core
             i = i2;
 
             string intVal = context.Expression.Substring(index, i - index);
-            parseNode = new ParseNode(ParseNodeType.LiteralInteger, index, index - i);
+            parseNode = new ParseNode(ParseNodeType.LiteralInteger, index,   i-index);
             return new GetIntResult(intVal, parseNode, i);
         }
     }

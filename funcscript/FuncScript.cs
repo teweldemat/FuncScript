@@ -398,12 +398,12 @@ namespace funcscript
             switch (mode)
             {
                 case ParseMode.Standard:
-                    exp = core.FuncScriptParser.Parse(context).Expression;
+                    exp = core.FuncScriptParser.Parse(context).Block;
                     break;
                 case ParseMode.SpaceSeparatedList:
                     return core.FuncScriptParser.ParseSpaceSepratedList(context);
                 case ParseMode.FsTemplate:
-                    exp = core.FuncScriptParser.ParseFsTemplate(context).Expression;
+                    exp = core.FuncScriptParser.ParseFsTemplate(context).Block;
                     break;
                 default:    
                     exp = null;

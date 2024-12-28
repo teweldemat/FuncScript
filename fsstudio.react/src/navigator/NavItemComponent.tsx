@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { ListItem, ListItemIcon, ListItemText, Collapse, List, Box, IconButton, Menu, MenuItem, TextField, InputBaseComponentProps, Dialog, DialogTitle, Button, DialogActions, DialogContent, DialogContentText } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import FolderIcon from '@mui/icons-material/Folder';
-import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -28,14 +27,18 @@ const NavItemComponent: React.FC<NavItemComponentProps> = ({ item, onSelect, sel
     const [open, setOpen] = useState(item.path === "/");
     const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
     const [newInputMode, setNewInputMode] = useState(false);
-    const [inputType, setInputType] = useState(''); // 'file' or 'folder'
+    const [inputType, setInputType] = useState('');
     const [newName, setNewName] = useState('');
     const [renameMode, setRenameMode] = useState<boolean>(false);
     const [renameValue, setRenameValue] = useState<string>('');
     const [deleteItem, setDeleteItem] = useState<boolean>(false);
+    const [duplicateMode, setDuplicateMode] = useState<boolean>(false);
+    const [duplicateValue, setDuplicateValue] = useState<string>('');
 
     const renameInputRef = useRef<InputBaseComponentProps['inputRef']>(null);
     const newInputRef = useRef<InputBaseComponentProps['inputRef']>(null);
+    const duplicateRef = useRef<InputBaseComponentProps['inputRef']>(null);
+
     useEffect(() => {
         if (renameMode && renameInputRef.current) {
             renameInputRef.current.focus();
@@ -49,6 +52,13 @@ const NavItemComponent: React.FC<NavItemComponentProps> = ({ item, onSelect, sel
             newInputRef.current.select();
         }
     }, [newInputMode]);
+
+    useEffect(() => {
+        if (duplicateMode && duplicateRef.current) {
+            duplicateRef.current.focus();
+            duplicateRef.current.select();
+        }
+    }, [duplicateMode]);
 
     useEffect(() => {
         if (item.isFolder && open) {
@@ -97,7 +107,11 @@ const NavItemComponent: React.FC<NavItemComponentProps> = ({ item, onSelect, sel
                 setRenameValue(item.name);
                 break;
             case 'delete':
-                setDeleteItem(true)
+                setDeleteItem(true);
+                break;
+            case 'duplicate':
+                setDuplicateMode(true);
+                setDuplicateValue(item.name + '_copy');
                 break;
             default:
                 break;
@@ -107,19 +121,16 @@ const NavItemComponent: React.FC<NavItemComponentProps> = ({ item, onSelect, sel
     const handleAddItem = () => {
         if (newName.trim() !== '') {
             const apiPath = inputType === 'file' ? '/CreateFile' : '/CreateFolder';
-            const fullPath = `${item.path}${newName}`;
             axios.post(`${SERVER_URL}/api/FileSystem${apiPath}`, {
                 Path: item.path,
                 Name: newName
             })
                 .then(response => {
-                    console.log(`${inputType} created: `, response.data);
-                    fetchChildren(); // Refresh the list to show the new file/folder
+                    fetchChildren();
                     setNewName('');
                     setNewInputMode(false);
                 })
                 .catch(error => {
-                    console.error('Error creating item:', error);
                     alert('Failed to create item: ' + error.message);
                 });
         }
@@ -132,13 +143,11 @@ const NavItemComponent: React.FC<NavItemComponentProps> = ({ item, onSelect, sel
                 Name: renameValue
             })
                 .then(response => {
-                    console.log(`${inputType} renamed: `, response.data);
                     onRename();
                     setRenameMode(false);
                     setRenameValue('');
                 })
                 .catch(error => {
-                    console.error('Error rename item:', error);
                     alert('Failed to rename item: ' + error.message);
                 });
         }
@@ -151,35 +160,49 @@ const NavItemComponent: React.FC<NavItemComponentProps> = ({ item, onSelect, sel
             }
         })
             .then(response => {
-                console.log(`Deleted: `, response.data);
                 setDeleteItem(false);
                 onDelete();
             })
             .catch(error => {
-                console.error('Error deleting item:', error);
                 alert(`Failed to delete item: ${error.message}`);
             });
-    }
+    };
 
+    const handleDuplicateItem = () => {
+        if (duplicateValue.trim() !== '') {
+            axios.post(`${SERVER_URL}/api/FileSystem/DuplicateFile`, {
+                Path: item.path,
+                Name: duplicateValue
+            })
+                .then(response => {
+                    setDuplicateMode(false);
+                    setDuplicateValue('');
+                    onDelete();
+                })
+                .catch(error => {
+                    alert('Failed to duplicate item: ' + error.message);
+                });
+        }
+    };
 
     const isRoot = item.path === "/";
-    const menuOptions = item.isFolder ? (isRoot ? ['Add Folder', 'Add File'] : ['Add Folder', 'Add File', 'Rename', 'Delete']) : ['Rename', 'Delete'];
+    const menuOptions = item.isFolder
+        ? (isRoot ? ['Add Folder', 'Add File'] : ['Add Folder', 'Add File', 'Rename', 'Delete'])
+        : ['Rename', 'Duplicate', 'Delete'];
 
     return (
-
         <>
             <ListItem
                 sx={{
-                    display: 'flex', alignItems: 'center', width: '100%',
-
-                    backgroundColor: item.path === selectedPath ? 'lightgray' : 'inherit', // Highlight the selected item
+                    display: 'flex',
+                    alignItems: 'center',
+                    width: '100%',
+                    backgroundColor: item.path === selectedPath ? 'lightgray' : 'inherit',
                     cursor: 'pointer',
-                    '&:hover': {
-                        backgroundColor: 'lightblue' // Color change on hover
-                    }
-
+                    '&:hover': { backgroundColor: 'lightblue' }
                 }}
-                onClick={item.isFolder?()=>{}: handleSelect}>
+                onClick={item.isFolder ? () => {} : handleSelect}
+            >
                 <IconButton onClick={handleMenuClick} size="small">
                     <MoreVertIcon />
                 </IconButton>
@@ -189,54 +212,58 @@ const NavItemComponent: React.FC<NavItemComponentProps> = ({ item, onSelect, sel
                     onClose={handleCloseMenu}
                 >
                     {menuOptions.map(option => (
-                        <MenuItem key={option} onClick={() => handleMenuAction(option.toLowerCase().replace(' ', '-'))}>
+                        <MenuItem
+                            key={option}
+                            onClick={() => handleMenuAction(option.toLowerCase().replace(' ', '-'))}
+                        >
                             {option}
                         </MenuItem>
                     ))}
                 </Menu>
-                {!isRoot && (<>
-                    {item.isFolder && (
-                        <IconButton onClick={handleToggleExpand} size="small" sx={{ marginRight: '8px' }}>
-                            {open ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-                        </IconButton>
-                    )}
-                    <ListItemIcon>
-                        {item.isFolder ? <FolderIcon /> : <FileCopyIcon />}
-                    </ListItemIcon>
-                    {renameMode ?
-                        (<TextField size="small"
-                            label={`Enter ${inputType.replace('add-', '')} name`}
-                            value={renameValue}
-                            onChange={(e) => setRenameValue(e.target.value)}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter')
-                                    handleRenameItem();
-                                else if (e.key === "Escape")
-                                    setRenameMode(false);
-                            }}
-                            autoFocus
-                            InputProps={{
-                                onFocus: event => event.target.select()
-                            }}
-                            inputRef={renameInputRef}
-                        />) :
-                        (<ListItemText primary={item.name} sx={{ flexGrow: 1 }} />)}
-                </>
+                {!isRoot && (
+                    <>
+                        {item.isFolder && (
+                            <IconButton onClick={handleToggleExpand} size="small" sx={{ marginRight: '8px' }}>
+                                {open ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                            </IconButton>
+                        )}
+                        <ListItemIcon>
+                            {item.isFolder ? <FolderIcon /> : <FileCopyIcon />}
+                        </ListItemIcon>
+                        {renameMode ? (
+                            <TextField
+                                size="small"
+                                label={`Enter name`}
+                                value={renameValue}
+                                onChange={(e) => setRenameValue(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') handleRenameItem();
+                                    else if (e.key === "Escape") setRenameMode(false);
+                                }}
+                                autoFocus
+                                InputProps={{
+                                    onFocus: event => event.target.select()
+                                }}
+                                inputRef={renameInputRef}
+                            />
+                        ) : (
+                            <ListItemText primary={item.name} sx={{ flexGrow: 1 }} />
+                        )}
+                    </>
                 )}
-                 {isRoot &&(<ListItemText primary="Files" />)}
+                {isRoot && (<ListItemText primary="Files" />)}
             </ListItem>
+
             {newInputMode && (
                 <Box pl={isRoot ? 0 : 4}>
                     <TextField
                         size="small"
-                        label={`Enter ${inputType.replace('add-', '')} name`}
+                        label={`Enter ${inputType} name`}
                         value={newName}
                         onChange={(e) => setNewName(e.target.value)}
                         onKeyDown={(e) => {
-                            if (e.key === 'Enter')
-                                handleAddItem();
-                            else if (e.key === "Escape")
-                                setNewInputMode(false);
+                            if (e.key === 'Enter') handleAddItem();
+                            else if (e.key === "Escape") setNewInputMode(false);
                         }}
                         autoFocus
                         inputRef={newInputRef}
@@ -260,6 +287,7 @@ const NavItemComponent: React.FC<NavItemComponentProps> = ({ item, onSelect, sel
                     </List>
                 </Collapse>
             )}
+
             <Dialog
                 open={deleteItem}
                 onClose={() => setDeleteItem(false)}
@@ -281,10 +309,42 @@ const NavItemComponent: React.FC<NavItemComponentProps> = ({ item, onSelect, sel
                     </Button>
                 </DialogActions>
             </Dialog>
-        </>
-    )
-        ;
 
+            <Dialog
+                open={duplicateMode}
+                onClose={() => setDuplicateMode(false)}
+                aria-labelledby="duplicate-dialog-title"
+                aria-describedby="duplicate-dialog-description"
+            >
+                <DialogTitle id="duplicate-dialog-title">Duplicate File</DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="duplicate-dialog-description">
+                        Enter the new name for your duplicated file
+                    </DialogContentText>
+                    <TextField
+                        size="small"
+                        value={duplicateValue}
+                        onChange={(e) => setDuplicateValue(e.target.value)}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter') handleDuplicateItem();
+                            else if (e.key === "Escape") setDuplicateMode(false);
+                        }}
+                        autoFocus
+                        inputRef={duplicateRef}
+                        fullWidth
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setDuplicateMode(false)} color="primary">
+                        Cancel
+                    </Button>
+                    <Button onClick={handleDuplicateItem} color="primary" autoFocus>
+                        Confirm
+                    </Button>
+                </DialogActions>
+            </Dialog>
+        </>
+    );
 };
 
 export default NavItemComponent;

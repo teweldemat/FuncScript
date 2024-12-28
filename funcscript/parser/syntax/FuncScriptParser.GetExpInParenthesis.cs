@@ -1,5 +1,4 @@
 using funcscript.block;
-using funcscript.model;
 namespace funcscript.core
 {
     public partial class FuncScriptParser
@@ -17,8 +16,8 @@ namespace funcscript.core
 
             i = SkipSpace(context, i).NextIndex;
             var expressionResult = GetExpression(context, i);
-            expBlock = expressionResult.Expression;
-            var nodeExpression = expressionResult.Node;
+            expBlock = expressionResult.Block;
+            var nodeExpression = expressionResult.ParseNode;
             if (expressionResult.NextIndex == i)
                 expBlock = null;
             else
@@ -34,7 +33,7 @@ namespace funcscript.core
             i = i2;
             if (expBlock == null)
                 expBlock = new NullExpressionBlock();
-            expBlock.SetContext(context.Provider);
+            expBlock.SetContext(context.ReferenceProvider);
 
             parseNode = new ParseNode(ParseNodeType.ExpressionInBrace, index, i - index, new[] { nodeExpression });
             return new ExpressionBlockResult(expBlock, parseNode, i);

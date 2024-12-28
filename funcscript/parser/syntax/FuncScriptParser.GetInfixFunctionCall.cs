@@ -4,9 +4,8 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        public record GetInfixFunctionCallResult(ExpressionBlock Program, ParseNode ParseNode, int NextIndex);
 
-        static GetInfixFunctionCallResult GetInfixFunctionCall(ParseContext context, int index)
+        static ExpressionBlockResult GetInfixFunctionCall(ParseContext context, int index)
         {
             var childNodes = new List<ParseNode>();
             var allOperands = new List<ExpressionBlock>();
@@ -14,10 +13,10 @@ namespace funcscript.core
             var result = GetCallAndMemberAccess(context, index);
             if (result.NextIndex == index)
             {
-                return new GetInfixFunctionCallResult(null, null, index);
+                return new ExpressionBlockResult(null, null, index);
             }
-            var prog = result.Expression;
-            var parseNode = result.Node;
+            var prog = result.Block;
+            var parseNode = result.ParseNode;
 
             allOperands.Add(prog);
             childNodes.Add(parseNode);
@@ -26,17 +25,17 @@ namespace funcscript.core
             var identifierResult = GetIdentifier(context, i, false);
             if (identifierResult.NextIndex == i)
             {
-                return new GetInfixFunctionCallResult(prog, parseNode, i);
+                return new ExpressionBlockResult(prog, parseNode, i);
             }
-            var func = context.Provider.Get(identifierResult.IdenLower);
+            var func = context.ReferenceProvider.Get(identifierResult.IdenLower);
             if (!(func is IFsFunction inf))
             {
                 context.SyntaxErrors.Add(new SyntaxErrorData(i, identifierResult.NextIndex - i, "A function expected"));
-                return new GetInfixFunctionCallResult(null, null, index);
+                return new ExpressionBlockResult(null, null, index);
             }
             if (inf.CallType != CallType.Dual)
             {
-                return new GetInfixFunctionCallResult(prog, parseNode, i);
+                return new ExpressionBlockResult(prog, parseNode, i);
             }
 
             childNodes.Add(identifierResult.ParseNode);
@@ -46,11 +45,11 @@ namespace funcscript.core
             if (secondParamResult.NextIndex == i)
             {
                 context.SyntaxErrors.Add(new SyntaxErrorData(i, 0, $"Right side operand expected for {identifierResult.Iden}"));
-                return new GetInfixFunctionCallResult(null, null, index);
+                return new ExpressionBlockResult(null, null, index);
             }
 
-            allOperands.Add(secondParamResult.Expression);
-            childNodes.Add(secondParamResult.Node);
+            allOperands.Add(secondParamResult.Block);
+            childNodes.Add(secondParamResult.ParseNode);
             i = SkipSpace(context, secondParamResult.NextIndex).NextIndex;
 
             while (true)
@@ -64,13 +63,13 @@ namespace funcscript.core
                     break;
                 i = SkipSpace(context, moreOperandResult.NextIndex).NextIndex;
 
-                allOperands.Add(moreOperandResult.Expression);
-                childNodes.Add(moreOperandResult.Node);
+                allOperands.Add(moreOperandResult.Block);
+                childNodes.Add(moreOperandResult.ParseNode);
             }
 
             if (allOperands.Count < 2)
             {
-                return new GetInfixFunctionCallResult(null, null, index);
+                return new ExpressionBlockResult(null, null, index);
             }
 
             prog = new FunctionCallExpression
@@ -78,11 +77,11 @@ namespace funcscript.core
                 Function = new LiteralBlock(func),
                 Parameters = allOperands.ToArray()
             };
-            prog.SetContext(context.Provider);
+            prog.SetContext(context.ReferenceProvider);
             parseNode = new ParseNode(ParseNodeType.GeneralInfixExpression, childNodes[0].Pos,
                 childNodes[^1].Pos + childNodes[^1].Length + childNodes[0].Pos);
 
-            return new GetInfixFunctionCallResult(prog, parseNode, i);
+            return new ExpressionBlockResult(prog, parseNode, i);
         }
     }
 }

@@ -9,9 +9,9 @@ namespace funcscript.core
         public static ExpressionBlockResult Parse(ParseContext context)
         {
             var rootExpressionResult = GetRootExpression(context, 0);
-            if (rootExpressionResult.Expression != null)
+            if (rootExpressionResult.Block != null)
             {
-                rootExpressionResult.Expression.SetContext(context.Provider);
+                rootExpressionResult.Block.SetContext(context.ReferenceProvider);
             }
             return rootExpressionResult;
         }

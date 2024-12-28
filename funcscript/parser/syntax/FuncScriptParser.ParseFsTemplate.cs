@@ -7,7 +7,7 @@ namespace funcscript.core
         public static ExpressionBlockResult ParseFsTemplate(ParseContext context)
         {
             var result = GetFSTemplate(context, 0);
-            result.Expression.SetContext(context.Provider);
+            result.Block.SetContext(context.ReferenceProvider);
             return result;
         }
     }

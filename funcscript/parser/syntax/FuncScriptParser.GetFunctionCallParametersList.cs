@@ -12,9 +12,8 @@ namespace funcscript.core
             return result;
         }
 
-        public record FunctionCallParametersResult(ExpressionBlock Prog, ParseNode Node, int NextIndex) : ExpressionBlockResult(Prog, Node, NextIndex);
 
-        static FunctionCallParametersResult GetFunctionCallParametersList(ParseContext context, string openBrace, string closeBrace,
+        static ExpressionBlockResult GetFunctionCallParametersList(ParseContext context, string openBrace, string closeBrace,
             ExpressionBlock func, int index)
         {
             ParseNode parseNode = null;
@@ -23,7 +22,7 @@ namespace funcscript.core
             var i = SkipSpace(context, index).NextIndex;
             var i2 = GetLiteralMatch(context, i, openBrace).NextIndex;
             if (i == i2)
-                return new FunctionCallParametersResult(null, null, index);
+                return new ExpressionBlockResult(null, null, index);
 
             i = i2;
             var pars = new List<ExpressionBlock>();
@@ -35,8 +34,8 @@ namespace funcscript.core
             if (exprResult.NextIndex > i)
             {
                 i = exprResult.NextIndex;
-                pars.Add(exprResult.Expression);
-                parseNodes.Add(exprResult.Node);
+                pars.Add(exprResult.Block);
+                parseNodes.Add(exprResult.ParseNode);
                 do
                 {
                     i2 = SkipSpace(context, i).NextIndex;
@@ -48,12 +47,12 @@ namespace funcscript.core
                     if (exprResult.NextIndex == i)
                     {
                         context.SyntaxErrors.Add(new SyntaxErrorData(i, 0, "Parameter for call expected"));
-                        return new FunctionCallParametersResult(null, null, index);
+                        return new ExpressionBlockResult(null, null, index);
                     }
 
                     i = exprResult.NextIndex;
-                    pars.Add(exprResult.Expression);
-                    parseNodes.Add(exprResult.Node);
+                    pars.Add(exprResult.Block);
+                    parseNodes.Add(exprResult.ParseNode);
                 } while (true);
             }
 
@@ -62,7 +61,7 @@ namespace funcscript.core
             if (i2 == i)
             {
                 context.SyntaxErrors.Add(new SyntaxErrorData(i, 0, $"'{closeBrace}' expected"));
-                return new FunctionCallParametersResult(null, null, index);
+                return new ExpressionBlockResult(null, null, index);
             }
 
             i = i2;
@@ -74,9 +73,9 @@ namespace funcscript.core
                 CodePos = func.CodePos,
                 CodeLength = i - func.CodePos,
             };
-            prog.SetContext(context.Provider);
+            prog.SetContext(context.ReferenceProvider);
             parseNode = new ParseNode(ParseNodeType.FunctionParameterList, index, i - index, parseNodes);
-            return new FunctionCallParametersResult(prog, parseNode, i);
+            return new ExpressionBlockResult(prog, parseNode, i);
         }
     }
 }

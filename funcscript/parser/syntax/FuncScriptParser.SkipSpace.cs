@@ -2,7 +2,9 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        public static SkipSpaceResult SkipSpace(ParseContext context, int index)
+        record SkipSpaceResult(int NextIndex);
+
+        static SkipSpaceResult SkipSpace(ParseContext context, int index)
         {
             int i = index;
             var expression = context.Expression;

@@ -4,9 +4,8 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        public record GetKvcExpressionResult(KvcExpression KvcExpr, ParseNode ParseNode, int NextIndex);
 
-        static GetKvcExpressionResult GetKvcExpression(ParseContext context, bool nakdeMode, int index)
+        static ExpressionBlockResult GetKvcExpression(ParseContext context, bool nakdeMode, int index)
         {
             var syntaxErrors = context.SyntaxErrors;
             ParseNode parseNode = null;
@@ -17,7 +16,7 @@ namespace funcscript.core
             {
                 i2 = GetLiteralMatch(context, i, "{").NextIndex;
                 if (i2 == i)
-                    return new GetKvcExpressionResult(null, null, index);
+                    return new ExpressionBlockResult(null, null, index);
                 i = SkipSpace(context, i2).NextIndex;
             }
 
@@ -45,8 +44,8 @@ namespace funcscript.core
                 {
                     if (retExp != null)
                     {
-                        syntaxErrors.Add(new SyntaxErrorData(nodeOtherItem.Pos, nodeItems.Count, "Duplicate return statement"));
-                        return new GetKvcExpressionResult(null, null, index);
+                        syntaxErrors.Add(new SyntaxErrorData(nodeOtherItem.Pos, nodeOtherItem.Length, "Duplicate return statement"));
+                        return new ExpressionBlockResult(null, null, index);
                     }
 
                     retExp = otherItem.ValueExpression;
@@ -64,7 +63,7 @@ namespace funcscript.core
                 if (i2 == i)
                 {
                     syntaxErrors.Add(new SyntaxErrorData(i, 0, "'}' expected"));
-                    return new GetKvcExpressionResult(null, null, index);
+                    return new ExpressionBlockResult(null, null, index);
                 }
 
                 i = SkipSpace(context, i2).NextIndex;
@@ -73,20 +72,20 @@ namespace funcscript.core
             if (nakdeMode)
             {
                 if (kvs.Count == 0 && retExp == null)
-                    return new GetKvcExpressionResult(null, null, index);
+                    return new ExpressionBlockResult(null, null, index);
             }
 
             kvcExpr = new KvcExpression();
-            kvcExpr.SetContext(context.Provider);
+            kvcExpr.SetContext(context.ReferenceProvider);
             var error = kvcExpr.SetKeyValues(kvs.ToArray(), retExp);
             if (error != null)
             {
                 syntaxErrors.Add(new SyntaxErrorData(index, i - index, error));
-                return new GetKvcExpressionResult(null, null, index);
+                return new ExpressionBlockResult(null, null, index);
             }
 
             parseNode = new ParseNode(ParseNodeType.KeyValueCollection, index, i - index, nodeItems);
-            return new GetKvcExpressionResult(kvcExpr, parseNode, i);
+            return new ExpressionBlockResult(kvcExpr, parseNode, i);
         }
     }
 }

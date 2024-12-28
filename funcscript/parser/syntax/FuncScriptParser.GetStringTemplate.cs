@@ -15,7 +15,7 @@ namespace funcscript.core
 
         public static ExpressionBlockResult GetStringTemplate(ParseContext context, string delimiter, int index)
         {
-            var provider = context.Provider;
+            var provider = context.ReferenceProvider;
             var exp = context.Expression;
             var syntaxErrors = context.SyntaxErrors;
             ExpressionBlock prog = null;
@@ -93,8 +93,8 @@ namespace funcscript.core
                         return new ExpressionBlockResult(prog, parseNode, index);
                     }
 
-                    parts.Add(exprResult.Expression);
-                    nodeParts.Add(exprResult.Node);
+                    parts.Add(exprResult.Block);
+                    nodeParts.Add(exprResult.ParseNode);
                     i = exprResult.NextIndex;
                     i2 = GetLiteralMatch(context, i, "}").NextIndex;
                     if (i2 == i)

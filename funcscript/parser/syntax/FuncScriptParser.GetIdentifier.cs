@@ -4,7 +4,9 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        public record GetIdentifierResult(string Iden, string IdenLower, bool ParentRef, ParseNode ParseNode, int NextIndex);
+
+        record GetIdentifierResult(string Iden, string IdenLower, bool ParentRef, ParseNode ParseNode, int NextIndex)
+            :ParseResult(ParseNode,NextIndex);
 
         static GetIdentifierResult GetIdentifier(ParseContext context, int index, bool supportParentRef)
         {

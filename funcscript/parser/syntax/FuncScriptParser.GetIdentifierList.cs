@@ -5,7 +5,9 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        public record GetIdentifierListResult(List<string> IdenList, ParseNode ParseNode, int NextIndex);
+
+        record GetIdentifierListResult(List<string> IdenList, ParseNode ParseNode, int NextIndex)
+            :ParseResult(ParseNode,NextIndex);
 
         static GetIdentifierListResult GetIdentifierList(ParseContext context, int index)
         {
@@ -49,7 +51,7 @@ namespace funcscript.core
             if (i >= context.Expression.Length || context.Expression[i++] != ')')
                 return new GetIdentifierListResult(null, null, index);
 
-            var parseNode = new ParseNode(ParseNodeType.IdentiferList, index, i - index, parseNodes);
+            var parseNode = new ParseNode(ParseNodeType.IdentifierList, index, i - index, parseNodes);
             return new GetIdentifierListResult(idenList, parseNode, i);
         }
     }

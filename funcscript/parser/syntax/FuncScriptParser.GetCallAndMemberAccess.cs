@@ -38,11 +38,11 @@ namespace funcscript.core
                     theUnit = new SelectorExpression
                     {
                         Source = theUnit,
-                        Selector = kvc,
+                        Selector = kvc as KvcExpression,
                         CodePos = i,
                         CodeLength = i2 - i
                     };
-                    theUnit.SetContext(context.Provider);
+                    theUnit.SetContext(context.ReferenceProvider);
                     parseNode = new ParseNode(ParseNodeType.Selection, index, i - index, new[] { parseNode, nodeKvc });
                     continue;
                 }

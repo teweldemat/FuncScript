@@ -9,9 +9,9 @@ namespace funcscript.core
         {
             var result = GetInfixExpressionSingleLevel(context, s_operatorSymols.Length - 1, s_operatorSymols[^1], index);
             
-            if (result.Expression != null)
+            if (result.Block != null)
             {
-                result.Expression.SetContext(context.Provider);
+                result.Block.SetContext(context.ReferenceProvider);
             }
 
             return result;

@@ -11,7 +11,7 @@ namespace funcscript.core
             ExpressionBlock retExp = null;
             var i = GetLiteralMatch(context, index, KW_RETURN).NextIndex;
             if (i == index)
-                return new ExpressionBlockResult(retExp, parseNode, index);
+                return new ExpressionBlockResult(null, null, index);
 
             var nodeReturn = new ParseNode(ParseNodeType.KeyWord, index, i - index);
             i = SkipSpace(context, i).NextIndex;
@@ -20,16 +20,16 @@ namespace funcscript.core
             if (exprResult.NextIndex == i)
             {
                 context.SyntaxErrors.Add(new SyntaxErrorData(i, 0, "return expression expected"));
-                return new ExpressionBlockResult(retExp, parseNode, index);
+                return new ExpressionBlockResult(null, null, index);
             }
 
             i = exprResult.NextIndex;
-            retExp = exprResult.Expression;
-            retExp.SetContext(context.Provider);
+            retExp = exprResult.Block;
+            retExp.SetContext(context.ReferenceProvider);
             retExp.CodePos = index;
             retExp.CodeLength = i - index;
-            parseNode = new ParseNode(ParseNodeType.ExpressionInBrace, index, i - index,
-                new[] { nodeReturn, exprResult.Node });
+            parseNode = new ParseNode(ParseNodeType.ReturnExpression, index, i - index,
+                new[] { nodeReturn, exprResult.ParseNode });
 
             return new ExpressionBlockResult(retExp, parseNode, i);
         }

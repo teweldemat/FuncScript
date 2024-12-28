@@ -5,7 +5,9 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        record GetStringResult(string Str, ParseNode Node,int NextIndex);
+        record GetStringResult(string Str, ParseNode ParseNode, int NextIndex)
+            :ParseResult(ParseNode,NextIndex);
+
         static GetStringResult GetSimpleString(ParseContext context, int index)
         {
             var res = GetSimpleString(context,  "\"", index);

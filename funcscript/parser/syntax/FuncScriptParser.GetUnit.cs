@@ -16,9 +16,9 @@ namespace funcscript.core
             i = templateResult.NextIndex;
             if (i > index)
             {
-                parseNode = templateResult.Node;
-                expBlock = templateResult.Expression;
-                expBlock.SetContext(context.Provider);
+                parseNode = templateResult.ParseNode;
+                expBlock = templateResult.Block;
+                expBlock.SetContext(context.ReferenceProvider);
                 expBlock.CodePos = index;
                 expBlock.CodeLength = i - index;
                 return new ExpressionBlockResult(expBlock, parseNode, i);
@@ -29,9 +29,9 @@ namespace funcscript.core
             i = simpleStrResult.NextIndex;
             if (i > index)
             {
-                parseNode = simpleStrResult.Node;
+                parseNode = simpleStrResult.ParseNode;
                 expBlock = new LiteralBlock(simpleStrResult.Str);
-                expBlock.SetContext(context.Provider);
+                expBlock.SetContext(context.ReferenceProvider);
                 expBlock.CodePos = index;
                 expBlock.CodeLength = i - index;
                 return new ExpressionBlockResult(expBlock, parseNode, i);
@@ -44,7 +44,7 @@ namespace funcscript.core
             {
                 parseNode = numberResult.ParseNode;
                 expBlock = new LiteralBlock(numberResult.Number);
-                expBlock.SetContext(context.Provider);
+                expBlock.SetContext(context.ReferenceProvider);
                 expBlock.CodePos = index;
                 expBlock.CodeLength = i - index;
                 return new ExpressionBlockResult(expBlock, parseNode, i);
@@ -56,8 +56,8 @@ namespace funcscript.core
             if (i > index)
             {
                 parseNode = listExprResult.ParseNode;
-                expBlock = listExprResult.ListExpr;
-                expBlock.SetContext(context.Provider);
+                expBlock = listExprResult.Block;
+                expBlock.SetContext(context.ReferenceProvider);
                 expBlock.CodePos = index;
                 expBlock.CodeLength = i - index;
                 return new ExpressionBlockResult(expBlock, parseNode, i);
@@ -69,8 +69,8 @@ namespace funcscript.core
             if (i > index)
             {
                 parseNode = kvcExprResult.ParseNode;
-                expBlock = kvcExprResult.KvcExpr;
-                expBlock.SetContext(context.Provider);
+                expBlock = kvcExprResult.Block;
+                expBlock.SetContext(context.ReferenceProvider);
                 expBlock.CodePos = index;
                 expBlock.CodeLength = i - index;
                 return new ExpressionBlockResult(expBlock, parseNode, i);
@@ -80,9 +80,9 @@ namespace funcscript.core
             i = caseExprResult.NextIndex;
             if (i > index)
             {
-                parseNode = caseExprResult.Node;
-                expBlock = caseExprResult.Expression;
-                expBlock.SetContext(context.Provider);
+                parseNode = caseExprResult.ParseNode;
+                expBlock = caseExprResult.Block;
+                expBlock.SetContext(context.ReferenceProvider);
                 expBlock.CodePos = index;
                 expBlock.CodeLength = i - index;
                 return new ExpressionBlockResult(expBlock, parseNode, i);
@@ -93,8 +93,8 @@ namespace funcscript.core
             if (i > index)
             {
                 parseNode = switchExprResult.ParseNode;
-                expBlock = switchExprResult.Prog;
-                expBlock.SetContext(context.Provider);
+                expBlock = switchExprResult.Block;
+                expBlock.SetContext(context.ReferenceProvider);
                 expBlock.CodePos = index;
                 expBlock.CodeLength = i - index;
                 return new ExpressionBlockResult(expBlock, parseNode, i);
@@ -105,9 +105,9 @@ namespace funcscript.core
             i = lambdaExprResult.NextIndex;
             if (i > index)
             {
-                parseNode = lambdaExprResult.Node;
-                expBlock = new LiteralBlock(lambdaExprResult.ExpressionFunction);
-                expBlock.SetContext(context.Provider);
+                parseNode = lambdaExprResult.ParseNode;
+                expBlock = new LiteralBlock(lambdaExprResult.Block);
+                expBlock.SetContext(context.ReferenceProvider);
                 expBlock.CodePos = index;
                 expBlock.CodeLength = i - index;
                 return new ExpressionBlockResult(expBlock, parseNode, i);
@@ -120,7 +120,7 @@ namespace funcscript.core
             {
                 parseNode = keywordLiteralResult.ParseNode;
                 expBlock = new LiteralBlock(keywordLiteralResult.Literal);
-                expBlock.SetContext(context.Provider);
+                expBlock.SetContext(context.ReferenceProvider);
                 expBlock.CodePos = index;
                 expBlock.CodeLength = i - index;
                 return new ExpressionBlockResult(expBlock, parseNode, i);
@@ -133,7 +133,7 @@ namespace funcscript.core
             {
                 parseNode = identResult.ParseNode;
                 expBlock = new ReferenceBlock(identResult.Iden, identResult.IdenLower, identResult.ParentRef);
-                expBlock.SetContext(context.Provider);
+                expBlock.SetContext(context.ReferenceProvider);
                 expBlock.CodePos = index;
                 expBlock.CodeLength = i - index;
                 return new ExpressionBlockResult(expBlock, parseNode, i);
@@ -143,9 +143,9 @@ namespace funcscript.core
             i = expInParenResult.NextIndex;
             if (i > index)
             {
-                parseNode = expInParenResult.Node;
-                expBlock = expInParenResult.Expression;
-                expBlock.SetContext(context.Provider);
+                parseNode = expInParenResult.ParseNode;
+                expBlock = expInParenResult.Block;
+                expBlock.SetContext(context.ReferenceProvider);
                 expBlock.CodePos = index;
                 expBlock.CodeLength = i - index;
                 return new ExpressionBlockResult(expBlock, parseNode, i);
@@ -156,8 +156,8 @@ namespace funcscript.core
             i = prefixOpResult.NextIndex;
             if (i > index)
             {
-                parseNode = prefixOpResult.Node;
-                expBlock = prefixOpResult.Expression;
+                parseNode = prefixOpResult.ParseNode;
+                expBlock = prefixOpResult.Block;
                 expBlock.CodePos = index;
                 expBlock.CodeLength = i - index;
                 return new ExpressionBlockResult(expBlock, parseNode, i);

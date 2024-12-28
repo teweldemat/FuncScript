@@ -3,7 +3,8 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        public record GetSpaceLessStringResult(string Text, ParseNode ParseNode, int NextIndex);
+        record GetSpaceLessStringResult(string Text, ParseNode ParseNode, int NextIndex)
+            :ParseResult(ParseNode,NextIndex);
 
         static GetSpaceLessStringResult GetSpaceLessString(ParseContext context, int index)
         {

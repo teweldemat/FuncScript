@@ -28,8 +28,8 @@ namespace funcscript.core
                         return new ExpressionBlockResult(null, null, index);
                     }
 
-                    pars.Add(expressionResult.Expression);
-                    childNodes.Add(expressionResult.Node);
+                    pars.Add(expressionResult.Block);
+                    childNodes.Add(expressionResult.ParseNode);
                     i = SkipSpace(context, expressionResult.NextIndex).NextIndex;
                 }
                 else
@@ -41,8 +41,8 @@ namespace funcscript.core
                     var expressionResult = GetExpression(context, i);
                     if (expressionResult.NextIndex == i)
                         break;
-                    pars.Add(expressionResult.Expression);
-                    childNodes.Add(expressionResult.Node);
+                    pars.Add(expressionResult.Block);
+                    childNodes.Add(expressionResult.ParseNode);
                     i = SkipSpace(context, expressionResult.NextIndex).NextIndex;
                 }
 
@@ -60,21 +60,21 @@ namespace funcscript.core
                     return new ExpressionBlockResult(null, null, index);
                 }
 
-                pars.Add(valueExpressionResult.Expression);
-                childNodes.Add(valueExpressionResult.Node);
+                pars.Add(valueExpressionResult.Block);
+                childNodes.Add(valueExpressionResult.ParseNode);
                 i = SkipSpace(context, valueExpressionResult.NextIndex).NextIndex;
             } while (true);
 
             expBlock = new FunctionCallExpression
             {
-                Function = new LiteralBlock(context.Provider.Get(KW_CASE)),
+                Function = new LiteralBlock(context.ReferenceProvider.Get(KW_CASE)),
                 CodePos = index,
                 CodeLength = i - index,
                 Parameters = pars.ToArray(),
             };
-            expBlock.SetContext(context.Provider);
+            expBlock.SetContext(context.ReferenceProvider);
             parseNode = new ParseNode(ParseNodeType.Case, index, i - index);
-            parseNode.Childs = childNodes;
+            parseNode.Children = childNodes;
             return new ExpressionBlockResult(expBlock, parseNode, i);
         }
     }

@@ -23,15 +23,15 @@ namespace funcscript.core
                     if (level == 0)
                     {
                         var result = GetInfixFunctionCall(context, i);
-                        prog = result.Program;
+                        prog = result.Block;
                         parseNode = result.ParseNode;
                         i2 = result.NextIndex;
                     }
                     else
                     {
                         var result = GetInfixExpressionSingleLevel(context, level - 1, s_operatorSymols[level - 1], i);
-                        prog = result.Expression;
-                        parseNode = result.Node;
+                        prog = result.Block;
+                        parseNode = result.ParseNode;
                         i2 = result.NextIndex;
                     }
 
@@ -64,15 +64,15 @@ namespace funcscript.core
                     if (level == 0)
                     {
                         var result = GetInfixFunctionCall(context, i);
-                        nextOperand = result.Program;
+                        nextOperand = result.Block;
                         nextOperandNode = result.ParseNode;
                         i2 = result.NextIndex;
                     }
                     else
                     {
                         var result = GetInfixExpressionSingleLevel(context, level - 1, s_operatorSymols[level - 1], i);
-                        nextOperand = result.Expression;
-                        nextOperandNode = result.Node;
+                        nextOperand = result.Block;
+                        nextOperandNode = result.ParseNode;
                         i2 = result.NextIndex;
                     }
 
@@ -91,7 +91,7 @@ namespace funcscript.core
 
                 if (operands.Count > 1)
                 {
-                    var func = context.Provider.Get(symbol);
+                    var func = context.ReferenceProvider.Get(symbol);
                     if (symbol == "|")
                     {
                         if (operands.Count > 2)
@@ -104,10 +104,10 @@ namespace funcscript.core
                         {
                             ValueExpressions = operands.ToArray(),
                             CodePos = prog.CodePos,
-                            CodeLength = operands[^1].CodePos + operands[^1].CodeLength - prog.CodeLength
+                            CodeLength = operands[^1].CodePos + operands[^1].CodeLength - prog.CodePos
                         };
-                        prog.SetContext(context.Provider);
-                        parseNode = new ParseNode(ParseNodeType.InfixExpression, parseNode.Pos, operandNodes[^1].Pos + operandNodes[^1].Length - parseNode.Length);
+                        prog.SetContext(context.ReferenceProvider);
+                        parseNode = new ParseNode(ParseNodeType.InfixExpression, parseNode.Pos, operandNodes[^1].Pos + operandNodes[^1].Length - parseNode.Pos);
                     }
                     else
                     {
@@ -118,8 +118,8 @@ namespace funcscript.core
                             CodePos = prog.CodePos,
                             CodeLength = operands[^1].CodePos + operands[^1].CodeLength - prog.CodeLength
                         };
-                        prog.SetContext(context.Provider);
-                        parseNode = new ParseNode(ParseNodeType.InfixExpression, parseNode.Pos, operandNodes[^1].Pos + operandNodes[^1].Length - parseNode.Length);
+                        prog.SetContext(context.ReferenceProvider);
+                        parseNode = new ParseNode(ParseNodeType.InfixExpression, parseNode.Pos, operandNodes[^1].Pos + operandNodes[^1].Length - parseNode.Pos);
                     }
                 }
             }

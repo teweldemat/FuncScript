@@ -4,7 +4,9 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        public record GetKeyValuePairResult(KvcExpression.KeyValueExpression KeyValue, ParseNode ParseNode, int NextIndex);
+
+        record GetKeyValuePairResult(KvcExpression.KeyValueExpression KeyValue, ParseNode ParseNode, int NextIndex)
+            :ParseResult(ParseNode,NextIndex);
 
         static GetKeyValuePairResult GetKeyValuePair(ParseContext context, int index)
         {

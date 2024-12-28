@@ -15,15 +15,15 @@ namespace funcscript.test
     {
         static ParseNode Flatten(ParseNode node)
         {
-            if(node.Childs.Count==1)
+            if(node.Children.Count==1)
             {
-                return node.Childs[0];
+                return node.Children[0];
             }
             
-            if(node.Childs.Count>1)
+            if(node.Children.Count>1)
             {
-                for (int i = 0; i < node.Childs.Count; i++)
-                    node.Childs[i] = Flatten(node.Childs[i]);
+                for (int i = 0; i < node.Children.Count; i++)
+                    node.Children[i] = Flatten(node.Children[i]);
             }
             return node;
         }

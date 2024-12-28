@@ -40,8 +40,8 @@ namespace funcscript.core
 
                     i = SkipSpace(context, i).NextIndex;
                     var resultExpr = GetExpression(context, i);
-                    var expr = resultExpr.Expression;
-                    var nodeExpr = resultExpr.Node;
+                    var expr = resultExpr.Block;
+                    var nodeExpr = resultExpr.ParseNode;
                     i2 = resultExpr.NextIndex;
 
                     if (i2 == i)
@@ -52,7 +52,7 @@ namespace funcscript.core
 
                     i = SkipSpace(context, i).NextIndex;
 
-                    expr.SetContext(context.Provider);
+                    expr.SetContext(context.ReferenceProvider);
                     parts.Add(expr);
                     nodeParts.Add(nodeExpr);
                     i = i2;
@@ -99,10 +99,10 @@ namespace funcscript.core
             {
                 prog = new FunctionCallExpression
                 {
-                    Function = new LiteralBlock(context.Provider.Get(TemplateMergeMergeFunction.SYMBOL)),
+                    Function = new LiteralBlock(context.ReferenceProvider.Get(TemplateMergeMergeFunction.SYMBOL)),
                     Parameters = parts.ToArray()
                 };
-                prog.SetContext(context.Provider);
+                prog.SetContext(context.ReferenceProvider);
                 parseNode = new ParseNode(ParseNodeType.StringTemplate, index, i - index, nodeParts);
             }
 

@@ -5,18 +5,18 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        public record GetListExpressionResult(ListExpression ListExpr, ParseNode ParseNode, int NextIndex);
-
-        static GetListExpressionResult GetListExpression(ParseContext context, int index)
+        static ExpressionBlockResult GetListExpression(ParseContext context, int index)
         {
             var exp = context.Expression;
-            var provider = context.Provider;
+            var provider = context.ReferenceProvider;
             var syntaxErrors = context.SyntaxErrors;
 
             var i = SkipSpace(context, index).NextIndex;
+            
             var i2 = GetLiteralMatch(context, i, "[").NextIndex;
             if (i2 == i)
-                return new GetListExpressionResult(null, null, index); // we didn't find '['
+                return new ExpressionBlockResult(null, null, index); // we didn't find '['
+            var tokenStart = i2;
             i = i2;
 
             var listItems = new List<ExpressionBlock>();
@@ -25,8 +25,8 @@ namespace funcscript.core
             var expressionResult = GetExpression(context, i);
             if (expressionResult.NextIndex > i)
             {
-                listItems.Add(expressionResult.Expression);
-                nodeListItems.Add(expressionResult.Node);
+                listItems.Add(expressionResult.Block);
+                nodeListItems.Add(expressionResult.ParseNode);
                 i = expressionResult.NextIndex;
                 do
                 {
@@ -40,8 +40,8 @@ namespace funcscript.core
                     expressionResult = GetExpression(context, i);
                     if (expressionResult.NextIndex == i)
                         break;
-                    listItems.Add(expressionResult.Expression);
-                    nodeListItems.Add(expressionResult.Node);
+                    listItems.Add(expressionResult.Block);
+                    nodeListItems.Add(expressionResult.ParseNode);
                     i = expressionResult.NextIndex;
                 } while (true);
             }
@@ -51,7 +51,7 @@ namespace funcscript.core
             if (i2 == i)
             {
                 syntaxErrors.Add(new SyntaxErrorData(i, 0, "']' expected"));
-                return new GetListExpressionResult(null, null, index);
+                return new ExpressionBlockResult(null, null, index);
             }
 
             i = i2;
@@ -60,8 +60,8 @@ namespace funcscript.core
                 ValueExpressions = listItems.ToArray()
             };
             listExpr.SetContext(provider);
-            var parseNode = new ParseNode(ParseNodeType.List, index, i - index, nodeListItems);
-            return new GetListExpressionResult(listExpr, parseNode, i);
+            var parseNode = new ParseNode(ParseNodeType.List, index, i - tokenStart, nodeListItems);
+            return new ExpressionBlockResult(listExpr, parseNode, i);
         }
     }
 }

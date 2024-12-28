@@ -5,7 +5,8 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        public record GetNumberResult(object Number, ParseNode ParseNode, int NextIndex);
+        record GetNumberResult(object Number, ParseNode ParseNode, int NextIndex)
+            :ParseResult(ParseNode,NextIndex);
 
         static GetNumberResult GetNumber(ParseContext context, int index)
         {

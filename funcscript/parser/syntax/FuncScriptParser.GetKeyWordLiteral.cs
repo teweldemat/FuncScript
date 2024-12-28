@@ -3,9 +3,11 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        public record GetKeyWordLiteralResult(object Literal, ParseNode ParseNode, int NextIndex);
+    
+        record GetKeyWordLiteralResult(object Literal, ParseNode ParseNode, int NextIndex)
+            :ParseResult(ParseNode,NextIndex);
 
-        public static GetKeyWordLiteralResult GetKeyWordLiteral(ParseContext context, int index)
+        static GetKeyWordLiteralResult GetKeyWordLiteral(ParseContext context, int index)
         {
             ParseNode parseNode = null;
             int i = GetLiteralMatch(context, index, "null").NextIndex;

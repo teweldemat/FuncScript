@@ -26,7 +26,7 @@ namespace funcscript.core
             }
 
             i = SkipSpace(context, i).NextIndex;
-            var func = context.Provider.Get(oper);
+            var func = context.ReferenceProvider.Get(oper);
             if (func == null)
             {
                 context.SyntaxErrors.Add(new SyntaxErrorData(index, i - index, $"Prefix operator {oper} not defined"));
@@ -45,11 +45,11 @@ namespace funcscript.core
             var expBlock = new FunctionCallExpression
             {
                 Function = new LiteralBlock(func),
-                Parameters = new[] { callResult.Expression },
+                Parameters = new[] { callResult.Block },
                 CodePos = index,
                 CodeLength = i - index,
             };
-            expBlock.SetContext(context.Provider);
+            expBlock.SetContext(context.ReferenceProvider);
             var parseNode = new ParseNode(ParseNodeType.PrefixOperatorExpression, index, i - index);
             
             return new ExpressionBlockResult(expBlock, parseNode, i);

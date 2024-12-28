@@ -83,7 +83,7 @@ public class ExecutionNode : KeyValueCollection
                 var result = FuncScriptParser.ParseFsTemplate(new FuncScriptParser.ParseContext(provider, this.Expression, serrors));
                 if (result == null)
                     throw new SyntaxError(this.Expression,serrors);
-                var ret=result.Expression .Evaluate();
+                var ret=result.Block .Evaluate();
 
                 return ret;
             default:

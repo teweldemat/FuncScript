@@ -5,6 +5,8 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
+        record ParseLambdaExpressionResult(ExpressionFunction Block, ParseNode ParseNode, int NextIndex)
+            :ParseResult(ParseNode,NextIndex);
         static ParseLambdaExpressionResult GetLambdaExpression(ParseContext context, int index)
         {
             ParseNode parseNode = null;
@@ -38,7 +40,7 @@ namespace funcscript.core
             }
 
             func = new ExpressionFunction(parms.ToArray(), defination);
-            func.SetContext(context.Provider);
+            func.SetContext(context.ReferenceProvider);
             i = i2;
             parseNode = new ParseNode(ParseNodeType.LambdaExpression, index, i - index,
                 new[] { nodesParams, nodeDefination });
