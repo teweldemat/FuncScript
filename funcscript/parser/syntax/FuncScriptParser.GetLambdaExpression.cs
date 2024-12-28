@@ -21,7 +21,7 @@ namespace funcscript.core
             var i2 = GetLiteralMatch(context, i, "=>").NextIndex;
             if (i2 == i)
             {
-                context.Serrors.Add(new SyntaxErrorData(i, 0, "'=>' expected"));
+                context.SyntaxErrors.Add(new SyntaxErrorData(i, 0, "'=>' expected"));
                 return new ParseLambdaExpressionResult(func, parseNode, index);
             }
 
@@ -33,7 +33,7 @@ namespace funcscript.core
            (var defination,var nodeDefination, i2) = GetExpression(context, i);
             if (i2 == i)
             {
-                context.Serrors.Add(new SyntaxErrorData(i, 0, "definition of lambda expression expected"));
+                context.SyntaxErrors.Add(new SyntaxErrorData(i, 0, "definition of lambda expression expected"));
                 return new ParseLambdaExpressionResult(func, parseNode, index);
             }
 

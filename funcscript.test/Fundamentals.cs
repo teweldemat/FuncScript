@@ -19,7 +19,7 @@ public class Fundamentals
             new List<FuncScriptParser.SyntaxErrorData>());
         var (exp, node, _) = FuncScriptParser.Parse(context);
         Assert.IsNotNull(exp);
-        Assert.That(context.Serrors, Is.Empty);
+        Assert.That(context.SyntaxErrors, Is.Empty);
         Assert.That(node.NodeType, Is.EqualTo(FuncScriptParser.ParseNodeType.LiteralInteger));
         AssertLiteralBlock(exp, 5);
 
@@ -35,7 +35,7 @@ public class Fundamentals
         var context = new FuncScriptParser.ParseContext(new DefaultFsDataProvider(), expStr, errors);
         var (exp, node, _) = FuncScriptParser.Parse(context);
         Assert.IsNotNull(exp);
-        Assert.That(context.Serrors, Is.Empty);
+        Assert.That(context.SyntaxErrors, Is.Empty);
         Assert.That(node.NodeType, Is.EqualTo(FuncScriptParser.ParseNodeType.LiteralString));
         AssertLiteralBlock(exp, "5");
 
@@ -51,7 +51,7 @@ public class Fundamentals
         var context = new FuncScriptParser.ParseContext(new DefaultFsDataProvider(), expStr, errors);
         var (exp, node, _) = FuncScriptParser.Parse(context);
         Assert.IsNotNull(exp);
-        Assert.That(context.Serrors, Is.Empty);
+        Assert.That(context.SyntaxErrors, Is.Empty);
 
         Assert.That(node.NodeType, Is.EqualTo(FuncScriptParser.ParseNodeType.InfixExpression));
         AssertLiteralFunctionCallBlock<AddFunction>(
@@ -73,7 +73,7 @@ public class Fundamentals
         var (exp, node, _) = FuncScriptParser.Parse(context);
 
         Assert.IsNotNull(exp);
-        Assert.That(context.Serrors, Is.Empty);
+        Assert.That(context.SyntaxErrors, Is.Empty);
 
         Assert.That(node.NodeType, Is.EqualTo(FuncScriptParser.ParseNodeType.KeyValueCollection));
         Assert.That(exp is KvcExpression);
@@ -103,7 +103,7 @@ public class Fundamentals
         var (exp, node, _) = FuncScriptParser.Parse(context);
 
         Assert.IsNotNull(exp);
-        Assert.That(context.Serrors, Is.Empty);
+        Assert.That(context.SyntaxErrors, Is.Empty);
 
         Assert.That(node.NodeType, Is.EqualTo(FuncScriptParser.ParseNodeType.KeyValueCollection));
         Assert.That(exp is KvcExpression);
@@ -125,7 +125,7 @@ public class Fundamentals
         var (exp, node, _) = FuncScriptParser.Parse(context);
 
         Assert.IsNotNull(exp);
-        Assert.That(context.Serrors, Is.Empty);
+        Assert.That(context.SyntaxErrors, Is.Empty);
 
         Assert.That(node.NodeType, Is.EqualTo(FuncScriptParser.ParseNodeType.KeyValueCollection));
         Assert.That(exp is KvcExpression);
@@ -147,7 +147,7 @@ public class Fundamentals
         var (exp, node, _) = FuncScriptParser.Parse(context);
 
         Assert.IsNotNull(exp);
-        Assert.That(context.Serrors, Is.Empty);
+        Assert.That(context.SyntaxErrors, Is.Empty);
         Assert.That(exp is FunctionCallExpression);
         var fblock = (FunctionCallExpression)exp;
         Assert.That(fblock.Function is KeyValueCollection);
@@ -167,7 +167,7 @@ public class Fundamentals
         var (exp, node, _) = FuncScriptParser.Parse(context);
 
         Assert.IsNotNull(exp);
-        Assert.That(context.Serrors, Is.Empty);
+        Assert.That(context.SyntaxErrors, Is.Empty);
 
         var res = exp.Evaluate();
         Assert.That(res is KeyValueCollection);
@@ -186,7 +186,7 @@ public class Fundamentals
         var (exp, node, _) = FuncScriptParser.Parse(context);
 
         Assert.IsNotNull(exp);
-        Assert.That(context.Serrors, Is.Empty, errors.FirstOrDefault()?.Message);
+        Assert.That(context.SyntaxErrors, Is.Empty, errors.FirstOrDefault()?.Message);
 
         var res = exp.Evaluate();
         Assert.That(res is KeyValueCollection);
@@ -205,7 +205,7 @@ public class Fundamentals
         var (exp, node, _) = FuncScriptParser.Parse(context);
 
         Assert.IsNotNull(exp);
-        Assert.That(context.Serrors, Is.Empty);
+        Assert.That(context.SyntaxErrors, Is.Empty);
 
         Assert.That(node.NodeType, Is.EqualTo(FuncScriptParser.ParseNodeType.List));
         Assert.That(exp is ListExpression);
@@ -230,7 +230,7 @@ public class Fundamentals
         var (exp, node, _) = FuncScriptParser.Parse(context);
 
         Assert.IsNotNull(exp);
-        Assert.That(context.Serrors, Is.Empty);
+        Assert.That(context.SyntaxErrors, Is.Empty);
 
         Assert.That(node.NodeType, Is.EqualTo(FuncScriptParser.ParseNodeType.KeyValueCollection));
         Assert.That(exp is KvcExpression);
@@ -266,7 +266,7 @@ public class Fundamentals
         var (exp, node, _) = FuncScriptParser.Parse(context);
 
         Assert.IsNotNull(exp);
-        Assert.That(context.Serrors, Is.Empty);
+        Assert.That(context.SyntaxErrors, Is.Empty);
 
         var result = exp.Evaluate();
         Assert.That(result is KeyValueCollection);

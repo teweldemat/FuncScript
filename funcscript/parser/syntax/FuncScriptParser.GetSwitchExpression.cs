@@ -22,7 +22,7 @@ namespace funcscript.core
             var expressionResult = GetExpression(context, i);
             if (expressionResult.NextIndex == i)
             {
-                context.Serrors.Add(new SyntaxErrorData(i, 1, "Switch selector expected"));
+                context.SyntaxErrors.Add(new SyntaxErrorData(i, 1, "Switch selector expected"));
                 return new GetSwitchExpressionResult(null, null, index);
             }
 
@@ -54,7 +54,7 @@ namespace funcscript.core
                 var part2Result = GetExpression(context, i);
                 if (part2Result.NextIndex == i)
                 {
-                    context.Serrors.Add(new SyntaxErrorData(i, 1, "Selector result expected"));
+                    context.SyntaxErrors.Add(new SyntaxErrorData(i, 1, "Selector result expected"));
                     return new GetSwitchExpressionResult(null, null, index);
                 }
 

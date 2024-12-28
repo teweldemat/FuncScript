@@ -6,7 +6,7 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        public static ParseResult GetFSTemplate(ParseContext context, int index)
+        public static ExpressionBlockResult GetFSTemplate(ParseContext context, int index)
         {
             var parseNode = (ParseNode)null;
             var prog = (ExpressionBlock)null;
@@ -46,8 +46,8 @@ namespace funcscript.core
 
                     if (i2 == i)
                     {
-                        context.Serrors.Add(new SyntaxErrorData(i, 0, "expression expected"));
-                        return new ParseResult(null, null, index);
+                        context.SyntaxErrors.Add(new SyntaxErrorData(i, 0, "expression expected"));
+                        return new ExpressionBlockResult(null, null, index);
                     }
 
                     i = SkipSpace(context, i).NextIndex;
@@ -60,8 +60,8 @@ namespace funcscript.core
                     i2 = GetLiteralMatch(context, i, "}").NextIndex;
                     if (i2 == i)
                     {
-                        context.Serrors.Add(new SyntaxErrorData(i, 0, "'}' expected"));
-                        return new ParseResult(null, null, index);
+                        context.SyntaxErrors.Add(new SyntaxErrorData(i, 0, "'}' expected"));
+                        return new ExpressionBlockResult(null, null, index);
                     }
 
                     i = i2;
@@ -106,7 +106,7 @@ namespace funcscript.core
                 parseNode = new ParseNode(ParseNodeType.StringTemplate, index, i - index, nodeParts);
             }
 
-            return new ParseResult(prog, parseNode, i);
+            return new ExpressionBlockResult(prog, parseNode, i);
         }
     }
 }

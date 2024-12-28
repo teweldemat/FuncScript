@@ -82,7 +82,7 @@ namespace funcscript.core
             i2 = GetLiteralMatch(context, i, delimator).NextIndex;
             if (i2 == i)
             {
-                context.Serrors.Add(new SyntaxErrorData(i, 0, $"'{delimator}' expected"));
+                context.SyntaxErrors.Add(new SyntaxErrorData(i, 0, $"'{delimator}' expected"));
                 return new GetStringResult(null,null,index);
             }
 

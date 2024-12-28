@@ -5,13 +5,13 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static ParseResult GetReturnDefinition(ParseContext context, int index)
+        static ExpressionBlockResult GetReturnDefinition(ParseContext context, int index)
         {
             ParseNode parseNode = null;
             ExpressionBlock retExp = null;
             var i = GetLiteralMatch(context, index, KW_RETURN).NextIndex;
             if (i == index)
-                return new ParseResult(retExp, parseNode, index);
+                return new ExpressionBlockResult(retExp, parseNode, index);
 
             var nodeReturn = new ParseNode(ParseNodeType.KeyWord, index, i - index);
             i = SkipSpace(context, i).NextIndex;
@@ -19,8 +19,8 @@ namespace funcscript.core
             var exprResult = GetExpression(context, i);
             if (exprResult.NextIndex == i)
             {
-                context.Serrors.Add(new SyntaxErrorData(i, 0, "return expression expected"));
-                return new ParseResult(retExp, parseNode, index);
+                context.SyntaxErrors.Add(new SyntaxErrorData(i, 0, "return expression expected"));
+                return new ExpressionBlockResult(retExp, parseNode, index);
             }
 
             i = exprResult.NextIndex;
@@ -31,7 +31,7 @@ namespace funcscript.core
             parseNode = new ParseNode(ParseNodeType.ExpressionInBrace, index, i - index,
                 new[] { nodeReturn, exprResult.Node });
 
-            return new ParseResult(retExp, parseNode, i);
+            return new ExpressionBlockResult(retExp, parseNode, i);
         }
     }
 }

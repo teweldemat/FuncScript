@@ -5,7 +5,7 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        public static ParseResult GetStringTemplate(ParseContext context, int index)
+        public static ExpressionBlockResult GetStringTemplate(ParseContext context, int index)
         {
             var result = GetStringTemplate(context, "\"", index);
             if (result.NextIndex > index)
@@ -13,11 +13,11 @@ namespace funcscript.core
             return GetStringTemplate(context, "'", index);
         }
 
-        public static ParseResult GetStringTemplate(ParseContext context, string delimiter, int index)
+        public static ExpressionBlockResult GetStringTemplate(ParseContext context, string delimiter, int index)
         {
             var provider = context.Provider;
             var exp = context.Expression;
-            var syntaxErrors = context.Serrors;
+            var syntaxErrors = context.SyntaxErrors;
             ExpressionBlock prog = null;
             ParseNode parseNode = null;
             var parts = new List<ExpressionBlock>();
@@ -25,7 +25,7 @@ namespace funcscript.core
 
             var i = GetLiteralMatch(context, index, $"f{delimiter}").NextIndex;
             if (i == index)
-                return new ParseResult(prog, parseNode, index);
+                return new ExpressionBlockResult(prog, parseNode, index);
             
             var lastIndex = i;
             var sb = new StringBuilder();
@@ -90,7 +90,7 @@ namespace funcscript.core
                     if (exprResult.NextIndex == i)
                     {
                         syntaxErrors.Add(new SyntaxErrorData(i, 0, "expression expected"));
-                        return new ParseResult(prog, parseNode, index);
+                        return new ExpressionBlockResult(prog, parseNode, index);
                     }
 
                     parts.Add(exprResult.Expression);
@@ -100,7 +100,7 @@ namespace funcscript.core
                     if (i2 == i)
                     {
                         syntaxErrors.Add(new SyntaxErrorData(i, 0, "'}' expected"));
-                        return new ParseResult(prog, parseNode, index);
+                        return new ExpressionBlockResult(prog, parseNode, index);
                     }
 
                     i = i2;
@@ -133,7 +133,7 @@ namespace funcscript.core
             if (i2 == i)
             {
                 syntaxErrors.Add(new SyntaxErrorData(i, 0, $"'{delimiter}' expected"));
-                return new ParseResult(prog, parseNode, index);
+                return new ExpressionBlockResult(prog, parseNode, index);
             }
 
             i = i2;
@@ -160,7 +160,7 @@ namespace funcscript.core
                 parseNode = new ParseNode(ParseNodeType.StringTemplate, index, i - index, nodeParts);
             }
 
-            return new ParseResult(prog, parseNode, i);
+            return new ExpressionBlockResult(prog, parseNode, i);
         }
 
     }

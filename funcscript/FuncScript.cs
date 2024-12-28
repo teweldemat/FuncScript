@@ -675,7 +675,7 @@ namespace funcscript
             }
 
             if (exp == null)
-                throw new error.SyntaxError(context.Expression, context.Serrors);
+                throw new error.SyntaxError(context.Expression, context.SyntaxErrors);
             return Evaluate(exp, expression, provider, vars);
         }
         public static object Evaluate(ExpressionBlock exp, string expression, KeyValueCollection provider, object vars)

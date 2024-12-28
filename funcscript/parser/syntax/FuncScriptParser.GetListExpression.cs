@@ -11,7 +11,7 @@ namespace funcscript.core
         {
             var exp = context.Expression;
             var provider = context.Provider;
-            var syntaxErrors = context.Serrors;
+            var syntaxErrors = context.SyntaxErrors;
 
             var i = SkipSpace(context, index).NextIndex;
             var i2 = GetLiteralMatch(context, i, "[").NextIndex;

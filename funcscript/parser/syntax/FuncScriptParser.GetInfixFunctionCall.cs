@@ -31,7 +31,7 @@ namespace funcscript.core
             var func = context.Provider.Get(identifierResult.IdenLower);
             if (!(func is IFsFunction inf))
             {
-                context.Serrors.Add(new SyntaxErrorData(i, identifierResult.NextIndex - i, "A function expected"));
+                context.SyntaxErrors.Add(new SyntaxErrorData(i, identifierResult.NextIndex - i, "A function expected"));
                 return new GetInfixFunctionCallResult(null, null, index);
             }
             if (inf.CallType != CallType.Dual)
@@ -45,7 +45,7 @@ namespace funcscript.core
             var secondParamResult = GetCallAndMemberAccess(context, i);
             if (secondParamResult.NextIndex == i)
             {
-                context.Serrors.Add(new SyntaxErrorData(i, 0, $"Right side operand expected for {identifierResult.Iden}"));
+                context.SyntaxErrors.Add(new SyntaxErrorData(i, 0, $"Right side operand expected for {identifierResult.Iden}"));
                 return new GetInfixFunctionCallResult(null, null, index);
             }
 

@@ -30,7 +30,7 @@ namespace funcscript.core
 
             if (identifierResult.NextIndex == i)
             {
-                context.Serrors.Add(new SyntaxErrorData(i, 0, "member identifier expected"));
+                context.SyntaxErrors.Add(new SyntaxErrorData(i, 0, "member identifier expected"));
                 return new GetMemberAccessResult(null, null, index);
             }
 

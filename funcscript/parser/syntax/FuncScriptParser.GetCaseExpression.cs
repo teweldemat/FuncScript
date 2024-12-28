@@ -5,14 +5,14 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static ParseResult GetCaseExpression(ParseContext context, int index)
+        static ExpressionBlockResult GetCaseExpression(ParseContext context, int index)
         {
             ExpressionBlock expBlock = null;
             ParseNode parseNode = null;
             var i = index;
             var literalMatchResult = GetLiteralMatch(context, i, KW_CASE);
             if (literalMatchResult.NextIndex == i)
-                return new ParseResult(null, null, index);
+                return new ExpressionBlockResult(null, null, index);
             
             i = SkipSpace(context, literalMatchResult.NextIndex).NextIndex;
             var pars = new List<ExpressionBlock>();
@@ -24,8 +24,8 @@ namespace funcscript.core
                     var expressionResult = GetExpression(context, i);
                     if (expressionResult.NextIndex == i)
                     {
-                        context.Serrors.Add(new SyntaxErrorData(i, 1, "Case condition expected"));
-                        return new ParseResult(null, null, index);
+                        context.SyntaxErrors.Add(new SyntaxErrorData(i, 1, "Case condition expected"));
+                        return new ExpressionBlockResult(null, null, index);
                     }
 
                     pars.Add(expressionResult.Expression);
@@ -56,8 +56,8 @@ namespace funcscript.core
                 var valueExpressionResult = GetExpression(context, i);
                 if (valueExpressionResult.NextIndex == i)
                 {
-                    context.Serrors.Add(new SyntaxErrorData(i, 1, "Case value expected"));
-                    return new ParseResult(null, null, index);
+                    context.SyntaxErrors.Add(new SyntaxErrorData(i, 1, "Case value expected"));
+                    return new ExpressionBlockResult(null, null, index);
                 }
 
                 pars.Add(valueExpressionResult.Expression);
@@ -75,7 +75,7 @@ namespace funcscript.core
             expBlock.SetContext(context.Provider);
             parseNode = new ParseNode(ParseNodeType.Case, index, i - index);
             parseNode.Childs = childNodes;
-            return new ParseResult(expBlock, parseNode, i);
+            return new ExpressionBlockResult(expBlock, parseNode, i);
         }
     }
 }

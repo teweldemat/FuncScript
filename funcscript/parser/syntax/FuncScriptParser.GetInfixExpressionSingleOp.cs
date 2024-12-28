@@ -98,7 +98,7 @@ namespace funcscript.core
                     {
                         if (operands.Count > 2)
                         {
-                            context.Serrors.Add(new SyntaxErrorData(i, 0, "Only two parameters expected for | "));
+                            context.SyntaxErrors.Add(new SyntaxErrorData(i, 0, "Only two parameters expected for | "));
                             return new GetInfixExpressionSingleOpResult(null, null, i);
                         }
 

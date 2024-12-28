@@ -6,7 +6,7 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static ParseResult GetPrefixOperator(ParseContext context, int index)
+        static ExpressionBlockResult GetPrefixOperator(ParseContext context, int index)
         {
             int i = 0;
             string oper = null;
@@ -22,22 +22,22 @@ namespace funcscript.core
 
             if (i == index)
             {
-                return new ParseResult(null, null, index);
+                return new ExpressionBlockResult(null, null, index);
             }
 
             i = SkipSpace(context, i).NextIndex;
             var func = context.Provider.Get(oper);
             if (func == null)
             {
-                context.Serrors.Add(new SyntaxErrorData(index, i - index, $"Prefix operator {oper} not defined"));
-                return new ParseResult(null, null, index);
+                context.SyntaxErrors.Add(new SyntaxErrorData(index, i - index, $"Prefix operator {oper} not defined"));
+                return new ExpressionBlockResult(null, null, index);
             }
 
             var callResult = GetCallAndMemberAccess(context, i);
             if (callResult.NextIndex == i)
             {
-                context.Serrors.Add(new SyntaxErrorData(i, 0, $"Operant for {oper} expected"));
-                return new ParseResult(null, null, index);
+                context.SyntaxErrors.Add(new SyntaxErrorData(i, 0, $"Operant for {oper} expected"));
+                return new ExpressionBlockResult(null, null, index);
             }
 
             i = SkipSpace(context, callResult.NextIndex).NextIndex;
@@ -52,7 +52,7 @@ namespace funcscript.core
             expBlock.SetContext(context.Provider);
             var parseNode = new ParseNode(ParseNodeType.PrefixOperatorExpression, index, i - index);
             
-            return new ParseResult(expBlock, parseNode, i);
+            return new ExpressionBlockResult(expBlock, parseNode, i);
         }
     }
 }

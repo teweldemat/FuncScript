@@ -44,7 +44,7 @@ namespace funcscript.core
             (var expBlock,var nodeExpBlock,i2) = GetExpression(context, i);
             if (i2 == i)
             {
-                context.Serrors.Add(new SyntaxErrorData(i, 0, "value expression expected"));
+                context.SyntaxErrors.Add(new SyntaxErrorData(i, 0, "value expression expected"));
                 return new GetKeyValuePairResult(null, null, index);
             }
 

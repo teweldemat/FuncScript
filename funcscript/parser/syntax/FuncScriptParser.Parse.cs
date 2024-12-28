@@ -6,7 +6,7 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        public static ParseResult Parse(ParseContext context)
+        public static ExpressionBlockResult Parse(ParseContext context)
         {
             var rootExpressionResult = GetRootExpression(context, 0);
             if (rootExpressionResult.Expression != null)

@@ -5,7 +5,7 @@ namespace funcscript.core
     public partial class FuncScriptParser
     {
 
-        static ParseResult GetInfixExpressionSingleLevel(ParseContext context, int level, string[] candidates, int index)
+        static ExpressionBlockResult GetInfixExpressionSingleLevel(ParseContext context, int level, string[] candidates, int index)
         {
             ExpressionBlock prog = null;
             ParseNode parseNode = null;
@@ -37,7 +37,7 @@ namespace funcscript.core
                     }
 
                     if (i2 == i)
-                        return new ParseResult(prog, parseNode, i);
+                        return new ExpressionBlockResult(prog, parseNode, i);
 
                     i = SkipSpace(context, i2).NextIndex;
                     continue;
@@ -78,7 +78,7 @@ namespace funcscript.core
                     }
 
                     if (i2 == i)
-                        return new ParseResult(prog, parseNode, indexBeforeOperator);
+                        return new ExpressionBlockResult(prog, parseNode, indexBeforeOperator);
 
                     operands.Add(nextOperand);
                     operandNodes.Add(nextOperandNode);
@@ -97,8 +97,8 @@ namespace funcscript.core
                     {
                         if (operands.Count > 2)
                         {
-                            context.Serrors.Add(new SyntaxErrorData(i, 0, "Only two parameters expected for | "));
-                            return new ParseResult(prog, parseNode, i);
+                            context.SyntaxErrors.Add(new SyntaxErrorData(i, 0, "Only two parameters expected for | "));
+                            return new ExpressionBlockResult(prog, parseNode, i);
                         }
 
                         prog = new ListExpression
@@ -125,7 +125,7 @@ namespace funcscript.core
                 }
             }
 
-            return new ParseResult(prog, parseNode, i);
+            return new ExpressionBlockResult(prog, parseNode, i);
         }
     }
 }

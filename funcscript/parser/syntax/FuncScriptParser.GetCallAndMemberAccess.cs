@@ -3,13 +3,13 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static ParseResult GetCallAndMemberAccess(ParseContext context, int index)
+        static ExpressionBlockResult GetCallAndMemberAccess(ParseContext context, int index)
         {
             ExpressionBlock prog = null;
             var i1 = SkipSpace(context, index).NextIndex;
             var (theUnit,parseNode,i) = GetUnit(context, i1);
             if (i == index)
-                return new ParseResult(prog, parseNode, index);
+                return new ExpressionBlockResult(prog, parseNode, index);
 
             do
             {
@@ -48,7 +48,7 @@ namespace funcscript.core
                 }
 
                 prog = theUnit;
-                return new ParseResult(prog, parseNode, i);
+                return new ExpressionBlockResult(prog, parseNode, i);
             } while (true);
         }
     }

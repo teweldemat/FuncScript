@@ -5,7 +5,7 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static ParseResult GetInfixExpression(ParseContext context, int index)
+        static ExpressionBlockResult GetInfixExpression(ParseContext context, int index)
         {
             var result = GetInfixExpressionSingleLevel(context, s_operatorSymols.Length - 1, s_operatorSymols[^1], index);
             

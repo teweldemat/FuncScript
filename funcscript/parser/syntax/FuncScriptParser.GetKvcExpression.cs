@@ -8,7 +8,7 @@ namespace funcscript.core
 
         static GetKvcExpressionResult GetKvcExpression(ParseContext context, bool nakdeMode, int index)
         {
-            var syntaxErrors = context.Serrors;
+            var syntaxErrors = context.SyntaxErrors;
             ParseNode parseNode = null;
             KvcExpression kvcExpr = null;
             var i = SkipSpace(context, index).NextIndex;

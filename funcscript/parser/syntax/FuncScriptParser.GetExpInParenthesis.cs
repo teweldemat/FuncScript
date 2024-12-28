@@ -4,7 +4,7 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static ParseResult GetExpInParenthesis(ParseContext context, int index)
+        static ExpressionBlockResult GetExpInParenthesis(ParseContext context, int index)
         {
             ParseNode parseNode = null;
             ExpressionBlock expBlock = null;
@@ -12,7 +12,7 @@ namespace funcscript.core
             i = SkipSpace(context, i).NextIndex;
             var i2 = GetLiteralMatch(context, i, "(").NextIndex;
             if (i == i2)
-                return new ParseResult(expBlock, parseNode, index);
+                return new ExpressionBlockResult(expBlock, parseNode, index);
             i = i2;
 
             i = SkipSpace(context, i).NextIndex;
@@ -27,8 +27,8 @@ namespace funcscript.core
             i2 = GetLiteralMatch(context, i, ")").NextIndex;
             if (i == i2)
             {
-                context.Serrors.Add(new SyntaxErrorData(i, 0, "')' expected"));
-                return new ParseResult(expBlock, parseNode, index);
+                context.SyntaxErrors.Add(new SyntaxErrorData(i, 0, "')' expected"));
+                return new ExpressionBlockResult(expBlock, parseNode, index);
             }
 
             i = i2;
@@ -37,7 +37,7 @@ namespace funcscript.core
             expBlock.SetContext(context.Provider);
 
             parseNode = new ParseNode(ParseNodeType.ExpressionInBrace, index, i - index, new[] { nodeExpression });
-            return new ParseResult(expBlock, parseNode, i);
+            return new ExpressionBlockResult(expBlock, parseNode, i);
         }
     }
 }

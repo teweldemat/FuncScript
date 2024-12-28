@@ -4,7 +4,7 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static ParseResult GetFunctionCallParametersList(ParseContext context, ExpressionBlock func, int index)
+        static ExpressionBlockResult GetFunctionCallParametersList(ParseContext context, ExpressionBlock func, int index)
         {
             var result = GetFunctionCallParametersList(context, "(", ")", func, index);
             if (result.NextIndex == index)
@@ -12,7 +12,7 @@ namespace funcscript.core
             return result;
         }
 
-        public record FunctionCallParametersResult(ExpressionBlock Prog, ParseNode Node, int NextIndex) : ParseResult(Prog, Node, NextIndex);
+        public record FunctionCallParametersResult(ExpressionBlock Prog, ParseNode Node, int NextIndex) : ExpressionBlockResult(Prog, Node, NextIndex);
 
         static FunctionCallParametersResult GetFunctionCallParametersList(ParseContext context, string openBrace, string closeBrace,
             ExpressionBlock func, int index)
@@ -47,7 +47,7 @@ namespace funcscript.core
                     exprResult = GetExpression(context, i);
                     if (exprResult.NextIndex == i)
                     {
-                        context.Serrors.Add(new SyntaxErrorData(i, 0, "Parameter for call expected"));
+                        context.SyntaxErrors.Add(new SyntaxErrorData(i, 0, "Parameter for call expected"));
                         return new FunctionCallParametersResult(null, null, index);
                     }
 
@@ -61,7 +61,7 @@ namespace funcscript.core
             i2 = GetLiteralMatch(context, i, closeBrace).NextIndex;
             if (i2 == i)
             {
-                context.Serrors.Add(new SyntaxErrorData(i, 0, $"'{closeBrace}' expected"));
+                context.SyntaxErrors.Add(new SyntaxErrorData(i, 0, $"'{closeBrace}' expected"));
                 return new FunctionCallParametersResult(null, null, index);
             }
 

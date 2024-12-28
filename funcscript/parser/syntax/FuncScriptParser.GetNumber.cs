@@ -50,7 +50,7 @@ namespace funcscript.core
             {
                 if (!double.TryParse(context.Expression.Substring(index, i - index), out var dval))
                 {
-                    context.Serrors.Add(new SyntaxErrorData(index, i - index,
+                    context.SyntaxErrors.Add(new SyntaxErrorData(index, i - index,
                         $"{context.Expression.Substring(index, i - index)} couldn't be parsed as floating point"));
                     return new GetNumberResult(null, null, index);
                 }
@@ -64,7 +64,7 @@ namespace funcscript.core
             {
                 if (!int.TryParse(expDigits, out var e) || e < 0)
                 {
-                    context.Serrors.Add(new SyntaxErrorData(index, expDigits == null ? 0 : expDigits.Length,
+                    context.SyntaxErrors.Add(new SyntaxErrorData(index, expDigits == null ? 0 : expDigits.Length,
                         $"Invalid exponentional {expDigits}"));
                     return new GetNumberResult(null, null, index);
                 }
@@ -72,7 +72,7 @@ namespace funcscript.core
                 var maxLng = long.MaxValue.ToString();
                 if (maxLng.Length + 1 < intDigits.Length + e)
                 {
-                    context.Serrors.Add(new SyntaxErrorData(index, expDigits.Length,
+                    context.SyntaxErrors.Add(new SyntaxErrorData(index, expDigits.Length,
                         $"Exponential {expDigits} is out of range"));
                     return new GetNumberResult(null, null, index);
                 }
@@ -86,7 +86,7 @@ namespace funcscript.core
             {
                 if (!long.TryParse(intDigits, out longVal))
                 {
-                    context.Serrors.Add(new SyntaxErrorData(index, expDigits.Length,
+                    context.SyntaxErrors.Add(new SyntaxErrorData(index, expDigits.Length,
                         $"{intDigits} couldn't be parsed to 64bit integer"));
                     return new GetNumberResult(null, null, index);
                 }

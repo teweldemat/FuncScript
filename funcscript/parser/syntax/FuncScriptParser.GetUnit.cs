@@ -5,7 +5,7 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static ParseResult GetUnit(ParseContext context, int index)
+        static ExpressionBlockResult GetUnit(ParseContext context, int index)
         {
             ParseNode parseNode = null;
             ExpressionBlock expBlock = null;
@@ -21,7 +21,7 @@ namespace funcscript.core
                 expBlock.SetContext(context.Provider);
                 expBlock.CodePos = index;
                 expBlock.CodeLength = i - index;
-                return new ParseResult(expBlock, parseNode, i);
+                return new ExpressionBlockResult(expBlock, parseNode, i);
             }
 
             //get string 
@@ -34,7 +34,7 @@ namespace funcscript.core
                 expBlock.SetContext(context.Provider);
                 expBlock.CodePos = index;
                 expBlock.CodeLength = i - index;
-                return new ParseResult(expBlock, parseNode, i);
+                return new ExpressionBlockResult(expBlock, parseNode, i);
             }
 
             //get number
@@ -47,7 +47,7 @@ namespace funcscript.core
                 expBlock.SetContext(context.Provider);
                 expBlock.CodePos = index;
                 expBlock.CodeLength = i - index;
-                return new ParseResult(expBlock, parseNode, i);
+                return new ExpressionBlockResult(expBlock, parseNode, i);
             }
 
             //list expression
@@ -60,7 +60,7 @@ namespace funcscript.core
                 expBlock.SetContext(context.Provider);
                 expBlock.CodePos = index;
                 expBlock.CodeLength = i - index;
-                return new ParseResult(expBlock, parseNode, i);
+                return new ExpressionBlockResult(expBlock, parseNode, i);
             }
 
             //kvc expression
@@ -73,7 +73,7 @@ namespace funcscript.core
                 expBlock.SetContext(context.Provider);
                 expBlock.CodePos = index;
                 expBlock.CodeLength = i - index;
-                return new ParseResult(expBlock, parseNode, i);
+                return new ExpressionBlockResult(expBlock, parseNode, i);
             }
 
             var caseExprResult = GetCaseExpression(context, i);
@@ -85,7 +85,7 @@ namespace funcscript.core
                 expBlock.SetContext(context.Provider);
                 expBlock.CodePos = index;
                 expBlock.CodeLength = i - index;
-                return new ParseResult(expBlock, parseNode, i);
+                return new ExpressionBlockResult(expBlock, parseNode, i);
             }
 
             var switchExprResult = GetSwitchExpression(context, i);
@@ -97,7 +97,7 @@ namespace funcscript.core
                 expBlock.SetContext(context.Provider);
                 expBlock.CodePos = index;
                 expBlock.CodeLength = i - index;
-                return new ParseResult(expBlock, parseNode, i);
+                return new ExpressionBlockResult(expBlock, parseNode, i);
             }
 
             //expression function
@@ -110,7 +110,7 @@ namespace funcscript.core
                 expBlock.SetContext(context.Provider);
                 expBlock.CodePos = index;
                 expBlock.CodeLength = i - index;
-                return new ParseResult(expBlock, parseNode, i);
+                return new ExpressionBlockResult(expBlock, parseNode, i);
             }
 
             //null, true, false
@@ -123,7 +123,7 @@ namespace funcscript.core
                 expBlock.SetContext(context.Provider);
                 expBlock.CodePos = index;
                 expBlock.CodeLength = i - index;
-                return new ParseResult(expBlock, parseNode, i);
+                return new ExpressionBlockResult(expBlock, parseNode, i);
             }
 
             //get identifier
@@ -136,7 +136,7 @@ namespace funcscript.core
                 expBlock.SetContext(context.Provider);
                 expBlock.CodePos = index;
                 expBlock.CodeLength = i - index;
-                return new ParseResult(expBlock, parseNode, i);
+                return new ExpressionBlockResult(expBlock, parseNode, i);
             }
 
             var expInParenResult = GetExpInParenthesis(context, index);
@@ -148,7 +148,7 @@ namespace funcscript.core
                 expBlock.SetContext(context.Provider);
                 expBlock.CodePos = index;
                 expBlock.CodeLength = i - index;
-                return new ParseResult(expBlock, parseNode, i);
+                return new ExpressionBlockResult(expBlock, parseNode, i);
             }
 
             //get prefix operator
@@ -160,10 +160,10 @@ namespace funcscript.core
                 expBlock = prefixOpResult.Expression;
                 expBlock.CodePos = index;
                 expBlock.CodeLength = i - index;
-                return new ParseResult(expBlock, parseNode, i);
+                return new ExpressionBlockResult(expBlock, parseNode, i);
             }
 
-            return new ParseResult(expBlock, parseNode, index);
+            return new ExpressionBlockResult(expBlock, parseNode, index);
         }
     }
 }
