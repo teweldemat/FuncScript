@@ -2,7 +2,7 @@ using System.Text;
 
 namespace funcscript.host;
 
-public class StringLogger : Fslogger
+public class StringLogger : FsLogger
 {
     private StringBuilder _stringBuilder;
 

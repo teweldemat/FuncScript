@@ -5,7 +5,6 @@ namespace funcscript.core
 {
     public interface IFsFunction
     {
-        //object Evaluate(KeyValueCollection parent, IParameterList pars);
         object EvaluateList(FsList pars);
         CallType CallType { get; }
         String Symbol { get; }

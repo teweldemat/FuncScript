@@ -1,24 +1,24 @@
 namespace funcscript.host;
 
-public class ConsoleLogger : Fslogger
+public class ConsoleLogger : FsLogger
 {
     public override void WriteLine(string text) => Console.WriteLine(text);
     public override void Clear() => Console.Clear();
 }
-public abstract class Fslogger
+public abstract class FsLogger
 {
     public abstract void WriteLine(string text);
     public abstract void Clear();
         
-    private static Fslogger _fslogger;
+    private static FsLogger _fsLogger;
 
-    public static void SetDefaultLogger(Fslogger logger)
+    public static void SetDefaultLogger(FsLogger logger)
     {
-        _fslogger = logger;
+        _fsLogger = logger;
     }
-    public static Fslogger DefaultLogger => _fslogger;
+    public static FsLogger DefaultLogger => _fsLogger;
 
-    static Fslogger()
+    static FsLogger()
     {
         SetDefaultLogger(new ConsoleLogger());
     }

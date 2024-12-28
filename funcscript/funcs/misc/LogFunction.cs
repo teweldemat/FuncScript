@@ -22,11 +22,11 @@ namespace funcscript.funcs.misc
             if (second is IFsFunction func)
             {
                 var result = func.EvaluateList(new ArrayFsList(new object[] { anchor }));
-                Fslogger.DefaultLogger.WriteLine(result?.ToString() ?? "<null>");
+                FsLogger.DefaultLogger.WriteLine(result?.ToString() ?? "<null>");
             }
             else
             {
-                Fslogger.DefaultLogger.WriteLine(second?.ToString() ?? "<null>");
+                FsLogger.DefaultLogger.WriteLine(second?.ToString() ?? "<null>");
             }
             return anchor;
         }

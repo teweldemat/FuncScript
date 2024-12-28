@@ -81,7 +81,7 @@ public class Tests
     public void TestLogger()
     {
         var logger = new StringLogger();
-        Fslogger.SetDefaultLogger(logger);
+        FsLogger.SetDefaultLogger(logger);
         var exp = @"{
   f:(c)=>c;
   return [f(log(""x"",'start'))]
