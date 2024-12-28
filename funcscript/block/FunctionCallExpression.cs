@@ -12,7 +12,8 @@ namespace funcscript.block
     {
         public ExpressionBlock Function;
         public ExpressionBlock[] Parameters;
-
+        private object _result = null;
+        private bool _evaluated = false;
 
         class FuncParameterList : FsList
         {
@@ -57,21 +58,24 @@ namespace funcscript.block
 
         public override object Evaluate()
         {
+            if (_evaluated)
+                return _result;
             var func = Function.Evaluate();
             var paramList = new FuncParameterList
             {
                 parent = this
             };
+            object res;
             if (func is IFsFunction fn)
             {
                 try
                 {
                     if (func is ExpressionFunction expfn)
                     {
-                        return expfn.EvaluateWithContext(_context, paramList);
+                        res= expfn.EvaluateWithContext(_context, paramList);
                     }
-
-                    return fn.EvaluateList(paramList);
+                    else
+                        res=fn.EvaluateList(paramList);
                 }
                 catch (error.EvaluationException)
                 {
@@ -86,20 +90,17 @@ namespace funcscript.block
             else if (func is FsList)
             {
                 var index = paramList[0];
-                object ret;
                 if (index is int)
                 {
                     var i = (int)index;
                     var lst = (FsList)func;
                     if (i < 0 || i >= lst.Length)
-                        ret = null;
+                        res = null;
                     else
-                        ret = lst[i];
+                        res = lst[i];
                 }
                 else
-                    ret = null;
-
-                return ret;
+                    res = null;
             }
             else if (func is KeyValueCollection collection)
             {
@@ -108,16 +109,19 @@ namespace funcscript.block
                 if (index is string key)
                 {
                     var kvc = collection;
-                    var value = kvc.Get(key.ToLower());
-                    return value;
+                    res = kvc.Get(key.ToLower());
                 }
-
-                return null;
+                else
+                    res = null;
             }
-
-            throw new EvaluationException(this.CodePos, this.CodeLength,
+            else
+                throw new EvaluationException(this.CodePos, this.CodeLength,
                 new TypeMismatchError(
                     $"Function part didn't evaluate to a function or a list. {FuncScript.GetFsDataType(func)}"));
+
+            _evaluated = true;
+            _result = res;
+            return res;
         }
 
 
