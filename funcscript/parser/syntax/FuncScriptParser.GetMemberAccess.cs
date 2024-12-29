@@ -41,7 +41,7 @@ namespace funcscript.core
                 CodeLength = i - source.CodePos
             };
             prog.SetContext(context.ReferenceProvider);
-            return new ExpressionBlockResult(prog, parseNode, i);
+            return new ExpressionBlockResult(prog, identifierResult.ParseNode, i);
         }
     }
 }

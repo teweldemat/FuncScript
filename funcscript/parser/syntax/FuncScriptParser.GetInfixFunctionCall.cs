@@ -54,7 +54,7 @@ namespace funcscript.core
 
             while (true)
             {
-                var literalMatchResult = GetLiteralMatch(context, i, new string[] { "~" });
+                var literalMatchResult = GetLiteralMatchMultiple(context, i, new string[] { "~" });
                 if (literalMatchResult.NextIndex == i)
                     break;
                 i = SkipSpace(context, literalMatchResult.NextIndex).NextIndex;
@@ -79,7 +79,7 @@ namespace funcscript.core
             };
             prog.SetContext(context.ReferenceProvider);
             parseNode = new ParseNode(ParseNodeType.GeneralInfixExpression, childNodes[0].Pos,
-                childNodes[^1].Pos + childNodes[^1].Length + childNodes[0].Pos);
+                childNodes[^1].Pos + childNodes[^1].Length + childNodes[0].Pos,childNodes);
 
             return new ExpressionBlockResult(prog, parseNode, i);
         }

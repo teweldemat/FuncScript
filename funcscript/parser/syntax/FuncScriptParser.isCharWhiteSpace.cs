@@ -10,9 +10,5 @@ namespace funcscript.core
                ch == '\t' ||
                ch == '\n';
 
-        static void SomeParserMethod(ParseContext context)
-        {
-            // Method implementation
-        }
     }
 }

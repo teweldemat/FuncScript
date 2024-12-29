@@ -31,7 +31,7 @@ namespace funcscript.core
             
             while (true)
             {
-                i2 = GetLiteralMatch(context, i, ",", ";").NextIndex;
+                i2 = GetLiteralMatchMultiple(context, i, new []{",", ";"}).NextIndex;
                 if (i2 == i)
                     break;
                 i = SkipSpace(context, i2).NextIndex;

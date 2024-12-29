@@ -8,7 +8,7 @@ namespace funcscript.funcs.misc
     {
         private const int MaxParameters = 2;
 
-        public CallType CallType => CallType.Infix;
+        public CallType CallType => CallType.Dual;
         public string Symbol => "log";
 
         public object EvaluateList(FsList pars)

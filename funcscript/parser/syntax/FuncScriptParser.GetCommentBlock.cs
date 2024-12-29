@@ -7,7 +7,7 @@ namespace funcscript.core
         static GetCommentBlockResult GetCommentBlock(ParseContext context, int index)
         {
             ParseNode parseNode = null;
-            var i = GetLiteralMatch(context, index, new string[] { "//" }).NextIndex;
+            var i = GetLiteralMatchMultiple(context, index, new string[] { "//" }).NextIndex;
             if (i == index)
                 return new GetCommentBlockResult(parseNode, index);
             var i2 = context.Expression.IndexOf("\n", i,StringComparison.InvariantCulture);

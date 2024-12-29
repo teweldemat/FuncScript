@@ -10,7 +10,7 @@ namespace funcscript.core
             ExpressionBlock expBlock = null;
             ParseNode parseNode = null;
             var i = index;
-            var literalMatchResult = GetLiteralMatch(context, i, KW_CASE);
+            var literalMatchResult = GetLiteralMatch(context, i,  KW_CASE);
             if (literalMatchResult.NextIndex == i)
                 return new ExpressionBlockResult(null, null, index);
             
@@ -34,7 +34,7 @@ namespace funcscript.core
                 }
                 else
                 {
-                    literalMatchResult = GetLiteralMatch(context, i, ",", ";");
+                    literalMatchResult = GetLiteralMatchMultiple(context, i,new [] {",", ";"});
                     if (literalMatchResult.NextIndex == i)
                         break;
                     i = SkipSpace(context, literalMatchResult.NextIndex).NextIndex;

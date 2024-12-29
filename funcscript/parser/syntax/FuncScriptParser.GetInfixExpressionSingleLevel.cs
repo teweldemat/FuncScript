@@ -17,7 +17,7 @@ namespace funcscript.core
                 ParseNode operatorNode = null;
                 string symbol = null;
 
-                if (prog == null) //if we parsing the first operand
+                if (prog == null) //if we are parsing the first operand
                 {
                     //get an infix with one level higher or call expression when we are parsing for highest precedence operators
                     if (level == 0)
@@ -55,7 +55,7 @@ namespace funcscript.core
                 i = SkipSpace(context, i2).NextIndex;
 
                 var operands = new List<ExpressionBlock> { prog };
-                var operandNodes = new List<ParseNode> { parseNode };
+                var infixComponentNodes = new List<ParseNode> { parseNode };
 
                 while (true)
                 {
@@ -80,12 +80,14 @@ namespace funcscript.core
                         return new ExpressionBlockResult(prog, parseNode, indexBeforeOperator);
 
                     operands.Add(nextOperand);
-                    operandNodes.Add(nextOperandNode);
+                    infixComponentNodes.Add(operatorNode);
+                    infixComponentNodes.Add(nextOperandNode);
                     i = SkipSpace(context, i2).NextIndex;
-
-                    i2 = GetLiteralMatch(context, i, symbol).NextIndex;
+                    operatorResult = GetOperator(context, new string[] { symbol }, i);
+                    i2 = operatorResult.NextIndex;
                     if (i2 == i)
                         break;
+                    
                     i = SkipSpace(context, i2).NextIndex;
                 }
 
@@ -107,7 +109,7 @@ namespace funcscript.core
                             CodeLength = operands[^1].CodePos + operands[^1].CodeLength - prog.CodePos
                         };
                         prog.SetContext(context.ReferenceProvider);
-                        parseNode = new ParseNode(ParseNodeType.InfixExpression, parseNode.Pos, operandNodes[^1].Pos + operandNodes[^1].Length - parseNode.Pos);
+                        parseNode = new ParseNode(ParseNodeType.InfixExpression, parseNode.Pos, infixComponentNodes[^1].Pos + infixComponentNodes[^1].Length - parseNode.Pos);
                     }
                     else
                     {
@@ -119,7 +121,10 @@ namespace funcscript.core
                             CodeLength = operands[^1].CodePos + operands[^1].CodeLength - prog.CodeLength
                         };
                         prog.SetContext(context.ReferenceProvider);
-                        parseNode = new ParseNode(ParseNodeType.InfixExpression, parseNode.Pos, operandNodes[^1].Pos + operandNodes[^1].Length - parseNode.Pos);
+                        parseNode = new ParseNode(ParseNodeType.InfixExpression,
+                            parseNode.Pos, infixComponentNodes[^1].Pos + infixComponentNodes[^1].Length - parseNode.Pos,
+                            infixComponentNodes
+                            );
                     }
                 }
             }

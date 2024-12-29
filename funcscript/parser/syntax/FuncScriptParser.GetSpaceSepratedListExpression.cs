@@ -22,7 +22,7 @@ namespace funcscript.core
                 i = i2;
                 do
                 {
-                    i2 = GetLiteralMatch(context, i, new[] { " " }).NextIndex;
+                    i2 = GetLiteralMatchMultiple(context, i, new[] { " " }).NextIndex;
                     if (i2 == i)
                         break;
                     i = i2;

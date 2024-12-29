@@ -1,0 +1,15 @@
+{
+    "name": "funcscript",
+    "private": true,
+    "scripts": {
+        "build": "npm run build -w funcscript.ts.core",
+        "test": "npm run test -w funcscript.ts.core.test"
+    },
+    "workspaces": [
+        "core",
+        "test"
+    ],
+    "devDependencies": {
+        "typescript": "^5.7.2"
+    }
+}

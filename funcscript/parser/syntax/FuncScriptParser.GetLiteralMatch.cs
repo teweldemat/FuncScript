@@ -8,11 +8,15 @@ namespace funcscript.core
     {
 
         public record GetLiteralMatchResult(string Matched, int NextIndex);
-        static GetLiteralMatchResult GetLiteralMatch(ParseContext context, int index, params string[] candidates)
+        static GetLiteralMatchResult GetLiteralMatch(ParseContext context, int index,  string candidate)
         {
-            return GetLiteralMatch(context.Expression, index, candidates);
+            return GetLiteralMatchMultiple(context, index, new []{candidate});
         }
-        public static GetLiteralMatchResult GetLiteralMatch(String expression, int index, params string[] candidates)
+        static GetLiteralMatchResult GetLiteralMatchMultiple(ParseContext context, int index, string[] candidates)
+        {
+            return GetLiteralMatchInternal(context.Expression, index, candidates);
+        }
+        public static GetLiteralMatchResult GetLiteralMatchInternal(String expression, int index, string[] candidates)
         {
             if (expression == null)
             {
