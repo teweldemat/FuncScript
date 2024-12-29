@@ -11,23 +11,20 @@ namespace funcscript.funcs.math
 
         public string Symbol => "/";
 
-        public object Evaluate(IFsDataProvider parent, IParameterList pars)
+        public object EvaluateList(FsList pars)
         {
-            var ret = EvaluateInternal(pars, (i) =>
-            {
-                var ret = pars.GetParameter(parent, i);
-                return (true, ret);
-            });
+            var ret = EvaluateInternal(pars, i => (true, pars[i]));
+
             return ret;
         }
 
-        object EvaluateInternal(IParameterList pars, Func<int, (bool, object)> getPar)
+        object EvaluateInternal(FsList pars, Func<int, (bool, object)> getPar)
         {
             bool isInt = false, isLong = false, isDouble = false;
             int intTotal = 1;
             long longTotal = 1;
             double doubleTotal = 1;
-            int count = pars.Count;
+            int count = pars.Length;
 
             if (count > 0)
             {

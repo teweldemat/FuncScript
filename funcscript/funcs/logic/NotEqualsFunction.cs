@@ -11,14 +11,14 @@ namespace funcscript.funcs.logic
 
         public string Symbol => "!=";
 
-        public object Evaluate(IFsDataProvider parent, IParameterList pars)
+        public object EvaluateList(FsList pars)
         {
-            if (pars.Count != MaxParameterCount)
+            if (pars.Length != MaxParameterCount)
                 return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH,
-                    $"{this.Symbol}: expected {MaxParameterCount} got {pars.Count}");
+                    $"{this.Symbol}: expected {MaxParameterCount} got {pars.Length}");
 
-            var par0 = pars.GetParameter(parent, 0);
-            var par1 = pars.GetParameter(parent, 1);
+            var par0 = pars[0];
+            var par1 = pars[1];
 
             return EvaluateInternal(par0, par1);
         }

@@ -173,5 +173,11 @@ namespace funcscript.test
         {
             Assert.AreEqual(expected, FuncScript.Evaluate(exp));
         }
+        [Test]
+        [TestCase("If(true,30,2)", 30)]
+        public void IfFunction(string exp, object expected)
+        {
+            Assert.AreEqual(expected, FuncScript.Evaluate(exp));
+        }
     }
 }

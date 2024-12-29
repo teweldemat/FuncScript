@@ -1,14 +1,13 @@
-using funcscript.core;
 using funcscript.model;
 using funcscript.error;
 using NUnit.Framework;
 using System;
 using System.Numerics;
 using System.Text;
+using funcscript.block;
 
 namespace funcscript.test
 {
-
     public class TestSet2
     {
         
@@ -324,16 +323,16 @@ return j;
         public void TestSpread()
         {
             var res = AssertSingleResultType("Select({'a':1,'b':2},{'b':5,'c':8})", typeof(KeyValueCollection));
-            var expected = FuncScript.Evaluate(null, "{'a':1,'b':5,'c':8}");
-            Assert.AreEqual(expected, res);
+            var expected = FuncScript.Evaluate(null, "{'b':5,'c':8}");
+            Assert.That(FuncScript.FormatToJson(res),Is.EqualTo(FuncScript.FormatToJson(expected)));
         }
 
         [Test]
         public void TestDotnetObject()
         {
             var res = new ObjectKvc(new { a = 1, b = 5, c = 8 });
-            var expected = FuncScript.Evaluate(null, "{'a':1,'b':5,'c':8}");
-            Assert.AreEqual(expected, res);
+            var expected = FuncScript.Evaluate(null, "{'a':1,'b':5,'c':8}") as KeyValueCollection;
+            Assert.That(FuncScript.ValueEqual(expected, res));
         }
         [Test]
         public void TestSpread2()
@@ -341,15 +340,15 @@ return j;
             var g = new DefaultFsDataProvider();
             var res = FuncScript.Evaluate(g, "Select({'a':1,'b':5,'c':8},{'a':null,'b':null})");
             var expected = new ObjectKvc(new { a = 1, b = 5 });
-            Assert.AreEqual(expected, res);
+            Assert.That(FuncScript.ValueEqual(expected, res));
         }
         [Test]
         public void TestIdenKey()
         {
             var g = new DefaultFsDataProvider();
-            var res = FuncScript.Evaluate(g, "Select({a:3,b:4},{a,c:5})");
+            var res = FuncScript.Evaluate(g, "Select({a:3,b:4},{a,c:5})") as KeyValueCollection;
             var expected = new ObjectKvc(new { a = 3, c = 5 });
-            Assert.AreEqual(expected, res);
+            Assert.That(FuncScript.ValueEqual(expected, res));
         }
         [Test]
         public void MapNull()
@@ -392,7 +391,7 @@ return j;
             var exp = "{}";
             var res = FuncScript.Evaluate(exp) as KeyValueCollection;
             Assert.IsNotNull(res);
-            Assert.That(res.GetAll().Count,Is.EqualTo(0));
+            Assert.That(res.GetAllKeys().Count,Is.EqualTo(0));
         }
 
         [Test]
@@ -403,7 +402,29 @@ return j;
             Assert.IsNotNull(res);
             Assert.That(res.Length, Is.EqualTo(0));
         }
-
+        [Test]
+        public void FuncInFunc()
+        {
+            var exp = 
+@"{
+    g:(x)=>x*2;
+    f:(x)=>g(x)+3;
+    return f(3);
+}";
+            var res=FuncScript.Evaluate(exp);
+            Assert.That(res,Is.EqualTo(9));
+        }
+        [Test]
+        public void FuncSimpleRec()
+        {
+            var exp = 
+@"{
+    f:(x)=>if(x=0,f(1),2);
+    return f(3);
+}";
+            var res=FuncScript.Evaluate(exp);
+            Assert.That(res,Is.EqualTo(2));
+        }
         [Test]
         public void ResursiveCall()
         {

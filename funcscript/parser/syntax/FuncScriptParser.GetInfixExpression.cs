@@ -1,14 +1,20 @@
+using funcscript.block;
+using funcscript.funcs.math;
+using funcscript.model;
 namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetInfixExpression(IFsDataProvider parseContext, String exp, int index, out ExpressionBlock prog,
-            out ParseNode parseNode, List<SyntaxErrorData> serrors)
+        static ExpressionBlockResult GetInfixExpression(ParseContext context, int index)
         {
-            var i = GetInfixExpressionSingleLevel(parseContext, s_operatorSymols.Length - 1, s_operatorSymols[^1], exp,
-                index, out prog,
-                out parseNode, serrors);
-            return i;
+            var result = GetInfixExpressionSingleLevel(context, s_operatorSymols.Length - 1, s_operatorSymols[^1], index);
+            
+            if (result.Block != null)
+            {
+                result.Block.SetContext(context.ReferenceProvider);
+            }
+
+            return result;
         }
     }
 }

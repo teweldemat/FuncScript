@@ -6,45 +6,27 @@ namespace funcscript.funcs.list
 {
     public class ReduceListFunction : IFsFunction
     {
-        private const int MaxParameters = 3;
 
         public CallType CallType => CallType.Dual;
 
         public string Symbol => "Reduce";
 
-        class DoListFuncPar : IParameterList
+        public object EvaluateList(FsList pars)
         {
-            public object S;
-            public object X;
-            public object I;
+            if (pars.Length < 2)
+                return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH,
+                    $"{this.Symbol}: expected at least 2 got {pars.Length}");
 
-            public override int Count => MaxParameters;
-
-            public override (object, CodeLocation) GetParameterWithLocation(IFsDataProvider provider, int index)
-            {
-                return index switch
-                {
-                    0 => (X, null),
-                    1 => (S, null),
-                    2 => (I, null),
-                    _ => (null, null),
-                };
-            }
-        }
-
-        public object Evaluate(IFsDataProvider parent, IParameterList pars)
-        {
-            var par0 = pars.GetParameter(parent, 0);
+            var par0 = pars[0];
             if (par0 is null) return null;
 
-            var par1 = pars.GetParameter(parent, 1);
+            var par1 = pars[1];
+            var par2 = pars[2];
 
-            var par2 = pars.GetParameter(parent, 2);
-
-            return EvaluateInternal(parent, par0, par1, par2, false);
+            return EvaluateInternal(par0, par1, par2, false);
         }
 
-        private object EvaluateInternal(IFsDataProvider parent, object par0, object par1, object par2, bool dref)
+        private object EvaluateInternal(object par0, object par1, object par2, bool dref)
         {
             if (!(par0 is FsList lst))
                 throw new error.TypeMismatchError($"{this.Symbol} function: The first parameter should be {this.ParName(0)}");
@@ -57,7 +39,7 @@ namespace funcscript.funcs.list
             
             for (int i = 0; i < lst.Length; i++)
             {
-                total = func.Evaluate(parent, new DoListFuncPar { S = total, X = lst[i], I = i });
+                total = func.EvaluateList(new ArrayFsList(new object[] { lst[i], total,  i }));
             }
 
             return FuncScript.NormalizeDataType(total);

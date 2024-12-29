@@ -13,13 +13,13 @@ namespace funcscript.funcs.text
 
         public string Symbol => SYMBOL;
 
-        public object Evaluate(IFsDataProvider parent, IParameterList pars)
+        public object EvaluateList(FsList pars)
         {
-            if (pars.Count != MAX_PAR_COUNT)
+            if (pars.Length != MAX_PAR_COUNT)
                 throw new funcscript.error.TypeMismatchError($"{this.Symbol}: Two parameters expected");
 
-            var par0 = pars.GetParameter(parent, 0);
-            var par1 = pars.GetParameter(parent, 1);
+            var par0 = pars[0];
+            var par1 = pars[1];
 
             if (par0 == null || par1 == null)
                 throw new funcscript.error.TypeMismatchError($"{this.Symbol}: List and separator expected as parameters");

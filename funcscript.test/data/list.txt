@@ -1,0 +1,22 @@
+[
+  "/Users/teweldema.tegegne/src/cis10/function-script/funcscript/parser/syntax/FuncScriptParser.GetUnit.cs",
+  "/Users/teweldema.tegegne/src/cis10/function-script/funcscript/parser/syntax/FuncScriptParser.GetInt.cs",
+  "/Users/teweldema.tegegne/src/cis10/function-script/funcscript/parser/syntax/FuncScriptParser.GetCaseExpression.cs",
+  "/Users/teweldema.tegegne/src/cis10/function-script/funcscript/parser/syntax/FuncScriptParser.GetLambdaExpression.cs",
+  "/Users/teweldema.tegegne/src/cis10/function-script/funcscript/parser/syntax/FuncScriptParser.GetCommentBlock.cs",
+  "/Users/teweldema.tegegne/src/cis10/function-script/funcscript/parser/syntax/FuncScriptParser.GetSpaceSepratedStringListExpression.cs",
+  "/Users/teweldema.tegegne/src/cis10/function-script/funcscript/parser/syntax/FuncScriptParser.GetPrefixOperator.cs",
+  "/Users/teweldema.tegegne/src/cis10/function-script/funcscript/parser/syntax/FuncScriptParser.GetSwitchExpression.cs",
+  "/Users/teweldema.tegegne/src/cis10/function-script/funcscript/parser/syntax/FuncScriptParser.GetLiteralMatch.cs",
+  "/Users/teweldema.tegegne/src/cis10/function-script/funcscript/parser/syntax/FuncScriptParser.GetSimpleString.cs",
+  "/Users/teweldema.tegegne/src/cis10/function-script/funcscript/parser/syntax/FuncScriptParser.GetKvcExpression.cs",
+  "/Users/teweldema.tegegne/src/cis10/function-script/funcscript/parser/syntax/FuncScriptParser.GetRootExpression.cs",
+  "/Users/teweldema.tegegne/src/cis10/function-script/funcscript/parser/syntax/FuncScriptParser.Parse.cs",
+  "/Users/teweldema.tegegne/src/cis10/function-script/funcscript/parser/syntax/FuncScriptParser.GetStringTemplate.cs",
+  "/Users/teweldema.tegegne/src/cis10/function-script/funcscript/parser/syntax/FuncScriptParser.GetKeyWordLiteral.cs",
+  "/Users/teweldema.tegegne/src/cis10/function-script/funcscript/parser/syntax/FuncScriptParser.IsIdentfierFirstChar.cs",
+  "/Users/teweldema.tegegne/src/cis10/function-script/funcscript/parser/syntax/FuncScriptParser.SkipSpace.cs",
+  "/Users/teweldema.tegegne/src/cis10/function-script/funcscript/parser/syntax/FuncScriptParser.GetOperator.cs",
+  "/Users/teweldema.tegegne/src/cis10/function-script/funcscript/parser/syntax/FuncScriptParser.GetLiteralMatch_IndexOf.cs",
+  
+]

@@ -1,45 +1,47 @@
 using funcscript.block;
+using funcscript.model;
 
 namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetMemberAccess(IFsDataProvider context, ExpressionBlock source, String exp, int index,
-            out ExpressionBlock prog, out ParseNode parseNode, List<SyntaxErrorData> serrors)
+        static ExpressionBlockResult GetMemberAccess(ParseContext context, ExpressionBlock source, int index)
         {
-            var i2 = GetMemberAccess(context, ".", source, exp, index, out prog, out parseNode, serrors);
-            if (i2 == index)
-                return GetMemberAccess(context, "?.", source, exp, index, out prog, out parseNode, serrors);
-            return i2;
+            var result = GetMemberAccessInternal(context, ".", source, index);
+            if (result.NextIndex == index)
+                return GetMemberAccessInternal(context, "?.", source, index);
+            return result;
         }
 
-        static int GetMemberAccess(IFsDataProvider context, string oper, ExpressionBlock source, String exp, int index,
-            out ExpressionBlock prog, out ParseNode parseNode, List<SyntaxErrorData> serrors)
+        static ExpressionBlockResult GetMemberAccessInternal(ParseContext context, string oper, ExpressionBlock source, int index)
         {
-            parseNode = null;
-            prog = null;
-            var i = SkipSpace(exp, index);
-            var i2 = GetLiteralMatch(exp, i, oper);
+            ParseNode parseNode = null;
+            ExpressionBlock prog = null;
+            var i = SkipSpace(context, index).NextIndex;
+            var i2 = GetLiteralMatch(context, i, oper).NextIndex;
             if (i2 == i)
-                return index;
-            i = i2;
-            i = SkipSpace(exp, i);
-            i2 = GetIdentifier(exp, i, out var member, out var memberLower, out parseNode);
-            if (i2 == i)
-            {
-                serrors.Add(new SyntaxErrorData(i, 0, "member identifier expected"));
-                return index;
-            }
+                return new ExpressionBlockResult(null, null, index);
 
             i = i2;
+            i = SkipSpace(context, i).NextIndex;
+            var identifierResult = GetIdentifier(context, i, false);
+
+            if (identifierResult.NextIndex == i)
+            {
+                context.SyntaxErrors.Add(new SyntaxErrorData(i, 0, "member identifier expected"));
+                return new ExpressionBlockResult(null, null, index);
+            }
+
+            i = identifierResult.NextIndex;
             prog = new FunctionCallExpression
             {
-                Function = new LiteralBlock(context.Get(oper)),
-                Parameters = new ExpressionBlock[] { source, new LiteralBlock(member) },
-                Pos = source.Pos,
-                Length = i - source.Pos
+                Function = new LiteralBlock(context.ReferenceProvider.Get(oper)),
+                Parameters = new ExpressionBlock[] { source, new LiteralBlock(identifierResult.Iden) },
+                CodePos = source.CodePos,
+                CodeLength = i - source.CodePos
             };
-            return i;
+            prog.SetContext(context.ReferenceProvider);
+            return new ExpressionBlockResult(prog, identifierResult.ParseNode, i);
         }
     }
 }

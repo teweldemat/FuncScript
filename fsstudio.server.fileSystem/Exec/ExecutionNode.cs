@@ -30,16 +30,16 @@ public class ExecutionNode : KeyValueCollection
 {
     private string _nameLower;
     private string _name;
-    private IFsDataProvider _prentNode = null;
-    public override IFsDataProvider ParentProvider => _prentNode;
-    public override object Get(string name)
+    private KeyValueCollection _prentNode = null;
+    public KeyValueCollection ParentContext => _prentNode;
+    public object Get(string name)
     {
         var ch = Children.FirstOrDefault(c => c._nameLower.Equals(name));
         if (ch == null)
             return _prentNode.Get(name);
         return ch.Evaluate(this);
     }
-    public void SetParent(IFsDataProvider parent)
+    public void SetParent(KeyValueCollection parent)
     {
         this._prentNode = parent;
         foreach (var ch in Children)
@@ -64,7 +64,7 @@ public class ExecutionNode : KeyValueCollection
     public string? Expression { get; set; }
     public IList<ExecutionNode> Children { get; set; }= new List<ExecutionNode>();
 
-    public object Evaluate(IFsDataProvider provider)
+    public object Evaluate(KeyValueCollection provider)
     {
         if (Children.Count > 0)
         {
@@ -79,15 +79,11 @@ public class ExecutionNode : KeyValueCollection
                 return FuncScript.Evaluate(provider, Expression);
             case ExpressionType.FuncScriptTextTemplate:
                 var serrors = new List<FuncScriptParser.SyntaxErrorData>();
-                var exp = FuncScriptParser.ParseFsTemplate(provider, this.Expression, serrors);
-                if (exp == null)
+                
+                var result = FuncScriptParser.ParseFsTemplate(new FuncScriptParser.ParseContext(provider, this.Expression, serrors));
+                if (result == null)
                     throw new SyntaxError(this.Expression,serrors);
-                var connctionActions = new List<Action>();
-                var ret=exp.Evaluate(provider,connctionActions);
-                foreach (var con in connctionActions)
-                {
-                    con.Invoke();
-                }
+                var ret=result.Block .Evaluate();
 
                 return ret;
             default:
@@ -97,14 +93,14 @@ public class ExecutionNode : KeyValueCollection
 
     
     
-    public override bool IsDefined(string key)
+    public bool IsDefined(string key)
     {
         return Children.Any(c => c._nameLower == key);
     }
 
-    public override IList<KeyValuePair<string, object>> GetAll()
+    public IList<string> GetAllKeys()
     {
-        return this.Children.Select(c => KeyValuePair.Create(c._name, c.Evaluate(this))).ToList();
+        return this.Children.Select(c => c._name).ToList();
     }
 
   

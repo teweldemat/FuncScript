@@ -11,11 +11,11 @@ namespace funcscript.funcs.os
 
         public string Symbol => "file";
 
-        public object Evaluate(IFsDataProvider parent, IParameterList pars)
+        public object EvaluateList(FsList pars)
         {
-            if (pars.Count != MaxParameters)
-                return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, $"{this.Symbol} function: invalid parameter count. {MaxParameters} expected got {pars.Count}");
-            var par0 = pars.GetParameter(parent, 0);
+            if (pars.Length != MaxParameters)
+                return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, $"{this.Symbol} function: invalid parameter count. {MaxParameters} expected got {pars.Length}");
+            var par0 = pars[0];
 
             if (par0 == null)
                 return null;

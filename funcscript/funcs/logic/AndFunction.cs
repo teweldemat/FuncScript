@@ -12,13 +12,13 @@ namespace funcscript.funcs.logic
 
         public string Symbol => "and";
 
-        public object Evaluate(IFsDataProvider parent, IParameterList pars)
+        public object EvaluateList(FsList pars)
         {
-            int count = pars.Count;
+            int count = pars.Length;
 
             for (int i = 0; i < count; i++)
             {
-                var par = pars.GetParameter(parent, i);
+                var par = pars[i];
 
                 if (!(par is bool b))
                     return new FsError(FsError.ERROR_TYPE_MISMATCH,

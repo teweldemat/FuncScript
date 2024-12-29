@@ -1,19 +1,20 @@
 using funcscript.block;
+using funcscript.model;
 
 namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetSpaceSepratedListExpression(IFsDataProvider context, String exp, int index,
-            out ListExpression listExpr, out ParseNode parseNode, List<SyntaxErrorData> serrors)
-        {
-            parseNode = null;
-            listExpr = null;
-            var i = SkipSpace(exp, index);
 
+        static ParseResult GetSpaceSepratedListExpression(ParseContext context, int index)
+        {
+            ParseNode parseNode = null;
+            ListExpression listExpr = null;
+            var i = SkipSpace(context, index).NextIndex;
+            var tokenStart = i;
             var listItems = new List<ExpressionBlock>();
             var nodeListItems = new List<ParseNode>();
-            var i2 = GetExpression(context, exp, i, out var firstItem, out var nodeFirstItem, serrors);
+            (var firstItem,var nodeFirstItem, var i2) = GetExpression(context, i);
             if (i2 > i)
             {
                 listItems.Add(firstItem);
@@ -21,12 +22,12 @@ namespace funcscript.core
                 i = i2;
                 do
                 {
-                    i2 = GetLiteralMatch(exp, i, " ");
+                    i2 = GetLiteralMatchMultiple(context, i, new[] { " " }).NextIndex;
                     if (i2 == i)
                         break;
                     i = i2;
-                    i = SkipSpace(exp, i);
-                    i2 = GetExpression(context, exp, i, out var otherItem, out var nodeOtherItem, serrors);
+                    i = SkipSpace(context, i).NextIndex;
+                    (var otherItem,var nodeOtherItem, i2) = GetExpression(context, i);
                     if (i2 == i)
                         break;
                     listItems.Add(otherItem);
@@ -36,8 +37,9 @@ namespace funcscript.core
             }
 
             listExpr = new ListExpression { ValueExpressions = listItems.ToArray() };
-            parseNode = new ParseNode(ParseNodeType.List, index, i - index, nodeListItems);
-            return i;
+            listExpr.SetContext(context.ReferenceProvider);
+            parseNode = new ParseNode(ParseNodeType.List, index, i - tokenStart, nodeListItems);
+            return new ExpressionBlockResult(listExpr, parseNode, i);
         }
     }
 }

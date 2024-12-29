@@ -1,32 +1,35 @@
-
+using funcscript.block;
+using funcscript.funcs.math;
+using funcscript.model;
 
 namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetOperator(IFsDataProvider parseContext, string[] candidates, string exp, int index,
-            out string matechedOp, out IFsFunction oper,
-            out ParseNode parseNode)
+        
+        record GetOperatorResult(string MatchedOp, IFsFunction Oper, ParseNode ParseNode, int NextIndex)
+            :ParseResult(ParseNode,NextIndex);
+
+        static GetOperatorResult GetOperator(ParseContext context, string[] candidates, int index)
         {
             foreach (var op in candidates)
             {
-                var i = GetLiteralMatch(exp, index, op);
+                var literalMatchResult = GetLiteralMatch(context, index, op);
+                var i = literalMatchResult.NextIndex;
                 if (i <= index) continue;
 
-                var func = parseContext.Get(op);
-//                if (func is not IFsFunction f) 
-//                    continue;
+                var func = context.ReferenceProvider.Get(op);
+                var oper = func as IFsFunction;
+                if (oper != null && oper is ExpressionBlock expressionBlock)
+                {
+                    expressionBlock.SetContext(context.ReferenceProvider);
+                }
 
-                oper = func as IFsFunction;
-                parseNode = new ParseNode(ParseNodeType.Operator, index, i - index);
-                matechedOp = op;
-                return i;
+                var parseNode = new ParseNode(ParseNodeType.Operator, index, i - index);
+                return new GetOperatorResult(op, oper, parseNode, i);
             }
 
-            oper = null;
-            parseNode = null;
-            matechedOp = null;
-            return index;
+            return new GetOperatorResult(null, null, null, index);
         }
     }
 }

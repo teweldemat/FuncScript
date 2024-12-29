@@ -6,7 +6,7 @@ using fsstudio.server.fileSystem;
 using fsstudio.server.fileSystem.exec;
 using funcscript;
 using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.Net.Http.Headers; // Ensure namespace includes ExecutionSession and related classes
+using Microsoft.Net.Http.Headers;
 
 namespace fsstudio.server.fileSystem.Controllers
 {
@@ -27,8 +27,7 @@ namespace fsstudio.server.fileSystem.Controllers
         }
 
         [HttpPost("create")]
-        public IActionResult CreateSession([FromBody] CreateSessionRequest request
-        )
+        public IActionResult CreateSession([FromBody] CreateSessionRequest request)
         {
             try
             {
@@ -283,7 +282,7 @@ namespace fsstudio.server.fileSystem.Controllers
         [HttpPost("SaveUiState")]
         public async Task<IActionResult> SaveUiState([FromBody] UiState uiState)
         {
-                if (uiState == null)
+            if (uiState == null)
                 return BadRequest("UI state is null.");
 
             try
@@ -296,6 +295,33 @@ namespace fsstudio.server.fileSystem.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        public class MoveNodeRequest
+        {
+            public string NodePath { get; set; }
+            public string? NewParentPath { get; set; }
+        }
+
+        [HttpPost("{sessionId}/node/move")]
+        public IActionResult MoveNode(Guid sessionId, [FromBody] MoveNodeRequest model)
+        {
+            lock (GetSessionLock(sessionId))
+            {
+                var session = sessionManager.GetSession(sessionId);
+                if (session == null)
+                    return NotFound($"Session with ID {sessionId} not found.");
+
+                try
+                {
+                    session.MoveNode(model.NodePath, model.NewParentPath);
+                    return Ok();
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest(ex.Message);
+                }
             }
         }
     }

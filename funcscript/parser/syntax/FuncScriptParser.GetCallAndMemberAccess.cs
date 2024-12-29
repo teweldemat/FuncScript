@@ -1,61 +1,54 @@
 using funcscript.block;
-
 namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetCallAndMemberAccess(IFsDataProvider parseContext, String exp, int index, out ExpressionBlock prog,
-            out ParseNode parseNode, List<SyntaxErrorData> serrors)
+        static ExpressionBlockResult GetCallAndMemberAccess(ParseContext context, int index)
         {
-            parseNode = null;
-            prog = null;
-            var i1 = SkipSpace(exp, index);
-            var i = GetUnit(parseContext, exp, i1, out var theUnit, out parseNode, serrors);
+            ExpressionBlock prog = null;
+            var i1 = SkipSpace(context, index).NextIndex;
+            var (theUnit,parseNode,i) = GetUnit(context, i1);
             if (i == index)
-                return index;
+                return new ExpressionBlockResult(prog, parseNode, index);
 
             do
             {
-                //lets see if this is part of a function call
-                var i2 = GetFunctionCallParametersList(parseContext, theUnit, exp, i, out var funcCall,
-                    out var nodeParList, serrors);
+                var (funcCall, nodeParList,i2) = GetFunctionCallParametersList(context, theUnit, i);
                 if (i2 > i)
                 {
                     i = i2;
                     theUnit = funcCall;
-                    parseNode = new ParseNode(ParseNodeType.FunctionCall, index, i - index,
-                        new[] { parseNode, nodeParList });
+                    parseNode = new ParseNode(ParseNodeType.FunctionCall, index, i - index, new[] { parseNode, nodeParList });
                     continue;
                 }
 
-                i2 = GetMemberAccess(parseContext, theUnit, exp, i, out var memberAccess, out var nodeMemberAccess,
-                    serrors);
+                (var memberAccess, var nodeMemberAccess,i2) = GetMemberAccess(context, theUnit, i);
                 if (i2 > i)
                 {
                     i = i2;
                     theUnit = memberAccess;
-                    parseNode = new ParseNode(ParseNodeType.MemberAccess, index, i - index,
-                        new[] { parseNode, nodeMemberAccess });
+                    parseNode = new ParseNode(ParseNodeType.MemberAccess, index, i - index, new[] { parseNode, nodeMemberAccess });
                     continue;
                 }
 
-                i2 = GetKvcExpression(parseContext, false, exp, i, out var kvc, out var nodeKvc, serrors);
+                (var kvc,var nodeKvc,i2) = GetKvcExpression(context, false, i);
                 if (i2 > i)
                 {
                     i = i2;
                     theUnit = new SelectorExpression
                     {
                         Source = theUnit,
-                        Selector = kvc,
-                        Pos = i,
-                        Length = i2 - i
+                        Selector = kvc as KvcExpression,
+                        CodePos = i,
+                        CodeLength = i2 - i
                     };
+                    theUnit.SetContext(context.ReferenceProvider);
                     parseNode = new ParseNode(ParseNodeType.Selection, index, i - index, new[] { parseNode, nodeKvc });
                     continue;
                 }
 
                 prog = theUnit;
-                return i;
+                return new ExpressionBlockResult(prog, parseNode, i);
             } while (true);
         }
     }

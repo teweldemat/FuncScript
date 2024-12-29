@@ -1,4 +1,5 @@
 ﻿using funcscript.core;
+using funcscript.model;
 
 namespace funcscript.block
 {
@@ -6,6 +7,7 @@ namespace funcscript.block
     {
         string _name, _nameLower;
         private bool _fromParent;
+        private KeyValueCollection _context = null;
         public string Name
         {
             get
@@ -42,11 +44,11 @@ namespace funcscript.block
             _nameLower = nameLower;
             _fromParent =fromParent;
         }
-        public override (object,CodeLocation) Evaluate(IFsDataProvider provider,List<Action> connectionActions)
+        public override object Evaluate()
         {
             if (_fromParent)
-                return (provider.ParentProvider?.Get(_nameLower),this.CodeLocation);
-            return (provider.Get(_nameLower), this.CodeLocation);
+                return _context.ParentContext?.Get(_nameLower);
+            return _context.Get(_nameLower);
         }
 
         public override IList<ExpressionBlock> GetChilds()
@@ -58,11 +60,23 @@ namespace funcscript.block
             return Name;
         }
 
-        public override string AsExpString(IFsDataProvider provider)
+        public override string AsExpString()
         {
             return Name;
         }
-
+        public override void SetContext(KeyValueCollection provider)
+        {
+            _context = provider;
+        }
+        public override ExpressionBlock CloneExpression()
+        {
+            return new ReferenceBlock(_name,_nameLower)
+            {
+                _fromParent = this._fromParent,
+                CodePos = this.CodePos,
+                CodeLength = this.CodeLength,
+            };
+        }
     }
 
 }

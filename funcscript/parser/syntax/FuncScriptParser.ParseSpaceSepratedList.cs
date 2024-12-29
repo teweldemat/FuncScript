@@ -1,11 +1,14 @@
+using funcscript.block;
+using funcscript.funcs.math;
+using funcscript.model;
+
 namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        public static List<string> ParseSpaceSepratedList(IFsDataProvider context, String exp,
-            List<SyntaxErrorData> serrors)
+        public static List<string> ParseSpaceSepratedList(ParseContext context)
         {
-            var i = GetSpaceSepratedStringListExpression(context, exp, 0, out var prog, out var parseNode, serrors);
+            var (prog, parseNode, i) = GetSpaceSeparatedStringListExpression(context,  0);
             return prog;
         }
     }

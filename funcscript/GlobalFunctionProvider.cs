@@ -9,17 +9,22 @@ using System.Threading.Tasks;
 
 namespace funcscript
 {
-    public class DefaultFsDataProvider : IFsDataProvider
+    public class DefaultFsDataProvider : KeyValueCollection
     {
         static Dictionary<string, IFsFunction> s_funcByName = new Dictionary<string, IFsFunction>();
         static DefaultFsDataProvider()
         {
             LoadFromAssembly(Assembly.GetExecutingAssembly()); //always load builtin functions. May be we don't need this
         }
-        public IFsDataProvider ParentProvider => null;
+        public KeyValueCollection ParentContext => null;
         public bool IsDefined(string key)
         {
             return s_funcByName.ContainsKey(key);
+        }
+
+        public IList<string> GetAllKeys()
+        {
+            throw new NotImplementedException();
         }
 
         public static void LoadFromAssembly(Assembly a)
@@ -86,13 +91,14 @@ namespace funcscript
     }
 
     /// <summary>
-    /// IFSDataProvider backed by KeyValueCollection
+    /// KeyValueCollection backed by KeyValueCollection
     /// </summary>
-    public class KvcProvider : IFsDataProvider
+    public class KvcProvider:KeyValueCollection
     {
-        IFsDataProvider _kvc;
-        IFsDataProvider _parent;
-        public KvcProvider(IFsDataProvider kvc, IFsDataProvider parent)
+        public KeyValueCollection ParentContext => _parent;
+        KeyValueCollection _kvc;
+        KeyValueCollection _parent;
+        public KvcProvider(KeyValueCollection kvc, KeyValueCollection parent)
         {
             _kvc = kvc;
             _parent = parent;
@@ -106,7 +112,6 @@ namespace funcscript
                 return null;
             return _parent.Get(name);
         }
-        public IFsDataProvider ParentProvider => _parent;
         public bool IsDefined(string key)
         {
             if (_kvc.IsDefined(key))
@@ -114,6 +119,11 @@ namespace funcscript
             if (_parent != null)
                 return _parent.IsDefined(key);
             return false;
+        }
+
+        public IList<string> GetAllKeys()
+        {
+            throw new NotImplementedException();
         }
     }
 

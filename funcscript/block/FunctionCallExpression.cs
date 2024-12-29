@@ -1,4 +1,6 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Collections;
+using System.Linq.Expressions;
+using System.Runtime.InteropServices;
 using funcscript.core;
 using funcscript.error;
 using funcscript.model;
@@ -10,45 +12,70 @@ namespace funcscript.block
     {
         public ExpressionBlock Function;
         public ExpressionBlock[] Parameters;
+        private object _result = null;
+        private bool _evaluated = false;
 
-        
-        class FuncParameterList : IParameterList
+        class FuncParameterList : FsList
         {
             public FunctionCallExpression parent;
-            public List<Action> connectionActions;
-            public override int Count => parent.Parameters.Length;
-            public override (object,CodeLocation) GetParameterWithLocation(IFsDataProvider provider, int index)
+
+
+            public object this[int index] => index < 0 || index >= parent.Parameters.Length
+                ? null
+                : parent.Parameters[index].Evaluate();
+
+            public int Length => parent.Parameters.Length;
+
+            // Implementing the GetEnumerator method to return an enumerator for the parameters
+            public IEnumerator<object> GetEnumerator()
             {
-                
-                if(index < 0 || index >= parent.Parameters.Length)
-                    return (null,null); 
-                var ret=parent.Parameters[index].Evaluate(provider,connectionActions).Item1;
-                return (ret,parent.Parameters[index].CodeLocation);
+                foreach (var parameter in parent.Parameters)
+                {
+                    yield return parameter.Evaluate();
+                }
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return GetEnumerator();
             }
         }
 
 
         public int Count => Parameters.Length;
 
-        
-        public override (object,CodeLocation) Evaluate(IFsDataProvider provider,List<Action> connectionActions)
+
+        private KeyValueCollection _context = null;
+
+        public override void SetContext(KeyValueCollection provider)
         {
-            
-            var (func,_) = Function.Evaluate(provider,connectionActions);
-            var paramList=new FuncParameterList
+            _context = provider;
+            this.Function.SetContext(provider);
+            foreach (var p in Parameters)
+                p.SetContext(provider);
+        }
+
+
+        public override object Evaluate()
+        {
+            if (_evaluated)
+                return _result;
+            var func = Function.Evaluate();
+            var paramList = new FuncParameterList
             {
-                parent = this,
-                connectionActions=connectionActions
+                parent = this
             };
-            if (func is IFsFunction)
+            object res;
+            if (func is IFsFunction fn)
             {
-                string fn = null;
-                
                 try
                 {
-                   
-                    var ret = ((IFsFunction)func).Evaluate(provider, paramList);
-                    return (ret,this.CodeLocation);
+                    if (func is ExpressionFunction expfn)
+                    {
+                        res= expfn.EvaluateWithContext(_context, paramList);
+                    }
+                    else
+                        res=fn.EvaluateList(paramList);
                 }
                 catch (error.EvaluationException)
                 {
@@ -56,47 +83,48 @@ namespace funcscript.block
                 }
                 catch (Exception ex)
                 {
-                    throw new error.EvaluationException(this.Pos, this.Length, ex);
+                    throw new error.EvaluationException(this.CodePos, this.CodeLength, ex);
                 }
 
             }
             else if (func is FsList)
             {
-                var index = paramList.GetParameter(provider, 0);
-                object ret;
+                var index = paramList[0];
                 if (index is int)
                 {
                     var i = (int)index;
                     var lst = (FsList)func;
                     if (i < 0 || i >= lst.Length)
-                        ret = null;
+                        res = null;
                     else
-                        ret = lst[i];
+                        res = lst[i];
                 }
                 else
-                    ret = null;
-                return (ret,this.CodeLocation);
+                    res = null;
             }
             else if (func is KeyValueCollection collection)
             {
-                var index = paramList.GetParameter(provider, 0);
+                var index = paramList[0];
 
-                object ret;
                 if (index is string key)
                 {
                     var kvc = collection;
-                    var value = kvc.Get(key.ToLower());
-                    return (value,this.CodeLocation);
+                    res = kvc.Get(key.ToLower());
                 }
                 else
-                    ret = null;
-                return (ret,this.CodeLocation);
+                    res = null;
             }
-            throw new EvaluationException(this.Pos, this.Length,
-                new TypeMismatchError($"Function part didn't evaluate to a function or a list. {FuncScript.GetFsDataType(func)}"));
+            else
+                throw new EvaluationException(this.CodePos, this.CodeLength,
+                new TypeMismatchError(
+                    $"Function part didn't evaluate to a function or a list. {FuncScript.GetFsDataType(func)}"));
+
+            _evaluated = true;
+            _result = res;
+            return res;
         }
 
-        
+
 
         public override IList<ExpressionBlock> GetChilds()
         {
@@ -105,59 +133,64 @@ namespace funcscript.block
             ret.AddRange(this.Parameters);
             return ret;
         }
+
         public override string ToString()
         {
             return "function";
         }
-        public override string AsExpString(IFsDataProvider provider)
+
+        public override string AsExpString()
         {
             string infix = null;
-            if (this.Function is ReferenceBlock)
+            var f = this.Function.Evaluate() as IFsFunction;
+            if (f != null && f.CallType == CallType.Prefix)
             {
-                var f = provider.Get(((ExpressionBlock)this.Function).ToString().ToLower()) as IFsFunction;
-                if (f != null && f.CallType == CallType.Infix)
-                {
-                    infix = f.Symbol;
-                }
+                infix = f.Symbol;
             }
-            else if (this.Function is LiteralBlock)
-            {
-                var f = ((LiteralBlock)this.Function).Value as IFsFunction;
-                if (f != null && f.CallType == CallType.Infix)
-                {
-                    infix = f.Symbol;
-                }
-            }
+
             var sb = new StringBuilder();
             if (infix == null)
             {
-                sb.Append(this.Function.AsExpString(provider));
+                sb.Append(this.Function.AsExpString());
                 sb.Append("(");
                 if (Parameters.Length > 0)
                 {
-                    sb.Append(this.Parameters[0].AsExpString(provider));
+                    sb.Append(this.Parameters[0].AsExpString());
                     for (int i = 1; i < Parameters.Length; i++)
                     {
                         sb.Append(",");
-                        sb.Append(this.Parameters[i].AsExpString(provider));
+                        sb.Append(this.Parameters[i].AsExpString());
                     }
                 }
+
                 sb.Append(")");
             }
             else
             {
                 if (Parameters.Length > 0)
                 {
-                    sb.Append(this.Parameters[0].AsExpString(provider));
+                    sb.Append(this.Parameters[0].AsExpString());
                     for (int i = 1; i < Parameters.Length; i++)
                     {
                         sb.Append($" {infix} ");
-                        sb.Append(this.Parameters[i].AsExpString(provider));
+                        sb.Append(this.Parameters[i].AsExpString());
                     }
                 }
             }
+
             return sb.ToString();
         }
 
+        public override ExpressionBlock CloneExpression()
+        {
+            return new FunctionCallExpression
+            {
+                Function = this.Function.CloneExpression(),
+                Parameters = this.Parameters.Select(p => p.CloneExpression()).ToArray()
+
+            };
+        }
+
+        
     }
 }

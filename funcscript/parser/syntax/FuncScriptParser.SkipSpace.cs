@@ -2,25 +2,30 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int SkipSpace(String exp, int index)
+        record SkipSpaceResult(int NextIndex);
+
+        static SkipSpaceResult SkipSpace(ParseContext context, int index)
         {
             int i = index;
-            while (index < exp.Length)
+            var expression = context.Expression;
+            while (index < expression.Length)
             {
-                if (isCharWhiteSpace(exp[index]))
+                if (isCharWhiteSpace(expression[index]))
                 {
                     index++;
                 }
                 else
                 {
-                    i = GetCommentBlock(exp, index, out var nodeComment);
-                    if (i == index)
+                    var commentBlockResult = GetCommentBlock(context, index);
+                    if (commentBlockResult.NextIndex == index)
                         break;
-                    index = i;
+                    index = commentBlockResult.NextIndex;
                 }
             }
 
-            return index;
+            return new SkipSpaceResult(index);
         }
     }
+
+    public record SkipSpaceResult(int NextIndex);
 }

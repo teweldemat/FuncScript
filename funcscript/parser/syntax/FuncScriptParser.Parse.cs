@@ -1,20 +1,19 @@
+using funcscript.block;
+using funcscript.funcs.math;
+using funcscript.model;
+
 namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        public static ExpressionBlock Parse(IFsDataProvider context, String exp, List<SyntaxErrorData> serrors)
+        public static ExpressionBlockResult Parse(ParseContext context)
         {
-            return Parse(context, exp, out var node, serrors);
+            var rootExpressionResult = GetRootExpression(context, 0);
+            if (rootExpressionResult.Block != null)
+            {
+                rootExpressionResult.Block.SetContext(context.ReferenceProvider);
+            }
+            return rootExpressionResult;
         }
-
-
-        public static ExpressionBlock Parse(IFsDataProvider context, String exp, out ParseNode parseNode,
-            List<SyntaxErrorData> serrors)
-        {
-            var i = GetRootExpression(context, exp, 0, out var prog, out parseNode, serrors);
-            return prog;
-        }
-
-
     }
 }

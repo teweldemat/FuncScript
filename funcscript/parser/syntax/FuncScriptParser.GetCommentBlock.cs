@@ -2,19 +2,21 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetCommentBlock(String exp, int index, out ParseNode parseNode)
+        record GetCommentBlockResult(ParseNode ParseNode, int NextIndex)
+            :ParseResult(ParseNode,NextIndex);
+        static GetCommentBlockResult GetCommentBlock(ParseContext context, int index)
         {
-            parseNode = null;
-            var i = GetLiteralMatch(exp, index, "//");
+            ParseNode parseNode = null;
+            var i = GetLiteralMatchMultiple(context, index, new string[] { "//" }).NextIndex;
             if (i == index)
-                return index;
-            var i2 = exp.IndexOf("\n", i);
+                return new GetCommentBlockResult(parseNode, index);
+            var i2 = context.Expression.IndexOf("\n", i,StringComparison.InvariantCulture);
             if (i2 == -1)
-                i = exp.Length;
+                i = context.Expression.Length;
             else
                 i = i2 + 1;
             parseNode = new ParseNode(ParseNodeType.Comment, index, i - index);
-            return i;
+            return new GetCommentBlockResult(parseNode, i);
         }
     }
 }

@@ -1,83 +1,81 @@
 using funcscript.block;
-
+using funcscript.model;
 namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetFunctionCallParametersList(IFsDataProvider context, ExpressionBlock func, String exp, int index,
-            out ExpressionBlock prog, out ParseNode parseNode, List<SyntaxErrorData> serrors)
+        static ExpressionBlockResult GetFunctionCallParametersList(ParseContext context, ExpressionBlock func, int index)
         {
-            var i = GetFunctionCallParametersList(context, "(", ")", func, exp, index, out prog, out parseNode,
-                serrors);
-            if (i == index)
-                return GetFunctionCallParametersList(context, "[", "]", func, exp, index, out prog, out parseNode,
-                    serrors);
-            return i;
+            var result = GetFunctionCallParametersList(context, "(", ")", func, index);
+            if (result.NextIndex == index)
+                return GetFunctionCallParametersList(context, "[", "]", func, index);
+            return result;
         }
 
-        static int GetFunctionCallParametersList(IFsDataProvider context, String openBrance, String closeBrance,
-            ExpressionBlock func, String exp, int index, out ExpressionBlock prog, out ParseNode parseNode,
-            List<SyntaxErrorData> serrors)
-        {
-            parseNode = null;
-            prog = null;
 
-            //make sure we have open brace
-            var i = SkipSpace(exp, index);
-            var i2 = GetLiteralMatch(exp, i, openBrance);
+        static ExpressionBlockResult GetFunctionCallParametersList(ParseContext context, string openBrace, string closeBrace,
+            ExpressionBlock func, int index)
+        {
+            ParseNode parseNode = null;
+            ExpressionBlock prog = null;
+
+            var i = SkipSpace(context, index).NextIndex;
+            var i2 = GetLiteralMatch(context, i, openBrace).NextIndex;
             if (i == i2)
-                return index; //we didn't find '('
+                return new ExpressionBlockResult(null, null, index);
+
             i = i2;
             var pars = new List<ExpressionBlock>();
             var parseNodes = new List<ParseNode>();
-            //lets get first parameter
-            i = SkipSpace(exp, i);
-            i2 = GetExpression(context, exp, i, out var par1, out var parseNode1, serrors);
-            if (i2 > i)
+
+            i = SkipSpace(context, i).NextIndex;
+            var exprResult = GetExpression(context, i);
+
+            if (exprResult.NextIndex > i)
             {
-                i = i2;
-                pars.Add(par1);
-                parseNodes.Add(parseNode1);
+                i = exprResult.NextIndex;
+                pars.Add(exprResult.Block);
+                parseNodes.Add(exprResult.ParseNode);
                 do
                 {
-                    i2 = SkipSpace(exp, i);
-                    if (i2 >= exp.Length || exp[i2++] != ',') //stop collection of paramters if there is no ','
+                    i2 = SkipSpace(context, i).NextIndex;
+                    if (i2 >= context.Expression.Length || context.Expression[i2++] != ',')
                         break;
                     i = i2;
-                    i = SkipSpace(exp, i);
-                    i2 = GetExpression(context, exp, i, out var par2, out var parseNode2, serrors);
-                    if (i2 == i)
+                    i = SkipSpace(context, i).NextIndex;
+                    exprResult = GetExpression(context, i);
+                    if (exprResult.NextIndex == i)
                     {
-                        serrors.Add(new SyntaxErrorData(i, 0, "Parameter for call expected"));
-                        return index;
+                        context.SyntaxErrors.Add(new SyntaxErrorData(i, 0, "Parameter for call expected"));
+                        return new ExpressionBlockResult(null, null, index);
                     }
 
-                    i = i2;
-                    pars.Add(par2);
-                    parseNodes.Add(parseNode2);
+                    i = exprResult.NextIndex;
+                    pars.Add(exprResult.Block);
+                    parseNodes.Add(exprResult.ParseNode);
                 } while (true);
             }
 
-            i = SkipSpace(exp, i);
-            i2 = GetLiteralMatch(exp, i, closeBrance);
+            i = SkipSpace(context, i).NextIndex;
+            i2 = GetLiteralMatch(context, i, closeBrace).NextIndex;
             if (i2 == i)
             {
-                serrors.Add(new SyntaxErrorData(i, 0, $"'{closeBrance}' expected"));
-                return index;
+                context.SyntaxErrors.Add(new SyntaxErrorData(i, 0, $"'{closeBrace}' expected"));
+                return new ExpressionBlockResult(null, null, index);
             }
 
             i = i2;
-
 
             prog = new FunctionCallExpression
             {
                 Function = func,
                 Parameters = pars.ToArray(),
-                Pos = func.Pos,
-                Length = i - func.Pos,
+                CodePos = func.CodePos,
+                CodeLength = i - func.CodePos,
             };
+            prog.SetContext(context.ReferenceProvider);
             parseNode = new ParseNode(ParseNodeType.FunctionParameterList, index, i - index, parseNodes);
-            return i;
+            return new ExpressionBlockResult(prog, parseNode, i);
         }
     }
 }

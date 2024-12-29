@@ -1,24 +1,23 @@
 using funcscript.core;
-using System;
-using System.Globalization;
 using funcscript.model;
 
 namespace funcscript.funcs.text
 {
-    public class ParseText : IFsFunction, IFsDataProvider
+    public class ParseText : IFsFunction, KeyValueCollection
     {
+        private KeyValueCollection _parentContext;
         private const int MaxParameters = 2;
 
         public CallType CallType => CallType.Prefix;
 
         public string Symbol => "parse";
 
-        public object Evaluate(IFsDataProvider parent, IParameterList pars)
+        public object EvaluateList(FsList pars)
         {
-            if (pars.Count == 0)
+            if (pars.Length == 0)
                 throw new error.TypeMismatchError($"{this.Symbol} requires at least one parameter");
 
-            var par0 = pars.GetParameter(parent, 0);
+            var par0 = pars[0];
             
             if (par0 == null)
                 return null;
@@ -26,9 +25,9 @@ namespace funcscript.funcs.text
             var str = par0.ToString();
             object par1;
             string format = null;
-            if (pars.Count > 1)
+            if (pars.Length > 1)
             {
-                par1 = pars.GetParameter(parent, 1);
+                par1 = pars[1];
                 format = par1?.ToString();
             }
 
@@ -71,8 +70,14 @@ namespace funcscript.funcs.text
             return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"The parsed function script should have no variables");
         }
 
-        public IFsDataProvider ParentProvider { get; }
+
+        public KeyValueCollection ParentContext { get; }
         public bool IsDefined(string key)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IList<string> GetAllKeys()
         {
             throw new NotImplementedException();
         }

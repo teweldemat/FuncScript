@@ -18,4 +18,11 @@
     <ProjectReference Include="..\funcscript\funcscript.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="data\list.txt" />
+    <Content Include="data\list.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>

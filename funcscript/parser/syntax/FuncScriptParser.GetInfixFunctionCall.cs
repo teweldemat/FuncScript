@@ -1,88 +1,75 @@
 using funcscript.block;
-
+using funcscript.model;
 namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetInfixFunctionCall(IFsDataProvider parseContext, string exp, int index, out ExpressionBlock prog,
-            out ParseNode parseNode, List<SyntaxErrorData> serrors)
+
+        static ExpressionBlockResult GetInfixFunctionCall(ParseContext context, int index)
         {
             var childNodes = new List<ParseNode>();
             var allOperands = new List<ExpressionBlock>();
 
-            var i = GetCallAndMemberAccess(parseContext, exp, index, out var firstParam, out var firstPramNode,
-                serrors);
-            if (i == index)
+            var result = GetCallAndMemberAccess(context, index);
+            if (result.NextIndex == index)
             {
-                prog = null;
-                parseNode = null;
-                return index;
+                return new ExpressionBlockResult(null, null, index);
             }
-            prog = firstParam;
-            parseNode = firstPramNode;
+            var prog = result.Block;
+            var parseNode = result.ParseNode;
 
+            allOperands.Add(prog);
+            childNodes.Add(parseNode);
+            var i = SkipSpace(context, result.NextIndex).NextIndex;
 
-            allOperands.Add(firstParam);
-            childNodes.Add(firstPramNode);
-            i = SkipSpace(exp, i);
-
-            var i2 = GetIdentifier(exp, i, out var iden, out var idenLower, out var idenNode);
-            if (i2 == i)
+            var identifierResult = GetIdentifier(context, i, false);
+            if (identifierResult.NextIndex == i)
             {
-                return i;
+                return new ExpressionBlockResult(prog, parseNode, i);
             }
-            var func = parseContext.Get(idenLower);
+            var func = context.ReferenceProvider.Get(identifierResult.IdenLower);
             if (!(func is IFsFunction inf))
             {
-                prog = null;
-                parseNode = null;
-                serrors.Add(new SyntaxErrorData(i,i2-i,"A function expected"));
-                return index;
+                context.SyntaxErrors.Add(new SyntaxErrorData(i, identifierResult.NextIndex - i, "A function expected"));
+                return new ExpressionBlockResult(null, null, index);
             }
-            if (inf.CallType!=CallType.Dual)
+            if (inf.CallType != CallType.Dual)
             {
-                return i;
+                return new ExpressionBlockResult(prog, parseNode, i);
             }
 
-            
-            childNodes.Add(idenNode);
-            i = SkipSpace(exp, i2);
+            childNodes.Add(identifierResult.ParseNode);
+            i = SkipSpace(context, identifierResult.NextIndex).NextIndex;
 
-            i2 = GetCallAndMemberAccess(parseContext, exp, i, out var secondParam, out var secondParamNode, serrors);
-            if (i2 == i)
+            var secondParamResult = GetCallAndMemberAccess(context, i);
+            if (secondParamResult.NextIndex == i)
             {
-                serrors.Add(new SyntaxErrorData(i, 0, $"Right side operand expected for {iden}"));
-                prog = null;
-                parseNode = null;
-                return index;
+                context.SyntaxErrors.Add(new SyntaxErrorData(i, 0, $"Right side operand expected for {identifierResult.Iden}"));
+                return new ExpressionBlockResult(null, null, index);
             }
 
-            allOperands.Add(secondParam);
-            childNodes.Add(secondParamNode);
-            i = SkipSpace(exp, i2);
-
+            allOperands.Add(secondParamResult.Block);
+            childNodes.Add(secondParamResult.ParseNode);
+            i = SkipSpace(context, secondParamResult.NextIndex).NextIndex;
 
             while (true)
             {
-                i2 = GetLiteralMatch(exp, i, "~");
-                if (i2 == i)
+                var literalMatchResult = GetLiteralMatchMultiple(context, i, new string[] { "~" });
+                if (literalMatchResult.NextIndex == i)
                     break;
-                i = SkipSpace(exp, i2);
-                i2 = GetCallAndMemberAccess(parseContext, exp, i, out var moreOperand, out var morePrseNode, serrors);
-                if (i2 == i)
+                i = SkipSpace(context, literalMatchResult.NextIndex).NextIndex;
+                var moreOperandResult = GetCallAndMemberAccess(context, i);
+                if (moreOperandResult.NextIndex == i)
                     break;
-                i = SkipSpace(exp, i2);
+                i = SkipSpace(context, moreOperandResult.NextIndex).NextIndex;
 
-                allOperands.Add(moreOperand);
-                childNodes.Add(morePrseNode);
+                allOperands.Add(moreOperandResult.Block);
+                childNodes.Add(moreOperandResult.ParseNode);
             }
-
 
             if (allOperands.Count < 2)
             {
-                prog = null;
-                parseNode = null;
-                return index;
+                return new ExpressionBlockResult(null, null, index);
             }
 
             prog = new FunctionCallExpression
@@ -90,10 +77,11 @@ namespace funcscript.core
                 Function = new LiteralBlock(func),
                 Parameters = allOperands.ToArray()
             };
+            prog.SetContext(context.ReferenceProvider);
             parseNode = new ParseNode(ParseNodeType.GeneralInfixExpression, childNodes[0].Pos,
-                childNodes[^1].Pos + childNodes[^1].Length + childNodes[0].Pos);
+                childNodes[^1].Pos + childNodes[^1].Length + childNodes[0].Pos,childNodes);
 
-            return i;
+            return new ExpressionBlockResult(prog, parseNode, i);
         }
     }
 }

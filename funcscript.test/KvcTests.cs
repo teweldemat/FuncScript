@@ -3,10 +3,12 @@ using NUnit.Framework;
 using System;
 using System.Linq;
 using System.Text;
+using funcscript.block;
 
 namespace funcscript.test
 {
     delegate void VoidDelegate(int x);
+
     delegate int DelegateWithOut(int x, out int y);
 
     internal class KvcTests
@@ -17,16 +19,16 @@ namespace funcscript.test
             var g = new DefaultFsDataProvider();
             var res = FuncScript.Evaluate(g, "{a:3,c:5}");
             var expected = new ObjectKvc(new { a = 3, c = 5 });
-            Assert.AreEqual(FuncScript.FormatToJson(expected),  FuncScript.FormatToJson(res));
+            Assert.AreEqual(FuncScript.FormatToJson(expected), FuncScript.FormatToJson(res));
         }
 
         [Test]
         public void TestKvcCrossRef()
         {
             var g = new DefaultFsDataProvider();
-            var res = FuncScript.Evaluate(g, "{a:3,c:5,d:a*c}");
+            var res = FuncScript.Evaluate(g, "{a:3,c:5,d:a*c}") as KeyValueCollection;
             var expected = new ObjectKvc(new { a = 3, c = 5, d = 15 });
-            Assert.AreEqual(expected, res);
+            Assert.That(FuncScript.ValueEqual(expected, res));
         }
 
         [Test]
@@ -39,7 +41,16 @@ namespace funcscript.test
         }
 
         [Test]
-        public void TestKvcIdenOnly()
+        public void TestKvcIdenOnly1()
+        {
+            var g = new DefaultFsDataProvider();
+            var res = FuncScript.Evaluate(g, "{a:4,return {a}}");
+            var expected = new ObjectKvc(new { a = 4 });
+            Assert.AreEqual(FuncScript.FormatToJson(expected), FuncScript.FormatToJson(res));
+        }
+
+        [Test]
+        public void TestKvcIdenOnly2()
         {
             var g = new DefaultFsDataProvider();
             var res = FuncScript.Evaluate(g, "{a:4,b:5,c:6,return {a,c}}");
@@ -51,20 +62,20 @@ namespace funcscript.test
         public void TestKvcNameChanged()
         {
             var g = new DefaultFsDataProvider();
-            var res = FuncScript.Evaluate(g, "{a:4,b:5,c:6,return {x:a,y:c}}");
+            var res = FuncScript.Evaluate(g, "{a:4,b:5,c:6,return {x:^a,y:^c}}") as KeyValueCollection;
             var expected = new ObjectKvc(new { x = 4, y = 6 });
-            Assert.AreEqual(expected, res);
+            Assert.That(FuncScript.ValueEqual(expected, res));
         }
 
         [Test]
         public void TestSelector()
         {
             var g = new DefaultFsDataProvider();
-            var res = FuncScript.Evaluate(g, "{a:4,b:5,c:6}{a,c}");
+            var res = FuncScript.Evaluate(g, "{a:4,b:5,c:6}{a,c}") as KeyValueCollection;
             var expected = new ObjectKvc(new { a = 4, c = 6 });
-            Assert.AreEqual(expected, res);
+            Assert.That(FuncScript.ValueEqual(expected, res));
         }
-        
+
         // [Test]
         // public void TestSelectorNovel()
         // {
@@ -73,29 +84,31 @@ namespace funcscript.test
         //     var expected = 5;
         //     Assert.AreEqual(expected, res);
         // }
-        
+
         [Test]
         public void TestSelectorStackOverflowBug()
         {
             var g = new DefaultFsDataProvider();
-            var res = FuncScript.Evaluate(g, "{a:4}{a:a}");
-            var expected = new ObjectKvc(new { a = 4});
-            Assert.AreEqual(expected, res);
+            var res = FuncScript.Evaluate(g, "{a:4}{a:^a}") as KeyValueCollection;
+            var expected = new ObjectKvc(new { a = 4 });
+            Assert.That(FuncScript.ValueEqual(expected, res));
         }
+
         [Test]
         public void TestSelectorStackOverflowBug2()
         {
             var g = new DefaultFsDataProvider();
-            var res = FuncScript.Evaluate(g, "{a:4}{a:a+1}");
+            var res = FuncScript.Evaluate(g, "{a:4}{a:^a+1}");
             var expected = new ObjectKvc(new { a = 5 });
             Assert.AreEqual(FuncScript.FormatToJson(expected), FuncScript.FormatToJson(res));
         }
+
         [Test]
         public void TestSelectorStackOverflowBug3()
         {
             var g = new DefaultFsDataProvider();
             var res = FuncScript.Evaluate(g, "{a:4}{a,b:5}");
-            var expected = new ObjectKvc(new { a = 4,b=5 });
+            var expected = new ObjectKvc(new { a = 4, b = 5 });
             Assert.AreEqual(FuncScript.FormatToJson(expected), FuncScript.FormatToJson(res));
         }
 
@@ -103,9 +116,9 @@ namespace funcscript.test
         public void TestSelector2()
         {
             var g = new DefaultFsDataProvider();
-            var res = FuncScript.Evaluate(g, "{a:4,b:5,c:6}{'a',\"c\"}");
+            var res = FuncScript.Evaluate(g, "{a:4,b:5,c:6}{'a',\"c\"}") as KeyValueCollection;
             var expected = new ObjectKvc(new { a = 4, c = 6 });
-            Assert.AreEqual(expected, res);
+            Assert.That(FuncScript.ValueEqual(expected, res));
         }
 
         [Test]
@@ -114,7 +127,6 @@ namespace funcscript.test
             var g = new DefaultFsDataProvider();
             var res = FuncScript.Evaluate(g, "{a:{id:3}}.a.id\r\n");
             var expected = 3;
-            ;
             Assert.AreEqual(expected, res);
         }
 
@@ -139,11 +151,11 @@ namespace funcscript.test
 
 
             var res = FuncScript.Evaluate(exp);
-            var expected = new ObjectKvc(new {aa=2,ab=3,ca=6,cb=7}); ;
-            Assert.AreEqual(FuncScript.FormatToJson( expected), FuncScript.FormatToJson(res));
-
+            var expected = new ObjectKvc(new { aa = 2, ab = 3, ca = 6, cb = 7 });
+            ;
+            Assert.AreEqual(FuncScript.FormatToJson(expected), FuncScript.FormatToJson(res));
         }
-        
+
         [Test]
         public void TestLamdaContextChange()
         {
@@ -161,13 +173,13 @@ namespace funcscript.test
             var res = FuncScript.Evaluate(exp);
             var expected = 8;
             Assert.AreEqual(expected, res);
-
         }
+
         [Test]
         public void TestLamdaContextChange2()
         {
             var exp =
-@"{
+                @"{
     a:
     {
       r:6;
@@ -181,9 +193,8 @@ namespace funcscript.test
             var res = FuncScript.Evaluate(exp);
             var expected = 8;
             Assert.AreEqual(expected, res);
-
         }
-        
+
         [Test]
         public void TestMapLambdaContextTest()
         {
@@ -194,9 +205,8 @@ namespace funcscript.test
 }";
 
             var res = FuncScript.Evaluate(exp);
-            var expected = new ArrayFsList(new int[]{6,7});
+            var expected = new ArrayFsList(new int[] { 6, 7 });
             Assert.AreEqual(expected, res);
-
         }
 
         [Test]
@@ -204,8 +214,8 @@ namespace funcscript.test
         {
             var g = new DefaultFsDataProvider();
             var res = FuncScript.Evaluate(g, "{a:{id:3}}.a");
-            var expected = new ObjectKvc(new {id=3}); ;
-            Assert.AreEqual(FuncScript.FormatToJson( expected), FuncScript.FormatToJson(res));
+            var expected = new ObjectKvc(new { id = 3 });
+            Assert.AreEqual(FuncScript.FormatToJson(expected), FuncScript.FormatToJson(res));
         }
 
         [Test]
@@ -223,32 +233,41 @@ namespace funcscript.test
             var g = new DefaultFsDataProvider();
             var res = FuncScript.Evaluate(g, "{a:5,b:6}");
             var jsonStr = FuncScript.FormatToJson(res);
-            Assert.That(jsonStr.Replace(" ",""), Is.EqualTo( @"{""a"":5,""b"":6}"));
-
+            Assert.That(jsonStr.Replace(" ", ""), Is.EqualTo(@"{""a"":5,""b"":6}"));
         }
-    
 
-    [Test]
+
+        [Test]
         public void TestSelectorOnArray()
         {
             var g = new DefaultFsDataProvider();
-            var res = FuncScript.Evaluate(g, "[{a:4,b:5,c:6},{a:7,b:8,c:9}]\n{a,c}") as FsList;
+            var res = FuncScript.Evaluate(g, "[{a:4,b:5,c:6},{a:7,b:8,c:9}]{a,c}") as FsList;
             Assert.IsNotNull(res);
-            Assert.That(res.Length,Is.EqualTo(2));
+            Assert.That(res.Length, Is.EqualTo(2));
             var item1 = res[0] as KeyValueCollection;
-            Assert.IsNotNull(item1);
-            Assert.That(item1.Get("a"),Is.EqualTo(4));
-            Assert.That(item1.Get("c"),Is.EqualTo(6));
             var item2 = res[1] as KeyValueCollection;
+            Assert.IsNotNull(item1);
             Assert.IsNotNull(item2);
-            Assert.That(item2.Get("a"),Is.EqualTo(7));
-            Assert.That(item2.Get("c"),Is.EqualTo(9));
+            Assert.That(item1.ParentContext!=item2.ParentContext);
+            var par1 = item1.ParentContext as KvcExpression;
+            var par2 = item2.ParentContext as KvcExpression;
+            Assert.NotNull(par1);
+            Assert.NotNull(par2);
+            Assert.That(par1.Get("a"),Is.EqualTo(4));
+            Assert.That(par2.Get("a"),Is.EqualTo(7));
 
-            var expected = new ArrayFsList(new object[]{new ObjectKvc(new { a = 4, c=6})
-            ,new ObjectKvc(new { a = 7, c = 9})
+            Assert.That(item1.Get("c"), Is.EqualTo(6));
+            Assert.That(item1.Get("a"), Is.EqualTo(4));
+            Assert.That(item2.Get("a"), Is.EqualTo(7));
+            Assert.That(item2.Get("c"), Is.EqualTo(9));
+
+            var expected = new ArrayFsList(new object[]
+            {
+                new ObjectKvc(new { a = 4, c = 6 }), new ObjectKvc(new { a = 7, c = 9 })
             });
             Assert.AreEqual(FuncScript.FormatToJson(expected), FuncScript.FormatToJson(res));
         }
+
         [Test]
         public void ChainFunctionCall()
         {
@@ -256,8 +275,8 @@ namespace funcscript.test
             var res = FuncScript.Evaluate(g, "((x)=>((y)=>3*y))(0)(2)");
             var expected = 6;
             Assert.AreEqual(expected, res);
-
         }
+
         [Test]
         public void DoubleMap()
         {
@@ -281,6 +300,7 @@ return Map(z,(x)=>x*x);
 
             Assert.AreEqual(expected, res);
         }
+
         [Test]
         public void TestDelegate()
         {
@@ -301,15 +321,16 @@ return Map(z,(x)=>x*x);
                     var vars = new
                     {
                         f = new DelegateWithOut((int x, out int y) =>
-                        {
-                            y = 2;
-                            return x + 1;
-                        }
+                            {
+                                y = 2;
+                                return x + 1;
+                            }
                         )
                     };
                     var ret = FuncScript.EvaluateWithVars("f(3)", vars);
                 });
         }
+
         [Test]
         public void TestDelegateRejectVoid()
         {
@@ -323,6 +344,7 @@ return Map(z,(x)=>x*x);
                     var ret = FuncScript.EvaluateWithVars("f(3)", vars);
                 });
         }
+
         [Test]
         public void ByteArray()
         {
@@ -330,11 +352,13 @@ return Map(z,(x)=>x*x);
             var b = FuncScript.EvaluateWithVars("x", new { x = bytes });
             Assert.AreEqual(bytes, b);
         }
+
         class XY
         {
             String a;
             String b;
         }
+
         [Test]
         public void TestJsonEquivalenceWithTextLineFeed()
         {
@@ -348,35 +372,42 @@ d";
             var str = sb.ToString();
             var ret = Newtonsoft.Json.JsonConvert.DeserializeObject<XY>(str);
         }
+
         [Test]
         public void TestListParse2()
         {
             var exp = @" [ [ 3, 4 ] , [ 5 , 6 ] ]";
-            var expected = new ArrayFsList(new object[] { new ArrayFsList(new object[] { 3,4}) ,
-                 new ArrayFsList(new object[] { 5, 6 }) });
+            var expected = new ArrayFsList(new object[]
+            {
+                new ArrayFsList(new object[] { 3, 4 }),
+                new ArrayFsList(new object[] { 5, 6 })
+            });
             var res = FuncScript.Evaluate(exp) as FsList;
             Assert.NotNull(res);
             Assert.AreEqual(expected, res);
         }
+
         [Test]
         public void TestListParse3()
         {
             var exp = " \n [ \n [ \n 3 \n , \n 4 \n ] \n , \n [ \n 5 \n , \n 6 \n ] \n ] \n ";
-            var expected = new ArrayFsList(new object[] { new ArrayFsList(new object[] { 3,4}) ,
-                 new ArrayFsList(new object[] { 5, 6 }) });
+            var expected = new ArrayFsList(new object[]
+            {
+                new ArrayFsList(new object[] { 3, 4 }),
+                new ArrayFsList(new object[] { 5, 6 })
+            });
             var res = FuncScript.Evaluate(exp) as FsList;
             Assert.NotNull(res);
             Assert.AreEqual(expected, res);
         }
+
         [Test]
         public void FromJson1()
         {
             string json = "{x:1}";
             var expected = new ObjectKvc(new { x = 1 });
-
-            var res = FuncScript.FromJson(json);
-
-            Assert.AreEqual(expected, res);
+            var res = FuncScript.FromJson(json) as KeyValueCollection;
+            Assert.That(FuncScript.ValueEqual(expected, res));
         }
 
         [Test]
@@ -388,10 +419,10 @@ d";
             var res = FuncScript.FromJson(json);
             Assert.AreEqual(expected, res);
         }
+
         [Test]
         [TestCase("5", "5")]
         [TestCase("5.0", "5.0")]
-
         [TestCase("'5'", "'5'")]
         [TestCase("'5'", "\"5\"")]
         [TestCase("'{5'", @"'{5'")]
@@ -403,8 +434,11 @@ d";
         {
             var res = FuncScript.FromJson(json);
             var expected = FuncScript.Evaluate(fs);
-            Assert.AreEqual( FuncScript.FormatToJson( expected), FuncScript.FormatToJson(res));
+            var jsonExpected = FuncScript.FormatToJson(expected);
+            var jsonActual = FuncScript.FormatToJson(res);
+            Assert.AreEqual(jsonExpected, jsonActual);
         }
+
         [Test]
         public void ObjectKvRetailCases()
         {
@@ -412,8 +446,8 @@ d";
             var sb = new StringBuilder();
             FuncScript.Format(sb, obj, null, false, true);
             Assert.IsTrue(FuncScript.FormatToJson(sb).Contains("AbC"));
-
         }
+
         [Test]
         public void IndexKvcSensitivyBug()
         {
@@ -421,8 +455,9 @@ d";
 'A':5
 }['A']";
             var res = FuncScript.Evaluate(exp);
-            Assert.AreEqual(5, res);  
+            Assert.AreEqual(5, res);
         }
+
         [Test]
         public void IndexKvcSensitivyBug2()
         {
@@ -430,8 +465,7 @@ d";
 'A':5
 }['a']";
             var res = FuncScript.Evaluate(exp);
-            Assert.AreEqual(5, res);  
+            Assert.AreEqual(5, res);
         }
     }
-
 }

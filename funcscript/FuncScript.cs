@@ -10,7 +10,7 @@ using Newtonsoft.Json.Serialization;
 
 namespace funcscript
 {
-    public static class FuncScript
+    public static partial class FuncScript
     {
         static HashSet<Type> _useJson;
         static Newtonsoft.Json.JsonSerializerSettings _nsSetting;
@@ -240,271 +240,7 @@ namespace funcscript
                     val is double ||
                     val is string;
         }
-        /// <summary>
-        /// Formats a value into string
-        /// </summary>
-        /// <param name="sb">A string builder object</param>
-        /// <param name="val">Value to format</param>
-        /// <param name="format">Optional formatting parameter </param>
-        /// <param name="asFuncScriptLiteral">Format as FuncScript literal</param>
-        /// <param name="asJsonLiteral">Format as JSON literal</param>
-        public static void Format(StringBuilder sb, object val, string format = null,
-            bool asFuncScriptLiteral = false,
-            bool asJsonLiteral = false)
-        {
 
-
-            Format("", sb, val, format, asFuncScriptLiteral, asJsonLiteral, true);
-        }
-        
-        public static string  FormatToJson(object val)
-        {
-
-            var sb = new StringBuilder();
-            Format( sb, val,  asJsonLiteral:true);
-            return  sb.ToString();
-        }
-        static String TestFormat(object val, string format = null,
-            bool asFuncScriptLiteral = false,
-            bool asJsonLiteral = false)
-        {
-            var sb = new StringBuilder();
-            Format("", sb, val, format, asFuncScriptLiteral, asJsonLiteral, false);
-            return sb.ToString();
-        }
-        static void Format(String indent, StringBuilder sb, object val,
-            string format,
-            bool asFuncScriptLiteral,
-            bool asJsonLiteral, bool adaptiveLineBreak)
-        {
-
-            if (val is FsError error)
-            {
-                sb.Append($"Error: {error.ErrorMessage}");
-                sb.Append($"  type: {error.ErrorType}");
-                if(error.ErrorData!=null)
-                    sb.Append($"\nData:\n{error.ErrorData}");
-            }
-            if (val == null)
-            {
-                sb.Append("null");
-                return;
-            }
-            if (val is ByteArray)
-            {
-                if (asFuncScriptLiteral || asFuncScriptLiteral)
-                    sb.Append("");
-                sb.Append(Convert.ToBase64String(((ByteArray)val).Bytes));
-                if (asFuncScriptLiteral || asFuncScriptLiteral)
-                    sb.Append("");
-                return;
-            }
-            if (val is FsList)
-            {
-                var list = (FsList)val;
-                bool useLineBreak = false;
-                if (adaptiveLineBreak)
-                {
-                    var test = TestFormat(val, format, asFuncScriptLiteral, asJsonLiteral);
-                    useLineBreak = test.Length > BREAK_LINE_THRUSHOLD;
-                }
-                sb.Append($"[");
-                if (list.Length > 0)
-                if (list.Length > 0)
-                {
-                    if (useLineBreak)
-                        sb.Append($"\n{indent}{TAB}");
-                    else
-                        sb.Append($" ");
-                    Format($"{indent}{TAB}", sb, list[0], format, asFuncScriptLiteral, asJsonLiteral, adaptiveLineBreak);
-                    for (int i = 1; i < list.Length; i++)
-                    {
-                        if (useLineBreak)
-                            sb.Append($",\n{indent}{TAB}");
-                        else
-                            sb.Append($", ");
-                        Format($"{indent}{TAB}", sb, list[i], format, asFuncScriptLiteral, asJsonLiteral, adaptiveLineBreak);
-                    }
-                }
-                if (useLineBreak)
-                    sb.Append($"\n{indent}]");
-                else
-                    sb.Append($" ]");
-                return;
-            }
-            if (val is KeyValueCollection)
-            {
-                bool useLineBreak = false;
-                if (adaptiveLineBreak)
-                {
-                    var test = TestFormat(val, format, asFuncScriptLiteral, asJsonLiteral);
-                    useLineBreak = test.Length > BREAK_LINE_THRUSHOLD;
-                }
-
-                var kv = (KeyValueCollection)val;
-                if (useLineBreak)
-                    sb.Append($"{{\n");
-                else
-                    sb.Append("{ ");
-                var pairs = kv.GetAll();
-                if (pairs.Count > 0)
-                {
-                    var pair = pairs[0];
-                    if (useLineBreak)
-                        sb.Append($"{indent}{TAB}\"{pair.Key}\":");
-                    else
-                        sb.Append($"\"{pair.Key}\":");
-                    Format($"{indent}{TAB}", sb, pair.Value, format, asFuncScriptLiteral, asJsonLiteral, adaptiveLineBreak);
-                    for (int i = 1; i < pairs.Count; i++)
-                    {
-                        if (useLineBreak)
-                            sb.Append(",\n");
-                        else
-                            sb.Append(", ");
-
-                        pair = pairs[i];
-                        if (useLineBreak)
-                            sb.Append($"{indent}{TAB}\"{pair.Key}\":");
-                        else
-                            sb.Append($"\"{pair.Key}\":");
-                        Format($"{indent}{TAB}", sb, pair.Value, format, asFuncScriptLiteral, asJsonLiteral, adaptiveLineBreak);
-                    }
-                }
-                if (useLineBreak)
-                    sb.Append($"\n{indent}}}");
-                else
-                    sb.Append("}");
-                return;
-            }
-            if (val is bool)
-            {
-                sb.Append((bool)val ? "true" : "false");
-                return;
-            }
-            if (val is int)
-            {
-                if (format == null)
-                    sb.Append(val.ToString());
-                else
-                    sb.Append(((int)val).ToString(format));
-                return;
-            }
-            if (val is long)
-            {
-                if (asJsonLiteral)
-                    sb.Append("\"");
-                if (format == null)
-                    sb.Append(val.ToString());
-                else
-                    sb.Append(((long)val).ToString(format));
-                if (asJsonLiteral)
-                    sb.Append("\"");
-                else if (asFuncScriptLiteral)
-                    sb.Append("L");
-                return;
-            }
-            if (val is double)
-            {
-                if (format == null)
-                    sb.Append(val.ToString());
-                else
-                    sb.Append(((double)val).ToString(format));
-                return;
-            }
-            if (val is DateTime)
-            {
-                if (asJsonLiteral || asFuncScriptLiteral)
-                    sb.Append("\"");
-                if (format == null)
-                    sb.Append(((DateTime)val).ToString("yyy-MM-dd HH:mm:ss"));
-                else
-                    sb.Append(((DateTime)val).ToString(format));
-                if (asJsonLiteral || asFuncScriptLiteral)
-                    sb.Append("\"");
-                return;
-            }
-            if (val is Guid)
-            {
-                if (asJsonLiteral || asFuncScriptLiteral)
-                    sb.Append("\"");
-                if (format == null)
-                    sb.Append(val.ToString());
-                else
-                    sb.Append(((Guid)val).ToString(format));
-                if (asJsonLiteral || asFuncScriptLiteral)
-                    sb.Append("\"");
-                return;
-            }
-            if (val is double)
-            {
-                if (format == null)
-                    sb.Append(val.ToString());
-                else
-                    sb.Append(((double)val).ToString(format));
-                return;
-            }
-            if (val is string valStr)
-            {
-                if (asJsonLiteral || asFuncScriptLiteral)
-
-                {
-                    sb.Append("\"");
-                    foreach (var ch in valStr)
-                    {
-                        if (char.IsControl(ch)) // check if it's a control character
-                        {
-                            sb.Append("\\u" + ((int)ch).ToString("x4")); // append it in \uxxxx form
-                        }
-                        else
-                        {
-                            switch (ch)
-                            {
-                                case '\n':
-                                    sb.Append(@"\n");
-                                    break;
-                                case '\r':
-                                    sb.Append(@"\r");
-                                    break;
-                                case '\t':
-                                    sb.Append(@"\t");
-                                    break;
-                                case '"':
-                                    sb.Append(@"\""");
-                                    break;
-                                case '{':
-                                    if (asFuncScriptLiteral)
-                                        sb.Append(@"\{");
-                                    else
-                                        sb.Append(@"{");
-                                    break;
-                                case '\\':
-                                    sb.Append(@"\\");
-                                    break;
-                                default:
-                                    sb.Append(ch);
-                                    break;
-                            }
-                        }
-                    }
-                    sb.Append("\"");
-                }
-                else
-                    sb.Append(valStr);
-                return;
-            }
-            if (asJsonLiteral || asFuncScriptLiteral)
-                sb.Append("\"");
-            sb.Append(val.ToString().Replace("\"", "\\\""));
-            if (asJsonLiteral || asFuncScriptLiteral)
-                sb.Append("\"");
-        }
-
-        /// <summary>
-        /// Gets the data type of a value as FSDataType
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        /// <exception cref="error.UnsupportedUnderlyingType"></exception>
         public static FSDataType GetFsDataType(object value)
         {
             if (value == null)
@@ -639,7 +375,7 @@ namespace funcscript
         {
             return Evaluate(expression, new DefaultFsDataProvider(), vars, ParseMode.Standard);
         }
-        public static object Evaluate(IFsDataProvider providers, string expression)
+        public static object Evaluate(KeyValueCollection providers, string expression)
         {
             return Evaluate(expression, providers, null, ParseMode.Standard);
         }
@@ -649,23 +385,25 @@ namespace funcscript
             SpaceSeparatedList,
             FsTemplate
         }
-        public static object Evaluate(string expression, IFsDataProvider provider, object vars, ParseMode mode)
+        public static object Evaluate(string expression, KeyValueCollection provider, object vars, ParseMode mode)
         {
             if (vars != null)
             {
                 provider = new KvcProvider(new ObjectKvc(vars), provider);
             }
-            var serrors = new List<FuncScriptParser.SyntaxErrorData>();
+
+            var context =
+                new FuncScriptParser.ParseContext(provider, expression, new List<FuncScriptParser.SyntaxErrorData>());
             ExpressionBlock exp;
             switch (mode)
             {
                 case ParseMode.Standard:
-                    exp = core.FuncScriptParser.Parse(provider, expression, serrors);
+                    exp = core.FuncScriptParser.Parse(context).Block;
                     break;
                 case ParseMode.SpaceSeparatedList:
-                    return core.FuncScriptParser.ParseSpaceSepratedList(provider, expression, serrors);
+                    return core.FuncScriptParser.ParseSpaceSepratedList(context);
                 case ParseMode.FsTemplate:
-                    exp = core.FuncScriptParser.ParseFsTemplate(provider, expression, serrors);
+                    exp = core.FuncScriptParser.ParseFsTemplate(context).Block;
                     break;
                 default:    
                     exp = null;
@@ -673,17 +411,14 @@ namespace funcscript
             }
 
             if (exp == null)
-                throw new error.SyntaxError(expression,serrors);
+                throw new error.SyntaxError(context.Expression, context.SyntaxErrors);
             return Evaluate(exp, expression, provider, vars);
         }
-        public static object Evaluate(ExpressionBlock exp, string expression, IFsDataProvider provider, object vars)
+        public static object Evaluate(ExpressionBlock exp, string expression, KeyValueCollection provider, object vars)
         {
             try
             {
-                List<Action> connectionActions = new List<Action>();
-                var (ret,_)=exp.Evaluate(provider,connectionActions);
-                foreach(var con in connectionActions)
-                    con.Invoke();
+                var ret=exp.Evaluate();
                 return ret;
             }
             catch (EvaluationException ex)
@@ -697,5 +432,44 @@ namespace funcscript
             }
         }
 
+        public static bool ValueEqual(object val1, object val2)
+        {
+            var t1 = GetFsDataType(val1);
+            var t2 = GetFsDataType(val2);
+            if (t1 != t2)
+                return false;
+            if (val1 == null && val2 == null)
+                return true;
+            if (val1 == null ^ val2 == null)
+                return false;
+            
+            if (val1 is KeyValueCollection kv1 && val2 is KeyValueCollection kv2)
+            {
+                foreach (var key in kv1.GetAllKeys())
+                {
+                    if (!kv2.IsDefined(key.ToLowerInvariant()))
+                        return false;
+                    if (!ValueEqual(kv1.Get(key), kv2.Get(key)))
+                        return false;
+                }
+
+                return true;
+            }
+            if (val1 is FsList lst1 && val2 is FsList lst2)
+            {
+                if (lst1.Length != lst2.Length)
+                    return false;
+                var e1 = lst1.GetEnumerator();
+                var e2 = lst2.GetEnumerator();
+                while (e1.MoveNext())
+                {
+                    e2.MoveNext();
+                    if (!ValueEqual(e1.Current, e2.Current))
+                        return false;
+                }
+                return true;
+            }
+            return val1.Equals(val2);
+        }
     }
 }

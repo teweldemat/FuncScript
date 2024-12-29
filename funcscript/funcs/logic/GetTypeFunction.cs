@@ -1,5 +1,6 @@
 using funcscript.core;
 using System;
+using funcscript.model;
 
 namespace funcscript.funcs.os
 {
@@ -11,12 +12,12 @@ namespace funcscript.funcs.os
 
         public string Symbol => "type";
 
-        public object Evaluate(IFsDataProvider parent, IParameterList pars)
+        public object EvaluateList(FsList pars)
         {
-            if (pars.Count != MaxParsCountValue)
-                throw new error.EvaluationTimeException($"{this.Symbol} function: invalid parameter count. {MaxParsCountValue} expected, got {pars.Count}");
+            if (pars.Length != MaxParsCountValue)
+                throw new error.EvaluationTimeException($"{this.Symbol} function: invalid parameter count. {MaxParsCountValue} expected, got {pars.Length}");
 
-            var par0 = pars.GetParameter(parent, 0);
+            var par0 = pars[0];
             if (par0 == null)
                 return "null";
 

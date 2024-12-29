@@ -1,3 +1,5 @@
+using funcscript.model;
+
 namespace funcscript.core
 {
     public partial class FuncScriptParser
@@ -7,5 +9,6 @@ namespace funcscript.core
                ch == '\r' ||
                ch == '\t' ||
                ch == '\n';
+
     }
 }

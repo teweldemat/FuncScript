@@ -27,13 +27,13 @@ namespace funcscript.funcs.math
             }
         }
 
-        public object Evaluate(IFsDataProvider parent, IParameterList pars)
+        public object EvaluateList(FsList pars)
         {
             StringBuilder sb = new StringBuilder();
-            int c = pars.Count;
+            int c = pars.Length;
             for (int i = 0; i < c; i++)
             {
-                var o = pars.GetParameter(parent, i);
+                var o = pars[i];
                 if (o is FsList)
                     MergeList(sb, (FsList)o);
                 else

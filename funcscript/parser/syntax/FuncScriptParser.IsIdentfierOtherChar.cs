@@ -6,5 +6,6 @@ namespace funcscript.core
         {
             return char.IsLetterOrDigit(ch) || ch == '_';
         }
+        
     }
 }

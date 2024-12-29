@@ -1,4 +1,5 @@
 using funcscript.core;
+using funcscript.model;
 
 namespace funcscript.funcs.logic
 {
@@ -10,12 +11,12 @@ namespace funcscript.funcs.logic
 
         public string Symbol => "TicksToDate";
 
-        public object Evaluate(IFsDataProvider parent, IParameterList pars)
+        public object EvaluateList(FsList pars)
         {
-            if (pars.Count > MaxParameters)
-                throw new error.EvaluationTimeException($"{this.Symbol} function: Invalid parameter count. Expected a maximum of {MaxParameters}, but got {pars.Count}");
+            if (pars.Length > MaxParameters)
+                throw new error.EvaluationTimeException($"{this.Symbol} function: Invalid parameter count. Expected a maximum of {MaxParameters}, but got {pars.Length}");
 
-            var par0 = pars.GetParameter(parent, 0);
+            var par0 = pars[0];
 
             if (par0 == null)
                 return null;

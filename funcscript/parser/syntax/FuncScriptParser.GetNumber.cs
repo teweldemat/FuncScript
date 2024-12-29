@@ -1,76 +1,81 @@
+using funcscript.block;
+using funcscript.funcs.math;
+using funcscript.model;
 namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetNumber(String exp, int index, out object number, out ParseNode parseNode,
-            List<SyntaxErrorData> serros)
+        record GetNumberResult(object Number, ParseNode ParseNode, int NextIndex)
+            :ParseResult(ParseNode,NextIndex);
+
+        static GetNumberResult GetNumber(ParseContext context, int index)
         {
-            parseNode = null;
+            ParseNode parseNode = null;
             var hasDecimal = false;
             var hasExp = false;
             var hasLong = false;
-            number = null;
+            object number = null;
             int i = index;
-            var i2 = GetInt(exp, true, i, out var intDigits, out var nodeDigits);
+            var(intDigits,nodeDigits, i2) = GetInt(context, true, i);
             if (i2 == i)
-                return index;
+                return new GetNumberResult(null, null, index);
             i = i2;
 
-            i2 = GetLiteralMatch(exp, i, ".");
+            i2 = GetLiteralMatch(context, i, ".").NextIndex;
             if (i2 > i)
                 hasDecimal = true;
             i = i2;
             if (hasDecimal)
             {
-                i = GetInt(exp, false, i, out var decimalDigits, out var nodeDecimlaDigits);
+                (var decimalDigits, var nodeDecimlaDigits, i) = GetInt(context, false, i);
             }
 
-            i2 = GetLiteralMatch(exp, i, "E");
+            i2 = GetLiteralMatch(context, i, "E").NextIndex;
             if (i2 > i)
                 hasExp = true;
             i = i2;
-            String expDigits = null;
+            string expDigits = null;
             ParseNode nodeExpDigits;
             if (hasExp)
-                i = GetInt(exp, true, i, out expDigits, out nodeExpDigits);
+                (expDigits,nodeExpDigits, i) = GetInt(context, true, i);
 
-            if (!hasDecimal) //if no decimal we check if there is the 'l' suffix
+            if (!hasDecimal)
             {
-                i2 = GetLiteralMatch(exp, i, "l");
+                i2 = GetLiteralMatch(context, i, "l").NextIndex;
                 if (i2 > i)
                     hasLong = true;
                 i = i2;
             }
 
-            if (hasDecimal) //if it has decimal we treat it as 
+            if (hasDecimal)
             {
-                if (!double.TryParse(exp.Substring(index, i - index), out var dval))
+                if (!double.TryParse(context.Expression.Substring(index, i - index), out var dval))
                 {
-                    serros.Add(new SyntaxErrorData(index, i - index,
-                        $"{exp.Substring(index, i - index)} couldn't be parsed as floating point"));
-                    return index; //we don't expect this to happen
+                    context.SyntaxErrors.Add(new SyntaxErrorData(index, i - index,
+                        $"{context.Expression.Substring(index, i - index)} couldn't be parsed as floating point"));
+                    return new GetNumberResult(null, null, index);
                 }
 
                 number = dval;
                 parseNode = new ParseNode(ParseNodeType.LiteralDouble, index, i - index);
-                return i;
+                return new GetNumberResult(number, parseNode, i);
             }
 
-            if (hasExp) //it e is included without decimal, zeros are appended to the digits
+            if (hasExp)
             {
                 if (!int.TryParse(expDigits, out var e) || e < 0)
                 {
-                    serros.Add(new SyntaxErrorData(index, expDigits == null ? 0 : expDigits.Length,
+                    context.SyntaxErrors.Add(new SyntaxErrorData(index, expDigits == null ? 0 : expDigits.Length,
                         $"Invalid exponentional {expDigits}"));
-                    return index;
+                    return new GetNumberResult(null, null, index);
                 }
 
                 var maxLng = long.MaxValue.ToString();
-                if (maxLng.Length + 1 < intDigits.Length + e) //check overflow by length
+                if (maxLng.Length + 1 < intDigits.Length + e)
                 {
-                    serros.Add(new SyntaxErrorData(index, expDigits.Length,
+                    context.SyntaxErrors.Add(new SyntaxErrorData(index, expDigits.Length,
                         $"Exponential {expDigits} is out of range"));
-                    return index;
+                    return new GetNumberResult(null, null, index);
                 }
 
                 intDigits = intDigits + new string('0', e);
@@ -78,35 +83,35 @@ namespace funcscript.core
 
             long longVal;
 
-            if (hasLong) //if l suffix is found
+            if (hasLong)
             {
                 if (!long.TryParse(intDigits, out longVal))
                 {
-                    serros.Add(new SyntaxErrorData(index, expDigits.Length,
+                    context.SyntaxErrors.Add(new SyntaxErrorData(index, expDigits.Length,
                         $"{intDigits} couldn't be parsed to 64bit integer"));
-                    return index;
+                    return new GetNumberResult(null, null, index);
                 }
 
                 number = longVal;
                 parseNode = new ParseNode(ParseNodeType.LiteralLong, index, i - index);
-                return i;
+                return new GetNumberResult(number, parseNode, i);
             }
 
-            if (int.TryParse(intDigits, out var intVal)) //try parsing as int
+            if (int.TryParse(intDigits, out var intVal))
             {
                 number = intVal;
                 parseNode = new ParseNode(ParseNodeType.LiteralInteger, index, i - index);
-                return i;
+                return new GetNumberResult(number, parseNode, i);
             }
 
-            if (long.TryParse(intDigits, out longVal)) //try parsing as long
+            if (long.TryParse(intDigits, out longVal))
             {
                 number = longVal;
                 parseNode = new ParseNode(ParseNodeType.LiteralLong, index, i - index);
-                return i;
+                return new GetNumberResult(number, parseNode, i);
             }
 
-            return index; //all failed
+            return new GetNumberResult(null, null, index);
         }
     }
 }

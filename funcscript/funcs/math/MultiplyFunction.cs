@@ -1,25 +1,25 @@
 using funcscript.core;
+using funcscript.model;
 
 namespace funcscript.funcs.math
 {
     public class MultiplyFunction : IFsFunction
     {
-        private const int MaxParameterCount = -1;
         public CallType CallType => CallType.Infix;
 
         public string Symbol => "*";
 
-        public object Evaluate(IFsDataProvider parent, IParameterList pars)
+        public object EvaluateList(FsList pars)
         {
             bool isNull = true, isInt = false, isLong = false, isDouble = false;
             int intTotal = 1;
             long longTotal = 1;
             double doubleTotal = 1;
-            int count = pars.Count;
+            int count = pars.Length;
 
             for (int i = 0; i < count; i++)
             {
-                var d = pars.GetParameter(parent, i);
+                var d = pars[i];
 
                 if (isNull)
                 {

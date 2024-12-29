@@ -1,37 +1,38 @@
 using System.Text;
 using funcscript.block;
-
+using funcscript.model;
 namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetStringTemplate(IFsDataProvider provider, string exp, int index, out ExpressionBlock prog,
-            out ParseNode parseNode, List<SyntaxErrorData> serrors)
+        public static ExpressionBlockResult GetStringTemplate(ParseContext context, int index)
         {
-            var i = GetStringTemplate(provider, "\"", exp, index, out prog, out parseNode, serrors);
-            if (i > index)
-                return i;
-            return GetStringTemplate(provider, "'", exp, index, out prog, out parseNode, serrors);
+            var result = GetStringTemplate(context, "\"", index);
+            if (result.NextIndex > index)
+                return result;
+            return GetStringTemplate(context, "'", index);
         }
 
-        static int GetStringTemplate(IFsDataProvider provider, String delimator, string exp, int index,
-            out ExpressionBlock prog, out ParseNode parseNode, List<SyntaxErrorData> serrors)
+        public static ExpressionBlockResult GetStringTemplate(ParseContext context, string delimiter, int index)
         {
-            parseNode = null;
-            prog = null;
+            var provider = context.ReferenceProvider;
+            var exp = context.Expression;
+            var syntaxErrors = context.SyntaxErrors;
+            ExpressionBlock prog = null;
+            ParseNode parseNode = null;
             var parts = new List<ExpressionBlock>();
             var nodeParts = new List<ParseNode>();
 
-
-            var i = GetLiteralMatch(exp, index, $"f{delimator}");
+            var i = GetLiteralMatch(context, index, $"f{delimiter}").NextIndex;
             if (i == index)
-                return index;
+                return new ExpressionBlockResult(prog, parseNode, index);
+            
             var lastIndex = i;
             var sb = new StringBuilder();
             int i2;
             while (true)
             {
-                i2 = GetLiteralMatch(exp, i, @"\\");
+                i2 = GetLiteralMatch(context, i, @"\\").NextIndex;
                 if (i2 > i)
                 {
                     i = i2;
@@ -39,7 +40,7 @@ namespace funcscript.core
                     continue;
                 }
 
-                i2 = GetLiteralMatch(exp, i, @"\n");
+                i2 = GetLiteralMatch(context, i, @"\n").NextIndex;
                 if (i2 > i)
                 {
                     i = i2;
@@ -47,7 +48,7 @@ namespace funcscript.core
                     continue;
                 }
 
-                i2 = GetLiteralMatch(exp, i, @"\t");
+                i2 = GetLiteralMatch(context, i, @"\t").NextIndex;
                 if (i2 > i)
                 {
                     i = i2;
@@ -55,15 +56,15 @@ namespace funcscript.core
                     continue;
                 }
 
-                i2 = GetLiteralMatch(exp, i, $@"\{delimator}");
+                i2 = GetLiteralMatch(context, i, $@"\{delimiter}").NextIndex;
                 if (i2 > i)
                 {
                     i = i2;
-                    sb.Append(delimator);
+                    sb.Append(delimiter);
                     continue;
                 }
 
-                i2 = GetLiteralMatch(exp, i, @"\{");
+                i2 = GetLiteralMatch(context, i, @"\{").NextIndex;
                 if (i2 > i)
                 {
                     i = i2;
@@ -71,34 +72,35 @@ namespace funcscript.core
                     continue;
                 }
 
-                i2 = GetLiteralMatch(exp, i, "{");
+                i2 = GetLiteralMatch(context, i, "{").NextIndex;
                 if (i2 > i)
                 {
                     if (sb.Length > 0)
                     {
-                        parts.Add(new LiteralBlock(sb.ToString()));
+                        var lb = new LiteralBlock(sb.ToString());
+                        lb.SetContext(provider);
+                        parts.Add(lb);
                         nodeParts.Add(new ParseNode(ParseNodeType.LiteralString, lastIndex, i - lastIndex));
                         sb = new StringBuilder();
                     }
 
                     i = i2;
-
-                    i = SkipSpace(exp, i);
-                    i2 = GetExpression(provider, exp, i, out var expr, out var nodeExpr, serrors);
-                    if (i2 == i)
+                    i = SkipSpace(context, i).NextIndex;
+                    var exprResult = GetExpression(new ParseContext(provider, exp, syntaxErrors), i);
+                    if (exprResult.NextIndex == i)
                     {
-                        serrors.Add(new SyntaxErrorData(i, 0, "expression expected"));
-                        return index;
+                        syntaxErrors.Add(new SyntaxErrorData(i, 0, "expression expected"));
+                        return new ExpressionBlockResult(prog, parseNode, index);
                     }
 
-                    parts.Add(expr);
-                    nodeParts.Add(nodeExpr);
-                    i = i2;
-                    i2 = GetLiteralMatch(exp, i, "}");
+                    parts.Add(exprResult.Block);
+                    nodeParts.Add(exprResult.ParseNode);
+                    i = exprResult.NextIndex;
+                    i2 = GetLiteralMatch(context, i, "}").NextIndex;
                     if (i2 == i)
                     {
-                        serrors.Add(new SyntaxErrorData(i, 0, "'}' expected"));
-                        return index;
+                        syntaxErrors.Add(new SyntaxErrorData(i, 0, "'}' expected"));
+                        return new ExpressionBlockResult(prog, parseNode, index);
                     }
 
                     i = i2;
@@ -106,8 +108,9 @@ namespace funcscript.core
                     continue;
                 }
 
-                if (i >= exp.Length || GetLiteralMatch(exp, i, delimator) > i)
+                if (i >= exp.Length || GetLiteralMatch(context, i, delimiter).NextIndex > i)
                     break;
+
                 sb.Append(exp[i]);
                 i++;
             }
@@ -116,7 +119,9 @@ namespace funcscript.core
             {
                 if (sb.Length > 0)
                 {
-                    parts.Add(new LiteralBlock(sb.ToString()));
+                    var lb = new LiteralBlock(sb.ToString());
+                    lb.SetContext(provider);
+                    parts.Add(lb);
                     nodeParts.Add(new ParseNode(ParseNodeType.LiteralString, lastIndex, i - lastIndex));
                     sb = new StringBuilder();
                 }
@@ -124,11 +129,11 @@ namespace funcscript.core
                 nodeParts.Add(new ParseNode(ParseNodeType.LiteralString, lastIndex, i - lastIndex));
             }
 
-            i2 = GetLiteralMatch(exp, i, delimator);
+            i2 = GetLiteralMatch(context, i, delimiter).NextIndex;
             if (i2 == i)
             {
-                serrors.Add(new SyntaxErrorData(i, 0, $"'{delimator}' expected"));
-                return index;
+                syntaxErrors.Add(new SyntaxErrorData(i, 0, $"'{delimiter}' expected"));
+                return new ExpressionBlockResult(prog, parseNode, index);
             }
 
             i = i2;
@@ -136,10 +141,10 @@ namespace funcscript.core
             if (parts.Count == 0)
             {
                 prog = new LiteralBlock("");
+                prog.SetContext(provider);
                 parseNode = new ParseNode(ParseNodeType.LiteralString, index, i - index);
             }
-
-            if (parts.Count == 1)
+            else if (parts.Count == 1)
             {
                 prog = parts[0];
                 parseNode = nodeParts[0];
@@ -151,10 +156,12 @@ namespace funcscript.core
                     Function = new LiteralBlock(provider.Get("+")),
                     Parameters = parts.ToArray()
                 };
+                prog.SetContext(provider);
                 parseNode = new ParseNode(ParseNodeType.StringTemplate, index, i - index, nodeParts);
             }
 
-            return i;
+            return new ExpressionBlockResult(prog, parseNode, i);
         }
+
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using funcscript.core;
+using funcscript.model;
 
 namespace funcscript.block
 {
@@ -11,23 +12,16 @@ namespace funcscript.block
             Value = val;
         }
 
-        public override string AsExpString(IFsDataProvider provider)
+        public override string AsExpString()
         {
             var sb = new StringBuilder();
             FuncScript.Format(sb, Value, null, true, false);
             return sb.ToString();
         }
 
-        public override (object,CodeLocation) Evaluate(IFsDataProvider provider,List<Action> connectionActions)
+        public override object Evaluate()
         {
-            if (Value is ExpressionFunction exp)
-            {
-                lock (exp)
-                {
-                    exp.SetContext(provider);
-                }
-            }
-            return (Value,this.CodeLocation);
+            return Value;
         }
         public override IList<ExpressionBlock> GetChilds()
         {
@@ -40,6 +34,18 @@ namespace funcscript.block
             return Value.ToString();
         }
 
+        public override void SetContext(KeyValueCollection provider)
+        {
+            if (Value is ExpressionFunction exp)
+            {
+                exp.SetContext(provider);
+            }
+        }
+
+        public override ExpressionBlock CloneExpression()
+        {
+            return new LiteralBlock(this.Value);
+        }
     }
 
 }

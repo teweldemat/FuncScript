@@ -1,4 +1,4 @@
-using funcscript.core;
+﻿using funcscript.core;
 using funcscript.model;
 
 namespace funcscript.funcs.keyvalue
@@ -11,13 +11,13 @@ namespace funcscript.funcs.keyvalue
 
         public string Symbol => "Select";
 
-        public object Evaluate(IFsDataProvider parent, IParameterList pars)
+        public object EvaluateList(FsList pars)
         {
-            if (pars.Count != MaxParameters)
-                throw new error.TypeMismatchError($"{Symbol} function: Invalid parameter count. Expected {MaxParameters}, but got {pars.Count}");
+            if (pars.Length != MaxParameters)
+                throw new error.TypeMismatchError($"{Symbol} function: Invalid parameter count. Expected {MaxParameters}, but got {pars.Length}");
 
-            var par0 = pars.GetParameter(parent, 0);
-            var par1 = pars.GetParameter(parent, 1);
+            var par0 = pars[0];
+            var par1 = pars[1];
 
             if (!(par0 is KeyValueCollection))
                 throw new error.TypeMismatchError($"{Symbol} function: The first parameter should be {ParName(0)}");
@@ -26,7 +26,11 @@ namespace funcscript.funcs.keyvalue
                 throw new error.TypeMismatchError($"{Symbol} function: The second parameter should be {ParName(1)}");
 
             var first = (KeyValueCollection)par0;
-            var second = ((KeyValueCollection)par1).GetAll();
+            var secondKvc = ((KeyValueCollection)par1);
+            var second = secondKvc
+                .GetAllKeys()
+                .Select(k=>KeyValuePair.Create(k,secondKvc.Get(k)))
+                .ToList();
 
             for (int i = 0; i < second.Count; i++)
             {
@@ -38,7 +42,7 @@ namespace funcscript.funcs.keyvalue
                 }
             }
 
-            return new SimpleKeyValueCollection(parent, second.ToArray());
+            return new SimpleKeyValueCollection(second.ToArray());
         }
 
         public string ParName(int index)

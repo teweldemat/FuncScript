@@ -1,5 +1,4 @@
 using funcscript.core;
-using System;
 using funcscript.model;
 
 namespace funcscript.funcs.logic
@@ -13,13 +12,13 @@ namespace funcscript.funcs.logic
 
         public string Symbol => SYMBOL;
 
-        public object Evaluate(IFsDataProvider parent, IParameterList pars)
+        public object EvaluateList(FsList pars)
         {
-            if (pars.Count != MAX_PARS_COUNT)
+            if (pars.Length != MAX_PARS_COUNT)
                 return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH,
-                    $"{this.Symbol}: expected {MAX_PARS_COUNT} parameters, got {pars.Count}");
+                    $"{this.Symbol}: expected {MAX_PARS_COUNT} parameters, got {pars.Length}");
 
-            var par0 = pars.GetParameter(parent, 0);
+            var par0 = pars[0];
 
             if (par0 == null)
                 return false;

@@ -1,12 +1,13 @@
 using System.Collections.Concurrent;
 using funcscript.funcs.misc;
+using funcscript.host;
 
 namespace fsstudio.server.fileSystem.exec
 {
     public class SessionManager
     {
         
-        class RemoteLoggerForFs(RemoteLogger rl) : Fslogger
+        class RemoteLoggerForFs(RemoteLogger rl) : FsLogger
         {
             public override void WriteLine(string text)
             {
@@ -28,7 +29,7 @@ namespace fsstudio.server.fileSystem.exec
         {
             this.remoteLogger = remoteLogger;
             _rootPath = configuration.GetValue<string>("RootFolder")!;
-            Fslogger.SetDefaultLogger(new RemoteLoggerForFs(remoteLogger));
+            FsLogger.SetDefaultLogger(new RemoteLoggerForFs(remoteLogger));
         }
 
         public ExecutionSession CreateSession(string fromFile)

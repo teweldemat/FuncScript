@@ -1,97 +1,115 @@
 using funcscript.block;
-
+using funcscript.model;
 namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetInfixExpressionSingleLevel(IFsDataProvider parseContext, int level, string[] candidates,
-            string exp, int index,
-            out ExpressionBlock prog,
-            out ParseNode parseNode, List<SyntaxErrorData> serrors)
+        static ExpressionBlockResult GetInfixExpressionSingleLevel(ParseContext context, int level, string[] candidates, int index)
         {
-            prog = null; 
-            parseNode = null;
+            ExpressionBlock prog = null;
+            ParseNode parseNode = null;
             var i = index;
+
             while (true)
             {
                 int i2;
                 IFsFunction oper = null;
                 ParseNode operatorNode = null;
                 string symbol = null;
-                
-                if (prog == null) //if we parsing the first operaand
+
+                if (prog == null) //if we are parsing the first operand
                 {
-                    //get an infix with one level higher or call expression when we are parsing for highest precidence operators
+                    //get an infix with one level higher or call expression when we are parsing for highest precedence operators
                     if (level == 0)
                     {
-                        i2 = GetInfixFunctionCall(parseContext, exp, i, out prog, out parseNode, serrors);
+                        var result = GetInfixFunctionCall(context, i);
+                        prog = result.Block;
+                        parseNode = result.ParseNode;
+                        i2 = result.NextIndex;
                     }
                     else
                     {
-                        i2 = GetInfixExpressionSingleLevel(parseContext, level - 1, s_operatorSymols[level - 1], exp, i,
-                            out prog, out parseNode,
-                            serrors);
+                        var result = GetInfixExpressionSingleLevel(context, level - 1, s_operatorSymols[level - 1], i);
+                        prog = result.Block;
+                        parseNode = result.ParseNode;
+                        i2 = result.NextIndex;
                     }
 
                     if (i2 == i)
-                        return i;
+                        return new ExpressionBlockResult(prog, parseNode, i);
 
-                    i = SkipSpace(exp, i2);
+                    i = SkipSpace(context, i2).NextIndex;
                     continue;
                 }
 
                 var indexBeforeOperator = i;
-                i2 = GetOperator(parseContext, candidates, exp, i, out symbol, out oper,
-                    out operatorNode);
+                var operatorResult = GetOperator(context, candidates, i);
+                symbol = operatorResult.MatchedOp;
+                oper = operatorResult.Oper;
+                operatorNode = operatorResult.ParseNode;
+                i2 = operatorResult.NextIndex;
+
                 if (i2 == i)
                     break;
 
-                i = SkipSpace(exp, i2);
+                i = SkipSpace(context, i2).NextIndex;
 
-                var operands = new List<ExpressionBlock>();
-                var operandNodes = new List<ParseNode>();
-                operands.Add(prog);
-                operandNodes.Add(parseNode);
+                var operands = new List<ExpressionBlock> { prog };
+                var infixComponentNodes = new List<ParseNode> { parseNode };
+
                 while (true)
                 {
                     ExpressionBlock nextOperand;
                     ParseNode nextOperandNode;
                     if (level == 0)
-                        i2 = GetInfixFunctionCall(parseContext, exp, i, out nextOperand, out nextOperandNode, serrors);
+                    {
+                        var result = GetInfixFunctionCall(context, i);
+                        nextOperand = result.Block;
+                        nextOperandNode = result.ParseNode;
+                        i2 = result.NextIndex;
+                    }
                     else
-                        i2 = GetInfixExpressionSingleLevel(parseContext, level - 1, s_operatorSymols[level - 1], exp, i, out nextOperand, out nextOperandNode, serrors);
-                    if (i2 == i)
-                        return indexBeforeOperator;
-                    operands.Add(nextOperand);
-                    operandNodes.Add(nextOperandNode);
-                    i = SkipSpace(exp, i2);
+                    {
+                        var result = GetInfixExpressionSingleLevel(context, level - 1, s_operatorSymols[level - 1], i);
+                        nextOperand = result.Block;
+                        nextOperandNode = result.ParseNode;
+                        i2 = result.NextIndex;
+                    }
 
-                    i2 = GetLiteralMatch(exp, i, symbol);
+                    if (i2 == i)
+                        return new ExpressionBlockResult(prog, parseNode, indexBeforeOperator);
+
+                    operands.Add(nextOperand);
+                    infixComponentNodes.Add(operatorNode);
+                    infixComponentNodes.Add(nextOperandNode);
+                    i = SkipSpace(context, i2).NextIndex;
+                    operatorResult = GetOperator(context, new string[] { symbol }, i);
+                    i2 = operatorResult.NextIndex;
                     if (i2 == i)
                         break;
-                    i = SkipSpace(exp, i2);
+                    
+                    i = SkipSpace(context, i2).NextIndex;
                 }
 
                 if (operands.Count > 1)
                 {
-                    var func = parseContext.Get(symbol);
+                    var func = context.ReferenceProvider.Get(symbol);
                     if (symbol == "|")
                     {
                         if (operands.Count > 2)
                         {
-                            serrors.Add(new SyntaxErrorData(i, 0, "Only two parameters expected for | "));
-                            return i;
+                            context.SyntaxErrors.Add(new SyntaxErrorData(i, 0, "Only two parameters expected for | "));
+                            return new ExpressionBlockResult(prog, parseNode, i);
                         }
 
                         prog = new ListExpression
                         {
                             ValueExpressions = operands.ToArray(),
-                            Pos = prog.Pos,
-                            Length = operands[^1].Pos + operands[^1].Length - prog.Length
+                            CodePos = prog.CodePos,
+                            CodeLength = operands[^1].CodePos + operands[^1].CodeLength - prog.CodePos
                         };
-
-                        parseNode = new ParseNode(ParseNodeType.InfixExpression, parseNode!.Pos,
-                            operandNodes[^1].Pos + operandNodes[^1].Length - parseNode.Length);
+                        prog.SetContext(context.ReferenceProvider);
+                        parseNode = new ParseNode(ParseNodeType.InfixExpression, parseNode.Pos, infixComponentNodes[^1].Pos + infixComponentNodes[^1].Length - parseNode.Pos);
                     }
                     else
                     {
@@ -99,15 +117,19 @@ namespace funcscript.core
                         {
                             Function = new LiteralBlock(func),
                             Parameters = operands.ToArray(),
-                            Pos = prog.Pos,
-                            Length = operands[^1].Pos + operands[^1].Length - prog.Length
+                            CodePos = prog.CodePos,
+                            CodeLength = operands[^1].CodePos + operands[^1].CodeLength - prog.CodeLength
                         };
-                        parseNode = new ParseNode(ParseNodeType.InfixExpression, parseNode!.Pos,
-                            operandNodes[^1].Pos + operandNodes[^1].Length - parseNode.Length);
+                        prog.SetContext(context.ReferenceProvider);
+                        parseNode = new ParseNode(ParseNodeType.InfixExpression,
+                            parseNode.Pos, infixComponentNodes[^1].Pos + infixComponentNodes[^1].Length - parseNode.Pos,
+                            infixComponentNodes
+                            );
                     }
                 }
             }
-            return i;
+
+            return new ExpressionBlockResult(prog, parseNode, i);
         }
     }
 }

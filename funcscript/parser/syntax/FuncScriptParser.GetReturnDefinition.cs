@@ -1,33 +1,37 @@
-
+using funcscript.block;
+using funcscript.funcs.math;
+using funcscript.model;
 namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetReturnDefinition(IFsDataProvider context, String exp, int index, out ExpressionBlock retExp,
-            out ParseNode parseNode, List<SyntaxErrorData> serrors)
+        static ExpressionBlockResult GetReturnDefinition(ParseContext context, int index)
         {
-            parseNode = null;
-            retExp = null;
-            var i = GetLiteralMatch(exp, index, KW_RETURN);
+            ParseNode parseNode = null;
+            ExpressionBlock retExp = null;
+            var i = GetLiteralMatch(context, index, KW_RETURN).NextIndex;
             if (i == index)
-                return index;
+                return new ExpressionBlockResult(null, null, index);
+
             var nodeReturn = new ParseNode(ParseNodeType.KeyWord, index, i - index);
-            i = SkipSpace(exp, i);
-            var i2 = GetExpression(context, exp, i, out var expBlock, out var nodeExpBlock, serrors);
-            if (i2 == i)
+            i = SkipSpace(context, i).NextIndex;
+            
+            var exprResult = GetExpression(context, i);
+            if (exprResult.NextIndex == i)
             {
-                serrors.Add(new SyntaxErrorData(i, 0, "return expression expected"));
-                return index;
+                context.SyntaxErrors.Add(new SyntaxErrorData(i, 0, "return expression expected"));
+                return new ExpressionBlockResult(null, null, index);
             }
 
-            i = i2;
-            retExp = expBlock;
-            retExp.Pos = index;
-            retExp.Length = i - index;
-            parseNode = new ParseNode(ParseNodeType.ExpressionInBrace, index, i - index,
-                new[] { nodeReturn, nodeExpBlock });
+            i = exprResult.NextIndex;
+            retExp = exprResult.Block;
+            retExp.SetContext(context.ReferenceProvider);
+            retExp.CodePos = index;
+            retExp.CodeLength = i - index;
+            parseNode = new ParseNode(ParseNodeType.ReturnExpression, index, i - index,
+                new[] { nodeReturn, exprResult.ParseNode });
 
-            return i;
+            return new ExpressionBlockResult(retExp, parseNode, i);
         }
     }
 }

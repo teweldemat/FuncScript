@@ -1,40 +1,42 @@
 using funcscript.block;
-
 namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetExpInParenthesis(IFsDataProvider infixFuncProvider, String exp, int index,
-            out ExpressionBlock expression, out ParseNode parseNode, List<SyntaxErrorData> serrors)
+        static ExpressionBlockResult GetExpInParenthesis(ParseContext context, int index)
         {
-            parseNode = null;
-            expression = null;
+            ParseNode parseNode = null;
+            ExpressionBlock expBlock = null;
             var i = index;
-            i = SkipSpace(exp, i);
-            var i2 = GetLiteralMatch(exp, i, "(");
+            i = SkipSpace(context, i).NextIndex;
+            var i2 = GetLiteralMatch(context, i, "(").NextIndex;
             if (i == i2)
-                return index;
+                return new ExpressionBlockResult(expBlock, parseNode, index);
             i = i2;
 
-            i = SkipSpace(exp, i);
-            i2 = GetExpression(infixFuncProvider, exp, i, out expression, out var nodeExpression, serrors);
-            if (i2 == i)
-                expression = null;
+            i = SkipSpace(context, i).NextIndex;
+            var expressionResult = GetExpression(context, i);
+            expBlock = expressionResult.Block;
+            var nodeExpression = expressionResult.ParseNode;
+            if (expressionResult.NextIndex == i)
+                expBlock = null;
             else
-                i = i2;
-            i = SkipSpace(exp, i);
-            i2 = GetLiteralMatch(exp, i, ")");
+                i = expressionResult.NextIndex;
+            i = SkipSpace(context, i).NextIndex;
+            i2 = GetLiteralMatch(context, i, ")").NextIndex;
             if (i == i2)
             {
-                serrors.Add(new SyntaxErrorData(i, 0, "')' expected"));
-                return index;
+                context.SyntaxErrors.Add(new SyntaxErrorData(i, 0, "')' expected"));
+                return new ExpressionBlockResult(expBlock, parseNode, index);
             }
 
             i = i2;
-            if (expression == null)
-                expression = new NullExpressionBlock();
+            if (expBlock == null)
+                expBlock = new NullExpressionBlock();
+            expBlock.SetContext(context.ReferenceProvider);
+
             parseNode = new ParseNode(ParseNodeType.ExpressionInBrace, index, i - index, new[] { nodeExpression });
-            return i;
+            return new ExpressionBlockResult(expBlock, parseNode, i);
         }
     }
 }

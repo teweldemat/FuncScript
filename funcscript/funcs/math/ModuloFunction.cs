@@ -1,4 +1,5 @@
 using funcscript.core;
+using funcscript.model;
 
 namespace funcscript.funcs.math
 {
@@ -10,17 +11,17 @@ namespace funcscript.funcs.math
 
         public string Symbol => "%";
 
-        public object Evaluate(IFsDataProvider parent, IParameterList pars)
+        public object EvaluateList(FsList pars)
         {
             bool isInt = false, isLong = false, isDouble = false;
             int intTotal = 1;
             long longTotal = 1;
             double doubleTotal = 1;
-            int count = pars.Count;
+            int count = pars.Length;
 
             if (count > 0)
             {
-                var d = pars.GetParameter(parent, 0);
+                var d = pars[0];
 
                 if (d is int)
                 {
@@ -46,7 +47,7 @@ namespace funcscript.funcs.math
 
             for (int i = 1; i < count; i++)
             {
-                var d = pars.GetParameter(parent, i);
+                var d = pars[i];
 
                 if (isInt)
                 {

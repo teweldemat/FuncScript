@@ -12,14 +12,14 @@ namespace funcscript.funcs.text
 
         public string Symbol => SYMBOL;
 
-        public object Evaluate(IFsDataProvider parent, IParameterList pars)
+        public object EvaluateList(FsList pars)
         {
-            if (pars.Count < 2 || pars.Count > MAX_PARS_COUNT)
+            if (pars.Length < 2 || pars.Length > MAX_PARS_COUNT)
                 throw new funcscript.error.TypeMismatchError($"{this.Symbol}: Two or three parameters expected");
 
-            var par0 = pars.GetParameter(parent, 0);
-            var par1 = pars.GetParameter(parent, 1);
-            var par2 = pars.GetParameter(parent, 2);
+            var par0 = pars[0];
+            var par1 = pars[1];
+            var par2 = pars.Length > 2 ? pars[2] : null;
 
             if (par0 == null || par1 == null)
                 throw new funcscript.error.TypeMismatchError($"{this.Symbol}: Two strings and optionally an index expected as parameters");
@@ -28,10 +28,16 @@ namespace funcscript.funcs.text
                 return new FsError(FsError.ERROR_TYPE_MISMATCH, $"{this.Symbol}: first parameter should be string");
             if (!(par1 is string search))
                 return new FsError(FsError.ERROR_TYPE_MISMATCH, $"{this.Symbol}: second parameter should be string");
-            if (!(par2 is int startIndex))
-                startIndex = 0;
+
+            int startIndex = 0;
+            if (par2 != null && !(par2 is int))
+                return new FsError(FsError.ERROR_TYPE_MISMATCH, $"{this.Symbol}: third parameter should be an integer");
+            if (par2 != null)
+                startIndex = (int)par2;
+
             if (startIndex < 0 || startIndex >= text.Length)
                 return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"{this.Symbol}: index is out of range");
+
             return text.IndexOf(search, startIndex);
         }
 

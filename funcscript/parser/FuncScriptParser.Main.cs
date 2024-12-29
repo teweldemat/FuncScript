@@ -1,5 +1,7 @@
+using funcscript.block;
 using funcscript.funcs.math;
 using funcscript.funcs.logic;
+using funcscript.model;
 
 namespace funcscript.core
 {
@@ -18,7 +20,7 @@ namespace funcscript.core
             LiteralDouble,
             LiteralLong,
             Identifier,
-            IdentiferList,
+            IdentifierList,
             Operator,
             LambdaExpression,
             ExpressionInBrace,
@@ -29,20 +31,16 @@ namespace funcscript.core
             List,
             Key,
             Case,
-            DataConnection,
-            NormalErrorSink,
-            SigSequence,
-            ErrorKeyWord,
-            SignalConnection,
             GeneralInfixExpression,
-            PrefixOperatorExpression
+            PrefixOperatorExpression,
+            ReturnExpression
         }
 
         public class SyntaxErrorData
         {
             public int Loc;
             public int Length;
-            public String Message;
+            public string Message;
 
             public SyntaxErrorData(int loc, int length, string message)
             {
@@ -57,19 +55,19 @@ namespace funcscript.core
             public ParseNodeType NodeType;
             public int Pos;
             public int Length;
-            public IList<ParseNode> Childs;
+            public IList<ParseNode> Children;
 
             public ParseNode(ParseNodeType type, int pos, int length)
                 : this(type, pos, length, Array.Empty<ParseNode>())
             {
             }
 
-            public ParseNode(ParseNodeType nodeType, int pos, int length, IList<ParseNode> childs)
+            public ParseNode(ParseNodeType nodeType, int pos, int length, IList<ParseNode> children)
             {
                 NodeType = nodeType;
                 Pos = pos;
                 Length = length;
-                Childs = childs;
+                Children = children;
             }
         }
 
@@ -104,6 +102,8 @@ namespace funcscript.core
             s_KeyWords.Add(KW_SWITCH);
         }
 
-        record ParseResult(ExpressionBlock Expresion, ParseNode Node, int NextIndex);
+        public record ParseResult(ParseNode ParseNode, int NextIndex);
+        public record ExpressionBlockResult(ExpressionBlock Block, ParseNode ParseNode, int NextIndex):ParseResult(ParseNode,NextIndex);
+        public record ParseContext(KeyValueCollection ReferenceProvider, string Expression, List<SyntaxErrorData> SyntaxErrors);
     }
 }

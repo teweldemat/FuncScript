@@ -11,19 +11,19 @@ namespace funcscript.funcs.list
 
         public string Symbol => "Series";
 
-        public object Evaluate(IFsDataProvider parent, IParameterList pars)
+        public object EvaluateList(FsList pars)
         {
-            if (pars.Count < 2 || pars.Count > MaxParameters)
+            if (pars.Length < 2 || pars.Length > MaxParameters)
                 throw new error.TypeMismatchError($"{this.Symbol}: Two parameters expected");
 
-            var par0 = pars.GetParameter(parent, 0);
+            var par0 = pars[0];
 
             if (!(par0 is int))
                 throw new error.TypeMismatchError($"{this.Symbol}: {ParName(0)} must be an integer");
 
             int start = (int)par0;
 
-            var par1 = pars.GetParameter(parent, 1);
+            var par1 = pars[1];
 
             if (!(par1 is int))
                 throw new error.TypeMismatchError($"{this.Symbol}: {ParName(1)} must be an integer");

@@ -11,13 +11,13 @@ namespace funcscript.funcs.list
 
         public string Symbol => "Any";
 
-        public object Evaluate(IFsDataProvider parent, IParameterList pars)
+        public object EvaluateList(FsList pars)
         {
-            if (pars.Count != MaxParameters)
-                throw new error.EvaluationTimeException($"{this.Symbol} function: Invalid parameter count. Expected {MaxParameters}, but got {pars.Count}");
+            if (pars.Length != MaxParameters)
+                throw new error.EvaluationTimeException($"{this.Symbol} function: Invalid parameter count. Expected {MaxParameters}, but got {pars.Length}");
 
-            var par0 = pars.GetParameter(parent, 0);
-            var par1 = pars.GetParameter(parent, 1);
+            var par0 = pars[0];
+            var par1 = pars[1];
 
             if (par0 == null)
                 return false;
@@ -32,7 +32,7 @@ namespace funcscript.funcs.list
 
             for (int i = 0; i < lst.Length; i++)
             {
-                var result = func.Evaluate(parent, new ParameterList { X = lst[i], I = i });
+                var result = func.EvaluateList(new ArrayFsList( new object[] { lst[i], i }));
 
                 if (result is bool && (bool)result)
                     return true;
@@ -49,24 +49,6 @@ namespace funcscript.funcs.list
                 1 => "Filter Function",
                 _ => ""
             };
-        }
-
-        private class ParameterList : IParameterList
-        {
-            public object X;
-            public object I;
-
-            public override int Count => 2;
-
-            public override (object, CodeLocation) GetParameterWithLocation(IFsDataProvider provider, int index)
-            {
-                return index switch
-                {
-                    0 => (X, null),
-                    1 => (I, null),
-                    _ => (null, null)
-                };
-            }
         }
     }
 }

@@ -1,16 +1,17 @@
 using System.Text.RegularExpressions;
 using funcscript;
 using funcscript.core;
+using funcscript.model;
 
 namespace fsstudio.server.fileSystem.exec;
 
-public class ExecutionSession : IFsDataProvider
+public class ExecutionSession : KeyValueCollection
 {
     List<ExecutionNode> _nodes;
-    private IFsDataProvider _provider;
+    private KeyValueCollection _context;
     readonly string fileName;
     public Guid SessionId { get; private set; } = Guid.NewGuid();
-    public IFsDataProvider ParentProvider => _provider;
+    public KeyValueCollection ParentContext => _context;
 
    
 
@@ -29,7 +30,7 @@ public class ExecutionSession : IFsDataProvider
         _nodes =nodes.ToList() ;
         foreach(var n in _nodes)
             n.SetParent(this);
-        this._provider = new DefaultFsDataProvider();
+        this._context = new DefaultFsDataProvider();
     }
     public ExecutionSession(IEnumerable<ExecutionNode> nodes,RemoteLogger logger)
     {
@@ -205,7 +206,7 @@ public class ExecutionSession : IFsDataProvider
     {
         var n = _nodes.FirstOrDefault(c => c.NameLower == name);
         if (n == null)
-            return _provider.Get(name);
+            return _context.Get(name);
         return n.Evaluate(this);
     }
     public bool IsDefined(string name)
@@ -213,17 +214,66 @@ public class ExecutionSession : IFsDataProvider
         var n = _nodes.FirstOrDefault(c => c.NameLower == name);
         if (n != null)
             return true;
-        return _provider.IsDefined(name);
+        return _context.IsDefined(name);
     }
 
-    
+
+    public IList<string> GetAllKeys()
+    {
+        return this._nodes.Select(x => x.Name).ToList();
+    }
+
+
     public object EvaluateNode(string nodePath)
     {
         var segments = nodePath.Split('.');
         var parentNodePath = string.Join(".", segments.Take(segments.Length - 1));
-        var provider = (segments.Length > 1) ? (IFsDataProvider)FindNodeByPath(parentNodePath)! : this;
+        var provider = (segments.Length > 1) ? (KeyValueCollection)FindNodeByPath(parentNodePath)! : this;
         var res=provider.Get(segments.Last());
         return res;
     }
 
+    public void MoveNode(string modelNodePath, string? modelNewParentPath)
+    {
+        // Find the node to move
+        var node = FindNodeByPath(modelNodePath);
+        if (node == null)
+            throw new InvalidOperationException($"Node {modelNodePath} not found");
+
+        // Find current parent and remove node from the parent's collection
+        var segments = modelNodePath.Split('.');
+        var currentParentPath = string.Join(".", segments.Take(segments.Length - 1));
+        var currentParent = segments.Length == 1 ? null : FindNodeByPath(currentParentPath);
+        var currentChildrenList = currentParent == null ? _nodes : currentParent.Children;
+        currentChildrenList.Remove(node);
+
+        // Find new parent if provided
+        var newParent = modelNewParentPath == null ? null : FindNodeByPath(modelNewParentPath);
+        if (modelNewParentPath != null && newParent == null)
+            throw new InvalidOperationException($"New parent {modelNewParentPath} not found");
+
+        // Check duplicate name under new parent
+        var newChildrenList = newParent == null ? _nodes : newParent.Children;
+        if (newChildrenList.Any(n => n.NameLower == node.NameLower))
+            throw new InvalidOperationException($"Node named {node.Name} already exists under {modelNewParentPath ?? "root"}");
+
+        // Convert new parent to a container node if it isn't one yet
+        if (newParent != null && !string.IsNullOrEmpty(newParent.Expression))
+        {
+            var backupChild = new ExecutionNode
+            {
+                Name = $"{newParent.Name}_backup",
+                Expression = newParent.Expression,
+                ExpressionType = newParent.ExpressionType
+            };
+            newParent.Children.Add(backupChild);
+            newParent.ExpressionType = ExpressionType.FsStudioParentNode;
+            newParent.Expression = null;
+        }
+
+        // Attach node under new parent
+        node.SetParent(newParent == null ? this : newParent);
+        newChildrenList.Add(node);
+        UpdateFile();
+    }
 }

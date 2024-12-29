@@ -1,41 +1,57 @@
 using funcscript.block;
-
+using funcscript.model;
 namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetKeyValuePair(IFsDataProvider context, string exp, int index,
-            out KvcExpression.KeyValueExpression keyValue, out ParseNode parseNode, List<SyntaxErrorData> serrors)
+
+        record GetKeyValuePairResult(KvcExpression.KeyValueExpression KeyValue, ParseNode ParseNode, int NextIndex)
+            :ParseResult(ParseNode,NextIndex);
+
+        static GetKeyValuePairResult GetKeyValuePair(ParseContext context, int index)
         {
-            parseNode = null;
-            keyValue = null;
+            ParseNode parseNode = null;
+            KvcExpression.KeyValueExpression keyValue = null;
             string name;
-            var i = GetSimpleString(exp, index, out name, out var nodeNeme, new List<SyntaxErrorData>());
+            string nameLower;
+            ( name,var nodeNeme,var i) = GetSimpleString(context, index);
             if (i == index)
             {
-                i = GetIdentifier(exp, index, out name, out var nameLower, out nodeNeme);
+                (name,nameLower,_,nodeNeme,i) = GetIdentifier(context, index, false);
                 if (i == index)
-                    return index;
+                    return new GetKeyValuePairResult(null, null, index);
             }
+            else
+                nameLower = name.ToLower();
+            
+            i = SkipSpace(context, i).NextIndex;
 
-            i = SkipSpace(exp, i);
-
-            var i2 = GetLiteralMatch(exp, i, ":");
-            if (i2 == i)
-                return index;
-
-            i = i2;
-
-            i = SkipSpace(exp, i);
-            i2 = GetExpression(context, exp, i, out var expBlock, out var nodeExpBlock, serrors);
+            var i2 = GetLiteralMatch(context, i, ":").NextIndex;
             if (i2 == i)
             {
-                serrors.Add(new SyntaxErrorData(i, 0, "value expression expected"));
-                return index;
+                keyValue = new KvcExpression.KeyValueExpression
+                {
+                    Key = name,
+                    KeyLower = nameLower,
+                    ValueExpression = new ReferenceBlock(name, nameLower, true)
+                };
+                nodeNeme.NodeType = ParseNodeType.Key;
+                parseNode = new ParseNode(ParseNodeType.KeyValuePair, index, i - index, new[] { nodeNeme });
+                return new GetKeyValuePairResult(keyValue, parseNode, i);
             }
 
             i = i2;
-            i = SkipSpace(exp, i);
+
+            i = SkipSpace(context, i).NextIndex;
+            (var expBlock,var nodeExpBlock,i2) = GetExpression(context, i);
+            if (i2 == i)
+            {
+                context.SyntaxErrors.Add(new SyntaxErrorData(i, 0, "value expression expected"));
+                return new GetKeyValuePairResult(null, null, index);
+            }
+
+            i = i2;
+            i = SkipSpace(context, i).NextIndex;
             keyValue = new KvcExpression.KeyValueExpression
             {
                 Key = name,
@@ -43,7 +59,7 @@ namespace funcscript.core
             };
             nodeNeme.NodeType = ParseNodeType.Key;
             parseNode = new ParseNode(ParseNodeType.KeyValuePair, index, i - index, new[] { nodeNeme, nodeExpBlock });
-            return i;
+            return new GetKeyValuePairResult(keyValue, parseNode, i);
         }
     }
 }

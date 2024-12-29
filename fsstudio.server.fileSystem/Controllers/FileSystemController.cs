@@ -71,6 +71,23 @@ public class FileSystemController : ControllerBase
         }
         return Created(fullPath, $"File '{model.Name}.fsp' created successfully.");
     }
+    
+    [HttpPost("DuplicateFile")]
+    public IActionResult DuplicateFile([FromBody] FileOperationModel model)
+    {
+        string sourceFullPath = Program.GetAbsolutePath(_rootPath, Path.Combine(model.Path)) + ".fsp";
+        if (!System.IO.File.Exists(sourceFullPath))
+            return NotFound($"Source file ‘{model.Path}.fsp’ not found.");
+            
+        string directory = System.IO.Path.GetDirectoryName(sourceFullPath)!;
+        string targetFullPath = Path.Combine(directory, model.Name + ".fsp");
+        if (System.IO.File.Exists(targetFullPath))
+            return Conflict($"File '{model.Name}.fsp' already exists in the target folder.");
+
+        System.IO.File.Copy(sourceFullPath, targetFullPath);
+        return Created(targetFullPath, $"File duplicated as '{model.Name}.fsp' successfully.");
+    }
+
     // DELETE: api/FileSystem/DeleteFile
     [HttpDelete("DeleteItem")]
     public IActionResult DeleteItem(string path)

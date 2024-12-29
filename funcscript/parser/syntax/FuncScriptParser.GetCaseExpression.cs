@@ -1,79 +1,81 @@
 using funcscript.block;
+using funcscript.model;
 
 namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetCaseExpression(IFsDataProvider context, String exp, int index, out ExpressionBlock prog,
-            out ParseNode parseNode, List<SyntaxErrorData> serrors)
+        static ExpressionBlockResult GetCaseExpression(ParseContext context, int index)
         {
-            prog = null;
-            parseNode = null;
+            ExpressionBlock expBlock = null;
+            ParseNode parseNode = null;
             var i = index;
-            var i2 = GetLiteralMatch(exp, i, KW_CASE);
-            if (i2 == i)
-                return index;
-            i = SkipSpace(exp, i2);
+            var literalMatchResult = GetLiteralMatch(context, i,  KW_CASE);
+            if (literalMatchResult.NextIndex == i)
+                return new ExpressionBlockResult(null, null, index);
+            
+            i = SkipSpace(context, literalMatchResult.NextIndex).NextIndex;
             var pars = new List<ExpressionBlock>();
             var childNodes = new List<ParseNode>();
             do
             {
                 if (pars.Count == 0)
                 {
-                    i2 = GetExpression(context, exp, i, out var part1, out var part1Node, serrors);
-                    if (i2 == i)
+                    var expressionResult = GetExpression(context, i);
+                    if (expressionResult.NextIndex == i)
                     {
-                        serrors.Add(new SyntaxErrorData(i, 1, "Case condition expected"));
-                        return index;
+                        context.SyntaxErrors.Add(new SyntaxErrorData(i, 1, "Case condition expected"));
+                        return new ExpressionBlockResult(null, null, index);
                     }
 
-                    pars.Add(part1);
-                    childNodes.Add(part1Node);
-                    i = SkipSpace(exp, i2);
+                    pars.Add(expressionResult.Block);
+                    childNodes.Add(expressionResult.ParseNode);
+                    i = SkipSpace(context, expressionResult.NextIndex).NextIndex;
                 }
                 else
                 {
-                    i2 = GetLiteralMatch(exp, i, ",", ";");
-                    if (i2 == i)
+                    literalMatchResult = GetLiteralMatchMultiple(context, i,new [] {",", ";"});
+                    if (literalMatchResult.NextIndex == i)
                         break;
-                    i = SkipSpace(exp, i2);
-                    i2 = GetExpression(context, exp, i, out var part1, out var part1Node, serrors);
-                    if (i2 == i)
+                    i = SkipSpace(context, literalMatchResult.NextIndex).NextIndex;
+                    var expressionResult = GetExpression(context, i);
+                    if (expressionResult.NextIndex == i)
                         break;
-                    pars.Add(part1);
-                    childNodes.Add(part1Node);
-                    i = SkipSpace(exp, i2);
+                    pars.Add(expressionResult.Block);
+                    childNodes.Add(expressionResult.ParseNode);
+                    i = SkipSpace(context, expressionResult.NextIndex).NextIndex;
                 }
 
-                i2 = GetLiteralMatch(exp, i, ":");
-                if (i2 == i)
+                literalMatchResult = GetLiteralMatch(context, i, ":");
+                if (literalMatchResult.NextIndex == i)
                 {
                     break;
                 }
 
-                i = SkipSpace(exp, i2);
-                i2 = GetExpression(context, exp, i, out var part2, out var part2Node, serrors);
-                if (i2 == i)
+                i = SkipSpace(context, literalMatchResult.NextIndex).NextIndex;
+                var valueExpressionResult = GetExpression(context, i);
+                if (valueExpressionResult.NextIndex == i)
                 {
-                    serrors.Add(new SyntaxErrorData(i, 1, "Case value expected"));
-                    return index;
+                    context.SyntaxErrors.Add(new SyntaxErrorData(i, 1, "Case value expected"));
+                    return new ExpressionBlockResult(null, null, index);
                 }
 
-                pars.Add(part2);
-                childNodes.Add(part2Node);
-                i = SkipSpace(exp, i2);
+                pars.Add(valueExpressionResult.Block);
+                childNodes.Add(valueExpressionResult.ParseNode);
+                i = SkipSpace(context, valueExpressionResult.NextIndex).NextIndex;
             } while (true);
 
-            prog = new FunctionCallExpression
+            expBlock = new FunctionCallExpression
             {
-                Function = new LiteralBlock(context.Get(KW_CASE)),
-                Pos = index,
-                Length = i - index,
+                Function = new LiteralBlock(context.ReferenceProvider.Get(KW_CASE)),
+                CodePos = index,
+                CodeLength = i - index,
                 Parameters = pars.ToArray(),
             };
-            parseNode = new ParseNode(ParseNodeType.Case, index, index - i);
-            parseNode.Childs = childNodes;
-            return i;
+            expBlock.SetContext(context.ReferenceProvider);
+            parseNode = new ParseNode(ParseNodeType.Case, index, i - index);
+            parseNode.Children = childNodes;
+            return new ExpressionBlockResult(expBlock, parseNode, i);
         }
     }
 }

@@ -11,13 +11,13 @@ namespace funcscript.funcs.text
         public CallType CallType => CallType.Prefix;
         public string Symbol => "format";
 
-        public object Evaluate(IFsDataProvider parent, IParameterList pars)
+        public object EvaluateList(FsList pars)
         {
-            if (pars.Count < 1)
+            if (pars.Length < 1)
                 throw new error.EvaluationTimeException($"{this.Symbol} requires at least one parameter.");
 
-            var par0 = pars.GetParameter(parent, 0);
-            var par1 = pars.GetParameter(parent, 1);
+            var par0 = pars[0];
+            var par1 = pars.Length > 1 ? pars[1] : null;
 
             string format = par1 as string;
             var sb = new StringBuilder();

@@ -11,23 +11,24 @@ namespace funcscript.funcs.math
 
         public string Symbol => "-";
 
-        public object Evaluate(IFsDataProvider parent, IParameterList pars)
+        public object EvaluateList(FsList pars)
         {
-            var ret = EvaluateInternal(pars, (i) =>
+            var ret = EvaluateInternal(pars, (i) => 
             {
-                var ret = pars.GetParameter(parent, i);
+                if (i >= pars.Length) return (false, null);
+                var ret = pars[i];
                 return (true, ret);
             });
             return ret;
         }
 
-        object EvaluateInternal(IParameterList pars, Func<int, (bool, object)> getPar)
+        object EvaluateInternal(FsList pars, Func<int, (bool, object)> getPar)
         {
             bool isInt = false, isLong = false, isDouble = false;
             int intTotal = 0;
             long longTotal = 0;
             double doubleTotal = 0;
-            int count = pars.Count;
+            int count = pars.Length;
 
             if (count > 0)
             {
@@ -81,7 +82,6 @@ namespace funcscript.funcs.math
                         doubleTotal -= (double)d;
                     }
                 }
-
                 else if (isLong)
                 {
                     if (d is int)
@@ -100,7 +100,6 @@ namespace funcscript.funcs.math
                         doubleTotal -= (double)d;
                     }
                 }
-
                 else if (isDouble)
                 {
                     if (d is int)

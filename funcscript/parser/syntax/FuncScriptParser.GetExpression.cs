@@ -1,23 +1,15 @@
-
+using funcscript.model;
 namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static int GetExpression(IFsDataProvider parseContext, String exp, int index, out ExpressionBlock prog,
-            out ParseNode parseNode, List<SyntaxErrorData> serrors)
+        static ExpressionBlockResult GetExpression(ParseContext context, int index)
         {
-            // var i = GetInfixFunctionCall(parseContext, exp, index, out prog, out parseNode, serrors);
-            // if (i > index)
-            //     return i;
+            var result = GetInfixExpression(context, index);
+            if (result.NextIndex > index)
+                return result;
 
-            var i = GetInfixExpression(parseContext, exp, index, out prog, out parseNode, serrors);
-            if (i > index)
-                return i;
-
-            return index;
+            return new ExpressionBlockResult(null, null, index);
         }
-
-        // Other methods like GetInfixFunctionCall, GetInfixExpression, etc., required by GetExpression
-        // should also be included in this partial class or another partial class as needed.
     }
 }
