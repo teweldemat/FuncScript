@@ -233,4 +233,47 @@ public class ExecutionSession : KeyValueCollection
         return res;
     }
 
+    public void MoveNode(string modelNodePath, string? modelNewParentPath)
+    {
+        // Find the node to move
+        var node = FindNodeByPath(modelNodePath);
+        if (node == null)
+            throw new InvalidOperationException($"Node {modelNodePath} not found");
+
+        // Find current parent and remove node from the parent's collection
+        var segments = modelNodePath.Split('.');
+        var currentParentPath = string.Join(".", segments.Take(segments.Length - 1));
+        var currentParent = segments.Length == 1 ? null : FindNodeByPath(currentParentPath);
+        var currentChildrenList = currentParent == null ? _nodes : currentParent.Children;
+        currentChildrenList.Remove(node);
+
+        // Find new parent if provided
+        var newParent = modelNewParentPath == null ? null : FindNodeByPath(modelNewParentPath);
+        if (modelNewParentPath != null && newParent == null)
+            throw new InvalidOperationException($"New parent {modelNewParentPath} not found");
+
+        // Check duplicate name under new parent
+        var newChildrenList = newParent == null ? _nodes : newParent.Children;
+        if (newChildrenList.Any(n => n.NameLower == node.NameLower))
+            throw new InvalidOperationException($"Node named {node.Name} already exists under {modelNewParentPath ?? "root"}");
+
+        // Convert new parent to a container node if it isn't one yet
+        if (newParent != null && !string.IsNullOrEmpty(newParent.Expression))
+        {
+            var backupChild = new ExecutionNode
+            {
+                Name = $"{newParent.Name}_backup",
+                Expression = newParent.Expression,
+                ExpressionType = newParent.ExpressionType
+            };
+            newParent.Children.Add(backupChild);
+            newParent.ExpressionType = ExpressionType.FsStudioParentNode;
+            newParent.Expression = null;
+        }
+
+        // Attach node under new parent
+        node.SetParent(newParent == null ? this : newParent);
+        newChildrenList.Add(node);
+        UpdateFile();
+    }
 }

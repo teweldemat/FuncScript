@@ -6,11 +6,12 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import ClearAllIcon from '@mui/icons-material/ClearAll';
 import axios from 'axios';
 
-import EvalNodeComponent, { ExpressionType } from './EvalNodeComponent';
 import TextLogger from './RemoteLogger';
 import ReactMarkdown from 'react-markdown';
 import { SERVER_URL, SERVER_WS_URL } from '../backend';
 import CodeEditor from '../code-editor/CodeEditor';
+import { EvalNodProvider, ExpressionType } from './EvalNodProvider';
+import { EvalNodeTree } from './EvalNodeTree'; // <-- Use the new component
 
 interface ErrorItem {
   type: string;
@@ -310,18 +311,21 @@ StackTrace: ${error.stackTrace || 'N/A'}
       </Grid>
       <Grid item xs={4} style={{ display: 'flex', flexDirection: 'column' }}>
         {sessionId && (
-          <EvalNodeComponent
-            node={{
-              name: 'Root Node',
-              expressionType: ExpressionType.FuncScript,
-              childrenCount: 0,
-              expression: null,
-            }}
-            sessionId={sessionId}
-            onSelect={handleNodeSelect}
-            onModify={() => {}}
-            selectedNode={selectedNode}
-          />
+          <EvalNodProvider>
+            <EvalNodeTree
+              rootNode={{
+                // Minimal root node config
+                name: 'Root Node',
+                path: null,
+                expression: null,
+                expressionType: ExpressionType.FuncScript,
+                childrenCount: 0,
+              }}
+              sessionId={sessionId}
+              onSelect={handleNodeSelect}
+              selectedNode={selectedNode}
+            />
+          </EvalNodProvider>
         )}
       </Grid>
     </Grid>

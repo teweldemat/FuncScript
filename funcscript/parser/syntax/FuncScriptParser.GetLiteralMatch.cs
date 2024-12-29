@@ -8,11 +8,11 @@ namespace funcscript.core
     {
 
         public record GetLiteralMatchResult(string Matched, int NextIndex);
-        static GetLiteralMatchResult GetLiteralMatch(ParseContext context, int index, params string[] provider)
+        static GetLiteralMatchResult GetLiteralMatch(ParseContext context, int index, params string[] candidates)
         {
-            return GetLiteralMatch(context.Expression, index, provider);
+            return GetLiteralMatch(context.Expression, index, candidates);
         }
-        public static GetLiteralMatchResult GetLiteralMatch(String expression, int index, params string[] provider)
+        public static GetLiteralMatchResult GetLiteralMatch(String expression, int index, params string[] candidates)
         {
             if (expression == null)
             {
@@ -20,7 +20,7 @@ namespace funcscript.core
             }
 
             string matched = null;
-            foreach (var k in provider)
+            foreach (var k in candidates)
             {
                 bool matchFound = true;
                 if (index + k.Length <= expression.Length)
