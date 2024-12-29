@@ -1,0 +1,113 @@
+/* Syntax highlighting styles for FuncScript */
+
+/* General styles */
+.cm-keyword {
+  color: #007bff; /* Blue for keywords */
+  font-weight: bold;
+}
+
+.cm-literalstring {
+  color: #d63384; /* Pink for strings */
+}
+
+.cm-literalinteger {
+  color: #28a745; /* Green for integers */
+}
+
+.cm-literaldouble {
+  color: #20c997; /* Light green for doubles */
+}
+
+.cm-literallong {
+  color: #17a2b8; /* Cyan for long literals */
+}
+
+.cm-identifier {
+  color: #6c757d; /* Gray for identifiers */
+}
+
+.cm-functioncall {
+  color: #ffc107; /* Amber for function calls */
+}
+
+.cm-functionparameterlist {
+  color: #fd7e14; /* Orange for function parameter lists */
+}
+
+.cm-memberaccess {
+  color: #6610f2; /* Purple for member access */
+}
+
+.cm-operator {
+  color: #e83e8c; /* Pink for operators */
+  font-weight: bold;
+}
+
+.cm-comment {
+  color: #6c757d; /* Gray for comments */
+  font-style: italic;
+}
+
+.cm-keyvaluepair {
+  color: #28a745; /* Green for key-value pairs */
+}
+
+.cm-keyvaluecollection {
+  color: #20c997; /* Light green for key-value collections */
+}
+
+.cm-lambdaexpression {
+  color: #17a2b8; /* Cyan for lambda expressions */
+}
+
+.cm-expressioninbrace {
+  color: #ffc107; /* Amber for expressions inside braces */
+}
+
+.cm-stringtemplate {
+  color: #d63384; /* Pink for string templates */
+}
+
+.cm-case {
+  color: #007bff; /* Blue for case keywords */
+  font-weight: bold;
+}
+
+.cm-prefixoperatorexpression {
+  color: #e83e8c; /* Pink for prefix operator expressions */
+}
+
+.cm-returnexpression {
+  color: #007bff; /* Blue for return expressions */
+  font-weight: bold;
+}
+
+/* Additional styles for better visibility */
+.cm-selection {
+  background-color: #d9edf7; /* Light blue background for selections */
+}
+
+.cm-generalinfixexpression {
+  color: #6f42c1; /* Purple for general infix expressions */
+}
+
+.cm-key {
+  color: #0056b3; /* Dark blue for keys */
+}
+
+/* Style for the CodeMirror editor */
+.CodeMirror {
+  font-family: 'Fira Code', monospace;
+  font-size: 14px;
+  background: #f8f9fa; /* Light gray background */
+  color: #212529; /* Dark gray text */
+  line-height: 1.5;
+  padding: 10px;
+  border: 1px solid #ced4da; /* Light border */
+  border-radius: 4px;
+}
+
+.CodeMirror-focused {
+  outline: none; /* Remove focus outline */
+  border-color: #007bff; /* Blue border when focused */
+}
