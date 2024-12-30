@@ -1,4 +1,3 @@
-// ExecutionView.tsx
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Grid, Typography, Tab, Tabs, Box, IconButton } from '@mui/material';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
@@ -277,43 +276,62 @@ StackTrace: ${error.stackTrace || 'N/A'}
           </Box>
         </Grid>
         <Grid item sx={{ flex: 1, overflow: 'auto' }}>
-          {tabIndex === 0 && (
-            <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-              <CodeEditor
-                key={selectedNode || 'no-node'}
-                expression={expression}
-                setExpression={(value) => setExpression(value)}
-                expressionType={selectedExpressionType}
-              />
-            </Box>
-          )}
-          {tabIndex === 1 && (
-            <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'auto' }}>
-              <pre
-                style={{
-                  whiteSpace: 'pre-wrap',
-                  wordWrap: 'break-word',
-                  overflowWrap: 'break-word',
-                  border: '1px solid #ccc',
-                  padding: '10px',
-                  fontFamily: '"Lucida Console", monospace',
-                  flex: 1,
-                }}
-              >
-                {resultText}
-              </pre>
-            </Box>
-          )}
-          {tabIndex === 2 && (
-            <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'auto' }}>
-              <TextLogger messages={messages} />
-            </Box>
-          )}
-          {tabIndex === 3 && (
-            <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'auto' }}>
-              <ReactMarkdown>{markdown}</ReactMarkdown>
-            </Box>
-          )}
+          <Box
+            sx={{
+              display: tabIndex === 0 ? 'flex' : 'none',
+              flexDirection: 'column',
+              height: '100%',
+            }}
+          >
+            <CodeEditor
+              key={selectedNode || 'no-node'}
+              expression={expression}
+              setExpression={(value) => setExpression(value)}
+              expressionType={selectedExpressionType}
+            />
+          </Box>
+          <Box
+            sx={{
+              display: tabIndex === 1 ? 'flex' : 'none',
+              flexDirection: 'column',
+              height: '100%',
+              overflow: 'auto',
+            }}
+          >
+            <pre
+              style={{
+                whiteSpace: 'pre-wrap',
+                wordWrap: 'break-word',
+                overflowWrap: 'break-word',
+                border: '1px solid #ccc',
+                padding: '10px',
+                fontFamily: '"Lucida Console", monospace',
+                flex: 1,
+              }}
+            >
+              {resultText}
+            </pre>
+          </Box>
+          <Box
+            sx={{
+              display: tabIndex === 2 ? 'flex' : 'none',
+              flexDirection: 'column',
+              height: '100%',
+              overflow: 'auto',
+            }}
+          >
+            <TextLogger messages={messages} />
+          </Box>
+          <Box
+            sx={{
+              display: tabIndex === 3 ? 'flex' : 'none',
+              flexDirection: 'column',
+              height: '100%',
+              overflow: 'auto',
+            }}
+          >
+            <ReactMarkdown>{markdown}</ReactMarkdown>
+          </Box>
         </Grid>
       </Grid>
 
