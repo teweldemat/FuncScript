@@ -31,7 +31,6 @@ namespace funcscript.core
             List,
             Key,
             Case,
-            GeneralInfixExpression,
             PrefixOperatorExpression,
             ReturnExpression
         }

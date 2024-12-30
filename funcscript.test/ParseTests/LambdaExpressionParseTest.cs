@@ -16,7 +16,7 @@ public void MapLambdaExpressionParsedCorrectly()
     var (exp, parseNode, _) = FuncScriptParser.Parse(context);
 
     Assert.IsNotNull(parseNode);
-    Assert.AreEqual(FuncScriptParser.ParseNodeType.GeneralInfixExpression, parseNode.NodeType);
+    Assert.AreEqual(FuncScriptParser.ParseNodeType.InfixExpression, parseNode.NodeType);
 
     Assert.AreEqual(3, parseNode.Children.Count);
 

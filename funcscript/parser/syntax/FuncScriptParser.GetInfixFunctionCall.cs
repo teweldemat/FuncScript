@@ -78,7 +78,7 @@ namespace funcscript.core
                 Parameters = allOperands.ToArray()
             };
             prog.SetContext(context.ReferenceProvider);
-            parseNode = new ParseNode(ParseNodeType.GeneralInfixExpression, childNodes[0].Pos,
+            parseNode = new ParseNode(ParseNodeType.InfixExpression, childNodes[0].Pos,
                 childNodes[^1].Pos + childNodes[^1].Length + childNodes[0].Pos,childNodes);
 
             return new ExpressionBlockResult(prog, parseNode, i);

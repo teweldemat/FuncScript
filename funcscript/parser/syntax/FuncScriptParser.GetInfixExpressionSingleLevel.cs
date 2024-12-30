@@ -87,7 +87,7 @@ namespace funcscript.core
                     i2 = operatorResult.NextIndex;
                     if (i2 == i)
                         break;
-                    
+                    operatorNode = operatorResult.ParseNode;
                     i = SkipSpace(context, i2).NextIndex;
                 }
 
