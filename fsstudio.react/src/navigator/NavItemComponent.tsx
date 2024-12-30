@@ -97,6 +97,9 @@ const NavItemComponent: React.FC<NavItemComponentProps> = ({ item, onSelect, sel
     const handleMenuAction = (action: string) => {
         handleCloseMenu();
         switch (action) {
+            case 'open-folder':
+                window.location.href = '/open-folder-dialog';
+                break;          
             case 'add-file':
             case 'add-folder':
                 setNewInputMode(true);
@@ -187,9 +190,11 @@ const NavItemComponent: React.FC<NavItemComponentProps> = ({ item, onSelect, sel
 
     const isRoot = item.path === "/";
     const menuOptions = item.isFolder
-        ? (isRoot ? ['Add Folder', 'Add File'] : ['Add Folder', 'Add File', 'Rename', 'Delete'])
-        : ['Rename', 'Duplicate', 'Delete'];
-
+      ? isRoot
+        ? ['Open Folder', 'Add Folder', 'Add File']
+        : ['Add Folder', 'Add File', 'Rename', 'Delete']
+      : ['Rename', 'Duplicate', 'Delete'];
+    
     return (
         <>
             <ListItem

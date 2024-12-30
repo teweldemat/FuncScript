@@ -1,0 +1,20 @@
+using System.Collections.Generic;
+using funcscript.core;
+using NUnit.Framework;
+
+namespace funcscript.test.Bugs;
+
+public class TenPartsTemplateBug
+{
+    [Test]
+    public void TestStringLiteral()
+    {
+        const string expStr ="f\"1{'2'}3{'4'}5{'6'}7{'8'}9{'A'}B\"";
+        var errors = new List<FuncScriptParser.SyntaxErrorData>();
+        var context = new FuncScriptParser.ParseContext(new DefaultFsDataProvider(), expStr, errors);
+        var (exp, node, _) = FuncScriptParser.Parse(context);
+        var res = exp.Evaluate();
+        Assert.That(res, Is.EqualTo("123456789AB"));
+    }
+
+}

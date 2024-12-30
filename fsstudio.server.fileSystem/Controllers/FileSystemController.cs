@@ -1,4 +1,3 @@
-// FileSystemController.cs
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -11,6 +10,11 @@ namespace fsstudio.server.fileSystem
     {
         public string Path { get; set; } = "";
         public string Name { get; set; } = "";
+    }
+
+    public class RootFolderModel
+    {
+        public string NewRootFolder { get; set; } = "";
     }
 
     [Route("api/[controller]")]
@@ -117,6 +121,13 @@ namespace fsstudio.server.fileSystem
             {
                 return Conflict(ex.Message);
             }
+        }
+
+        [HttpPost("SetRootFolder")]
+        public IActionResult SetRootFolder([FromBody] RootFolderModel model)
+        {
+            _sessionManager.SetRootFolder(model.NewRootFolder);
+            return Ok($"Root folder changed to '{model.NewRootFolder}'.");
         }
     }
 }

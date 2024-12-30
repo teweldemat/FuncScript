@@ -15,16 +15,9 @@ namespace fsstudio.server.fileSystem.exec.Tests
         {
             _tempFolder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
             Directory.CreateDirectory(_tempFolder);
-
-            _configuration = new ConfigurationBuilder()
-                .AddInMemoryCollection(new Dictionary<string, string>
-                {
-                    {"RootFolder", _tempFolder}
-                })
-                .Build();
-
             _remoteLogger = new TestRemoteLogger();
             _sessionManager = new SessionManager(_configuration, _remoteLogger);
+            _sessionManager.SetRootFolder(_tempFolder);
         }
 
         [OneTimeTearDown]

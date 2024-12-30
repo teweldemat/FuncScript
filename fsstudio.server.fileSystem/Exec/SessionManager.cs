@@ -1,20 +1,26 @@
-// SessionManager.cs
 using System.Collections.Concurrent;
-using funcscript.funcs.misc;
 using funcscript.host;
-using Microsoft.Extensions.Configuration;
 
 namespace fsstudio.server.fileSystem.exec
 {
     public class SessionManager
     {
-        public static String GetAbsolutePath(string rootPath, string relativePath)
+        private readonly ConcurrentDictionary<string, ExecutionSession> _sessionsByFile = new();
+        private string _rootPath = null;
+        private readonly RemoteLogger _remoteLogger;
+        private readonly string _lastRootFolderFilePath;
+
+        public string RootPath => _rootPath;
+
+        public String GetAbsolutePath(string relativePath)
         {
+            if (_rootPath == null)
+                throw new InvalidOperationException("Root path not set");
             if (relativePath.StartsWith("/"))
-                return GetAbsolutePath(rootPath, relativePath.Substring(1));
+                return GetAbsolutePath(relativePath.Substring(1));
             if(relativePath.EndsWith("/"))
-                return GetAbsolutePath(rootPath, relativePath.Substring(0,relativePath.Length-1));
-            return Path.Combine(rootPath, relativePath);
+                return GetAbsolutePath(relativePath.Substring(0,relativePath.Length-1));
+            return Path.Combine(_rootPath, relativePath);
         }
 
         class RemoteLoggerForFs(RemoteLogger rl) : FsLogger
@@ -31,22 +37,37 @@ namespace fsstudio.server.fileSystem.exec
             }
         }
 
-        private readonly ConcurrentDictionary<string, ExecutionSession> _sessionsByFile = new();
-        private readonly string _rootPath;
-        private readonly RemoteLogger _remoteLogger;
-
-        public string RootPath => _rootPath;
-
         public SessionManager(IConfiguration configuration, RemoteLogger remoteLogger)
         {
             _remoteLogger = remoteLogger;
-            _rootPath = configuration.GetValue<string>("RootFolder")!;
             FsLogger.SetDefaultLogger(new RemoteLoggerForFs(remoteLogger));
+
+            var appDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            var appFolder = Path.Combine(appDataFolder, "fs-studio");
+            if(!Directory.Exists(appFolder)) Directory.CreateDirectory(appFolder);
+            _lastRootFolderFilePath = Path.Combine(appFolder, "last-root-folder.txt");
+            if(File.Exists(_lastRootFolderFilePath))
+            {
+                _rootPath = File.ReadAllText(_lastRootFolderFilePath).Trim();
+                if (string.IsNullOrWhiteSpace(_rootPath))
+                    _rootPath = null;
+            }
+        }
+
+        public void SetRootFolder(string newRootPath)
+        {
+            _rootPath = newRootPath;
+            _sessionsByFile.Clear();
+
+            var appDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            var appFolder = Path.Combine(appDataFolder, "fs-studio");
+            if(!Directory.Exists(appFolder)) Directory.CreateDirectory(appFolder);
+            File.WriteAllText(_lastRootFolderFilePath, newRootPath);
         }
 
         public ExecutionSession CreateOrGetSession(string fromFile)
         {
-            var absolutePath =GetAbsolutePath(_rootPath, fromFile + ".fsp");
+            var absolutePath = GetAbsolutePath(fromFile + ".fsp");
             if (_sessionsByFile.TryGetValue(absolutePath, out var existingSession))
             {
                 return existingSession;
@@ -83,7 +104,7 @@ namespace fsstudio.server.fileSystem.exec
 
         public (string[] Directories, string[] Files) ListSubFoldersAndFiles(string relativePath)
         {
-            string fullPath = GetAbsolutePath(_rootPath, relativePath);
+            string fullPath = GetAbsolutePath(relativePath);
             if (!Directory.Exists(fullPath))
                 throw new DirectoryNotFoundException("Directory not found.");
 
@@ -102,7 +123,7 @@ namespace fsstudio.server.fileSystem.exec
 
         public void CreateFolder(string relativePath, string folderName)
         {
-            string fullPath = GetAbsolutePath(_rootPath, Path.Combine(relativePath, folderName));
+            string fullPath = GetAbsolutePath(Path.Combine(relativePath, folderName));
             if (Directory.Exists(fullPath))
                 throw new IOException($"Folder '{folderName}' already exists.");
 
@@ -111,7 +132,7 @@ namespace fsstudio.server.fileSystem.exec
 
         public void CreateFile(string relativePath, string fileName)
         {
-            string fullPath = GetAbsolutePath(_rootPath, Path.Combine(relativePath, fileName + ".fsp"));
+            string fullPath = GetAbsolutePath(Path.Combine(relativePath, fileName + ".fsp"));
             if (File.Exists(fullPath))
                 throw new IOException($"File '{fileName}.fsp' already exists.");
 
@@ -121,7 +142,7 @@ namespace fsstudio.server.fileSystem.exec
 
         public void DuplicateFile(string relativePath, string newFileName)
         {
-            string sourceFullPath = GetAbsolutePath(_rootPath, relativePath) + ".fsp";
+            string sourceFullPath = GetAbsolutePath(relativePath) + ".fsp";
             if (!File.Exists(sourceFullPath))
                 throw new FileNotFoundException($"Source file '{relativePath}.fsp' not found.");
 
@@ -135,8 +156,8 @@ namespace fsstudio.server.fileSystem.exec
 
         public void DeleteItem(string relativePath)
         {
-            string filePath = GetAbsolutePath(_rootPath, relativePath) + ".fsp";
-            string dirPath = GetAbsolutePath(_rootPath, relativePath);
+            string filePath = GetAbsolutePath(relativePath) + ".fsp";
+            string dirPath = GetAbsolutePath(relativePath);
 
             if (File.Exists(filePath))
             {
@@ -162,7 +183,7 @@ namespace fsstudio.server.fileSystem.exec
 
         public void RenameItem(string relativePath, string newName)
         {
-            string fullPath = GetAbsolutePath(_rootPath, relativePath);
+            string fullPath = GetAbsolutePath(relativePath);
             if (Directory.Exists(fullPath))
             {
                 string directory = Directory.GetParent(fullPath)!.FullName;

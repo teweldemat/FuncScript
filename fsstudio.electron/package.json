@@ -1,7 +1,8 @@
 {
   "name": "fsstudio",
   "version": "1.0.0",
-  "main": "main.js",
+  "main": "main.cjs",
+  "type": "module",
   "scripts": {
     "start": "electron .",
     "dist": "electron-builder"
@@ -17,5 +18,8 @@
     "mac": {
       "category": "public.app-category.developer-tools"
     }
+  },
+  "dependencies": {
+    "electron-is-dev": "^3.0.1"
   }
 }
