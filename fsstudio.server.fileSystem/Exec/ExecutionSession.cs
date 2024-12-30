@@ -1,6 +1,7 @@
 using System.Text.RegularExpressions;
 using funcscript;
 using funcscript.core;
+using funcscript.funcs.text;
 using funcscript.model;
 
 namespace fsstudio.server.fileSystem.exec;
@@ -30,7 +31,12 @@ public class ExecutionSession : KeyValueCollection
         _nodes =nodes.ToList() ;
         foreach(var n in _nodes)
             n.SetParent(this);
-        this._context = new DefaultFsDataProvider();
+        this._context = new DefaultFsDataProvider(
+            new []
+            {
+                KeyValuePair.Create<string,object>("md",new MarkDownFunction(this.logger))
+            }
+            );
     }
     public ExecutionSession(IEnumerable<ExecutionNode> nodes,RemoteLogger logger)
     {
@@ -223,9 +229,16 @@ public class ExecutionSession : KeyValueCollection
         return this._nodes.Select(x => x.Name).ToList();
     }
 
-
+    void ClearCache()
+    {
+        foreach (var node in this._nodes)
+        {
+            node.ClearCache();
+        }
+    }
     public object EvaluateNode(string nodePath)
     {
+        ClearCache();
         var segments = nodePath.Split('.');
         var parentNodePath = string.Join(".", segments.Take(segments.Length - 1));
         var provider = (segments.Length > 1) ? (KeyValueCollection)FindNodeByPath(parentNodePath)! : this;

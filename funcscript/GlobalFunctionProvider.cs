@@ -24,7 +24,8 @@ namespace funcscript
 
         public IList<string> GetAllKeys()
         {
-            throw new NotImplementedException();
+            return this._data.Keys.Concat(
+                 s_funcByName.Keys.Where(k => !_data.ContainsKey(k))).ToList();
         }
 
         public static void LoadFromAssembly(Assembly a)
@@ -123,7 +124,7 @@ namespace funcscript
 
         public IList<string> GetAllKeys()
         {
-            throw new NotImplementedException();
+            return _kvc.GetAllKeys();
         }
     }
 

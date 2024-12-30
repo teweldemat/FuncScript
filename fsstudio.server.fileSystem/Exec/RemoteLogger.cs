@@ -66,6 +66,11 @@ public class RemoteLogger
         await SendMessage("log",message);
     }
 
+    public async void SendMarkdDown(string markdown)
+    {
+        await SendMessage("markdown",markdown);
+    }
+
     public async void Clear()
     {
         await SendMessage("clear",null);

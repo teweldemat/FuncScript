@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Grid, Typography, Tab, Tabs, Box, Toolbar, IconButton } from '@mui/material';
+import { Grid, Typography, Tab, Tabs, Box, IconButton } from '@mui/material';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import SaveIcon from '@mui/icons-material/Save';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
@@ -11,7 +11,7 @@ import ReactMarkdown from 'react-markdown';
 import { SERVER_URL, SERVER_WS_URL } from '../backend';
 import CodeEditor from '../code-editor/CodeEditor';
 import { EvalNodProvider, ExpressionType } from './EvalNodProvider';
-import { EvalNodeTree } from './EvalNodeTree'; // <-- Use the new component
+import { EvalNodeTree } from './EvalNodeTree';
 
 interface ErrorItem {
   type: string;
@@ -262,59 +262,60 @@ StackTrace: ${error.stackTrace || 'N/A'}
   return (
     <Grid container spacing={2} style={{ height: '100vh' }}>
       <Grid item xs={8} style={{ display: 'flex', flexDirection: 'column' }}>
-        <Toolbar>
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <IconButton onClick={executeExpression} color="primary">
-              <PlayArrowIcon />
-            </IconButton>
-            <IconButton
-              onClick={() =>
-                selectedNode && expression && !isSaveDisabled
-                  ? saveExpression(selectedNode, expression, false)
-                  : null
-              }
-              color="secondary"
-              disabled={isSaveDisabled}
-            >
-              <SaveIcon />
-            </IconButton>
-            <IconButton onClick={handleCopy} color="primary">
-              {copied ? 'Copied' : <ContentCopyIcon />}
-            </IconButton>
-            <IconButton onClick={handleClearLog} color="primary">
-              <ClearAllIcon />
-            </IconButton>
+        <Box sx={{ display: 'flex', alignItems: 'center', borderBottom: 1, borderColor: 'divider' }}>
+          <Tabs
+            value={tabIndex}
+            onChange={(event, newValue) => setTabIndex(newValue)}
+            aria-label="Data tabs"
+          >
+            <Tab label="Script" />
+            <Tab label="Result" />
+            <Tab label="Log" />
+            <Tab label="Document" />
+          </Tabs>
+          <Box sx={{ marginLeft: 'auto', display: 'flex', alignItems: 'center' }}>
+            {tabIndex === 0 && (
+              <>
+                <IconButton onClick={executeExpression} color="primary">
+                  <PlayArrowIcon />
+                </IconButton>
+                <IconButton
+                  onClick={() =>
+                    selectedNode && expression && !isSaveDisabled
+                      ? saveExpression(selectedNode, expression, false)
+                      : null
+                  }
+                  color="secondary"
+                  disabled={isSaveDisabled}
+                >
+                  <SaveIcon />
+                </IconButton>
+              </>
+            )}
+            {tabIndex === 1 && (
+              <IconButton onClick={handleCopy} color="primary">
+                {copied ? 'Copied' : <ContentCopyIcon />}
+              </IconButton>
+            )}
+            {tabIndex === 2 && (
+              <IconButton onClick={handleClearLog} color="primary">
+                <ClearAllIcon />
+              </IconButton>
+            )}
+            <Box sx={{ marginLeft: 2 }}>
+              <Typography variant="body2" color="textSecondary">
+                {selectedNode ? `${selectedNode} [${saveStatus}]` : `[${saveStatus}]`}
+              </Typography>
+            </Box>
           </Box>
-          <Box sx={{ marginLeft: 'auto', textAlign: 'right' }}>
-            <Typography variant="body2" color="textSecondary">
-              {selectedNode
-                ? `${selectedNode} [${saveStatus}]`
-                : `[${saveStatus}]`}
-            </Typography>
-          </Box>
-        </Toolbar>
-        <Tabs
-          value={tabIndex}
-          onChange={(event, newValue) => setTabIndex(newValue)}
-          aria-label="Data tabs"
-        >
-          <Tab label="Script" />
-          <Tab label="Result" />
-          <Tab label="Log" />
-          <Tab label="Document" />
-        </Tabs>
-        <Box
-          sx={{ flexGrow: 1, borderBottom: 1, borderColor: 'divider', overflow: 'auto' }}
-        >
-          {renderTabContent()}
         </Box>
+        <Box sx={{ flexGrow: 1, overflow: 'auto' }}>{renderTabContent()}</Box>
       </Grid>
       <Grid item xs={4} style={{ display: 'flex', flexDirection: 'column' }}>
         {sessionId && (
           <EvalNodProvider>
             <EvalNodeTree
               rootNode={{
-                // Minimal root node config
                 name: 'Root Node',
                 path: null,
                 expression: null,

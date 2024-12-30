@@ -3,6 +3,7 @@ using funcscript.model;
 
 namespace funcscript.core
 {
+    
     public interface IFsFunction
     {
         object EvaluateList(FsList pars);

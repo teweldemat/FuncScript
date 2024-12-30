@@ -12,8 +12,7 @@ public class ExpressionNodeInfo
     public int ChildrenCount { get; set; }
 }
 
-
-public class ExpressionNodeInfoWithExpression:ExpressionNodeInfo
+public class ExpressionNodeInfoWithExpression : ExpressionNodeInfo
 {
     public String? Expression { get; set; }
 }
@@ -30,8 +29,25 @@ public class ExecutionNode : KeyValueCollection
 {
     private string _nameLower;
     private string _name;
+    private object _cache = null;
+    private bool _cached = false;
+    public ExpressionType ExpressionType { get; set; } = ExpressionType.FuncScript;
+    public string? Expression { get; set; }
+    public IList<ExecutionNode> Children { get; set; } = new List<ExecutionNode>();
+
     private KeyValueCollection _prentNode = null;
     public KeyValueCollection ParentContext => _prentNode;
+
+    public void ClearCache()
+    {
+        _cache = null;
+        _cached = false;
+        foreach (var node in this.Children)
+        {
+            node.ClearCache();
+        }
+    }
+
     public object Get(string name)
     {
         var ch = Children.FirstOrDefault(c => c._nameLower.Equals(name));
@@ -39,17 +55,18 @@ public class ExecutionNode : KeyValueCollection
             return _prentNode.Get(name);
         return ch.Evaluate(this);
     }
+
     public void SetParent(KeyValueCollection parent)
     {
         this._prentNode = parent;
         foreach (var ch in Children)
         {
-            ch.SetParent(this);   
+            ch.SetParent(this);
         }
     }
-    
+
     public string NameLower => _nameLower;
-    
+
     public string Name
     {
         get => _name;
@@ -60,9 +77,6 @@ public class ExecutionNode : KeyValueCollection
         }
     }
 
-    public ExpressionType ExpressionType { get; set; } = ExpressionType.FuncScript;
-    public string? Expression { get; set; }
-    public IList<ExecutionNode> Children { get; set; }= new List<ExecutionNode>();
 
     public object Evaluate(KeyValueCollection provider)
     {
@@ -70,29 +84,36 @@ public class ExecutionNode : KeyValueCollection
         {
             return this;
         }
+        if (_cached)
+            return _cache;
 
         switch (ExpressionType)
         {
             case ExpressionType.ClearText:
-                return this.Expression;
+                _cache= this.Expression;
+                break;
             case ExpressionType.FuncScript:
-                return FuncScript.Evaluate(provider, Expression);
+                _cache=FuncScript.Evaluate(provider, Expression);
+                break;
             case ExpressionType.FuncScriptTextTemplate:
                 var serrors = new List<FuncScriptParser.SyntaxErrorData>();
-                
-                var result = FuncScriptParser.ParseFsTemplate(new FuncScriptParser.ParseContext(provider, this.Expression, serrors));
-                if (result == null)
-                    throw new SyntaxError(this.Expression,serrors);
-                var ret=result.Block .Evaluate();
 
-                return ret;
+                var result =
+                    FuncScriptParser.ParseFsTemplate(
+                        new FuncScriptParser.ParseContext(provider, this.Expression, serrors));
+                if (result == null)
+                    throw new SyntaxError(this.Expression, serrors);
+                _cache= result.Block.Evaluate();
+                break;
             default:
                 throw new InvalidOperationException("Unsupported expression type");
         }
+
+        _cached = true;
+        return _cache;
     }
 
-    
-    
+
     public bool IsDefined(string key)
     {
         return Children.Any(c => c._nameLower == key);
@@ -102,6 +123,4 @@ public class ExecutionNode : KeyValueCollection
     {
         return this.Children.Select(c => c._name).ToList();
     }
-
-  
 }
