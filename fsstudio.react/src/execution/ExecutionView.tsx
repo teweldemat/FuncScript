@@ -1,3 +1,4 @@
+// ExecutionView.tsx
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Grid, Typography, Tab, Tabs, Box, IconButton } from '@mui/material';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
@@ -5,7 +6,6 @@ import SaveIcon from '@mui/icons-material/Save';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import ClearAllIcon from '@mui/icons-material/ClearAll';
 import axios from 'axios';
-
 import TextLogger from './RemoteLogger';
 import ReactMarkdown from 'react-markdown';
 import { SERVER_URL, SERVER_WS_URL } from '../backend';
@@ -222,96 +222,102 @@ StackTrace: ${error.stackTrace || 'N/A'}
     saveExpression,
   ]);
 
-  const renderTabContent = () => {
-    switch (tabIndex) {
-      case 0:
-        return (
-          <CodeEditor
-            key={selectedNode || 'no-node'}
-            expression={expression}
-            setExpression={(value) => setExpression(value)}
-            expressionType={selectedExpressionType}
-          />
-        );
-      case 1:
-        return (
-          <pre
-            style={{
-              whiteSpace: 'pre-wrap',
-              wordWrap: 'break-word',
-              overflowWrap: 'break-word',
-              border: '1px solid #ccc',
-              padding: '10px',
-              fontFamily: '"Lucida Console", monospace',
-            }}
-          >
-            {resultText}
-          </pre>
-        );
-      case 2:
-        return <TextLogger messages={messages} />;
-      case 3:
-        return <ReactMarkdown>{markdown}</ReactMarkdown>;
-      default:
-        return null;
-    }
-  };
-
   const isSaveDisabled = expression === lastSavedExpression;
 
   return (
-    <Grid container spacing={2} style={{ height: '100vh' }}>
-      <Grid item xs={8} style={{ display: 'flex', flexDirection: 'column' }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', borderBottom: 1, borderColor: 'divider' }}>
-          <Tabs
-            value={tabIndex}
-            onChange={(event, newValue) => setTabIndex(newValue)}
-            aria-label="Data tabs"
-          >
-            <Tab label="Script" />
-            <Tab label="Result" />
-            <Tab label="Log" />
-            <Tab label="Document" />
-          </Tabs>
-          <Box sx={{ marginLeft: 'auto', display: 'flex', alignItems: 'center' }}>
-            {tabIndex === 0 && (
-              <>
-                <IconButton onClick={executeExpression} color="primary">
-                  <PlayArrowIcon />
+    <Grid container spacing={2} sx={{ height: '100vh', overflow: 'hidden' }}>
+      <Grid item xs={8} container direction="column" wrap="nowrap" sx={{ height: '100%' }}>
+        <Grid item sx={{ position: 'sticky', top: 0, zIndex: 100, backgroundColor: 'background.paper' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', borderBottom: 1, borderColor: 'divider' }}>
+            <Tabs
+              value={tabIndex}
+              onChange={(event, newValue) => setTabIndex(newValue)}
+              aria-label="Data tabs"
+            >
+              <Tab label="Script" />
+              <Tab label="Result" />
+              <Tab label="Log" />
+              <Tab label="Document" />
+            </Tabs>
+            <Box sx={{ marginLeft: 'auto', display: 'flex', alignItems: 'center' }}>
+              {tabIndex === 0 && (
+                <>
+                  <IconButton onClick={executeExpression} color="primary">
+                    <PlayArrowIcon />
+                  </IconButton>
+                  <IconButton
+                    onClick={() =>
+                      selectedNode && expression && !isSaveDisabled
+                        ? saveExpression(selectedNode, expression, false)
+                        : null
+                    }
+                    color="secondary"
+                    disabled={isSaveDisabled}
+                  >
+                    <SaveIcon />
+                  </IconButton>
+                </>
+              )}
+              {tabIndex === 1 && (
+                <IconButton onClick={handleCopy} color="primary">
+                  {copied ? 'Copied' : <ContentCopyIcon />}
                 </IconButton>
-                <IconButton
-                  onClick={() =>
-                    selectedNode && expression && !isSaveDisabled
-                      ? saveExpression(selectedNode, expression, false)
-                      : null
-                  }
-                  color="secondary"
-                  disabled={isSaveDisabled}
-                >
-                  <SaveIcon />
+              )}
+              {tabIndex === 2 && (
+                <IconButton onClick={handleClearLog} color="primary">
+                  <ClearAllIcon />
                 </IconButton>
-              </>
-            )}
-            {tabIndex === 1 && (
-              <IconButton onClick={handleCopy} color="primary">
-                {copied ? 'Copied' : <ContentCopyIcon />}
-              </IconButton>
-            )}
-            {tabIndex === 2 && (
-              <IconButton onClick={handleClearLog} color="primary">
-                <ClearAllIcon />
-              </IconButton>
-            )}
-            <Box sx={{ marginLeft: 2 }}>
-              <Typography variant="body2" color="textSecondary">
-                {selectedNode ? `${selectedNode} [${saveStatus}]` : `[${saveStatus}]`}
-              </Typography>
+              )}
+              <Box sx={{ marginLeft: 2 }}>
+                <Typography variant="body2" color="textSecondary">
+                  {selectedNode ? `${selectedNode} [${saveStatus}]` : `[${saveStatus}]`}
+                </Typography>
+              </Box>
             </Box>
           </Box>
-        </Box>
-        <Box sx={{ flexGrow: 1, overflow: 'auto' }}>{renderTabContent()}</Box>
+        </Grid>
+        <Grid item sx={{ flex: 1, overflow: 'auto' }}>
+          {tabIndex === 0 && (
+            <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+              <CodeEditor
+                key={selectedNode || 'no-node'}
+                expression={expression}
+                setExpression={(value) => setExpression(value)}
+                expressionType={selectedExpressionType}
+              />
+            </Box>
+          )}
+          {tabIndex === 1 && (
+            <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'auto' }}>
+              <pre
+                style={{
+                  whiteSpace: 'pre-wrap',
+                  wordWrap: 'break-word',
+                  overflowWrap: 'break-word',
+                  border: '1px solid #ccc',
+                  padding: '10px',
+                  fontFamily: '"Lucida Console", monospace',
+                  flex: 1,
+                }}
+              >
+                {resultText}
+              </pre>
+            </Box>
+          )}
+          {tabIndex === 2 && (
+            <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'auto' }}>
+              <TextLogger messages={messages} />
+            </Box>
+          )}
+          {tabIndex === 3 && (
+            <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'auto' }}>
+              <ReactMarkdown>{markdown}</ReactMarkdown>
+            </Box>
+          )}
+        </Grid>
       </Grid>
-      <Grid item xs={4} style={{ display: 'flex', flexDirection: 'column' }}>
+
+      <Grid item xs={4} sx={{ height: '100%', overflow: 'auto' }}>
         {sessionId && (
           <EvalNodProvider>
             <EvalNodeTree
