@@ -1,138 +1,122 @@
+// FileSystemController.cs
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using System;
 using System.IO;
+using fsstudio.server.fileSystem.exec;
 
-namespace fsstudio.server.fileSystem;
-
-public class FileOperationModel
+namespace fsstudio.server.fileSystem
 {
-    public string Path { get; set; }=""; // Path relative to root_folder
-    public string Name { get; set; }=""; // Name of the new file or folder
-}
-
-[Route("api/[controller]")]
-[ApiController]
-public class FileSystemController : ControllerBase
-{
-    private readonly string _rootPath;
-
-    public FileSystemController(IConfiguration configuration)
+    public class FileOperationModel
     {
-        _rootPath = configuration.GetValue<string>("RootFolder")!;
+        public string Path { get; set; } = "";
+        public string Name { get; set; } = "";
     }
-    
-    // GET: api/FileSystem/ListSubFoldersAndFiles
-    [HttpGet("ListSubFoldersAndFiles")]
-    public IActionResult ListSubFoldersAndFiles([FromQuery] string path)
+
+    [Route("api/[controller]")]
+    [ApiController]
+    public class FileSystemController : ControllerBase
     {
-        string fullPath =Program.GetAbsolutePath(_rootPath, path);
-        if (!Directory.Exists(fullPath))
+        private readonly SessionManager _sessionManager;
+
+        public FileSystemController(SessionManager sessionManager)
         {
-            return NotFound("Directory not found.");
+            _sessionManager = sessionManager;
         }
 
-        var directories = Directory.GetDirectories(fullPath).Select(Path.GetFileName).ToArray();
-        var files = Directory.GetFiles(fullPath, "*.fsp").Select(n=>
+        [HttpGet("ListSubFoldersAndFiles")]
+        public IActionResult ListSubFoldersAndFiles([FromQuery] string path)
         {
-            var f = new System.IO.FileInfo(n);
-            return f.Name.Substring(0,f.Name.Length-f.Extension.Length);
-        }).ToArray();
-
-        return Ok(new { Directories = directories, Files = files });
-    }
-
-    // POST: api/FileSystem/CreateFolder
-    [HttpPost("CreateFolder")]
-    public IActionResult CreateFolder([FromBody] FileOperationModel model)
-    {
-        string fullPath = Program.GetAbsolutePath(_rootPath, Path.Combine(model.Path, model.Name));
-        if (Directory.Exists(fullPath))
-        {
-            return Conflict("Folder already exists.");
-        }
-
-        Directory.CreateDirectory(fullPath);
-        return Created(fullPath, $"Folder '{model.Name}' created successfully.");
-    }
-    
-    // POST: api/FileSystem/CreateFile
-    [HttpPost("CreateFile")]
-    public IActionResult CreateFile([FromBody] FileOperationModel model)
-    {
-        string fullPath = Program.GetAbsolutePath(_rootPath, Path.Combine(model.Path, model.Name + ".fsp"));
-        if (System.IO.File.Exists(fullPath))
-        {
-            return Conflict("File already exists.");
-        }
-
-        using (var stream = System.IO.File.CreateText(fullPath))
-        {
-            stream.Write("[]");
-        }
-        return Created(fullPath, $"File '{model.Name}.fsp' created successfully.");
-    }
-    
-    [HttpPost("DuplicateFile")]
-    public IActionResult DuplicateFile([FromBody] FileOperationModel model)
-    {
-        string sourceFullPath = Program.GetAbsolutePath(_rootPath, Path.Combine(model.Path)) + ".fsp";
-        if (!System.IO.File.Exists(sourceFullPath))
-            return NotFound($"Source file ‘{model.Path}.fsp’ not found.");
-            
-        string directory = System.IO.Path.GetDirectoryName(sourceFullPath)!;
-        string targetFullPath = Path.Combine(directory, model.Name + ".fsp");
-        if (System.IO.File.Exists(targetFullPath))
-            return Conflict($"File '{model.Name}.fsp' already exists in the target folder.");
-
-        System.IO.File.Copy(sourceFullPath, targetFullPath);
-        return Created(targetFullPath, $"File duplicated as '{model.Name}.fsp' successfully.");
-    }
-
-    // DELETE: api/FileSystem/DeleteFile
-    [HttpDelete("DeleteItem")]
-    public IActionResult DeleteItem(string path)
-    {
-        string fullPath = Program.GetAbsolutePath(_rootPath, path);
-        if (System.IO.File.Exists(fullPath + ".fsp"))
-            System.IO.File.Delete(fullPath + ".fsp");
-        else if (System.IO.Directory.Exists(fullPath))
-            System.IO.Directory.Delete(fullPath, true); // Added 'true' to recursively delete directories
-        else
-            return NotFound("Path not found.");
-
-        return Ok($"File '{path}' deleted successfully.");
-    }
-
-    
-    // PUT: api/FileSystem/RenameItem
-    [HttpPut("RenameItem")]
-    public IActionResult RenameItem([FromBody] FileOperationModel model)
-    {
-        string fullPath = Program.GetAbsolutePath(_rootPath, model.Path);
-        if (System.IO.Directory.Exists(fullPath))
-        {
-            string directory = System.IO.Directory.GetParent(fullPath)!.FullName;
-            string newPath = Path.Combine(directory, model.Name);
-            if (System.IO.Directory.Exists(newPath))
-                return Conflict($"Path {newPath} already exists");
-            Console.WriteLine($"{fullPath} > {newPath}");
-            Directory.Move(fullPath,newPath);
-        }
-        else
-        {
-            fullPath += ".fsp";
-            if (System.IO.File.Exists(fullPath))
+            try
             {
-                string directory = new System.IO.FileInfo(fullPath).DirectoryName!;
-                string newPath = Path.Combine(directory, model.Name)+".fsp";
-                if ( System.IO.File.Exists(newPath))
-                    return Conflict($"Path {newPath} already exists");
-                Console.WriteLine($"{fullPath} > {newPath}");
-                System.IO.File.Move(fullPath,newPath);
+                var result = _sessionManager.ListSubFoldersAndFiles(path);
+                return Ok(new { Directories = result.Directories, Files = result.Files });
             }
-            else
-                return NotFound($"Path {model.Path} not found");
+            catch (DirectoryNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
-        return Ok($"File '{model.Name}' renamed successfully.");
+
+        [HttpPost("CreateFolder")]
+        public IActionResult CreateFolder([FromBody] FileOperationModel model)
+        {
+            try
+            {
+                _sessionManager.CreateFolder(model.Path, model.Name);
+                return Created($"{model.Path}/{model.Name}",
+                    $"Folder '{model.Name}' created successfully.");
+            }
+            catch (IOException ex)
+            {
+                return Conflict(ex.Message);
+            }
+        }
+
+        [HttpPost("CreateFile")]
+        public IActionResult CreateFile([FromBody] FileOperationModel model)
+        {
+            try
+            {
+                _sessionManager.CreateFile(model.Path, model.Name);
+                return Created($"{model.Path}/{model.Name}",
+                    $"File '{model.Name}.fsp' created successfully.");
+            }
+            catch (IOException ex)
+            {
+                return Conflict(ex.Message);
+            }
+        }
+
+        [HttpPost("DuplicateFile")]
+        public IActionResult DuplicateFile([FromBody] FileOperationModel model)
+        {
+            try
+            {
+                _sessionManager.DuplicateFile(model.Path, model.Name);
+                return Created($"{model.Path}/{model.Name}",
+                    $"File duplicated as '{model.Name}.fsp' successfully.");
+            }
+            catch (FileNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (IOException ex)
+            {
+                return Conflict(ex.Message);
+            }
+        }
+
+        [HttpDelete("DeleteItem")]
+        public IActionResult DeleteItem(string path)
+        {
+            try
+            {
+                _sessionManager.DeleteItem(path);
+                return Ok($"Item '{path}' deleted successfully.");
+            }
+            catch (FileNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
+        [HttpPut("RenameItem")]
+        public IActionResult RenameItem([FromBody] FileOperationModel model)
+        {
+            try
+            {
+                _sessionManager.RenameItem(model.Path, model.Name);
+                return Ok($"Item '{model.Path}' renamed to '{model.Name}' successfully.");
+            }
+            catch (FileNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (IOException ex)
+            {
+                return Conflict(ex.Message);
+            }
+        }
     }
 }

@@ -95,12 +95,4 @@ internal class Program
         DefaultFsDataProvider.LoadFromAssembly(typeof(funcscript.openai.ChatGptFunction).Assembly);
     }
 
-    public static String GetAbsolutePath(string rootPath, string relativePath)
-    {
-        if (relativePath.StartsWith("/"))
-            return GetAbsolutePath(rootPath, relativePath.Substring(1));
-        if(relativePath.EndsWith("/"))
-            return GetAbsolutePath(rootPath, relativePath.Substring(0,relativePath.Length-1));
-        return Path.Combine(rootPath, relativePath);
-    }
 }

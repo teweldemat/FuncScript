@@ -61,17 +61,17 @@ public class RemoteLogger
             }
         }
     }
-    public async void WriteLine(string message)
+    public virtual async void WriteLine(string message)
     {
         await SendMessage("log",message);
     }
 
-    public async void SendMarkdDown(string markdown)
+    public virtual async void SendMarkdDown(string markdown)
     {
         await SendMessage("markdown",markdown);
     }
 
-    public async void Clear()
+    public virtual async void Clear()
     {
         await SendMessage("clear",null);
     }

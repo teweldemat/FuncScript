@@ -31,7 +31,7 @@ namespace fsstudio.server.fileSystem.Controllers
         {
             try
             {
-                var session = sessionManager.CreateSession(request.FromFile);
+                var session = sessionManager.CreateOrGetSession(request.FromFile);
                 Console.WriteLine($"Session created {session.SessionId}");
                 return Ok(new { SessionId = session.SessionId });
             }
@@ -235,22 +235,24 @@ namespace fsstudio.server.fileSystem.Controllers
                 session = sessionManager.GetSession(sessionId);
                 if (session == null)
                     return NotFound($"Session with ID {sessionId} not found.");
-            }
-            try
-            {
-                var val = session.EvaluateNode(nodePath);
-                if (val is string str)
+
+                try
                 {
-                    return Content(str, MediaTypeHeaderValue.Parse("text/plain"));
+                    var val = session.EvaluateNode(nodePath);
+                    if (val is string str)
+                    {
+                        return Content(str, MediaTypeHeaderValue.Parse("text/plain"));
+                    }
+
+                    var sb = new StringBuilder();
+                    FuncScript.Format(sb, val, asJsonLiteral: true);
+                    var json = sb.ToString();
+                    return Content(json, MediaTypeHeaderValue.Parse("text/plain"));
                 }
-                var sb = new StringBuilder();
-                FuncScript.Format(sb, val, asJsonLiteral: true);
-                var json = sb.ToString();
-                return Content(json, MediaTypeHeaderValue.Parse("text/plain"));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new ErrorData(ex));
+                catch (Exception ex)
+                {
+                    return StatusCode(500, new ErrorData(ex));
+                }
             }
         }
 
