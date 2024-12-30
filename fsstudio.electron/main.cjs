@@ -20,16 +20,13 @@ function waitForServerAndLoadUrl(url, window) {
     });
 }
 
-async function createWindow() {
+async function createWindow(isDev) {
   mainWindow = new BrowserWindow({ width: 800, height: 600 });
-  mainWindow.loadURL(`data:text/html,<h1>Starting app..</h1>`);
-
-  // Only open dev tools if in development
-  const { default: isDev } = await import('electron-is-dev');
+  mainWindow.loadURL(`data:text/html,<h1>Starting ${isDev?'development app':'app'}.</h1>`);
   if (isDev) {
     mainWindow.webContents.openDevTools();
   }
-
+  
   mainWindow.on('closed', () => {
     if (serverProcess) {
       serverProcess.kill();
@@ -43,7 +40,8 @@ async function createWindow() {
         properties: ['openDirectory'],
       }).then(result => {
         if (!result.canceled && result.filePaths.length > 0) {
-          fetch('http://localhost:5099/api/FileSystem/SetRootFolder', {
+          const port = isDev ? 5099 : 5091;
+          fetch(`http://localhost:${port}/api/FileSystem/SetRootFolder`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ newRootFolder: result.filePaths[0] })
@@ -58,57 +56,45 @@ async function createWindow() {
       });
     }
   });
-  
 }
 
-const gotTheLock = app.requestSingleInstanceLock();
-if (!gotTheLock) {
-  app.quit();
-} else {
-  app.on('second-instance', () => {
-    if (mainWindow) {
-      if (mainWindow.isMinimized()) mainWindow.restore();
-      mainWindow.focus();
-    }
-  });
+app.whenReady().then(async () => {
+  //const { default: isDev } = await import('electron-is-dev');
+  //const isDev=false;
+  const isDev = !app.isPackaged;
+  if (isDev) {
+    await createWindow(isDev);
+    waitForServerAndLoadUrl('http://localhost:3000', mainWindow);
+  } else {
+    const serverExec = path.join(
+      process.resourcesPath,
+      'server',
+      'fsstudio.server.fileSystem'
+    );
 
-  app.whenReady().then(async () => {
-    const { default: isDev } = await import('electron-is-dev');
+    fs.access(serverExec, fs.constants.F_OK, async (err) => {
+      if (err) {
+        await createWindow();
+      } else {
+        serverProcess = spawn(serverExec, ['--urls', 'http://localhost:5091'], { shell: true });
+        serverProcess.stdout.on('data', (data) => {
+          console.log(`Server Output: ${data}`);
+        });
+        serverProcess.stderr.on('data', (data) => {
+          console.error(`Server Error: ${data}`);
+        });
 
-    if (isDev) {
-      await createWindow();
-      waitForServerAndLoadUrl('http://localhost:3000', mainWindow);
-    } else {
-      const serverExec = path.join(
-        process.resourcesPath,
-        'server',
-        'fsstudio.server.fileSystem'
-      );
+        await createWindow();
+        waitForServerAndLoadUrl('http://localhost:5091', mainWindow);
+      }
+    });
+  }
+});
 
-      fs.access(serverExec, fs.constants.F_OK, async (err) => {
-        if (err) {
-          await createWindow();
-        } else {
-          serverProcess = spawn(serverExec, ['--urls', 'http://localhost:5099'], { shell: true });
-          serverProcess.stdout.on('data', (data) => {
-            console.log(`Server Output: ${data}`);
-          });
-          serverProcess.stderr.on('data', (data) => {
-            console.error(`Server Error: ${data}`);
-          });
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') app.quit();
+});
 
-          await createWindow();
-          waitForServerAndLoadUrl('http://localhost:5099', mainWindow);
-        }
-      });
-    }
-  });
-
-  app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin') app.quit();
-  });
-
-  app.on('activate', async () => {
-    if (mainWindow === null) await createWindow();
-  });
-}
+app.on('activate', async () => {
+  if (mainWindow === null) await createWindow();
+});

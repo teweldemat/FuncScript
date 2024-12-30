@@ -25,4 +25,9 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="~\fsstudio\openai.json" />
+    <_ContentIncludedByDefault Remove="~\fsstudio\ui-state.json" />
+  </ItemGroup>
+
 </Project>

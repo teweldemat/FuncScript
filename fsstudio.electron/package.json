@@ -1,8 +1,10 @@
 {
   "name": "fsstudio",
   "version": "1.0.0",
+  "description": "FuncScript studio",
+  "author": "fs-studio",
   "main": "main.cjs",
-  "type": "module",
+  "type": "commonjs",
   "scripts": {
     "start": "electron .",
     "dist": "electron-builder"
@@ -21,5 +23,9 @@
   },
   "dependencies": {
     "electron-is-dev": "^3.0.1"
-  }
+  },
+"devDependencies": {
+  "electron": "26.0.0",
+  "electron-builder": "^25.1.8"
+}
 }
