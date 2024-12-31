@@ -177,7 +177,7 @@ namespace funcscript.funcs.math
                     }
                     else if (d is KeyValueCollection)
                     {
-                        throw new error.TypeMismatchError($"{this.Symbol}: Keyvalue collection not expected");
+                        return new FsError(FsError.ERROR_TYPE_MISMATCH, $"{this.Symbol}: Keyvalue collection not expected");
                     }
                 }
                 if (isDouble)
@@ -208,7 +208,7 @@ namespace funcscript.funcs.math
                     }
                     else if (d is KeyValueCollection)
                     {
-                        throw new error.TypeMismatchError($"{this.Symbol}: Keyvalue collection not expected");
+                        return new FsError(FsError.ERROR_TYPE_MISMATCH, $"{this.Symbol}: Keyvalue collection not expected");
                     }
                 }
                 if (isString)
@@ -239,14 +239,20 @@ namespace funcscript.funcs.math
                     }
                     else if (d is KeyValueCollection)
                     {
-                        throw new error.TypeMismatchError($"{this.Symbol}: Keyvalue collection not expected");
+                        return new FsError(FsError.ERROR_TYPE_MISMATCH, $"{this.Symbol}: Key value collection not expected");
                     }
+                    else if (d is FsError)
+                    {
+                        return d;
+                    }
+                    else
+                        return new FsError(FsError.ERROR_TYPE_MISMATCH, $"{this.Symbol}: Key value collection not expected");                
                 }
                 if (isKv)
                 {
                     var kv = d as KeyValueCollection;
                     if (kv == null)
-                        throw new error.TypeMismatchError("Keyvalue collection expected");
+                        return new FsError(FsError.ERROR_TYPE_MISMATCH, "Keyvalue collection expected");
                     if (kvTotal == null)
                         kvTotal = kv;
                     else

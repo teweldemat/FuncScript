@@ -9,7 +9,7 @@ import TextLogger from './RemoteLogger';
 import ReactMarkdown from 'react-markdown';
 import { SERVER_URL, SERVER_WS_URL } from '../backend';
 import CodeEditor from '../code-editor/CodeEditor';
-import { EvalNodProvider, ExpressionType } from './EvalNodProvider';
+import { EvalNodeProvider, ExpressionType } from './EvalNodeProvider';
 import { EvalNodeTree } from './EvalNodeTree';
 
 interface ErrorItem {
@@ -337,7 +337,7 @@ StackTrace: ${error.stackTrace || 'N/A'}
 
       <Grid item xs={4} sx={{ height: '100%', overflow: 'auto' }}>
         {sessionId && (
-          <EvalNodProvider>
+          <EvalNodeProvider>
             <EvalNodeTree
               rootNode={{
                 name: 'Root Node',
@@ -350,7 +350,7 @@ StackTrace: ${error.stackTrace || 'N/A'}
               onSelect={handleNodeSelect}
               selectedNode={selectedNode}
             />
-          </EvalNodProvider>
+          </EvalNodeProvider>
         )}
       </Grid>
     </Grid>

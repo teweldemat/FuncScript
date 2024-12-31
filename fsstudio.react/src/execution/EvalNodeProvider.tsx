@@ -17,7 +17,7 @@ export enum ExpressionType {
     FsStudioParentNode = 'FsStudioParentNode',
 }
 
-interface EvalNodContextValue {
+interface EvalNodeContextValue {
     fetchChildren: (sessionId: string, path: string | null) => Promise<NodeItem[]>;
     renameNode: (sessionId: string, nodePath: string, newName: string) => Promise<void>;
     deleteNode: (sessionId: string, nodePath: string) => Promise<void>;
@@ -30,9 +30,9 @@ interface EvalNodContextValue {
     moveNode: (sessionId: string, draggedPath: string, newParentPath: string | null) => Promise<void>;
 }
 
-const EvalNodContext = createContext<EvalNodContextValue | null>(null);
+const EvalNodContext = createContext<EvalNodeContextValue | null>(null);
 
-export const EvalNodProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const EvalNodeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const fetchChildren = (sessionId: string, path: string | null) => {
         return axios
             .get<NodeItem[]>(`${SERVER_URL}/api/sessions/${sessionId}/node/children`, {
@@ -84,7 +84,7 @@ export const EvalNodProvider: React.FC<{ children: React.ReactNode }> = ({ child
         });
     };
 
-    const value: EvalNodContextValue = {
+    const value: EvalNodeContextValue = {
         fetchChildren,
         renameNode,
         deleteNode,

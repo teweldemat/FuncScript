@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Box, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, Menu, MenuItem, TextField, List, Collapse } from '@mui/material';
-import { ExpressionType, NodeItem, useEvalNod } from './EvalNodProvider';
+import { ExpressionType, NodeItem, useEvalNod } from './EvalNodeProvider';
 import EvalNodeComponent from './EvalNodeComponent';
 
 interface NodeState {

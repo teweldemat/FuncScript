@@ -18,7 +18,7 @@ import FunctionsIcon from '@mui/icons-material/Functions';
 import CodeIcon from '@mui/icons-material/Code';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { ExpressionType, NodeItem } from './EvalNodProvider';
+import { ExpressionType, NodeItem } from './EvalNodeProvider';
 
 interface EvalNodeComponentProps {
     node: NodeItem;
