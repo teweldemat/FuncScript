@@ -1,10 +1,11 @@
 // App.tsx
 import React, { useEffect, useState } from 'react';
 import { CssBaseline, Box } from '@mui/material';
-import Navigation from './navigator/Navigation';
+import Navigation from './execution/Navigation';
 import ExecutionView from './execution/ExecutionView';
 import axios from 'axios';
 import { SERVER_URL } from './backend';
+import { FsStudioProvider } from './FsStudioProvider';
 
 const App: React.FC = () => {
   const [sessionMap, setSessionMap] = useState<{ [path: string]: string }>({});
@@ -31,21 +32,20 @@ const App: React.FC = () => {
   const createSession = (filePath: string) => {
     axios
       .post(`${SERVER_URL}/api/sessions/create`, { fromFile: filePath })
-      .then(response => {
+      .then((response) => {
         const newSessionId = response.data.sessionId;
-        setSessionMap(prevMap => ({
+        setSessionMap((prevMap) => ({
           ...prevMap,
-          [filePath]: newSessionId
+          [filePath]: newSessionId,
         }));
         setCurrentSessionId(newSessionId);
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Failed to create session:', error);
         alert('Failed to create session: ' + error.message);
       });
   };
 
-  // DISABLED: loadUiState no longer loads the last selected file/variable
   const loadUiState = () => {
     const uiStateJson = localStorage.getItem('uiState');
     if (uiStateJson) {
@@ -54,10 +54,9 @@ const App: React.FC = () => {
     }
   };
 
-  // DISABLED: saveUiState no longer stores selected file/variable
   const saveUiState = (uiState: { ExpandedNodes: string[] }) => {
     const newUiState = {
-      ExpandedNodes: uiState.ExpandedNodes
+      ExpandedNodes: uiState.ExpandedNodes,
     };
     localStorage.setItem('uiState', JSON.stringify(newUiState));
   };
@@ -67,17 +66,19 @@ const App: React.FC = () => {
   }, []);
 
   return (
-    <Box sx={{ display: 'flex' }}>
-      <CssBaseline />
-      <Navigation onSelected={handleSelected} initiallySelectedPath={null} />
-      {currentSessionId && (
-        <ExecutionView
-          sessionId={currentSessionId}
-          initiallySelectedNode={currentNode}
-          onNodeSelect={handleNodeSelect}
-        />
-      )}
-    </Box>
+    <FsStudioProvider>
+      <Box sx={{ display: 'flex' }}>
+        <CssBaseline />
+        <Navigation onSelected={handleSelected} initiallySelectedPath={null} />
+        {currentSessionId && (
+          <ExecutionView
+            sessionId={currentSessionId}
+            initiallySelectedNode={currentNode}
+            onNodeSelect={handleNodeSelect}
+          />
+        )}
+      </Box>
+    </FsStudioProvider>
   );
 };
 

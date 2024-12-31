@@ -1,3 +1,4 @@
+// ExecutionView.tsx
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Grid, Typography, Tab, Tabs, Box, IconButton } from '@mui/material';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
@@ -9,25 +10,16 @@ import TextLogger from './RemoteLogger';
 import ReactMarkdown from 'react-markdown';
 import { SERVER_URL, SERVER_WS_URL } from '../backend';
 import CodeEditor from '../code-editor/CodeEditor';
-import { EvalNodeProvider, ExpressionType } from './EvalNodeProvider';
+import { ExpressionType } from './EvalNodeProvider';
 import { EvalNodeTree } from './EvalNodeTree';
-
-interface ErrorItem {
-  type: string;
-  message: string;
-  stackTrace?: string;
-}
-
-interface ErrorData {
-  errors: ErrorItem[];
-}
+import { useFsStudio } from '../FsStudioProvider';
 
 const ExecutionView: React.FC<{
   sessionId: string;
   initiallySelectedNode: string | null;
   onNodeSelect: (nodePath: string | null) => void;
 }> = ({ sessionId, initiallySelectedNode, onNodeSelect }) => {
-  const [selectedNode, setSelectedNode] = useState<string | null>(null);
+  const [selectedNode, setSelectedNode] = useState<string | null>(initiallySelectedNode);
   const [expression, setExpression] = useState<string | null>(null);
   const [lastSavedExpression, setLastSavedExpression] = useState<string | null>(null);
   const [saveStatus, setSaveStatus] = useState('All changes saved');
@@ -46,14 +38,14 @@ const ExecutionView: React.FC<{
   const [queuedExpression, setQueuedExpression] = useState<string | null>(null);
 
   useEffect(() => {
-    setSelectedNode(null);
+    setSelectedNode(initiallySelectedNode);
     setExpression(null);
     setLastSavedExpression(null);
     setSaveStatus('All changes saved');
     setResultText('');
     setMessages([]);
     setMarkdown('');
-  }, [sessionId]);
+  }, [sessionId, initiallySelectedNode]);
 
   useEffect(() => {
     if (expression === lastSavedExpression) {
@@ -80,7 +72,7 @@ const ExecutionView: React.FC<{
         })
         .catch((error) => {
           if (error.response && error.response.data) {
-            setResultText(formatErrorData(error.response.data as ErrorData));
+            setResultText(formatErrorData(error.response.data));
           } else {
             setResultText('Failed to evaluate expression');
           }
@@ -120,6 +112,7 @@ const ExecutionView: React.FC<{
       setExpression('');
       setLastSavedExpression(null);
       setSaveStatus('All changes saved');
+      onNodeSelect(null);
       return;
     }
     axios
@@ -130,11 +123,11 @@ const ExecutionView: React.FC<{
         setLastSavedExpression(response.data.expression);
         setSelectedExpressionType(response.data.expressionType);
         setSaveStatus('All changes saved');
+        onNodeSelect(nodePath);
       });
-    onNodeSelect(nodePath);
   };
 
-  function formatErrorData(errorData: ErrorData): string {
+  function formatErrorData(errorData: { errors: { type: string; message: string; stackTrace?: string }[] }) {
     return errorData.errors
       .map((error, index) => {
         return `Error ${index + 1}:
@@ -212,14 +205,7 @@ StackTrace: ${error.stackTrace || 'N/A'}
         clearTimeout(saveTimerRef.current);
       }
     };
-  }, [
-    expression,
-    selectedNode,
-    lastSavedExpression,
-    queuedExpression,
-    savingInProgress,
-    saveExpression,
-  ]);
+  }, [expression, selectedNode, lastSavedExpression, queuedExpression, savingInProgress, saveExpression]);
 
   const isSaveDisabled = expression === lastSavedExpression;
 
@@ -337,20 +323,19 @@ StackTrace: ${error.stackTrace || 'N/A'}
 
       <Grid item xs={4} sx={{ height: '100%', overflow: 'auto' }}>
         {sessionId && (
-          <EvalNodeProvider>
-            <EvalNodeTree
-              rootNode={{
-                name: 'Root Node',
-                path: null,
-                expression: null,
-                expressionType: ExpressionType.FuncScript,
-                childrenCount: 0,
-              }}
-              sessionId={sessionId}
-              onSelect={handleNodeSelect}
-              selectedNode={selectedNode}
-            />
-          </EvalNodeProvider>
+          // We no longer wrap with <EvalNodeProvider>, we just use FsStudio:
+          <EvalNodeTree
+            rootNode={{
+              name: 'Root Node',
+              path: null,
+              expression: null,
+              expressionType: ExpressionType.FuncScript,
+              childrenCount: 0,
+            }}
+            sessionId={sessionId}
+            onSelect={handleNodeSelect}
+            selectedNode={selectedNode}
+          />
         )}
       </Grid>
     </Grid>
