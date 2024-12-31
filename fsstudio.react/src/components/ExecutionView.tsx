@@ -12,7 +12,6 @@ import { SERVER_URL, SERVER_WS_URL } from '../backend';
 import CodeEditor from '../code-editor/CodeEditor';
 import { ExpressionType } from './EvalNodeProvider';
 import { EvalNodeTree } from './EvalNodeTree';
-import { useFsStudio } from '../FsStudioProvider';
 
 const ExecutionView: React.FC<{
   sessionId: string;
@@ -39,8 +38,6 @@ const ExecutionView: React.FC<{
 
   useEffect(() => {
     setSelectedNode(initiallySelectedNode);
-    setExpression(null);
-    setLastSavedExpression(null);
     setSaveStatus('All changes saved');
     setResultText('');
     setMessages([]);

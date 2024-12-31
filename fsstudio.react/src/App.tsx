@@ -1,8 +1,8 @@
 // App.tsx
 import React, { useEffect, useState } from 'react';
 import { CssBaseline, Box } from '@mui/material';
-import Navigation from './execution/Navigation';
-import ExecutionView from './execution/ExecutionView';
+import Navigation from './components/Navigation';
+import ExecutionView from './components/ExecutionView';
 import axios from 'axios';
 import { SERVER_URL } from './backend';
 import { FsStudioProvider } from './FsStudioProvider';

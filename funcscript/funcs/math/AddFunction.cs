@@ -237,16 +237,14 @@ namespace funcscript.funcs.math
                         isString = false;
                         listTotal = new List<FsList>(new[] { new ArrayFsList(new object[] { stringTotal.ToString() }) });
                     }
-                    else if (d is KeyValueCollection)
-                    {
-                        return new FsError(FsError.ERROR_TYPE_MISMATCH, $"{this.Symbol}: Key value collection not expected");
-                    }
                     else if (d is FsError)
                     {
                         return d;
                     }
                     else
-                        return new FsError(FsError.ERROR_TYPE_MISMATCH, $"{this.Symbol}: Key value collection not expected");                
+                    {
+                        stringTotal.Append(FuncScript.FormatToJson(d));
+                    }                
                 }
                 if (isKv)
                 {

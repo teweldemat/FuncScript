@@ -15,17 +15,17 @@ namespace funcscript.core
             {
                 return new ExpressionBlockResult(null, null, index);
             }
-            var prog = result.Block;
+            var expressionBlock = result.Block;
             var parseNode = result.ParseNode;
 
-            allOperands.Add(prog);
+            allOperands.Add(expressionBlock);
             childNodes.Add(parseNode);
             var i = SkipSpace(context, result.NextIndex).NextIndex;
 
             var identifierResult = GetIdentifier(context, i, false);
             if (identifierResult.NextIndex == i)
             {
-                return new ExpressionBlockResult(prog, parseNode, i);
+                return new ExpressionBlockResult(expressionBlock, parseNode, i);
             }
             var func = context.ReferenceProvider.Get(identifierResult.IdenLower);
             if (!(func is IFsFunction inf))
@@ -35,7 +35,7 @@ namespace funcscript.core
             }
             if (inf.CallType != CallType.Dual)
             {
-                return new ExpressionBlockResult(prog, parseNode, i);
+                return new ExpressionBlockResult(expressionBlock, parseNode, i);
             }
 
             childNodes.Add(identifierResult.ParseNode);
@@ -72,16 +72,16 @@ namespace funcscript.core
                 return new ExpressionBlockResult(null, null, index);
             }
 
-            prog = new FunctionCallExpression
+            expressionBlock = new FunctionCallExpression
             {
                 Function = new LiteralBlock(func),
                 Parameters = allOperands.ToArray()
             };
-            prog.SetContext(context.ReferenceProvider);
+            expressionBlock.SetContext(context.ReferenceProvider);
             parseNode = new ParseNode(ParseNodeType.InfixExpression, childNodes[0].Pos,
                 childNodes[^1].Pos + childNodes[^1].Length + childNodes[0].Pos,childNodes);
 
-            return new ExpressionBlockResult(prog, parseNode, i);
+            return new ExpressionBlockResult(expressionBlock, parseNode, i);
         }
     }
 }
