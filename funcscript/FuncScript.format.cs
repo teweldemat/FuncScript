@@ -129,6 +129,7 @@ public static partial class FuncScript
             sb.Append($"  type: {error.ErrorType}");
             if (error.ErrorData != null)
                 sb.Append($"\nData:\n{error.ErrorData}");
+            return;
         }
 
         if (val == null)

@@ -1,3 +1,4 @@
+using System.Text;
 using funcscript.core;
 using funcscript.model;
 
@@ -40,19 +41,35 @@ namespace funcscript.funcs.text
                 return str;
             if (str == null)
                 return null;
-            switch (format.ToLower())
+            try
             {
-                case "hex":
-                    if (str.StartsWith("0x"))
-                        return Convert.ToInt32(str, 16);
-                    return Convert.ToInt32("0x" + str, 16);
-                case "l":
-                    return Convert.ToInt64(str);
-                case "fs":
-                    return FuncScript.Evaluate(this, str); // Assuming parent context is not needed or it is correctly handled within FuncScript.Evaluate
-                default:
-                    return str;
+                switch (format.ToLower())
+                {
+                    case "hex":
+                        if (str.StartsWith("0x"))
+                            return Convert.ToInt32(str, 16);
+                        return Convert.ToInt32("0x" + str, 16);
+                    case "l":
+                        return Convert.ToInt64(str);
+                    case "fs":
+                        return FuncScript.Evaluate(this, str);
+                    default:
+                        return str;
+                }
             }
+            catch (Exception e)
+            {
+                var sb = new StringBuilder();
+                while (e!=null)
+                {
+                    sb.Append(e.Message);
+                    e = e.InnerException;
+                    if(e!=null)
+                        sb.Append("\n");
+                }
+                return new FsError(FsError.ERROR_TYPE_EVALUATION,  sb.ToString());
+            }
+
         }
 
         public string ParName(int index)
