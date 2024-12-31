@@ -7,7 +7,7 @@ namespace funcscript.core
         record GetKvcItemResult(KvcExpression.KeyValueExpression Item, ParseNode ParseNode, int NextIndex)
             :ParseResult(ParseNode,NextIndex);
 
-        static GetKvcItemResult GetKvcItem(ParseContext context, bool nakedKvc, int index)
+        static GetKvcItemResult GetKvcItem(ParseContext context, int index)
         {
             KvcExpression.KeyValueExpression item = null;
             var result = GetKeyValuePair(context, index);
@@ -27,8 +27,7 @@ namespace funcscript.core
                 return new GetKvcItemResult(item, returnDefResult.ParseNode, returnDefResult.NextIndex);
             }
 
-            if (!nakedKvc)
-            {
+            
                 var identifierResult = GetIdentifier(context, index, false);
 
                 if (identifierResult.NextIndex > index)
@@ -64,7 +63,7 @@ namespace funcscript.core
                     item.ValueExpression.SetContext(context.ReferenceProvider);
                     return new GetKvcItemResult(item, simpleStringResult.ParseNode, simpleStringResult.NextIndex);
                 }
-            }
+            
 
             return new GetKvcItemResult(item, null, index);
         }

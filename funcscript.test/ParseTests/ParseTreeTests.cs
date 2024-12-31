@@ -13,6 +13,51 @@ namespace funcscript.test
 {
     internal class ParseTreeTests
     {
+        public static void AssertNoOverlappingSpans(ParseNode node)
+        {
+            int nodeStart = node.Pos;
+            int nodeEnd = node.Pos + node.Length;
+
+            // Make sure this node's children are within its own span
+            foreach (var child in node.Children)
+            {
+                int childStart = child.Pos;
+                int childEnd = child.Pos + child.Length;
+                Assert.That(childStart >= nodeStart, 
+                    $"Child start {childStart} is before the parent start {nodeStart}");
+                Assert.That(childEnd <= nodeEnd, 
+                    $"Child end {childEnd} is after the parent end {nodeEnd}");
+            }
+
+            // Make sure children don't overlap each other
+            for (int i = 0; i < node.Children.Count; i++)
+            {
+                var c1 = node.Children[i];
+                int c1Start = c1.Pos;
+                int c1End = c1.Pos + c1.Length;
+
+                for (int j = i + 1; j < node.Children.Count; j++)
+                {
+                    var c2 = node.Children[j];
+                    int c2Start = c2.Pos;
+                    int c2End = c2.Pos + c2.Length;
+
+                    Assert.That(!Overlaps(c1Start, c1End, c2Start, c2End),
+                        $"ParseNode children overlap: [{c1Start},{c1End}) overlaps [{c2Start},{c2End})");
+                }
+            }
+
+            // Recurse into children
+            foreach (var child in node.Children)
+            {
+                AssertNoOverlappingSpans(child);
+            }
+        }
+
+        private static bool Overlaps(int start1, int end1, int start2, int end2)
+        {
+            return (start1 < end2) && (start2 < end1);
+        }
         static ParseNode Flatten(ParseNode node)
         {
             if (node.Children.Count == 1)
@@ -102,12 +147,26 @@ namespace funcscript.test
 
             Assert.IsNotNull(parseNode, "ParseNode should not be null.");
             Assert.AreEqual(ParseNodeType.KeyValueCollection, parseNode.NodeType);
-            Assert.AreEqual(2, parseNode.Children?.Count ?? 2);
-            //Assert.AreEqual(0, parseNode.Pos, "Expected position to be 0.");
-            //Assert.AreEqual(2, parseNode.Length, "Expected length to be 3.");
+            Assert.AreEqual(1, parseNode.Children?.Count ?? 0);
+            
+            var ret = parseNode!.Children[0];
+            Assert.AreEqual(ParseNodeType.ReturnExpression, ret.NodeType);
+            Assert.AreEqual(2, ret.Children?.Count ?? 0);
 
-            Assert.AreEqual(ParseNodeType.PrefixOperatorExpression, parseNode.Children[1].NodeType);
+            var retKey = ret.Children[0];
+            Assert.AreEqual(ParseNodeType.KeyWord, retKey.NodeType);
+            Assert.AreEqual(0, retKey.Children?.Count ?? 0);
+            
 
+            var retExp = ret.Children[1];
+            Assert.AreEqual(ParseNodeType.PrefixOperatorExpression, retExp.NodeType);
+            Assert.AreEqual(2, retExp.Children?.Count ?? 0);
+
+            Assert.AreEqual(ParseNodeType.Operator, retExp.Children[0].NodeType);
+            Assert.AreEqual(0, retExp.Children[0].Children?.Count ?? 0);
+
+            Assert.AreEqual(ParseNodeType.Identifier, retExp.Children[1].NodeType);
+            Assert.AreEqual(0, retExp.Children[1].Children?.Count ?? 0);
 
         }
     }

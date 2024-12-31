@@ -31,7 +31,7 @@ namespace funcscript.core
                     continue;
                 }
 
-                (var kvc,var nodeKvc,i2) = GetKvcExpression(context, false, i);
+                (var kvc,var nodeKvc,i2) = GetKvcExpression(context,  i);
                 if (i2 > i)
                 {
                     i = i2;

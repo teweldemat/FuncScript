@@ -16,12 +16,20 @@ public class MapFilterBug
         var (exp, node, _) = FuncScriptParser.Parse(context);
         Assert.NotNull(node);
         Assert.That(node.NodeType,Is.EqualTo(FuncScriptParser.ParseNodeType.InfixExpression));
+        Assert.That(node.Pos,Is.EqualTo(0));
+        Assert.That(node.Length,Is.EqualTo(expStr.Length));
         Assert.That(node.Children.Count,Is.EqualTo(5));
+        
         Assert.That(node.Children[0].NodeType,Is.EqualTo(FuncScriptParser.ParseNodeType.List));
         Assert.That(node.Children[1].NodeType,Is.EqualTo(FuncScriptParser.ParseNodeType.Identifier));
         Assert.That(node.Children[2].NodeType,Is.EqualTo(FuncScriptParser.ParseNodeType.ExpressionInBrace));
         Assert.That(node.Children[3].NodeType,Is.EqualTo(FuncScriptParser.ParseNodeType.Identifier));
-        Assert.That(node.Children[4].NodeType,Is.EqualTo(FuncScriptParser.ParseNodeType.LambdaExpression));
+        var lambda = node.Children[4];
+        Assert.That(lambda.NodeType,Is.EqualTo(FuncScriptParser.ParseNodeType.LambdaExpression));
+        
+        Assert.That(lambda.Children[1].Children[2].NodeType,Is.EqualTo(FuncScriptParser.ParseNodeType.LiteralInteger));
+        
+        ParseTreeTests.AssertNoOverlappingSpans(node);
         
         var res = exp.Evaluate();
         Assert.That(FuncScript.FormatToJson(res).Replace(" ",""), Is.EqualTo("[]"));

@@ -10,13 +10,15 @@ namespace funcscript.core
         static ExpressionBlockResult GetPrefixOperator(ParseContext context, int index)
         {
             int i = 0;
-            (var oper,var func,var opNode, i) = GetOperator(context, s_prefixOp.Select(x=>x[0]).ToArray(),index);
-            
+            (var oper,var opNode, i) = GetOperator(context, s_prefixOp.Select(x=>x[0]).ToArray(),index);
 
             if (i == index)
             {
                 return new ExpressionBlockResult(null, null, index);
             }
+
+            var symbol = s_prefixOp.First(x => x[0] == oper)[1];
+            var func = context.ReferenceProvider.Get(symbol);
             if (func == null)
             {
                 context.SyntaxErrors.Add(new SyntaxErrorData(index, i - index, $"Prefix operator {oper} not defined"));

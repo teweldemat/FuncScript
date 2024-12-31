@@ -7,7 +7,7 @@ namespace funcscript.core
     public partial class FuncScriptParser
     {
         
-        record GetOperatorResult(string MatchedOp, IFsFunction Oper, ParseNode ParseNode, int NextIndex)
+        record GetOperatorResult(string MatchedOp, ParseNode ParseNode, int NextIndex)
             :ParseResult(ParseNode,NextIndex);
 
         static GetOperatorResult GetOperator(ParseContext context, string[] candidates, int index)
@@ -18,18 +18,11 @@ namespace funcscript.core
                 var i = literalMatchResult.NextIndex;
                 if (i <= index) continue;
 
-                var func = context.ReferenceProvider.Get(op);
-                var oper = func as IFsFunction;
-                if (oper != null && oper is ExpressionBlock expressionBlock)
-                {
-                    expressionBlock.SetContext(context.ReferenceProvider);
-                }
-
                 var parseNode = new ParseNode(ParseNodeType.Operator, index, i - index);
-                return new GetOperatorResult(op, oper, parseNode, i);
+                return new GetOperatorResult(op,  parseNode, i);
             }
 
-            return new GetOperatorResult(null, null, null, index);
+            return new GetOperatorResult(null, null, index);
         }
     }
 }

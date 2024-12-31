@@ -3,6 +3,7 @@ using funcscript.model;
 
 namespace funcscript.funcs.math
 {
+    
     public class NegateFunction : IFsFunction
     {
         public const string SYMBOL = "neg";

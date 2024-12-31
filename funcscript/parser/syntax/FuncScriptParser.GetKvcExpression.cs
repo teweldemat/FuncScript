@@ -5,20 +5,19 @@ namespace funcscript.core
     public partial class FuncScriptParser
     {
 
-        static ExpressionBlockResult GetKvcExpression(ParseContext context, bool nakdeMode, int index)
+        static ExpressionBlockResult GetKvcExpression(ParseContext context,int index)
         {
             var syntaxErrors = context.SyntaxErrors;
             ParseNode parseNode = null;
             KvcExpression kvcExpr = null;
             var i = SkipSpace(context, index).NextIndex;
             int i2;
-            if (!nakdeMode)
-            {
+            
                 i2 = GetLiteralMatch(context, i, "{").NextIndex;
                 if (i2 == i)
                     return new ExpressionBlockResult(null, null, index);
                 i = SkipSpace(context, i2).NextIndex;
-            }
+            
 
             var kvs = new List<KvcExpression.KeyValueExpression>();
             var nodeItems = new List<ParseNode>();
@@ -33,7 +32,7 @@ namespace funcscript.core
                     i = SkipSpace(context, i2).NextIndex;
                 }
 
-                var kvcItemResult = GetKvcItem(context, nakdeMode,  i);
+                var kvcItemResult = GetKvcItem(context,  i);
                 i2 = kvcItemResult.NextIndex;
                 var otherItem = kvcItemResult.Item;
                 var nodeOtherItem = kvcItemResult.ParseNode;
@@ -57,8 +56,7 @@ namespace funcscript.core
                 i = SkipSpace(context, i2).NextIndex;
             } while (true);
 
-            if (!nakdeMode)
-            {
+            
                 i2 = GetLiteralMatch(context, i, "}").NextIndex;
                 if (i2 == i)
                 {
@@ -67,13 +65,7 @@ namespace funcscript.core
                 }
 
                 i = SkipSpace(context, i2).NextIndex;
-            }
-
-            if (nakdeMode)
-            {
-                if (kvs.Count == 0 && retExp == null)
-                    return new ExpressionBlockResult(null, null, index);
-            }
+            
 
             kvcExpr = new KvcExpression();
             kvcExpr.SetContext(context.ReferenceProvider);

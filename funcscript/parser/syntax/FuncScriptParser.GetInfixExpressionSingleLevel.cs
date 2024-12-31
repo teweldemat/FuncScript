@@ -45,7 +45,6 @@ namespace funcscript.core
                 var indexBeforeOperator = i;
                 var operatorResult = GetOperator(context, candidates, i);
                 symbol = operatorResult.MatchedOp;
-                oper = operatorResult.Oper;
                 operatorNode = operatorResult.ParseNode;
                 i2 = operatorResult.NextIndex;
 

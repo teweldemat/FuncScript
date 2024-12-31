@@ -64,7 +64,7 @@ namespace funcscript.core
             }
 
             //kvc expression
-            var kvcExprResult = GetKvcExpression(context, false, index);
+            var kvcExprResult = GetKvcExpression(context, index);
             i = kvcExprResult.NextIndex;
             if (i > index)
             {
