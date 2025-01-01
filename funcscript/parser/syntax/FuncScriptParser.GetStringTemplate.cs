@@ -123,10 +123,7 @@ namespace funcscript.core
                     lb.SetContext(provider);
                     parts.Add(lb);
                     nodeParts.Add(new ParseNode(ParseNodeType.LiteralString, lastIndex, i - lastIndex));
-                    sb = new StringBuilder();
                 }
-
-                nodeParts.Add(new ParseNode(ParseNodeType.LiteralString, lastIndex, i - lastIndex));
             }
 
             i2 = GetLiteralMatch(context, i, delimiter).NextIndex;

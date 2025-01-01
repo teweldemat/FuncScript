@@ -81,7 +81,7 @@ namespace funcscript.core
                 // Check if this operator can also gather extra operands via '~'
                 while (true)
                 {
-                    var literalResult = GetLiteralMatchMultiple(context, index, new string[] { "~" });
+                    var literalResult = GetLiteralMatch(context, index,  "~" );
                     if (literalResult.NextIndex == index)
                     {
                         // No "~" found; stop collecting extra operands

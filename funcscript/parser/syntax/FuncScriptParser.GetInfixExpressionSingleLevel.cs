@@ -29,7 +29,7 @@ namespace funcscript.core
                     }
                     else
                     {
-                        var result = GetInfixExpressionSingleLevel(context, level - 1, s_operatorSymols[level - 1], i);
+                        var result = GetInfixExpressionSingleLevel(context, level - 1, s_operatorSymbols[level - 1], i);
                         prog = result.Block;
                         parseNode = result.ParseNode;
                         i2 = result.NextIndex;
@@ -69,7 +69,7 @@ namespace funcscript.core
                     }
                     else
                     {
-                        var result = GetInfixExpressionSingleLevel(context, level - 1, s_operatorSymols[level - 1], i);
+                        var result = GetInfixExpressionSingleLevel(context, level - 1, s_operatorSymbols[level - 1], i);
                         nextOperand = result.Block;
                         nextOperandNode = result.ParseNode;
                         i2 = result.NextIndex;

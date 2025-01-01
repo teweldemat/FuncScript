@@ -10,7 +10,7 @@ test("Map lambda expression parsed correctly", () => {
     const res = Parse(c);
   
     expect(res.ParseNode).toBeDefined();
-    expect(res.ParseNode!.NodeType).toBe(ParseNodeType.GeneralInfixExpression);
+    expect(res.ParseNode!.NodeType).toBe(ParseNodeType.InfixExpression);
   
     expect(res.ParseNode!.Children.length).toBe(3);
   

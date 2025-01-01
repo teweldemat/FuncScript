@@ -8,7 +8,7 @@ namespace funcscript.core
         record GetKeyValuePairResult(KvcExpression.KeyValueExpression KeyValue, ParseNode ParseNode, int NextIndex)
             :ParseResult(ParseNode,NextIndex);
 
-        static GetKeyValuePairResult GetKeyValuePair(ParseContext context, int index)
+        static GetKeyValuePairResult GetKeyValuePair(ParseContext context, int index,bool allowKeyOnly)
         {
             ParseNode parseNode = null;
             KvcExpression.KeyValueExpression keyValue = null;
@@ -29,6 +29,12 @@ namespace funcscript.core
             var i2 = GetLiteralMatch(context, i, ":").NextIndex;
             if (i2 == i)
             {
+                if (!allowKeyOnly)
+                {
+                    context.SyntaxErrors.Add(new SyntaxErrorData(i, 0, "':' expected"));
+                    return new GetKeyValuePairResult(null, null, index);
+                }
+
                 keyValue = new KvcExpression.KeyValueExpression
                 {
                     Key = name,

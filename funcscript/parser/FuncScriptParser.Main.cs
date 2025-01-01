@@ -70,7 +70,7 @@ namespace funcscript.core
             }
         }
 
-        static string[][] s_operatorSymols =
+        static string[][] s_operatorSymbols =
         {
             new[] { "^" },
             new[] { "*", "/", "%" },

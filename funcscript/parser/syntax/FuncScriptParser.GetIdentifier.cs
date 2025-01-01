@@ -32,7 +32,7 @@ namespace funcscript.core
                 }
             }
 
-            if (!IsIdentfierFirstChar(exp[i]))
+            if (!IsIdentifierFirstChar(exp[i]))
                 return new GetIdentifierResult(iden, idenLower, parentRef, parseNode, index);
             i++;
             while (i < exp.Length && IsIdentfierOtherChar(exp[i]))

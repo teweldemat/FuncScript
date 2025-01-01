@@ -8,7 +8,7 @@ namespace funcscript.funcs.list
     {
         private const int MaxParameters = 2;
 
-        public CallType CallType => CallType.Prefix;
+        public CallType CallType => CallType.Dual;
 
         public string Symbol => "Take";
 

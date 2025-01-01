@@ -6,37 +6,14 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static ExpressionBlockResult GetRootExpression(ParseContext context, int index)
+        static ExpressionBlockResult GetRootExpression(ParseContext context)
         {
-            var thisErrors = new List<SyntaxErrorData>();
-            var result = GetExpression(context, index);
-            if (result.NextIndex > index)
-            {
-                result.Block.SetContext(context.ReferenceProvider);
-                context.SyntaxErrors.AddRange(thisErrors);
-                return result;
-            }
-            return new ExpressionBlockResult(null, null, index);
-            /*
-            var thisErrors = new List<SyntaxErrorData>();
-            var kvcResult = GetKvcExpression(new ParseContext(context.Provider, context.Expression, thisErrors), false, index);
-            if (kvcResult.NextIndex > index)
-            {
-                kvcResult.Expression.SetContext(context.Provider);
-                context.Serrors.AddRange(thisErrors);
-                return kvcResult;
-            }
-
-            thisErrors = new List<SyntaxErrorData>();
-            var expressionResult = GetExpression(context, index);
-            if (expressionResult.NextIndex > index)
-            {
-                expressionResult.Expression.SetContext(context.Provider);
-                context.Serrors.AddRange(thisErrors);
-                return expressionResult;
-            }
-            return new ParseResult(null, null, index);
-            */
+            var res1 = GetNakedKvc(context, 0);
+            if (res1.NextIndex == context.Expression.Trim().Length)
+                return res1;
+            context.SyntaxErrors.Clear();
+            return GetExpression(context, 0);
+            
         }
     }
 }
