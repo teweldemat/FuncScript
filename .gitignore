@@ -400,3 +400,11 @@ FodyWeavers.xsd
 #orch
 orch.content/files/
 .DS_Store
+
+
+# Build output
+dist/
+
+# Temporary files
+*.log
+*.tmp
