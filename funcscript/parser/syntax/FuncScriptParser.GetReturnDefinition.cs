@@ -1,6 +1,7 @@
 using funcscript.block;
 using funcscript.funcs.math;
 using funcscript.model;
+
 namespace funcscript.core
 {
     public partial class FuncScriptParser
@@ -25,7 +26,6 @@ namespace funcscript.core
 
             i = exprResult.NextIndex;
             retExp = exprResult.Block;
-            retExp.SetContext(context.ReferenceProvider);
             retExp.CodePos = index;
             retExp.CodeLength = i - index;
             parseNode = new ParseNode(ParseNodeType.ReturnExpression, index, i - index,

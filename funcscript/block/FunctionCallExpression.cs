@@ -47,12 +47,12 @@ namespace funcscript.block
 
         private KeyValueCollection _context = null;
 
-        public override void SetContext(KeyValueCollection provider)
+        public override void SetReferenceProvider(KeyValueCollection provider)
         {
             _context = provider;
-            this.Function.SetContext(provider);
+            this.Function.SetReferenceProvider(provider);
             foreach (var p in Parameters)
-                p.SetContext(provider);
+                p.SetReferenceProvider(provider);
         }
 
 
@@ -141,16 +141,9 @@ namespace funcscript.block
 
         public override string AsExpString()
         {
-            string infix = null;
-            var f = this.Function.Evaluate() as IFsFunction;
-            if (f != null && f.CallType == CallType.Prefix)
-            {
-                infix = f.Symbol;
-            }
+            
 
             var sb = new StringBuilder();
-            if (infix == null)
-            {
                 sb.Append(this.Function.AsExpString());
                 sb.Append("(");
                 if (Parameters.Length > 0)
@@ -164,19 +157,7 @@ namespace funcscript.block
                 }
 
                 sb.Append(")");
-            }
-            else
-            {
-                if (Parameters.Length > 0)
-                {
-                    sb.Append(this.Parameters[0].AsExpString());
-                    for (int i = 1; i < Parameters.Length; i++)
-                    {
-                        sb.Append($" {infix} ");
-                        sb.Append(this.Parameters[i].AsExpString());
-                    }
-                }
-            }
+            
 
             return sb.ToString();
         }

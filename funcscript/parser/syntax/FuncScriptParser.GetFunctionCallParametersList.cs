@@ -12,7 +12,6 @@ namespace funcscript.core
             return result;
         }
 
-
         static ExpressionBlockResult GetFunctionCallParametersList(ParseContext context, string openBrace, string closeBrace,
             ExpressionBlock func, int index)
         {
@@ -73,7 +72,7 @@ namespace funcscript.core
                 CodePos = func.CodePos,
                 CodeLength = i - func.CodePos,
             };
-            prog.SetContext(context.ReferenceProvider);
+
             parseNode = new ParseNode(ParseNodeType.FunctionParameterList, index, i - index, parseNodes);
             return new ExpressionBlockResult(prog, parseNode, i);
         }

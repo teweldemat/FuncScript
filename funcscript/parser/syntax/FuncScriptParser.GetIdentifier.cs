@@ -1,12 +1,12 @@
 using funcscript.core;
 using funcscript.model;
+
 namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-
         record GetIdentifierResult(string Iden, string IdenLower, bool ParentRef, ParseNode ParseNode, int NextIndex)
-            :ParseResult(ParseNode,NextIndex);
+            : ParseResult(ParseNode, NextIndex);
 
         static GetIdentifierResult GetIdentifier(ParseContext context, int index, bool supportParentRef)
         {

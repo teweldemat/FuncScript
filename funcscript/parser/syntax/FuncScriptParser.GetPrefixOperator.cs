@@ -10,7 +10,7 @@ namespace funcscript.core
         static ExpressionBlockResult GetPrefixOperator(ParseContext context, int index)
         {
             int i = 0;
-            (var oper,var opNode, i) = GetOperator(context, s_prefixOp.Select(x=>x[0]).ToArray(),index);
+            (var oper, var opNode, i) = GetOperator(context, s_prefixOp.Select(x => x[0]).ToArray(), index);
 
             if (i == index)
             {
@@ -25,9 +25,7 @@ namespace funcscript.core
                 return new ExpressionBlockResult(null, null, index);
             }
 
-            
             i = SkipSpace(context, i).NextIndex;
-            
 
             var operandRes = GetCallAndMemberAccess(context, i);
             if (operandRes.NextIndex == i)
@@ -45,10 +43,10 @@ namespace funcscript.core
                 CodePos = index,
                 CodeLength = i - index,
             };
-            expBlock.SetContext(context.ReferenceProvider);
+
             var parseNode = new ParseNode(ParseNodeType.PrefixOperatorExpression, index, i - index,
-            new[]{opNode,operandRes.ParseNode});
-            
+            new[] { opNode, operandRes.ParseNode });
+
             return new ExpressionBlockResult(expBlock, parseNode, i);
         }
     }

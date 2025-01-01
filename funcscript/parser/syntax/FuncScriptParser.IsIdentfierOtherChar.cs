@@ -7,5 +7,6 @@ namespace funcscript.core
             return char.IsLetterOrDigit(ch) || ch == '_';
         }
         
+        // Other parser methods can be defined here as needed.
     }
 }

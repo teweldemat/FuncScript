@@ -40,7 +40,7 @@ namespace funcscript.core
         private object _expressionValue = null;
         private KeyValueCollection _context = null;
 
-        public void SetContext(KeyValueCollection context)
+        public void SetReferenceProvider(KeyValueCollection context)
         {
             _context = context;
         }
@@ -64,7 +64,7 @@ namespace funcscript.core
             if (_context == null)
                 throw new error.EvaluationTimeException("Context not set to expression function");
             var clone = this.Expression.CloneExpression();
-            clone.SetContext( new ParameterDataProvider
+            clone.SetReferenceProvider( new ParameterDataProvider
             {
                 expressionFunction = this,
                 EvaluationContext = _context,
@@ -76,7 +76,7 @@ namespace funcscript.core
         public object EvaluateWithContext(KeyValueCollection context, FsList pars)
         {
             var clone = this.Expression.CloneExpression();
-            clone.SetContext( new ParameterDataProvider
+            clone.SetReferenceProvider( new ParameterDataProvider
             {
                 expressionFunction = this,
                 EvaluationContext = context,

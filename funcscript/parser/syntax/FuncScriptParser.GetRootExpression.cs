@@ -11,9 +11,9 @@ namespace funcscript.core
             var res1 = GetNakedKvc(context, 0);
             if (res1.NextIndex == context.Expression.Trim().Length)
                 return res1;
+
             context.SyntaxErrors.Clear();
             return GetExpression(context, 0);
-            
         }
     }
 }

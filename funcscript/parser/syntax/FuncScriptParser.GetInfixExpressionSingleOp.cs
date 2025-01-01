@@ -17,9 +17,9 @@ namespace funcscript.core
                 ParseNode operatorNode = null;
                 string symbol = null;
 
-                if (prog == null) //if we are parsing the first operand
+                if (prog == null) // If we are parsing the first operand
                 {
-                    //get an infix with one level higher or call expression when we are parsing for highest precedence operators
+                    // Get an infix with one level higher or call expression when we are parsing for highest precedence operators
                     if (level == 0)
                     {
                         var result = GetCallAndMemberAccess(context, i);
@@ -47,7 +47,7 @@ namespace funcscript.core
                 symbol = operatorResult.MatchedOp;
                 operatorNode = operatorResult.ParseNode;
                 i2 = operatorResult.NextIndex;
-                
+
                 if (i2 == i)
                     break;
 
@@ -75,10 +75,10 @@ namespace funcscript.core
                         nextOperandNode = nextOperandResult.ParseNode;
                         i2 = nextOperandResult.NextIndex;
                     }
-                    
+
                     if (i2 == i)
                         return new ExpressionBlockResult(null, null, indexBeforeOperator);
-                    
+
                     operands.Add(nextOperand);
                     operandNodes.Add(nextOperandNode);
                     i = SkipSpace(context, i2).NextIndex;
@@ -96,7 +96,7 @@ namespace funcscript.core
                     {
                         if (operands.Count > 2)
                         {
-                            context.SyntaxErrors.Add(new SyntaxErrorData(i, 0, "Only two parameters expected for | "));
+                            context.SyntaxErrors.Add(new SyntaxErrorData(i, 0, "Only two parameters expected for | ")); 
                             return new ExpressionBlockResult(null, null, i);
                         }
 
@@ -106,7 +106,6 @@ namespace funcscript.core
                             CodePos = prog.CodePos,
                             CodeLength = operands[^1].CodePos + operands[^1].CodeLength - prog.CodeLength
                         };
-                        prog.SetContext(context.ReferenceProvider);
 
                         parseNode = new ParseNode(ParseNodeType.InfixExpression, parseNode!.Pos,
                             operandNodes[^1].Pos + operandNodes[^1].Length - parseNode.Length);
@@ -120,7 +119,7 @@ namespace funcscript.core
                             CodePos = prog.CodePos,
                             CodeLength = operands[^1].CodePos + operands[^1].CodeLength - prog.CodeLength
                         };
-                        prog.SetContext(context.ReferenceProvider);
+
                         parseNode = new ParseNode(ParseNodeType.InfixExpression, parseNode!.Pos,
                             operandNodes[^1].Pos + operandNodes[^1].Length - parseNode.Length);
                     }

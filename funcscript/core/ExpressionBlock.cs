@@ -15,7 +15,7 @@ namespace funcscript.core
     {
         public int CodePos;
         public int CodeLength;
-        public abstract void SetContext(KeyValueCollection provider);
+        public abstract void SetReferenceProvider(KeyValueCollection provider);
         public abstract object Evaluate();
         public abstract IList<ExpressionBlock> GetChilds();
         public abstract string AsExpString();

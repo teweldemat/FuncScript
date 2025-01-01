@@ -418,6 +418,7 @@ namespace funcscript
         {
             try
             {
+                exp.SetReferenceProvider(provider);
                 var ret=exp.Evaluate();
                 return ret;
             }

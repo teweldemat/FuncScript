@@ -21,7 +21,7 @@ namespace funcscript.block
                     if (l is KeyValueCollection e)
                     {
                         var clone = Selector.CloneExpression();
-                        clone.SetContext(e);
+                        clone.SetReferenceProvider(e);
                         ret[i] = clone.Evaluate();
                     }
                     else 
@@ -33,7 +33,7 @@ namespace funcscript.block
             
             if (sourceVal is KeyValueCollection kvcSource)
             {
-                Selector.SetContext(kvcSource);
+                Selector.SetReferenceProvider(kvcSource);
                 return Selector.Evaluate();
             }
 
@@ -53,7 +53,7 @@ namespace funcscript.block
             return $"{Source.AsExpString()} {Selector.AsExpString()}";
         }
 
-        public override void SetContext(KeyValueCollection provider)
+        public override void SetReferenceProvider(KeyValueCollection provider)
         {
             
         }

@@ -5,7 +5,6 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-
         static ParseResult GetSpaceSepratedListExpression(ParseContext context, int index)
         {
             ParseNode parseNode = null;
@@ -14,7 +13,7 @@ namespace funcscript.core
             var tokenStart = i;
             var listItems = new List<ExpressionBlock>();
             var nodeListItems = new List<ParseNode>();
-            (var firstItem,var nodeFirstItem, var i2) = GetExpression(context, i);
+            (var firstItem, var nodeFirstItem, var i2) = GetExpression(context, i);
             if (i2 > i)
             {
                 listItems.Add(firstItem);
@@ -27,7 +26,7 @@ namespace funcscript.core
                         break;
                     i = i2;
                     i = SkipSpace(context, i).NextIndex;
-                    (var otherItem,var nodeOtherItem, i2) = GetExpression(context, i);
+                    (var otherItem, var nodeOtherItem, i2) = GetExpression(context, i);
                     if (i2 == i)
                         break;
                     listItems.Add(otherItem);
@@ -37,7 +36,7 @@ namespace funcscript.core
             }
 
             listExpr = new ListExpression { ValueExpressions = listItems.ToArray() };
-            listExpr.SetContext(context.ReferenceProvider);
+            // The call to SetContext is removed below
             parseNode = new ParseNode(ParseNodeType.List, index, i - tokenStart, nodeListItems);
             return new ExpressionBlockResult(listExpr, parseNode, i);
         }

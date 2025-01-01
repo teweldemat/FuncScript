@@ -26,14 +26,13 @@ namespace funcscript.core
             i2 = GetLiteralMatch(context, i, ")").NextIndex;
             if (i == i2)
             {
-                context.SyntaxErrors.Add(new SyntaxErrorData(i, 0, "')' expected"));
+                context.SyntaxErrors.Add(new SyntaxErrorData(i, 0, ")' expected"));
                 return new ExpressionBlockResult(expBlock, parseNode, index);
             }
 
             i = i2;
             if (expBlock == null)
                 expBlock = new NullExpressionBlock();
-            expBlock.SetContext(context.ReferenceProvider);
 
             parseNode = new ParseNode(ParseNodeType.ExpressionInBrace, index, i - index, new[] { nodeExpression });
             return new ExpressionBlockResult(expBlock, parseNode, i);

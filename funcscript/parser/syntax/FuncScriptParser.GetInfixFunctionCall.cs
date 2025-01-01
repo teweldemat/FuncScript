@@ -34,7 +34,7 @@ namespace funcscript.core
             while (true)
             {
                 // Try to get an identifier as a potential "infix operator"
-                var operatorResult = GetIdentifier(context, index,true);
+                var operatorResult = GetIdentifier(context, index, true);
                 if (operatorResult.NextIndex == index)
                 {
                     // No operator found; break out
@@ -81,7 +81,7 @@ namespace funcscript.core
                 // Check if this operator can also gather extra operands via '~'
                 while (true)
                 {
-                    var literalResult = GetLiteralMatch(context, index,  "~" );
+                    var literalResult = GetLiteralMatch(context, index, "~");
                     if (literalResult.NextIndex == index)
                     {
                         // No "~" found; stop collecting extra operands
@@ -112,7 +112,6 @@ namespace funcscript.core
                     Function = new LiteralBlock(func),
                     Parameters = operands.ToArray()
                 };
-                callExpr.SetContext(context.ReferenceProvider);
 
                 // That becomes our new "running" expression
                 expression = callExpr;

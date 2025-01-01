@@ -30,7 +30,7 @@ public class MapFilterBug
         Assert.That(lambda.Children[1].Children[2].NodeType,Is.EqualTo(FuncScriptParser.ParseNodeType.LiteralInteger));
         
         ParseTreeTests.AssertNoOverlappingSpans(node);
-        
+        exp.SetReferenceProvider(context.ReferenceProvider);
         var res = exp.Evaluate();
         Assert.That(FuncScript.FormatToJson(res).Replace(" ",""), Is.EqualTo("[]"));
     }

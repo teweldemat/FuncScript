@@ -50,7 +50,7 @@ namespace funcscript.core
             i2 = GetLiteralMatch(context, i, "]").NextIndex;
             if (i2 == i)
             {
-                syntaxErrors.Add(new SyntaxErrorData(i, 0, "']' expected"));
+                syntaxErrors.Add(new SyntaxErrorData(i, 0, "]' expected"));
                 return new ExpressionBlockResult(null, null, index);
             }
 
@@ -59,7 +59,6 @@ namespace funcscript.core
             {
                 ValueExpressions = listItems.ToArray()
             };
-            listExpr.SetContext(provider);
             var parseNode = new ParseNode(ParseNodeType.List, index, i - tokenStart, nodeListItems);
             return new ExpressionBlockResult(listExpr, parseNode, i);
         }

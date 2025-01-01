@@ -52,7 +52,6 @@ namespace funcscript.core
 
                     i = SkipSpace(context, i).NextIndex;
 
-                    expr.SetContext(context.ReferenceProvider);
                     parts.Add(expr);
                     nodeParts.Add(nodeExpr);
                     i = i2;
@@ -102,7 +101,6 @@ namespace funcscript.core
                     Function = new LiteralBlock(context.ReferenceProvider.Get(TemplateMergeMergeFunction.SYMBOL)),
                     Parameters = parts.ToArray()
                 };
-                prog.SetContext(context.ReferenceProvider);
                 parseNode = new ParseNode(ParseNodeType.StringTemplate, index, i - index, nodeParts);
             }
 

@@ -6,9 +6,8 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        
         record GetOperatorResult(string MatchedOp, ParseNode ParseNode, int NextIndex)
-            :ParseResult(ParseNode,NextIndex);
+            :ParseResult(ParseNode, NextIndex);
 
         static GetOperatorResult GetOperator(ParseContext context, string[] candidates, int index)
         {
@@ -19,7 +18,7 @@ namespace funcscript.core
                 if (i <= index) continue;
 
                 var parseNode = new ParseNode(ParseNodeType.Operator, index, i - index);
-                return new GetOperatorResult(op,  parseNode, i);
+                return new GetOperatorResult(op, parseNode, i);
             }
 
             return new GetOperatorResult(null, null, index);

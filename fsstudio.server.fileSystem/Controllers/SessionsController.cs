@@ -213,7 +213,8 @@ namespace fsstudio.server.fileSystem.Controllers
 
                 try
                 {
-                    var children = session.GetChildNodeList(nodePath);
+                    var children = session.GetChildNodeList(nodePath)
+                        .OrderBy(x=>x.Name.ToLower());
                     return Ok(children);
                 }
                 catch (Exception ex)

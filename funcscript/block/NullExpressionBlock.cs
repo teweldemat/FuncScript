@@ -17,7 +17,7 @@ namespace funcscript.block
         {
             return "null";
         }
-        public override void SetContext(KeyValueCollection provider)
+        public override void SetReferenceProvider(KeyValueCollection provider)
         {
             
         }

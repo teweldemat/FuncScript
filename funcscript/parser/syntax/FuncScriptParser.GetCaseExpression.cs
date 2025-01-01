@@ -10,7 +10,7 @@ namespace funcscript.core
             ExpressionBlock expBlock = null;
             ParseNode parseNode = null;
             var i = index;
-            var literalMatchResult = GetLiteralMatch(context, i,  KW_CASE);
+            var literalMatchResult = GetLiteralMatch(context, i, KW_CASE);
             if (literalMatchResult.NextIndex == i)
                 return new ExpressionBlockResult(null, null, index);
             
@@ -34,7 +34,7 @@ namespace funcscript.core
                 }
                 else
                 {
-                    literalMatchResult = GetLiteralMatchMultiple(context, i,new [] {",", ";"});
+                    literalMatchResult = GetLiteralMatchMultiple(context, i, new[] { ",", ";" });
                     if (literalMatchResult.NextIndex == i)
                         break;
                     i = SkipSpace(context, literalMatchResult.NextIndex).NextIndex;
@@ -72,7 +72,6 @@ namespace funcscript.core
                 CodeLength = i - index,
                 Parameters = pars.ToArray(),
             };
-            expBlock.SetContext(context.ReferenceProvider);
             parseNode = new ParseNode(ParseNodeType.Case, index, i - index);
             parseNode.Children = childNodes;
             return new ExpressionBlockResult(expBlock, parseNode, i);

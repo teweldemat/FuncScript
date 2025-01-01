@@ -44,7 +44,6 @@ namespace funcscript.core
                         CodeLength = identifierResult.NextIndex - index
                     }
                 };
-                item.ValueExpression.SetContext(context.ReferenceProvider);
                 return new GetKvcItemResult(item, identifierResult.ParseNode, identifierResult.NextIndex);
             }
 
@@ -63,10 +62,8 @@ namespace funcscript.core
                             CodeLength = simpleStringResult.NextIndex - index
                         }
                 };
-                item.ValueExpression.SetContext(context.ReferenceProvider);
                 return new GetKvcItemResult(item, simpleStringResult.ParseNode, simpleStringResult.NextIndex);
             }
-
 
             return new GetKvcItemResult(item, null, index);
         }

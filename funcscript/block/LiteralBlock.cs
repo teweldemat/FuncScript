@@ -34,11 +34,11 @@ namespace funcscript.block
             return Value.ToString();
         }
 
-        public override void SetContext(KeyValueCollection provider)
+        public override void SetReferenceProvider(KeyValueCollection provider)
         {
             if (Value is ExpressionFunction exp)
             {
-                exp.SetContext(provider);
+                exp.SetReferenceProvider(provider);
             }
         }
 

@@ -3,7 +3,6 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-    
         record GetKeyWordLiteralResult(object Literal, ParseNode ParseNode, int NextIndex)
             :ParseResult(ParseNode,NextIndex);
 

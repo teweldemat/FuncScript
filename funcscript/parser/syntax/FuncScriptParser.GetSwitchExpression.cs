@@ -4,7 +4,6 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        
         static ExpressionBlockResult GetSwitchExpression(ParseContext context, int index)
         {
             ExpressionBlock prog = null;
@@ -69,7 +68,7 @@ namespace funcscript.core
                 CodeLength = i - index,
                 Parameters = pars.ToArray(),
             };
-            prog.SetContext(context.ReferenceProvider);
+            // Removed the SetContext call as it is no longer needed.
             parseNode = new ParseNode(ParseNodeType.Case, index, i - index);
             parseNode.Children = childNodes;
             return new ExpressionBlockResult(prog, parseNode, i);

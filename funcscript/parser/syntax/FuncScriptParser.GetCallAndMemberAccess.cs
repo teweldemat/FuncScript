@@ -42,7 +42,6 @@ namespace funcscript.core
                         CodePos = i,
                         CodeLength = i2 - i
                     };
-                    theUnit.SetContext(context.ReferenceProvider);
                     parseNode = new ParseNode(ParseNodeType.Selection, index, i - index, new[] { parseNode, nodeKvc });
                     continue;
                 }

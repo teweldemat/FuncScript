@@ -78,7 +78,6 @@ namespace funcscript.core
                     if (sb.Length > 0)
                     {
                         var lb = new LiteralBlock(sb.ToString());
-                        lb.SetContext(provider);
                         parts.Add(lb);
                         nodeParts.Add(new ParseNode(ParseNodeType.LiteralString, lastIndex, i - lastIndex));
                         sb = new StringBuilder();
@@ -120,7 +119,6 @@ namespace funcscript.core
                 if (sb.Length > 0)
                 {
                     var lb = new LiteralBlock(sb.ToString());
-                    lb.SetContext(provider);
                     parts.Add(lb);
                     nodeParts.Add(new ParseNode(ParseNodeType.LiteralString, lastIndex, i - lastIndex));
                 }
@@ -138,7 +136,6 @@ namespace funcscript.core
             if (parts.Count == 0)
             {
                 prog = new LiteralBlock("");
-                prog.SetContext(provider);
                 parseNode = new ParseNode(ParseNodeType.LiteralString, index, i - index);
             }
             else if (parts.Count == 1)
@@ -153,7 +150,6 @@ namespace funcscript.core
                     Function = new LiteralBlock(provider.Get("+")),
                     Parameters = parts.ToArray()
                 };
-                prog.SetContext(provider);
                 parseNode = new ParseNode(ParseNodeType.StringTemplate, index, i - index, nodeParts);
             }
 

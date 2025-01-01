@@ -6,13 +6,14 @@ namespace funcscript.core
     public partial class FuncScriptParser
     {
         record ParseLambdaExpressionResult(ExpressionFunction Block, ParseNode ParseNode, int NextIndex)
-            :ParseResult(ParseNode,NextIndex);
+            :ParseResult(ParseNode, NextIndex);
+            
         static ParseLambdaExpressionResult GetLambdaExpression(ParseContext context, int index)
         {
             ParseNode parseNode = null;
             ExpressionFunction func = null;
             
-            var (parms,nodesParams,  i) = GetIdentifierList(context, index);
+            var (parms, nodesParams, i) = GetIdentifierList(context, index);
             if (i == index)
                 return new ParseLambdaExpressionResult(func, parseNode, index);
 
@@ -31,8 +32,7 @@ namespace funcscript.core
             i = SkipSpace(context, i).NextIndex;
             var parmsSet = new HashSet<string>(parms);
 
-
-           (var defination,var nodeDefination, i2) = GetExpression(context, i);
+            (var defination, var nodeDefination, i2) = GetExpression(context, i);
             if (i2 == i)
             {
                 context.SyntaxErrors.Add(new SyntaxErrorData(i, 0, "definition of lambda expression expected"));
@@ -40,7 +40,7 @@ namespace funcscript.core
             }
 
             func = new ExpressionFunction(parms.ToArray(), defination);
-            func.SetContext(context.ReferenceProvider);
+            // Removed: func.SetContext(context.ReferenceProvider);
             i = i2;
             parseNode = new ParseNode(ParseNodeType.LambdaExpression, index, i - index,
                 new[] { nodesParams, nodeDefination });

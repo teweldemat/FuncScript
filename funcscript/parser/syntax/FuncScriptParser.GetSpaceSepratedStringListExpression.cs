@@ -1,12 +1,9 @@
-using funcscript.block;
-using funcscript.funcs.math;
 using funcscript.model;
 
 namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-
         record GetSpaceSeparatedStringListExpressionResult(List<string> StringList, ParseNode ParseNode, int NextIndex)
             :ParseResult(ParseNode,NextIndex);
         static GetSpaceSeparatedStringListExpressionResult GetSpaceSeparatedStringListExpression(ParseContext context, int index)

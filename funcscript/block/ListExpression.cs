@@ -38,11 +38,11 @@ namespace funcscript.block
             }
         }
 
-        public override void SetContext(KeyValueCollection provider)
+        public override void SetReferenceProvider(KeyValueCollection provider)
         {
             foreach (var val in this.ValueExpressions)
             {
-                val.SetContext(provider);
+                val.SetReferenceProvider(provider);
             }
         }
 

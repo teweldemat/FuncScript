@@ -107,7 +107,6 @@ namespace funcscript.core
                             CodePos = prog.CodePos,
                             CodeLength = operands[^1].CodePos + operands[^1].CodeLength - prog.CodePos
                         };
-                        prog.SetContext(context.ReferenceProvider);
                         parseNode = new ParseNode(ParseNodeType.InfixExpression, parseNode.Pos, infixComponentNodes[^1].Pos + infixComponentNodes[^1].Length - parseNode.Pos);
                     }
                     else
@@ -119,7 +118,6 @@ namespace funcscript.core
                             CodePos = prog.CodePos,
                             CodeLength = operands[^1].CodePos + operands[^1].CodeLength - prog.CodeLength
                         };
-                        prog.SetContext(context.ReferenceProvider);
                         parseNode = new ParseNode(ParseNodeType.InfixExpression,
                             parseNode.Pos, infixComponentNodes[^1].Pos + infixComponentNodes[^1].Length - parseNode.Pos,
                             infixComponentNodes

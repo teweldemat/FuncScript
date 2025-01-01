@@ -35,7 +35,7 @@ namespace funcscript.block
             
             this.singleReturn = retExpression;
             if (retExpression != null)
-                retExpression.SetContext(this);
+                retExpression.SetReferenceProvider(this);
             if (_keyValues == null)
                 index = null;
             else
@@ -43,7 +43,7 @@ namespace funcscript.block
                 index = new Dictionary<string, KeyValueExpression>();
                 foreach (var k in _keyValues)
                 {
-                    k.ValueExpression.SetContext(this);
+                    k.ValueExpression.SetReferenceProvider(this);
                     k.KeyLower = k.Key.ToLower();
                     if (this.index.ContainsKey(k.KeyLower))
                         return $"Key {k.KeyLower} is duplicated";
@@ -62,7 +62,7 @@ namespace funcscript.block
                 return singleReturn.Evaluate();
             return this;
         }
-        public override void SetContext(KeyValueCollection provider)
+        public override void SetReferenceProvider(KeyValueCollection provider)
         {
             this._context = provider;
         }

@@ -33,7 +33,8 @@ namespace funcscript.core
         {
             return GetKvcBody(context, index, false);
         }
-        static ExpressionBlockResult GetKvcBody(ParseContext context, int index,bool allowKeyOnly)
+
+        static ExpressionBlockResult GetKvcBody(ParseContext context, int index, bool allowKeyOnly)
         {
             var syntaxErrors = context.SyntaxErrors;
             ParseNode parseNode = null;
@@ -53,7 +54,7 @@ namespace funcscript.core
                     i = SkipSpace(context, i2).NextIndex;
                 }
 
-                var kvcItemResult = GetKvcItem(context, i,allowKeyOnly);
+                var kvcItemResult = GetKvcItem(context, i, allowKeyOnly);
                 i2 = kvcItemResult.NextIndex;
                 var otherItem = kvcItemResult.Item;
                 var nodeOtherItem = kvcItemResult.ParseNode;
@@ -64,8 +65,7 @@ namespace funcscript.core
                 {
                     if (retExp != null)
                     {
-                        syntaxErrors.Add(new SyntaxErrorData(nodeOtherItem.Pos, nodeOtherItem.Length,
-                            "Duplicate return statement"));
+                        syntaxErrors.Add(new SyntaxErrorData(nodeOtherItem.Pos, nodeOtherItem.Length, "Duplicate return statement"));
                         return new ExpressionBlockResult(null, null, index);
                     }
 
@@ -79,7 +79,7 @@ namespace funcscript.core
             } while (true);
 
             kvcExpr = new KvcExpression();
-            kvcExpr.SetContext(context.ReferenceProvider);
+            // Removed the kvcExpr.SetContext(context.ReferenceProvider) call
             var error = kvcExpr.SetKeyValues(kvs.ToArray(), retExp);
             if (error != null)
             {
