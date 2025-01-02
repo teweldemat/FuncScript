@@ -1,12 +1,15 @@
-import { ParseContext, ParseResult, SyntaxErrorData } from "../FuncScriptParser.Main";
+import { ParseContext, ParseResult } from "../FuncScriptParser.Main";
 import { GetExpression } from "./FuncScriptParser.GetExpression";
+import { GetNakedKvc } from "./FuncScriptParser.GetKvcExpression";
 
 export function GetRootExpression(context: ParseContext, index: number): ParseResult {
-    const thisErrors: SyntaxErrorData[] = [];
-    const result = GetExpression(context, index);
-    if (result.NextIndex > index) {
-        context.SyntaxErrors.push(...thisErrors);
-        return result;
+    const res1 = GetNakedKvc(context, index);
+    
+    if (res1.NextIndex === context.Expression.trim().length) {
+        return res1;
     }
-    return {ParseNode:null,NextIndex:index};
+
+    context.SyntaxErrors.length = 0;
+
+    return GetExpression(context, 0);
 }
