@@ -14,6 +14,15 @@ public class AdvancedSyntax
         var expected = new ObjectKvc(new { a = 4, b = 5 });
         Assert.That(FuncScript.FormatToJson(res),Is.EqualTo(FuncScript.FormatToJson(expected)));
     }
+    
+    [Test]
+    public void NakedWithImplicitReturn()
+    {
+        var exp = "a:4; a*3";
+        var res = FuncScript.Evaluate(exp);
+        var expected = 12;
+        Assert.That(FuncScript.FormatToJson(res),Is.EqualTo(FuncScript.FormatToJson(expected)));
+    }
     [Test]
     [TestCase("!true",false)]
     [TestCase("!false",true)]

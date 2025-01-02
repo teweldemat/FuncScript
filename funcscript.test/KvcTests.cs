@@ -217,7 +217,14 @@ namespace funcscript.test
             var expected = new ObjectKvc(new { id = 3 });
             Assert.AreEqual(FuncScript.FormatToJson(expected), FuncScript.FormatToJson(res));
         }
-
+        [Test]
+        public void KvcWithImplicitReturn()
+        {
+            var exp = "{a:4, return a*3}";
+            var res = FuncScript.Evaluate(exp);
+            var expected = 12;
+            Assert.That(FuncScript.FormatToJson(res),Is.EqualTo(FuncScript.FormatToJson(expected)));
+        }
         [Test]
         public void TestSelectorWithExp()
         {

@@ -6,13 +6,18 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
-        static ExpressionBlockResult GetReturnDefinition(ParseContext context, int index)
+        static ExpressionBlockResult GetReturnDefinition(ParseContext context, int index,bool allowImplicitReturn)
         {
             ParseNode parseNode = null;
             ExpressionBlock retExp = null;
+            
             var i = GetLiteralMatch(context, index, KW_RETURN).NextIndex;
             if (i == index)
+            {
+                if (allowImplicitReturn)
+                    return GetExpression(context, index);
                 return new ExpressionBlockResult(null, null, index);
+            }
 
             var nodeReturn = new ParseNode(ParseNodeType.KeyWord, index, i - index);
             i = SkipSpace(context, i).NextIndex;

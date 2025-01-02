@@ -5,6 +5,30 @@ namespace funcscript.core
 {
     public partial class FuncScriptParser
     {
+        
+        static ExpressionBlockResult GetSelectKvcExpression(ParseContext context, int index)
+        {
+            var syntaxErrors = context.SyntaxErrors;
+            var i = SkipSpace(context, index).NextIndex;
+            var nodeStart = i;
+            int i2 = GetLiteralMatch(context, i, "{").NextIndex;
+            if (i2 == i)
+                return new ExpressionBlockResult(null, null, index);
+            i = i2;
+            (var block, var parseNode, i2) = GetKvcBody(context, i,true,false,false);
+            i = SkipSpace(context, i2).NextIndex;
+            i2 = GetLiteralMatch(context, i, "}").NextIndex;
+            if (i2 == i)
+            {
+                syntaxErrors.Add(new SyntaxErrorData(i, 0, "'}' expected"));
+                return new ExpressionBlockResult(null, null, index);
+            }
+
+            i = i2;
+            parseNode.Pos = nodeStart;
+            parseNode.Length = i - nodeStart;
+            return new ExpressionBlockResult(block, parseNode, i);
+        }
         static ExpressionBlockResult GetKvcExpression(ParseContext context, int index)
         {
             var syntaxErrors = context.SyntaxErrors;
@@ -14,7 +38,7 @@ namespace funcscript.core
             if (i2 == i)
                 return new ExpressionBlockResult(null, null, index);
             i = i2;
-            (var block, var parseNode, i2) = GetKvcBody(context, i,true);
+            (var block, var parseNode, i2) = GetKvcBody(context, i,true,true,false);
             i = SkipSpace(context, i2).NextIndex;
             i2 = GetLiteralMatch(context, i, "}").NextIndex;
             if (i2 == i)
@@ -31,10 +55,24 @@ namespace funcscript.core
 
         static ExpressionBlockResult GetNakedKvc(ParseContext context, int index)
         {
-            return GetKvcBody(context, index, false);
+            var ret= GetKvcBody(context, index, false,true,true);
+            if (ret.Block is KvcExpression kvc)
+            {
+                if (kvc.KeyValues.Count == 0 && kvc.singleReturn != null)
+                {
+                    return new ExpressionBlockResult
+                    (
+                        Block:kvc.singleReturn,
+                        ParseNode:ret.ParseNode.Children[0],
+                        NextIndex: ret.NextIndex
+                    );
+                }
+            }
+
+            return ret;
         }
 
-        static ExpressionBlockResult GetKvcBody(ParseContext context, int index, bool allowKeyOnly)
+        static ExpressionBlockResult GetKvcBody(ParseContext context, int index, bool allowKeyOnly,bool allowReturn,bool allowImplictReturn)
         {
             var syntaxErrors = context.SyntaxErrors;
             ParseNode parseNode = null;
@@ -54,7 +92,7 @@ namespace funcscript.core
                     i = SkipSpace(context, i2).NextIndex;
                 }
 
-                var kvcItemResult = GetKvcItem(context, i, allowKeyOnly);
+                var kvcItemResult = GetKvcItem(context, i, allowKeyOnly,allowReturn,allowImplictReturn);
                 i2 = kvcItemResult.NextIndex;
                 var otherItem = kvcItemResult.Item;
                 var nodeOtherItem = kvcItemResult.ParseNode;

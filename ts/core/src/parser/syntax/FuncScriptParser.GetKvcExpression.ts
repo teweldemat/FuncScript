@@ -1,74 +1,154 @@
-
-import { ParseContext, ParseNode, ParseNodeType, ParseResult, SyntaxErrorData } from "../FuncScriptParser.Main";
-import { SkipSpace } from "./FuncScriptParser.SkipSpace";
-import { GetLiteralMatch, GetLiteralMatchMultiple } from "./FuncScriptParser.GetLiteralMatch";
+import { ParseContext, ParseResult, SyntaxErrorData, ParseNode, ParseNodeType } from "../FuncScriptParser.Main";
 import { GetKvcItem } from "./FuncScriptParser.GetKvcItem";
+import { GetLiteralMatch, GetLiteralMatchMultiple } from "./FuncScriptParser.GetLiteralMatch";
+import { SkipSpace } from "./FuncScriptParser.SkipSpace";
 
-export function GetKvcExpression(context: ParseContext, index: number): ParseResult {
-    const syntaxErrors = context.SyntaxErrors;
+export function GetSelectKvcExpression(
+    context: ParseContext,
+    index: number
+): ParseResult {
+
     let i = SkipSpace(context, index).NextIndex;
     const nodeStart = i;
-    let i2 = GetLiteralMatch(context, i, "{").NextIndex;
-    if (i2 === i) return { ParseNode: null, NextIndex: index };
 
-    i = i2;
-    const bodyResult = GetKvcBody(context, i, true);
-    const { ParseNode: parseNode, NextIndex: nextIndex } = bodyResult;
-
-    i = SkipSpace(context, nextIndex).NextIndex;
-    i2 = GetLiteralMatch(context, i, "}").NextIndex;
-    if (i2 === i) {
-        syntaxErrors.push(new SyntaxErrorData(i, 0, "'}' expected"));
+    // Match '{'
+    const braceOpen = GetLiteralMatch(context, i, "{");
+    if (braceOpen.NextIndex === i) {
         return { ParseNode: null, NextIndex: index };
     }
+    i = braceOpen.NextIndex;
 
-    i = i2;
-    if (parseNode) {
-        parseNode.Pos = nodeStart;
-        parseNode.Length = i - nodeStart;
+    // Parse body with allowKeyOnly=true, allowReturn=false, allowImplicitReturn=false
+    const bodyResult = GetKvcBody(context, i, true, false, false);
+    if (!bodyResult.ParseNode) {
+        return { ParseNode: null, NextIndex: index };
     }
+    i = SkipSpace(context, bodyResult.NextIndex).NextIndex;
 
-    return { ParseNode: parseNode, NextIndex: i };
+    // Match '}'
+    const braceClose = GetLiteralMatch(context, i, "}");
+    if (braceClose.NextIndex === i) {
+        context.SyntaxErrors.push(
+            new SyntaxErrorData(i, 0, "'}' expected")
+        );
+        return { ParseNode: null, NextIndex: index };
+    }
+    i = braceClose.NextIndex;
+
+    // Adjust parse node
+    bodyResult.ParseNode.Pos = nodeStart;
+    bodyResult.ParseNode.Length = i - nodeStart;
+
+    return {
+        ParseNode: bodyResult.ParseNode,
+        NextIndex: i
+    };
 }
 
-export function GetNakedKvc(context: ParseContext, index: number): ParseResult {
-    return GetKvcBody(context, index, false);
-}
+// -----------------------------------------------------------------------------
 
-export function GetKvcBody(context: ParseContext, index: number, allowKeyOnly: boolean): ParseResult {
-    const syntaxErrors = context.SyntaxErrors;
-    let parseNode: ParseNode | null = null;
+export function GetKvcExpression(
+    context: ParseContext,
+    index: number
+): ParseResult {
+
     let i = SkipSpace(context, index).NextIndex;
-    const nodeItems: ParseNode[] = [];
-    let retExp: ParseNode | null = null;
+    const nodeStart = i;
 
-    do {
-        let i2: number;
-        if (nodeItems.length > 0 || retExp) {
-            i2 = GetLiteralMatchMultiple(context, i, [",", ";"]).NextIndex;
-            if (i2 === i) break;
-            i = SkipSpace(context, i2).NextIndex;
+    // Match '{'
+    const braceOpen = GetLiteralMatch(context, i, "{");
+    if (braceOpen.NextIndex === i) {
+        return { ParseNode: null, NextIndex: index };
+    }
+    i = braceOpen.NextIndex;
+
+    // Parse body with allowKeyOnly=true, allowReturn=true, allowImplicitReturn=false
+    const bodyResult = GetKvcBody(context, i, true, true, false);
+    if (!bodyResult.ParseNode) {
+        return { ParseNode: null, NextIndex: index };
+    }
+    i = SkipSpace(context, bodyResult.NextIndex).NextIndex;
+
+    // Match '}'
+    const braceClose = GetLiteralMatch(context, i, "}");
+    if (braceClose.NextIndex === i) {
+        context.SyntaxErrors.push(
+            new SyntaxErrorData(i, 0, "'}' expected")
+        );
+        return { ParseNode: null, NextIndex: index };
+    }
+    i = braceClose.NextIndex;
+
+    bodyResult.ParseNode.Pos = nodeStart;
+    bodyResult.ParseNode.Length = i - nodeStart;
+
+    return {
+        ParseNode: bodyResult.ParseNode,
+        NextIndex: i
+    };
+}
+
+// -----------------------------------------------------------------------------
+
+export function GetNakedKvc(
+    context: ParseContext,
+    index: number
+): ParseResult {
+
+    const result = GetKvcBody(context, index, false, true, true);
+    if(result.NextIndex>index)
+    {
+        if(result.ParseNode!.Children.length==1)
+        {
+            return {ParseNode:result.ParseNode!.Children[0],NextIndex:result!.NextIndex};
+        }
+    }
+    return result;
+}
+
+// -----------------------------------------------------------------------------
+
+export function GetKvcBody(
+    context: ParseContext,
+    index: number,
+    allowKeyOnly: boolean,
+    allowReturn: boolean,
+    allowImplicitReturn: boolean
+): ParseResult {
+
+    let i = SkipSpace(context, index).NextIndex;
+    const children: ParseNode[] = [];
+    const startPos = i;
+
+    while (true) {
+        // If we already have items, expect a comma or semicolon before next
+        if (children.length > 0) {
+            const delim = GetLiteralMatchMultiple(context, i, [",", ";"]);
+            if (!delim.Matched) {
+                break;
+            }
+            i = SkipSpace(context, delim.NextIndex).NextIndex;
         }
 
-        const kvcItemResult = GetKvcItem(context, i, allowKeyOnly);
-        i2 = kvcItemResult.NextIndex;
-        const otherItem = kvcItemResult.ParseNode;
+        // Parse next KVC item
+        const itemRes = GetKvcItem(context, i, allowKeyOnly, allowReturn, allowImplicitReturn);
+        if (!itemRes.ParseNode || itemRes.NextIndex === i) {
+            break;
+        }
+        children.push(itemRes.ParseNode);
+        i = SkipSpace(context, itemRes.NextIndex).NextIndex;
+    }
 
-        if (!otherItem) break;
+    // Build the KeyValueCollection node
+    const node = new ParseNode(
+        ParseNodeType.KeyValueCollection,
+        startPos,
+        i - startPos,
+        children
+    );
 
-        if (otherItem.NodeType === ParseNodeType.ReturnExpression) {
-            if (retExp) {
-                syntaxErrors.push(new SyntaxErrorData(otherItem.Pos, otherItem.Length, "Duplicate return statement"));
-                return { ParseNode: null, NextIndex: index };
-            }
-            retExp = otherItem;
-        } 
-        
-        nodeItems.push(otherItem);        
-
-        i = SkipSpace(context, i2).NextIndex;
-    } while (true);
-
-    parseNode = new ParseNode(ParseNodeType.KeyValueCollection, index, i - index, nodeItems);
-    return { ParseNode: parseNode, NextIndex: i };
+    return {
+        ParseNode: node,
+        NextIndex: i
+    };
 }
