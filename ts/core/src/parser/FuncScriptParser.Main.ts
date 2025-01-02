@@ -1,28 +1,28 @@
     export enum ParseNodeType {
-        Comment,
-        FunctionParameterList,
-        FunctionCall,
-        MemberAccess,
-        Selection,
-        InfixExpression,
-        LiteralInteger,
-        KeyWord,
-        LiteralDouble,
-        LiteralLong,
-        Identifier,
-        IdentifierList,
-        Operator,
-        LambdaExpression,
-        ExpressionInBrace,
-        LiteralString,
-        StringTemplate,
-        KeyValuePair,
-        KeyValueCollection,
-        List,
-        Key,
-        Case,
-        PrefixOperatorExpression,
-        ReturnExpression
+        Comment,//0
+        FunctionParameterList,//1
+        FunctionCall,//2
+        MemberAccess,//3
+        Selection,//4
+        InfixExpression,//5
+        LiteralInteger,//6
+        KeyWord,//7
+        LiteralDouble,//8
+        LiteralLong,//9
+        Identifier,//10
+        IdentifierList,//11
+        Operator,//12
+        LambdaExpression,//13
+        ExpressionInBrace,//14
+        LiteralString,//15
+        StringTemplate,//16
+        KeyValuePair,//17
+        KeyValueCollection,//19
+        List,//19
+        Key,//20
+        Case,//21
+        PrefixOperatorExpression,//22
+        ReturnExpression//23
     }
 
     export class SyntaxErrorData {

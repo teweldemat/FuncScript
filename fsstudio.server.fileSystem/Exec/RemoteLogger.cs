@@ -1,3 +1,4 @@
+// RemoteLogger.cs
 using System.Net.WebSockets;
 using System.Text;
 
@@ -46,13 +47,15 @@ public class RemoteLogger
         _clients.Remove(client);
     }
 
-    public async Task SendMessage(string cmd, string? data)
+    public async Task SendMessage(string cmd, object? data)
     {
-        foreach (var client in _clients.ToList())
+        var jsonObj = new { cmd, data };
+        var msg = Encoding.UTF8.GetBytes(System.Text.Json.JsonSerializer.Serialize(jsonObj));
+        var clientsCopy = _clients.ToList();
+        foreach (var client in clientsCopy)
         {
             if (client.State == WebSocketState.Open)
             {
-                var msg = Encoding.UTF8.GetBytes(System.Text.Json.JsonSerializer.Serialize(new {cmd,data}));
                 await client.SendAsync(new ArraySegment<byte>(msg), WebSocketMessageType.Text, true, CancellationToken.None);
             }
             else
@@ -61,18 +64,24 @@ public class RemoteLogger
             }
         }
     }
+
     public virtual async void WriteLine(string message)
     {
-        await SendMessage("log",message);
+        await SendMessage("log", message);
     }
 
     public virtual async void SendMarkdDown(string markdown)
     {
-        await SendMessage("markdown",markdown);
+        await SendMessage("markdown", markdown);
     }
 
     public virtual async void Clear()
     {
-        await SendMessage("clear",null);
+        await SendMessage("clear", null);
+    }
+
+    public async void SendObject(string cmd, dynamic dataObject)
+    {
+        await SendMessage(cmd, (object?)dataObject);
     }
 }

@@ -10,8 +10,8 @@ import TextLogger from './RemoteLogger';
 import ReactMarkdown from 'react-markdown';
 import { SERVER_URL, SERVER_WS_URL } from '../backend';
 import CodeEditor from '../code-editor/CodeEditor';
-import { ExpressionType } from './EvalNodeProvider';
 import { EvalNodeTree } from './EvalNodeTree';
+import { ExpressionType } from '../FsStudioProvider';
 
 const ExecutionView: React.FC<{
   sessionId: string;

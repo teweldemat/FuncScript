@@ -13,7 +13,7 @@ public class Tests
     }
 
     [Test]
-    public void TestRelativeRef()
+    public async Task TestRelativeRef()
     {
         var nodes = new[]
         {
@@ -49,13 +49,13 @@ public class Tests
             }
         };
         var session = new ExecutionSession(nodes, null);
-        var res = session.EvaluateNode("x.y");
+        var res = await session.EvaluateNodeAsync("x.y");
         Assert.That(res is int);
         Assert.That((int)res, Is.EqualTo(11));
     }
 
     [Test]
-    public void NodeVariable()
+    public async Task  NodeVariable()
     {
         var nodes = new[]
         {
@@ -73,13 +73,13 @@ public class Tests
             }
         };
         var session = new ExecutionSession(nodes, null);
-        var res = session.EvaluateNode("x");
+        var res = await session.EvaluateNodeAsync("x");
         Assert.That(res is int);
         Assert.That((int)res, Is.EqualTo(11));
     }
     
     [Test]
-    public void TestLogger()
+    public async Task  TestLogger()
     {
         var logger = new StringLogger();
         FsLogger.SetDefaultLogger(logger);
@@ -98,7 +98,7 @@ public class Tests
             }                   
         };
         var session = new ExecutionSession(nodes, null);
-        var res = session.EvaluateNode("x");
+        var res = await session.EvaluateNodeAsync("x");
         Assert.That(res is FsList);
         var l = (FsList)res;
         Assert.That(l.Length,Is.EqualTo(1));
@@ -108,7 +108,7 @@ public class Tests
     }
     
     [Test]
-    public void TestCaching()
+    public async Task TestCaching()
     {
         var logger = new StringLogger();
         FsLogger.SetDefaultLogger(logger);
@@ -135,13 +135,13 @@ public class Tests
             } 
         };
         var session = new ExecutionSession(nodes, null);
-        var res = session.EvaluateNode("dl");
+        var res =await session.EvaluateNodeAsync("dl");
         FuncScript.FormatToJson(res);
         Assert.That(logger.GetLogContent().Trim(),Is.EqualTo("a"));
 
     }
     [Test]
-    public void TestCacheClearing()
+    public async Task TestCacheClearing()
     {
         var logger = new StringLogger();
         FsLogger.SetDefaultLogger(logger);
@@ -168,14 +168,14 @@ public class Tests
             } 
         };
         var session = new ExecutionSession(nodes, null);
-        var res = session.EvaluateNode("dl");
+        var res = await session.EvaluateNodeAsync("dl");
         var json=FuncScript.FormatToJson(res);
         Assert.That(logger.GetLogContent().Trim(),Is.EqualTo("a"));
         Assert.That(FuncScript.FormatToJson(FuncScript.NormalizeDataType(new {r="5y",m="5z"})),Is.EqualTo(json));
 
         logger.Clear();
         nodes[0].Expression = "2 log 'b'";
-        res = session.EvaluateNode("dl");
+        res = await session.EvaluateNodeAsync("dl");
         json=FuncScript.FormatToJson(res);
         Assert.That(logger.GetLogContent().Trim(),Is.EqualTo("b"));
         

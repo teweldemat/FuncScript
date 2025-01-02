@@ -14,11 +14,17 @@ public class ExecutionSession : KeyValueCollection
     public Guid SessionId { get; private set; } = Guid.NewGuid();
     public KeyValueCollection ParentContext => _context;
 
-   
-
-
     private RemoteLogger logger;
-    public ExecutionSession(string fileName,RemoteLogger logger)
+    private Task<object>? _evaluationTask;
+    private Exception? _evaluationException;
+    private object? _evaluationResult;
+
+    public bool IsEvaluationInProgress => _evaluationTask != null && !_evaluationTask.IsCompleted;
+    public bool IsEvaluationCompleted => _evaluationTask != null && _evaluationTask.IsCompleted;
+    public object? LastEvaluationResult => _evaluationResult;
+    public Exception? LastEvaluationException => _evaluationException;
+
+    public ExecutionSession(string fileName, RemoteLogger logger)
     {
         this.logger = logger;
         this.fileName = fileName;
@@ -36,7 +42,7 @@ public class ExecutionSession : KeyValueCollection
             {
                 KeyValuePair.Create<string,object>("md",new MarkDownFunction(this.logger))
             }
-            );
+        );
     }
     public ExecutionSession(IEnumerable<ExecutionNode> nodes,RemoteLogger logger)
     {
@@ -65,13 +71,13 @@ public class ExecutionSession : KeyValueCollection
         return currentNode;
     }
 
-    public void CreateNode(string? parentNodePath, string name, string expression,ExpressionType expressionType)
+    public void CreateNode(string? parentNodePath, string name, string expression, ExpressionType expressionType)
     {
         if (!ValidName(name))
             throw new InvalidOperationException($"{name} is invalid");
 
-        var parentNode =parentNodePath==null?null:  this.FindNodeByPath(parentNodePath);
-        var nodes = parentNodePath == null ? this._nodes : parentNode?.Children;
+        var parentNode = parentNodePath==null?null:FindNodeByPath(parentNodePath);
+        var nodes = parentNodePath == null ? _nodes : parentNode?.Children;
         if (nodes == null)
             throw new InvalidOperationException($"Path {parentNodePath} not found");
         var nameLower = name.ToLower();
@@ -103,13 +109,12 @@ public class ExecutionSession : KeyValueCollection
         UpdateFile();
     }
 
-   
     public void RemoveNode(string nodePath)
     {
         var segments = nodePath.Split('.');
         var parentNodePath = string.Join(".", segments.Take(segments.Length - 1));
-        ExecutionNode ? parentNode=null;
-        var nodes=segments.Length==1?this._nodes:(parentNode=FindNodeByPath(parentNodePath))?.Children;
+        ExecutionNode? parentNode=null;
+        var nodes=segments.Length==1? _nodes : (parentNode=FindNodeByPath(parentNodePath))?.Children;
         if (nodes == null)
             throw new InvalidOperationException($"Path {parentNodePath} not found");
 
@@ -122,7 +127,6 @@ public class ExecutionSession : KeyValueCollection
             {
                 parentNode.ExpressionType = ExpressionType.FuncScript;
             }
-                
         }
         UpdateFile();
     }
@@ -138,7 +142,6 @@ public class ExecutionSession : KeyValueCollection
 
     public static bool ValidName(string name)
     {
-        // Regular expression for a valid JavaScript identifier
         Regex regex = new Regex(@"^[a-zA-Z_$][a-zA-Z0-9_$]*$");
         return regex.IsMatch(name);
     }
@@ -166,10 +169,10 @@ public class ExecutionSession : KeyValueCollection
         var node = FindNodeByPath(nodePath);
         if (node == null)
             throw new Exception("Node not found.");
-
         node.ExpressionType = expType;
         UpdateFile();
     }
+
     public void UpdateExpression(string nodePath, string expression)
     {
         var node = FindNodeByPath(nodePath);
@@ -183,7 +186,7 @@ public class ExecutionSession : KeyValueCollection
 
     public List<ExpressionNodeInfo> GetChildNodeList(string? nodePath)
     {
-        var nodes = nodePath == null ?this._nodes: this.FindNodeByPath(nodePath)?.Children;
+        var nodes = nodePath == null ? _nodes : FindNodeByPath(nodePath)?.Children;
         if (nodes == null)
             throw new InvalidOperationException($"Path {nodePath} not found");
 
@@ -208,14 +211,16 @@ public class ExecutionSession : KeyValueCollection
             Expression = node.Expression
         };
     }
-    public object Get(string name)
+
+    public  object Get(string name)
     {
         var n = _nodes.FirstOrDefault(c => c.NameLower == name);
         if (n == null)
             return _context.Get(name);
         return n.Evaluate(this);
     }
-    public bool IsDefined(string name)
+
+    public  bool IsDefined(string name)
     {
         var n = _nodes.FirstOrDefault(c => c.NameLower == name);
         if (n != null)
@@ -223,54 +228,91 @@ public class ExecutionSession : KeyValueCollection
         return _context.IsDefined(name);
     }
 
-
-    public IList<string> GetAllKeys()
+    public  IList<string> GetAllKeys()
     {
-        return this._nodes.Select(x => x.Name).ToList();
+        return _nodes.Select(x => x.Name).ToList();
     }
 
     void ClearCache()
     {
-        foreach (var node in this._nodes)
+        foreach (var node in _nodes)
         {
             node.ClearCache();
         }
     }
-    public object EvaluateNode(string nodePath)
+
+    object EvaluateNodeInternal(string nodePath)
     {
         ClearCache();
         var segments = nodePath.Split('.');
         var parentNodePath = string.Join(".", segments.Take(segments.Length - 1));
         var provider = (segments.Length > 1) ? (KeyValueCollection)FindNodeByPath(parentNodePath)! : this;
-        var res=provider.Get(segments.Last());
-        return res;
+        return provider.Get(segments.Last());
+    }
+
+    public Task<object> EvaluateNodeAsync(string nodePath)
+    {
+        if (IsEvaluationInProgress)
+            throw new InvalidOperationException("Only one evaluation is supported at a time.");
+
+        _evaluationException = null;
+        _evaluationResult = null;
+
+        _evaluationTask = Task.Run(() =>
+        {
+            try
+            {
+                var res = EvaluateNodeInternal(nodePath);
+                return res;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        });
+
+        _evaluationTask.ContinueWith(task =>
+        {
+            if (task.IsFaulted && task.Exception != null)
+            {
+                _evaluationException = task.Exception.GetBaseException();
+                logger.SendObject("evaluation_error", new {
+                    sessionId = SessionId,
+                    error = _evaluationException.Message
+                });
+            }
+            else
+            {
+                _evaluationResult = task.Result;
+                logger.SendObject("evaluation_success", new {
+                    sessionId = SessionId,
+                    result = _evaluationResult
+                });
+            }
+        }, TaskContinuationOptions.ExecuteSynchronously);
+
+        return _evaluationTask;
     }
 
     public void MoveNode(string modelNodePath, string? modelNewParentPath)
     {
-        // Find the node to move
         var node = FindNodeByPath(modelNodePath);
         if (node == null)
             throw new InvalidOperationException($"Node {modelNodePath} not found");
 
-        // Find current parent and remove node from the parent's collection
         var segments = modelNodePath.Split('.');
         var currentParentPath = string.Join(".", segments.Take(segments.Length - 1));
         var currentParent = segments.Length == 1 ? null : FindNodeByPath(currentParentPath);
         var currentChildrenList = currentParent == null ? _nodes : currentParent.Children;
         currentChildrenList.Remove(node);
 
-        // Find new parent if provided
         var newParent = modelNewParentPath == null ? null : FindNodeByPath(modelNewParentPath);
         if (modelNewParentPath != null && newParent == null)
             throw new InvalidOperationException($"New parent {modelNewParentPath} not found");
-
-        // Check duplicate name under new parent
         var newChildrenList = newParent == null ? _nodes : newParent.Children;
         if (newChildrenList.Any(n => n.NameLower == node.NameLower))
             throw new InvalidOperationException($"Node named {node.Name} already exists under {modelNewParentPath ?? "root"}");
 
-        // Convert new parent to a container node if it isn't one yet
         if (newParent != null && !string.IsNullOrEmpty(newParent.Expression))
         {
             var backupChild = new ExecutionNode
@@ -284,7 +326,6 @@ public class ExecutionSession : KeyValueCollection
             newParent.Expression = null;
         }
 
-        // Attach node under new parent
         node.SetParent(newParent == null ? this : newParent);
         newChildrenList.Add(node);
         UpdateFile();

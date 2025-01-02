@@ -1,3 +1,4 @@
+// SessionsController.cs
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Concurrent;
 using System.Text;
@@ -224,6 +225,56 @@ namespace fsstudio.server.fileSystem.Controllers
             }
         }
 
+        [HttpPost("{sessionId}/node/evaluate")]
+        public IActionResult EvaluateNode(Guid sessionId, string nodePath)
+        {
+            lock (GetSessionLock(sessionId))
+            {
+                var session = sessionManager.GetSession(sessionId);
+                if (session == null)
+                    return NotFound($"Session with ID {sessionId} not found.");
+
+                try
+                {
+                    session.EvaluateNodeAsync(nodePath);
+                    return Ok(new { message = "Evaluation started" });
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest(ex.Message);
+                }
+            }
+        }
+
+        [HttpGet("{sessionId}/node/evaluate/status")]
+        public IActionResult GetEvaluationStatus(Guid sessionId)
+        {
+            var session = sessionManager.GetSession(sessionId);
+            if (session == null)
+                return NotFound($"Session with ID {sessionId} not found.");
+
+            if (!session.IsEvaluationInProgress && !session.IsEvaluationCompleted)
+                return Ok(new { status = "idle" });
+
+            if (session.IsEvaluationInProgress)
+                return Ok(new { status = "inprogress" });
+
+            if (session.LastEvaluationException != null)
+            {
+                return Ok(new
+                {
+                    status = "error",
+                    error = session.LastEvaluationException.Message
+                });
+            }
+
+            return Ok(new
+            {
+                status = "success",
+                result = session.LastEvaluationResult
+            });
+        }
+
         [HttpGet("{sessionId}/node/value/")]
         public IActionResult GetValue(Guid sessionId, string nodePath)
         {
@@ -233,24 +284,7 @@ namespace fsstudio.server.fileSystem.Controllers
                 session = sessionManager.GetSession(sessionId);
                 if (session == null)
                     return NotFound($"Session with ID {sessionId} not found.");
-
-                try
-                {
-                    var val = session.EvaluateNode(nodePath);
-                    if (val is string str)
-                    {
-                        return Content(str, MediaTypeHeaderValue.Parse("text/plain"));
-                    }
-
-                    var sb = new StringBuilder();
-                    FuncScript.Format(sb, val, asJsonLiteral: true);
-                    var json = sb.ToString();
-                    return Content(json, MediaTypeHeaderValue.Parse("text/plain"));
-                }
-                catch (Exception ex)
-                {
-                    return StatusCode(500, new ErrorData(ex));
-                }
+                return NotFound("Not implemented");
             }
         }
 

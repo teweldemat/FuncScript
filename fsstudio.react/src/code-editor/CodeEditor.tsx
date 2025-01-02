@@ -1,7 +1,7 @@
 import { useCodeMirror, EditorView } from "@uiw/react-codemirror";
 import { useRef } from "react";
-import { ExpressionType } from "../components/EvalNodeProvider";
 import { parserHighlight } from "./parserHighlight";
+import { ExpressionType } from "../FsStudioProvider";
 
 const CodeEditor: React.FC<{
   expression: string | null;

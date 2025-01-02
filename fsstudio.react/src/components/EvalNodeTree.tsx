@@ -1,9 +1,8 @@
 // EvalNodeTree.tsx
 import React, { useEffect, useCallback } from 'react';
 import { Box, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, List } from '@mui/material';
-import { ExpressionType, NodeItem } from './EvalNodeProvider'; // You could move these into FsStudioProvider or keep them in a shared file
 import EvalNodeComponent from './EvalNodeComponent';
-import { useFsStudio } from '../FsStudioProvider';
+import { ExpressionType, NodeItem, useFsStudio } from '../FsStudioProvider';
 
 export const EvalNodeTree: React.FC<{
   rootNode: NodeItem;
