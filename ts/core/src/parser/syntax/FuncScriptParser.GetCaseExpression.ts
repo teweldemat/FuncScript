@@ -1,4 +1,4 @@
-import { ParseContext, ParseNode, ParseNodeType, ParseResult, SyntaxErrorData } from "../FuncScriptParser.Main"; 
+import { KW_CASE, ParseContext, ParseNode, ParseNodeType, ParseResult, SyntaxErrorData } from "../FuncScriptParser.Main"; 
 import { GetLiteralMatch, GetLiteralMatchMultiple } from "./FuncScriptParser.GetLiteralMatch"; 
 import { SkipSpace } from "./FuncScriptParser.SkipSpace"; 
 import { GetExpression } from "./FuncScriptParser.GetExpression"; 

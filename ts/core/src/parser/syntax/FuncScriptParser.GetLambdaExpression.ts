@@ -7,7 +7,7 @@ import { GetIdentifierList } from "./FuncScriptParser.GetIdentifierList";
 export function GetLambdaExpression(context: ParseContext, index: number): ParseResult { 
     let parseNode: ParseNode | null = null; 
 
-    const { Identifiers: parms, ParseNode: nodesParams, NextIndex: i_initial } = GetIdentifierList(context, index); 
+    const { ParseNode: nodesParams, NextIndex: i_initial } = GetIdentifierList(context, index); 
     let i = i_initial; 
     if (i === index) { 
         return { ParseNode: parseNode, NextIndex: index }; 

@@ -1,5 +1,5 @@
 import { ParseContext, ParseNode, ParseNodeType, ParseResult } from "../FuncScriptParser.Main";  
-import { GetLiteralMatchMultiple } from "./FuncScriptParser.GetLiteralMatchMultiple";  
+import { GetLiteralMatchMultiple } from "./FuncScriptParser.GetLiteralMatch";
 
 export interface GetCommentBlockResult extends ParseResult {}  
 

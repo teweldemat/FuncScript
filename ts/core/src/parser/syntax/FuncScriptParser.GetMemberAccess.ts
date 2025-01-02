@@ -32,14 +32,6 @@ function GetMemberAccessInternal(context: ParseContext, oper: string, index: num
         return { ParseNode: null, NextIndex: index };
     }
 
-    i = identifierResult.NextIndex;
 
-    parseNode = new ParseNode(
-        ParseNodeType.MemberAccess,
-        index,
-        i - index,
-        [identifierResult.ParseNode!]
-    );
-
-    return { ParseNode: parseNode, NextIndex: i };
+    return identifierResult;
 }
