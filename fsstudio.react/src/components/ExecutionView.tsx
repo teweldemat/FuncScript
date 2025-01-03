@@ -1,26 +1,35 @@
-// ExecutionView.tsx
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Grid, Typography, Tab, Tabs, Box, IconButton } from '@mui/material';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import SaveIcon from '@mui/icons-material/Save';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import ClearAllIcon from '@mui/icons-material/ClearAll';
 import axios from 'axios';
-import TextLogger from './RemoteLogger';
 import ReactMarkdown from 'react-markdown';
 import { SERVER_URL, SERVER_WS_URL } from '../backend';
-import CodeEditor from '../code-editor/CodeEditor';
-import { EvalNodeTree } from './EvalNodeTree';
+import CodeEditor from '../code-editor/CodeEditor'; // Adjust your import
+import TextLogger from './RemoteLogger';           // Adjust your import
 import { ExpressionType } from '../FsStudioProvider';
+import { EvalNodeTree } from './EvalNodeTree';
 
-const ExecutionView: React.FC<{
+interface ExecutionViewProps {
   sessionId: string;
   initiallySelectedNode: string | null;
   onNodeSelect: (nodePath: string | null) => void;
-}> = ({ sessionId, initiallySelectedNode, onNodeSelect }) => {
-  const [selectedNode, setSelectedNode] = useState<string | null>(initiallySelectedNode);
+}
+
+const ExecutionView: React.FC<ExecutionViewProps> = ({
+  sessionId,
+  initiallySelectedNode,
+  onNodeSelect,
+}) => {
+  const [selectedNode, setSelectedNode] = useState<string | null>(
+    initiallySelectedNode
+  );
   const [expression, setExpression] = useState<string | null>(null);
   const [lastSavedExpression, setLastSavedExpression] = useState<string | null>(null);
+  const [selectedChildrenCount, setSelectedChildrenCount] = useState<number>(0);
+
   const [saveStatus, setSaveStatus] = useState('All changes saved');
   const [resultText, setResultText] = useState('');
   const [tabIndex, setTabIndex] = useState(0);
@@ -28,9 +37,8 @@ const ExecutionView: React.FC<{
   const [messages, setMessages] = useState<string[]>([]);
   const [markdown, setMarkdown] = useState<string>('');
   const [copied, setCopied] = useState(false);
-  const [selectedExpressionType, setSelectedExpressionType] = useState<ExpressionType>(
-    ExpressionType.FuncScript
-  );
+  const [selectedExpressionType, setSelectedExpressionType] =
+    useState<ExpressionType>(ExpressionType.FuncScript);
 
   const saveTimerRef = useRef<NodeJS.Timeout | null>(null);
   const [savingInProgress, setSavingInProgress] = useState(false);
@@ -54,32 +62,24 @@ const ExecutionView: React.FC<{
 
   const executeExpression = useCallback(() => {
     if (!selectedNode) return;
-    if (expression === lastSavedExpression) {
-      axios
-        .get(`${SERVER_URL}/api/sessions/${sessionId}/node/value`, {
-          params: { nodePath: selectedNode },
-        })
-        .then((response) => {
-          if (typeof response.data === 'string') {
-            setResultText(response.data);
-          } else {
-            setResultText(JSON.stringify(response.data, null, 2));
-          }
-          setTabIndex(1);
-        })
-        .catch((error) => {
-          if (error.response && error.response.data) {
-            setResultText(formatErrorData(error.response.data));
-          } else {
-            setResultText('Failed to evaluate expression');
-          }
-          setTabIndex(1);
-        });
-    }
-  }, [expression, lastSavedExpression, selectedNode, sessionId]);
+    axios
+      .post(`${SERVER_URL}/api/sessions/${sessionId}/node/evaluate`, null, {
+        params: { nodePath: selectedNode },
+      })
+      .then(() => {
+        // The actual result will come in WebSocket messages
+      })
+      .catch(() => {
+        // handle error
+      });
+  }, [selectedNode, sessionId]);
 
   const saveExpression = useCallback(
     async (nodePath: string, newExpression: string | null, thenEvaluate: boolean) => {
+// If node is parent, skip
+     if (selectedChildrenCount > 0 || selectedExpressionType === ExpressionType.FsStudioParentNode) {
+       return;
+     }
       if (newExpression === null) return;
       try {
         setSavingInProgress(true);
@@ -100,9 +100,13 @@ const ExecutionView: React.FC<{
     [executeExpression, sessionId]
   );
 
-  const handleNodeSelect = (nodePath: string | null) => {
+  const handleNodeSelectInternal = (nodePath: string | null) => {
+    // Save old node if needed
     if (selectedNode && expression !== lastSavedExpression) {
-      saveExpression(selectedNode, expression, false);
+     // only attempt to save if old node was a leaf node:
+     if (!(selectedChildrenCount > 0 || selectedExpressionType === ExpressionType.FsStudioParentNode)) {
+       saveExpression(selectedNode, expression, false);
+     }    
     }
     if (nodePath == null) {
       setSelectedNode(null);
@@ -112,6 +116,7 @@ const ExecutionView: React.FC<{
       onNodeSelect(null);
       return;
     }
+
     axios
       .get(`${SERVER_URL}/api/sessions/${sessionId}/node`, { params: { nodePath } })
       .then((response) => {
@@ -123,18 +128,6 @@ const ExecutionView: React.FC<{
         onNodeSelect(nodePath);
       });
   };
-
-  function formatErrorData(errorData: { errors: { type: string; message: string; stackTrace?: string }[] }) {
-    return errorData.errors
-      .map((error, index) => {
-        return `Error ${index + 1}:
-Type: ${error.type}
-Message: ${error.message}
-StackTrace: ${error.stackTrace || 'N/A'}
-`;
-      })
-      .join('\n');
-  }
 
   useEffect(() => {
     const websocket = new WebSocket(SERVER_WS_URL);
@@ -152,6 +145,12 @@ StackTrace: ${error.stackTrace || 'N/A'}
           setTabIndex(3);
           setMarkdown(msg.data);
           break;
+        case 'evaluation_success':
+          // handle success
+          break;
+        case 'evaluation_error':
+          // handle error
+          break;
         default:
           break;
       }
@@ -161,7 +160,7 @@ StackTrace: ${error.stackTrace || 'N/A'}
     return () => {
       websocket.close();
     };
-  }, []);
+  }, [sessionId]);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(resultText);
@@ -173,8 +172,12 @@ StackTrace: ${error.stackTrace || 'N/A'}
     setMessages([]);
   };
 
+  // Auto-save
   useEffect(() => {
     if (!selectedNode || expression == null) return;
+   if (selectedChildrenCount > 0 || selectedExpressionType === ExpressionType.FsStudioParentNode) {
+           return;
+         }
     if (saveTimerRef.current) {
       clearTimeout(saveTimerRef.current);
     }
@@ -202,14 +205,38 @@ StackTrace: ${error.stackTrace || 'N/A'}
         clearTimeout(saveTimerRef.current);
       }
     };
-  }, [expression, selectedNode, lastSavedExpression, queuedExpression, savingInProgress, saveExpression]);
+  }, [
+    expression,
+    selectedNode,
+    lastSavedExpression,
+    queuedExpression,
+    savingInProgress,
+    saveExpression,
+    selectedChildrenCount,
+    selectedExpressionType
+  ]);
 
   const isSaveDisabled = expression === lastSavedExpression;
 
+  const memoizedRootNode = useMemo(
+    () => ({
+      name: 'Root Node',
+      path: null,
+      expression: null,
+      expressionType: ExpressionType.FuncScript,
+      childrenCount: 0,
+    }),
+    [sessionId]
+  );
+  
   return (
     <Grid container spacing={2} sx={{ height: '100vh', overflow: 'hidden' }}>
       <Grid item xs={8} container direction="column" wrap="nowrap" sx={{ height: '100%' }}>
-        <Grid item sx={{ position: 'sticky', top: 0, zIndex: 100, backgroundColor: 'background.paper' }}>
+        {/* Tabs Header */}
+        <Grid
+          item
+          sx={{ position: 'sticky', top: 0, zIndex: 100, backgroundColor: 'background.paper' }}
+        >
           <Box sx={{ display: 'flex', alignItems: 'center', borderBottom: 1, borderColor: 'divider' }}>
             <Tabs
               value={tabIndex}
@@ -258,7 +285,9 @@ StackTrace: ${error.stackTrace || 'N/A'}
             </Box>
           </Box>
         </Grid>
+        {/* Tabs Content */}
         <Grid item sx={{ flex: 1, overflow: 'auto' }}>
+          {/* Script Tab */}
           <Box
             sx={{
               display: tabIndex === 0 ? 'flex' : 'none',
@@ -273,6 +302,7 @@ StackTrace: ${error.stackTrace || 'N/A'}
               expressionType={selectedExpressionType}
             />
           </Box>
+          {/* Result Tab */}
           <Box
             sx={{
               display: tabIndex === 1 ? 'flex' : 'none',
@@ -295,6 +325,7 @@ StackTrace: ${error.stackTrace || 'N/A'}
               {resultText}
             </pre>
           </Box>
+          {/* Log Tab */}
           <Box
             sx={{
               display: tabIndex === 2 ? 'flex' : 'none',
@@ -305,6 +336,7 @@ StackTrace: ${error.stackTrace || 'N/A'}
           >
             <TextLogger messages={messages} />
           </Box>
+          {/* Document Tab */}
           <Box
             sx={{
               display: tabIndex === 3 ? 'flex' : 'none',
@@ -320,17 +352,10 @@ StackTrace: ${error.stackTrace || 'N/A'}
 
       <Grid item xs={4} sx={{ height: '100%', overflow: 'auto' }}>
         {sessionId && (
-          // We no longer wrap with <EvalNodeProvider>, we just use FsStudio:
           <EvalNodeTree
-            rootNode={{
-              name: 'Root Node',
-              path: null,
-              expression: null,
-              expressionType: ExpressionType.FuncScript,
-              childrenCount: 0,
-            }}
+            rootNode={memoizedRootNode}
             sessionId={sessionId}
-            onSelect={handleNodeSelect}
+            onSelect={handleNodeSelectInternal}
             selectedNode={selectedNode}
           />
         )}

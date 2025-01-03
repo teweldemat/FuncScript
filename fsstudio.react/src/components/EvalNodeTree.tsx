@@ -1,114 +1,91 @@
-// EvalNodeTree.tsx
-import React, { useEffect, useCallback } from 'react';
-import { Box, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, List } from '@mui/material';
+import React, { useEffect, useCallback, useState } from 'react';
+import { Box, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@mui/material';
+import { ExpressionType, NodeItem } from '../FsStudioProvider'; 
 import EvalNodeComponent from './EvalNodeComponent';
-import { ExpressionType, NodeItem, useFsStudio } from '../FsStudioProvider';
+import axios from 'axios';
+import { SERVER_URL } from '../backend';
 
-export const EvalNodeTree: React.FC<{
+interface EvalNodeTreeProps {
   rootNode: NodeItem;
   sessionId: string;
   onSelect: (path: string | null) => void;
   selectedNode: string | null;
-}> = ({ rootNode, sessionId, onSelect, selectedNode }) => {
-  const {
-    sessions,
-    setSessions,
-    fetchChildren,
-    renameNode,
-    deleteNode,
-    createNode,
-    moveNode,
-    updateNodeStates,
-  } = useFsStudio();
+}
 
-  // We can store everything in sessions[sessionId], falling back if not present
-  const sessionData = sessions[sessionId] || {
-    nodeStates: {},
-    selectedNode: null,
-  };
+export const EvalNodeTree: React.FC<EvalNodeTreeProps> = ({
+  rootNode,
+  sessionId,
+  onSelect,
+  selectedNode,
+}) => {
+  const [nodeStates, setNodeStates] = useState<Record<string, any>>({});
 
   useEffect(() => {
+    // Initialize root node state
     initializeNodeState(rootNode);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rootNode]);
 
   const initializeNodeState = (node: NodeItem) => {
-    setSessions((prev) => {
-      const existingSession = prev[sessionId] || { nodeStates: {}, selectedNode: null };
-      if (!existingSession.nodeStates[node.path || 'root']) {
-        existingSession.nodeStates[node.path || 'root'] = {
+    setNodeStates((prev) => {
+      const key = node.path || 'root';
+      if (!prev[key]) {
+        prev[key] = {
           open: !node.path,
-          menuAnchorEl: null,
           renameMode: false,
           renamedName: node.name,
           newInputMode: false,
           newName: '',
-          newNodeType: ExpressionType.FuncScript,
           deleteItem: false,
           dragOver: false,
           children: [],
+          evaluating: false,
         };
       }
-      return { ...prev, [sessionId]: existingSession };
+      return { ...prev };
     });
-    fetchChildren(sessionId, node.path).then((chs) => {
-      updateNodeStates(sessionId, node.path || 'root', { children: chs });
-    });
+    fetchChildNodes(node.path);
   };
 
   const fetchChildNodes = useCallback(
-    (path: string | null) => {
+    async (path: string | null) => {
       const key = path || 'root';
-      fetchChildren(sessionId, path).then((chs) => {
-        updateNodeStates(sessionId, key, { children: chs });
-      });
+      try {
+        const response = await axios.get<NodeItem[]>(
+          `${SERVER_URL}/api/sessions/${sessionId}/node/children`,
+          {
+            params: { nodePath: path },
+          }
+        );
+        const children = response.data.map((item) => ({
+          ...item,
+          path: path ? `${path}.${item.name}` : item.name,
+        }));
+        setNodeStates((prev) => ({
+          ...prev,
+          [key]: { ...prev[key], children },
+        }));
+      } catch (error) {
+        console.error('Error fetching children:', error);
+      }
     },
-    [fetchChildren, sessionId, updateNodeStates]
+    [sessionId]
   );
 
+  const getParentPath = (path: string) => {
+    const idx = path.lastIndexOf('.');
+    return idx > 0 ? path.slice(0, idx) : null;
+  };
+
   const handleStateChange = (nodePath: string, updatedState: Partial<any>) => {
-    updateNodeStates(sessionId, nodePath, updatedState);
-  };
-
-  const handleMenuClick = (nodePath: string, anchorEl: HTMLElement) => {
-    const existing = sessionData.nodeStates[nodePath] || {};
-    handleStateChange(nodePath, { ...existing, menuAnchorEl: anchorEl });
-  };
-
-  const handleCloseMenu = (nodePath: string) => {
-    handleStateChange(nodePath, { menuAnchorEl: null });
-  };
-
-  const handleMenuAction = (node: NodeItem, action: string) => {
-    const nodePath = node.path || 'root';
-    handleCloseMenu(nodePath);
-    switch (action) {
-      case 'add-standard':
-      case 'add-text':
-      case 'add-text-template':
-        handleStateChange(nodePath, {
-          newInputMode: true,
-          newNodeType:
-            action === 'add-standard'
-              ? ExpressionType.FuncScript
-              : action === 'add-text'
-              ? ExpressionType.ClearText
-              : ExpressionType.FuncScriptTextTemplate,
-        });
-        break;
-      case 'rename':
-        handleStateChange(nodePath, { renameMode: true, renamedName: node.name });
-        break;
-      case 'delete':
-        handleStateChange(nodePath, { deleteItem: true });
-        break;
-      default:
-        break;
-    }
+    setNodeStates((prev) => ({
+      ...prev,
+      [nodePath]: { ...prev[nodePath], ...updatedState },
+    }));
   };
 
   const handleToggleExpand = (nodePath: string) => {
-    const nodeState = sessionData.nodeStates[nodePath] || {};
+    const nodeState = nodeStates[nodePath] || {};
     const newOpen = !nodeState.open;
     handleStateChange(nodePath, { open: newOpen });
     if (newOpen) {
@@ -122,25 +99,30 @@ export const EvalNodeTree: React.FC<{
 
   const handleApplyRename = async (node: NodeItem) => {
     const nodePath = node.path || 'root';
-    const nameToSet = sessionData.nodeStates[nodePath].renamedName;
+    const nameToSet = nodeStates[nodePath].renamedName;
     try {
-      await renameNode(sessionId, nodePath, nameToSet);
+      await axios.post(`${SERVER_URL}/api/sessions/${sessionId}/node/rename`, {
+        nodePath,
+        newName: nameToSet,
+      });
       handleStateChange(nodePath, { renameMode: false });
-      fetchChildNodes(getParentPath(nodePath));
+      fetchChildNodes(getParentPath(nodePath) || null);
     } catch (error) {
-      console.error('Error updating expression:', error);
+      console.error('Error renaming node:', error);
     }
   };
 
   const handleDeleteItem = async (node: NodeItem) => {
     const nodePath = node.path || 'root';
     try {
-      await deleteNode(sessionId, nodePath);
+      await axios.delete(`${SERVER_URL}/api/sessions/${sessionId}/node`, {
+        params: { nodePath },
+      });
       if (selectedNode === node.path) {
         onSelect(null);
       }
       handleStateChange(nodePath, { deleteItem: false });
-      fetchChildNodes(getParentPath(nodePath));
+      fetchChildNodes(getParentPath(nodePath) || null);
     } catch (error) {
       console.error('Error deleting node:', error);
     }
@@ -148,10 +130,15 @@ export const EvalNodeTree: React.FC<{
 
   const handleAddItem = async (node: NodeItem) => {
     const nodePath = node.path || 'root';
-    const { newName, newNodeType } = sessionData.nodeStates[nodePath];
+    const { newName } = nodeStates[nodePath];
     if (newName.trim() !== '') {
       try {
-        await createNode(sessionId, node.path, newName, newNodeType);
+        await axios.post(`${SERVER_URL}/api/sessions/${sessionId}/node`, {
+          ParentNodePath: node.path,
+          Name: newName,
+          ExpressionType: ExpressionType.FuncScript,
+          Expression: '',
+        });
         handleStateChange(nodePath, { newInputMode: false, newName: '' });
         onSelect(node.path ? `${node.path}.${newName}` : newName);
         handleStateChange(nodePath, { open: true });
@@ -192,9 +179,13 @@ export const EvalNodeTree: React.FC<{
     handleStateChange(nodePath, { dragOver: false });
     const draggedPath = e.dataTransfer.getData('draggedPath');
     const oldParentPath = e.dataTransfer.getData('oldParentPath');
+
     if (draggedPath && draggedPath !== node.path) {
       try {
-        await moveNode(sessionId, draggedPath, node.path || null);
+        await axios.post(`${SERVER_URL}/api/sessions/${sessionId}/node/move`, {
+          nodePath: draggedPath,
+          newParentPath: node.path || null,
+        });
         fetchChildNodes(oldParentPath || null);
         fetchChildNodes(node.path || null);
       } catch (error) {
@@ -203,25 +194,14 @@ export const EvalNodeTree: React.FC<{
     }
   };
 
-  const getParentPath = (path: string) => {
-    const idx = path.lastIndexOf('.');
-    return idx > 0 ? path.slice(0, idx) : null;
-  };
-
   return (
     <Box>
       <EvalNodeComponent
         node={rootNode}
-        sessionId={sessionId}
-        selectedNode={selectedNode}
-        nodeStates={sessionData.nodeStates}
+        nodeStates={nodeStates}
         onStateChange={handleStateChange}
-        onFetchChildren={fetchChildNodes}
         onSelect={handleSelect}
         onToggleExpand={handleToggleExpand}
-        onMenuClick={handleMenuClick}
-        onCloseMenu={handleCloseMenu}
-        onMenuAction={handleMenuAction}
         onApplyRename={handleApplyRename}
         onDeleteItem={handleDeleteItem}
         onAddItem={handleAddItem}
@@ -229,19 +209,20 @@ export const EvalNodeTree: React.FC<{
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
+        selectedNode={selectedNode}
       />
 
-      {Object.entries(sessionData.nodeStates).map(([path, state]) => (
+      {/* All "deleteItem" dialogs for each node path */}
+      {Object.entries(nodeStates).map(([path, state]) => (
         <Dialog
           key={path}
-          open={state.deleteItem}
+          open={Boolean(state.deleteItem)}
           onClose={() => handleStateChange(path, { deleteItem: false })}
         >
           <DialogTitle>Confirm Deletion</DialogTitle>
           <DialogContent>
             <DialogContentText>
-              Are you sure you want to delete {state.renamedName}? This action cannot
-              be undone.
+              Are you sure you want to delete {state.renamedName}? This action cannot be undone.
             </DialogContentText>
           </DialogContent>
           <DialogActions>
@@ -256,8 +237,8 @@ export const EvalNodeTree: React.FC<{
                 handleDeleteItem({
                   path: path === 'root' ? '' : path,
                   name: state.renamedName,
-                  childrenCount: state.children.length,
                   expressionType: ExpressionType.FsStudioParentNode,
+                  childrenCount: state.children?.length || 0,
                   expression: null,
                 });
               }}

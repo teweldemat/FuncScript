@@ -1,7 +1,7 @@
-// Navigation.tsx
 import React, { useState } from 'react';
 import { Drawer, Box } from '@mui/material';
 import NavItemComponent from './NavItemComponent';
+
 const drawerWidth = '20%';
 
 interface NavigationProps {
@@ -9,8 +9,13 @@ interface NavigationProps {
   initiallySelectedPath: string | null;
 }
 
-const Navigation: React.FC<NavigationProps> = ({ onSelected, initiallySelectedPath }) => {
-  const [selectedPath, setSelectedPath] = useState<string>(initiallySelectedPath ?? '');
+const Navigation: React.FC<NavigationProps> = ({
+  onSelected,
+  initiallySelectedPath,
+}) => {
+  const [selectedPath, setSelectedPath] = useState<string>(
+    initiallySelectedPath ?? ''
+  );
 
   const handleSelect = (path: string) => {
     if (selectedPath !== path) {

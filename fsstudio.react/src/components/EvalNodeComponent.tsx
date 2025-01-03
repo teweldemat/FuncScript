@@ -1,4 +1,3 @@
-// EvalNodeComponent.tsx
 import React from 'react';
 import {
   ListItem,
@@ -11,6 +10,7 @@ import {
   MenuItem,
   Collapse,
   List,
+  CircularProgress,
 } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import FolderIcon from '@mui/icons-material/Folder';
@@ -23,15 +23,10 @@ import { NodeItem, ExpressionType } from '../FsStudioProvider';
 
 interface EvalNodeComponentProps {
   node: NodeItem;
-  sessionId: string;
   nodeStates: Record<string, any>;
   onStateChange: (nodePath: string, updatedState: Partial<any>) => void;
-  onFetchChildren: (path: string | null) => void;
   onSelect: (node: NodeItem) => void;
   onToggleExpand: (nodePath: string) => void;
-  onMenuClick: (nodePath: string, anchorEl: HTMLElement) => void;
-  onCloseMenu: (nodePath: string) => void;
-  onMenuAction: (node: NodeItem, action: string) => void;
   onApplyRename: (node: NodeItem) => void;
   onDeleteItem: (node: NodeItem) => void;
   onAddItem: (node: NodeItem) => void;
@@ -44,15 +39,10 @@ interface EvalNodeComponentProps {
 
 const EvalNodeComponent: React.FC<EvalNodeComponentProps> = ({
   node,
-  sessionId,
   nodeStates,
   onStateChange,
-  onFetchChildren,
   onSelect,
   onToggleExpand,
-  onMenuClick,
-  onCloseMenu,
-  onMenuAction,
   onApplyRename,
   onDeleteItem,
   onAddItem,
@@ -66,15 +56,44 @@ const EvalNodeComponent: React.FC<EvalNodeComponentProps> = ({
   const nodeState = nodeStates[nodePathKey] || {};
   const {
     open,
-    menuAnchorEl,
     renameMode,
     renamedName,
     newInputMode,
     newName,
-    newNodeType,
     dragOver: isDragOver,
     children,
+    evaluating,
   } = nodeState;
+
+  const [menuAnchorEl, setMenuAnchorEl] = React.useState<HTMLElement | null>(null);
+
+  const handleMenuClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    setMenuAnchorEl(event.currentTarget);
+  };
+
+  const handleCloseMenu = () => {
+    setMenuAnchorEl(null);
+  };
+
+  const handleMenuAction = (action: string) => {
+    handleCloseMenu();
+    switch (action) {
+      case 'add-standard':
+      case 'add-text':
+      case 'add-text-template':
+        onStateChange(nodePathKey, { newInputMode: true });
+        break;
+      case 'rename':
+        onStateChange(nodePathKey, { renameMode: true });
+        break;
+      case 'delete':
+        onStateChange(nodePathKey, { deleteItem: true });
+        break;
+      default:
+        break;
+    }
+  };
 
   function getIconForExpressionType() {
     switch (node.expressionType) {
@@ -84,10 +103,10 @@ const EvalNodeComponent: React.FC<EvalNodeComponentProps> = ({
         return <FunctionsIcon />;
       case ExpressionType.FuncScriptTextTemplate:
         return (
-          <>
-            <FunctionsIcon />
+          <Box sx={{ display: 'inline-flex', alignItems: 'center' }}>
+            <FunctionsIcon sx={{ marginRight: '4px' }} />
             <DescriptionIcon />
-          </>
+          </Box>
         );
       case ExpressionType.FsStudioParentNode:
         return <CodeIcon />;
@@ -110,9 +129,9 @@ const EvalNodeComponent: React.FC<EvalNodeComponentProps> = ({
           onSelect(node);
         }}
         draggable={!isRoot}
-        onDragStart={(e) => onDragStart(node.path || '', e)}
-        onDragOver={(e) => onDragOver(node.path || 'root', e)}
-        onDragLeave={() => onDragLeave(node.path || 'root')}
+        onDragStart={(e) => onDragStart(nodePathKey, e)}
+        onDragOver={(e) => onDragOver(nodePathKey, e)}
+        onDragLeave={() => onDragLeave(nodePathKey)}
         onDrop={(e) => onDrop(node, e)}
         sx={{
           display: 'flex',
@@ -126,35 +145,23 @@ const EvalNodeComponent: React.FC<EvalNodeComponentProps> = ({
               ? 'lightgreen'
               : 'inherit',
           cursor: 'pointer',
-          '&:hover':
-            node.childrenCount === 0
-              ? {
-                  backgroundColor: 'lightblue',
-                }
-              : {},
         }}
       >
         <IconButton
-          onClick={(e) => {
-            onMenuClick(node.path || 'root', e.currentTarget);
-            e.stopPropagation();
-          }}
+          onClick={handleMenuClick}
           size="small"
+          sx={{ marginRight: 1 }}
         >
           <MoreVertIcon />
         </IconButton>
 
-        <Menu
-          anchorEl={menuAnchorEl}
-          open={Boolean(menuAnchorEl)}
-          onClose={() => onCloseMenu(node.path || 'root')}
-        >
+        <Menu anchorEl={menuAnchorEl} open={Boolean(menuAnchorEl)} onClose={handleCloseMenu}>
           {menuItems.map((mi) => (
             <MenuItem
               key={mi}
               onClick={(event) => {
                 event.stopPropagation();
-                onMenuAction(node, mi.toLowerCase().replaceAll(' ', '-'));
+                handleMenuAction(mi.toLowerCase().replaceAll(' ', '-'));
               }}
             >
               {mi}
@@ -168,28 +175,27 @@ const EvalNodeComponent: React.FC<EvalNodeComponentProps> = ({
               <IconButton
                 onClick={(e) => {
                   e.stopPropagation();
-                  onToggleExpand(node.path || 'root');
+                  onToggleExpand(nodePathKey);
                 }}
                 size="small"
               >
                 {open ? <ExpandLessIcon /> : <ExpandMoreIcon />}
               </IconButton>
             )}
-            <ListItemIcon>{getIconForExpressionType()}</ListItemIcon>
+            <ListItemIcon>
+              {evaluating ? <CircularProgress size="1rem" /> : getIconForExpressionType()}
+            </ListItemIcon>
             {!renameMode ? (
               <ListItemText primary={node.name} />
             ) : (
               <TextField
                 size="small"
                 value={renamedName}
-                onChange={(e) =>
-                  onStateChange(nodePathKey, { renamedName: e.target.value })
-                }
+                onChange={(e) => onStateChange(nodePathKey, { renamedName: e.target.value })}
                 autoFocus
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') onApplyRename(node);
-                  else if (e.key === 'Escape')
-                    onStateChange(nodePathKey, { renameMode: false });
+                  else if (e.key === 'Escape') onStateChange(nodePathKey, { renameMode: false });
                 }}
               />
             )}
@@ -198,6 +204,7 @@ const EvalNodeComponent: React.FC<EvalNodeComponentProps> = ({
         {isRoot && <ListItemText primary="Nodes" />}
       </ListItem>
 
+      {/* If user clicked "add" -> show input field */}
       {newInputMode && (
         <Box pl={isRoot ? 0 : 4}>
           <TextField
@@ -207,14 +214,14 @@ const EvalNodeComponent: React.FC<EvalNodeComponentProps> = ({
             onChange={(e) => onStateChange(nodePathKey, { newName: e.target.value })}
             onKeyDown={(e) => {
               if (e.key === 'Enter') onAddItem(node);
-              else if (e.key === 'Escape')
-                onStateChange(nodePathKey, { newInputMode: false });
+              else if (e.key === 'Escape') onStateChange(nodePathKey, { newInputMode: false });
             }}
             autoFocus
           />
         </Box>
       )}
 
+      {/* Collapsed children */}
       {open && (
         <Collapse in={open} timeout="auto" unmountOnExit>
           <List component="div" disablePadding dense>
@@ -222,15 +229,10 @@ const EvalNodeComponent: React.FC<EvalNodeComponentProps> = ({
               <Box key={index} pl={isRoot ? 0 : 4}>
                 <EvalNodeComponent
                   node={child}
-                  sessionId={sessionId}
                   nodeStates={nodeStates}
                   onStateChange={onStateChange}
-                  onFetchChildren={onFetchChildren}
                   onSelect={onSelect}
                   onToggleExpand={onToggleExpand}
-                  onMenuClick={onMenuClick}
-                  onCloseMenu={onCloseMenu}
-                  onMenuAction={onMenuAction}
                   onApplyRename={onApplyRename}
                   onDeleteItem={onDeleteItem}
                   onAddItem={onAddItem}

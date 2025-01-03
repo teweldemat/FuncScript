@@ -1,4 +1,3 @@
-// RemoteLogger.cs
 using System.Net.WebSockets;
 using System.Text;
 
