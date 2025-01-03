@@ -1,22 +1,29 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { SERVER_URL, SERVER_WS_URL } from '../backend';
 
+
+export enum ExpressionType {
+    ClearText = 'ClearText',
+    FuncScript = 'FuncScript',
+    FuncScriptTextTemplate = 'FuncScriptTextTemplate',
+    FsStudioParentNode = 'FsStudioParentNode',
+  }
 interface ExpressionNodeInfo {
     name: string;
-    expressionType: number;
+    expressionType: ExpressionType;
     childrenCount: number;
 }
 interface ExpressionNodeInfoWithExpression {
     name: string;
-    expressionType: number;
+    expressionType: ExpressionType;
     childrenCount: number;
     expression: string | null;
 }
 
 interface NodeState extends ExpressionNodeInfoWithExpression {
     evaluating: boolean;
-    cachedValue:string|null;
-    isCached:boolean;
+    cachedValue: string | null;
+    isCached: boolean;
     evaluationRes: any;
     evaluationError: string | null;
     childNodes?: ExpressionNodeInfo[];
@@ -27,6 +34,8 @@ interface SessionState {
     filePath: string;
     nodes: Record<string, NodeState>;
     evaluationInProgressNodePath?: string;
+    rootChildren?: ExpressionNodeInfo[];
+    expandedNodes: Record<string, boolean>;
 }
 
 interface DirectoryListResult {
@@ -40,13 +49,15 @@ interface SessionsContextValue {
     loadNode: (sessionId: string, nodePath: string) => Promise<ExpressionNodeInfoWithExpression>;
     evaluateNode: (sessionId: string, nodePath: string) => Promise<void>;
     listDirectory: (path: string) => Promise<DirectoryListResult>;
-    loadChildNodeList: (sessionId: string,nodePath: string) => Promise<ExpressionNodeInfo[]>;
+    loadChildNodeList: (sessionId: string, nodePath: string | null) => Promise<ExpressionNodeInfo[]>;
+    toggleNodeExpanded: (sessionId: string, nodePath: string) => void;
 }
 
 const ExecutionSessionContext = createContext<SessionsContextValue | null>(null);
 
 export function ExecutionSessionProvider({ children }: { children: React.ReactNode }) {
     const [sessions, setSessions] = useState<Record<string, SessionState>>({});
+    const [directoryCache, setDirectoryCache] = useState<Record<string, DirectoryListResult>>({});
     const wsRef = useRef<WebSocket | null>(null);
 
     useEffect(() => {
@@ -113,6 +124,7 @@ export function ExecutionSessionProvider({ children }: { children: React.ReactNo
                     sessionId,
                     filePath,
                     nodes: {},
+                    expandedNodes: {},
                 },
             };
         });
@@ -123,8 +135,8 @@ export function ExecutionSessionProvider({ children }: { children: React.ReactNo
         const params = new URLSearchParams({ nodePath });
         const res = await fetch(`${SERVER_URL}/api/sessions/${sessionId}/node?${params.toString()}`);
         if (!res.ok) throw new Error(await res.text());
+        
         const nodeInfo = (await res.json()) as ExpressionNodeInfoWithExpression;
-
         setSessions((prev) => {
             const session = prev[sessionId];
             if (!session) return prev;
@@ -133,8 +145,8 @@ export function ExecutionSessionProvider({ children }: { children: React.ReactNo
                 evaluating: false,
                 evaluationRes: null,
                 evaluationError: null,
-                cachedValue:null,
-                isCached:false,
+                cachedValue: null,
+                isCached: false,
             };
             const newSession = {
                 ...session,
@@ -166,20 +178,40 @@ export function ExecutionSessionProvider({ children }: { children: React.ReactNo
             return { ...prev, [sessionId]: newSession };
         });
         const params = new URLSearchParams({ nodePath });
-        const res = await fetch(`${SERVER_URL}/api/sessions/${sessionId}/node/evaluate?${params.toString()}`, {
-            method: 'POST',
-        });
+        const res = await fetch(
+            `${SERVER_URL}/api/sessions/${sessionId}/node/evaluate?${params.toString()}`,
+            {
+                method: 'POST',
+            }
+        );
         if (!res.ok) throw new Error(await res.text());
     };
 
     const listDirectory = async (path: string) => {
+        if (directoryCache[path]) {
+            return directoryCache[path];
+        }
         const url = `${SERVER_URL}/api/FileSystem/ListSubFoldersAndFiles?path=${encodeURIComponent(path)}`;
         const res = await fetch(url);
         if (!res.ok) throw new Error(await res.text());
-        return (await res.json()) as DirectoryListResult;
+        const result = (await res.json()) as DirectoryListResult;
+        setDirectoryCache((prev) => ({ ...prev, [path]: result }));
+        return result;
     };
 
     const loadChildNodeList = async (sessionId: string, nodePath: string | null) => {
+        const session = sessions[sessionId];
+        if (session) {
+            if (!nodePath && session.rootChildren) {
+                return session.rootChildren;
+            }
+            if (nodePath) {
+                const node = session.nodes[nodePath];
+                if (node && node.childNodes) {
+                    return node.childNodes;
+                }
+            }
+        }
         const params = new URLSearchParams();
         if (nodePath) {
             params.set('nodePath', nodePath);
@@ -189,24 +221,41 @@ export function ExecutionSessionProvider({ children }: { children: React.ReactNo
         const childNodes = (await res.json()) as ExpressionNodeInfo[];
     
         setSessions((prev) => {
-            const session = prev[sessionId];
-            if (!session) return prev;
-            const newSession = { ...session };
-    
+            const currentSession = prev[sessionId];
+            if (!currentSession) return prev;
+            const newSession = { ...currentSession };
             if (nodePath) {
                 const node = newSession.nodes[nodePath];
                 if (node) {
                     newSession.nodes[nodePath] = {
                         ...node,
-                        childNodes
+                        childNodes,
                     };
                 }
             } else {
-                (newSession as any).rootChildren = childNodes;
+                newSession.rootChildren = childNodes;
             }
             return { ...prev, [sessionId]: newSession };
         });
         return childNodes;
+    };
+
+    const toggleNodeExpanded = (sessionId: string, nodePath: string) => {
+        setSessions((prev) => {
+            const session = prev[sessionId];
+            if (!session) return prev;
+            const isOpen = !!session.expandedNodes[nodePath];
+            return {
+                ...prev,
+                [sessionId]: {
+                    ...session,
+                    expandedNodes: {
+                        ...session.expandedNodes,
+                        [nodePath]: !isOpen,
+                    },
+                },
+            };
+        });
     };
 
     return (
@@ -217,7 +266,8 @@ export function ExecutionSessionProvider({ children }: { children: React.ReactNo
                 loadNode,
                 evaluateNode,
                 listDirectory,
-                loadChildNodeList
+                loadChildNodeList,
+                toggleNodeExpanded
             }}
         >
             {children}
