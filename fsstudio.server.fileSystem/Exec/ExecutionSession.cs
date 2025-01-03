@@ -203,12 +203,16 @@ public class ExecutionSession : KeyValueCollection
         var node= FindNodeByPath(nodePath);
         if (node == null)
             return null;
+        var c = node.GetCache();
+        
         return new ExpressionNodeInfoWithExpression
         {
             Name = node.Name,
             ExpressionType = node.ExpressionType,
             ChildrenCount = node.Children.Count,
-            Expression = node.Expression
+            Expression = node.Expression,
+            CachedValue = c==null?null:FuncScript.FormatToJson(c),
+            IsCached = node.IsCached()
         };
     }
 

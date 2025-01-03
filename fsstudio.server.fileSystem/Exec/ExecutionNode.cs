@@ -14,7 +14,9 @@ public class ExpressionNodeInfo
 
 public class ExpressionNodeInfoWithExpression : ExpressionNodeInfo
 {
-    public String? Expression { get; set; }
+    public string? Expression { get; set; }
+    public string? CachedValue { get; set; }
+    public bool IsCached { get; set; }
 }
 
 public enum ExpressionType
@@ -29,7 +31,7 @@ public class ExecutionNode : KeyValueCollection
 {
     private string _nameLower;
     private string _name;
-    private object _cache = null;
+    private object?_cache = null;
     private bool _cached = false;
     public ExpressionType ExpressionType { get; set; } = ExpressionType.FuncScript;
     public string? Expression { get; set; }
@@ -37,7 +39,8 @@ public class ExecutionNode : KeyValueCollection
 
     private KeyValueCollection _prentNode = null;
     public KeyValueCollection ParentContext => _prentNode;
-
+    public object? GetCache() => _cache;
+    public bool IsCached() => _cached;
     public void ClearCache()
     {
         _cache = null;

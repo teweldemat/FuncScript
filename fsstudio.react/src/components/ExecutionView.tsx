@@ -9,7 +9,7 @@ import ReactMarkdown from 'react-markdown';
 import { SERVER_URL, SERVER_WS_URL } from '../backend';
 import CodeEditor from '../code-editor/CodeEditor'; // Adjust your import
 import TextLogger from './RemoteLogger';           // Adjust your import
-import { ExpressionType } from '../FsStudioProvider';
+import { ExpressionType, useFsStudio } from '../FsStudioProvider';
 import { EvalNodeTree } from './EvalNodeTree';
 
 interface ExecutionViewProps {
@@ -23,6 +23,7 @@ const ExecutionView: React.FC<ExecutionViewProps> = ({
   initiallySelectedNode,
   onNodeSelect,
 }) => {
+  const { nodeEvaluations } = useFsStudio(); 
   const [selectedNode, setSelectedNode] = useState<string | null>(
     initiallySelectedNode
   );
@@ -101,32 +102,8 @@ const ExecutionView: React.FC<ExecutionViewProps> = ({
   );
 
   const handleNodeSelectInternal = (nodePath: string | null) => {
-    // Save old node if needed
-    if (selectedNode && expression !== lastSavedExpression) {
-     // only attempt to save if old node was a leaf node:
-     if (!(selectedChildrenCount > 0 || selectedExpressionType === ExpressionType.FsStudioParentNode)) {
-       saveExpression(selectedNode, expression, false);
-     }    
-    }
-    if (nodePath == null) {
-      setSelectedNode(null);
-      setExpression('');
-      setLastSavedExpression(null);
-      setSaveStatus('All changes saved');
-      onNodeSelect(null);
-      return;
-    }
-
-    axios
-      .get(`${SERVER_URL}/api/sessions/${sessionId}/node`, { params: { nodePath } })
-      .then((response) => {
-        setSelectedNode(nodePath);
-        setExpression(response.data.expression ?? '');
-        setLastSavedExpression(response.data.expression);
-        setSelectedExpressionType(response.data.expressionType);
-        setSaveStatus('All changes saved');
-        onNodeSelect(nodePath);
-      });
+    setSelectedNode(nodePath);
+    onNodeSelect(nodePath);
   };
 
   useEffect(() => {
@@ -146,6 +123,7 @@ const ExecutionView: React.FC<ExecutionViewProps> = ({
           setMarkdown(msg.data);
           break;
         case 'evaluation_success':
+          console.log(`eval success:${msg.data.sessionId} ${msg.data.result}`)
           // handle success
           break;
         case 'evaluation_error':
@@ -229,6 +207,8 @@ const ExecutionView: React.FC<ExecutionViewProps> = ({
     [sessionId]
   );
   
+  const displayedResult = selectedNode ? nodeEvaluations[selectedNode] || '' : '';
+
   return (
     <Grid container spacing={2} sx={{ height: '100vh', overflow: 'hidden' }}>
       <Grid item xs={8} container direction="column" wrap="nowrap" sx={{ height: '100%' }}>
@@ -322,7 +302,7 @@ const ExecutionView: React.FC<ExecutionViewProps> = ({
                 flex: 1,
               }}
             >
-              {resultText}
+               {displayedResult}
             </pre>
           </Box>
           {/* Log Tab */}
