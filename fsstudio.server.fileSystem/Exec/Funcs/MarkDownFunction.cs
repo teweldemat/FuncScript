@@ -5,14 +5,8 @@ using fsstudio.server.fileSystem.exec;
 
 namespace funcscript.funcs.text
 {
-    internal class MarkDownFunction : IFsFunction
+    internal class MarkDownFunction(RemoteLogger remoteLogger,string sessionId) : IFsFunction
     {
-        public RemoteLogger _remoteLogger;
-
-        public MarkDownFunction(RemoteLogger remoteLogger)
-        {
-            _remoteLogger = remoteLogger;
-        }
         private const int MaxParameters = 1;
         public CallType CallType => CallType.Prefix;
         public string Symbol => "MarkDown";
@@ -27,15 +21,15 @@ namespace funcscript.funcs.text
 
             var par0 = pars[0];
             if(par0 is null)
-                _remoteLogger.SendMarkdDown("");
+                remoteLogger.SendMarkdDown(sessionId,"");
             else if (par0 is string str)
             {
                 string content = (string)par0;
-                _remoteLogger.SendMarkdDown(str);
+                remoteLogger.SendMarkdDown(sessionId, str);
             }
             else
             {
-                _remoteLogger.SendMarkdDown($"Unsupported type {FuncScript.GetFsDataType(par0)} for markdown");
+                remoteLogger.SendMarkdDown(sessionId,$"Unsupported type {FuncScript.GetFsDataType(par0)} for markdown");
             }
             return par0;
         }

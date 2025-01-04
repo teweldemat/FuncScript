@@ -51,16 +51,15 @@ interface SessionsContextValue {
 
 const ExecutionSessionContext = createContext<SessionsContextValue | null>(null);
 
-export function findNodeByPath(rootNodes?: NodeState[], nodePath?: string): NodeState | undefined {
-    if(!rootNodes||!nodePath)
-        return undefined;
+
+export function findNodeByPath(rootNodes: NodeState[], nodePath: string): NodeState | null {
     const parts = nodePath.split('.');
     let currentNodes = rootNodes;
-    let currentNode: NodeState | undefined;
+    let currentNode: NodeState | null=null;
 
     for (const part of parts) {
-        currentNode = currentNodes.find((n) => n.name === part);
-        if (!currentNode) return undefined;
+        currentNode = currentNodes.find((n) => n.name === part)??null;
+        if (!currentNode) return null;
         if (!currentNode.childNodes) currentNode.childNodes = [];
         currentNodes = currentNode.childNodes;
     }
@@ -98,7 +97,7 @@ export function ExecutionSessionProvider({ children }: { children: React.ReactNo
     const wsRef = useRef<WebSocket | null>(null);
 
     useEffect(() => {
-        const ws = new WebSocket(`${SERVER_WS_URL}/ws`);
+        const ws = new WebSocket(SERVER_WS_URL);
         wsRef.current = ws;
         ws.onmessage = (evt) => handleWsMessage(evt);
         return () => {
@@ -142,7 +141,9 @@ export function ExecutionSessionProvider({ children }: { children: React.ReactNo
             });
         } else if (data.cmd === 'log') {
             const { sessionId, message } = data.data;
+            console.log('log:'+message)
             if (!sessionId) return;
+            console.log(message)
             setSessions((prev) => {
                 const session = prev[sessionId];
                 if (!session) return prev;
@@ -169,7 +170,7 @@ export function ExecutionSessionProvider({ children }: { children: React.ReactNo
                 };
             });
         } else if (data.cmd === 'markdown') {
-            const { sessionId, data: md } = data.data;
+            const { sessionId, markdown: md } = data.data;
             if (!sessionId) return;
             setSessions((prev) => {
                 const session = prev[sessionId];
@@ -190,7 +191,7 @@ export function ExecutionSessionProvider({ children }: { children: React.ReactNo
             (session) => session.filePath === filePath
         );
         if (existingSession) {
-            throw new Error(`File "${filePath}" is already loaded`);
+            return existingSession.sessionId;
         }
         const res = await fetch(`${SERVER_URL}/api/sessions/create`, {
             method: 'POST',

@@ -98,7 +98,6 @@ namespace fsstudio.server.fileSystem.Controllers
                 try
                 {
                     var ret = session.GetExpression(nodePath);
-                    Console.WriteLine("Get expression:" + ret?.Expression);
                     return Ok(ret);
                 }
                 catch (Exception ex)

@@ -17,6 +17,7 @@ public class WebSocketMiddleware
     {
         if (context.WebSockets.IsWebSocketRequest)
         {
+            Console.WriteLine("WebStocket");
             WebSocket webSocket = await context.WebSockets.AcceptWebSocketAsync();
             await _logger.AddClient(webSocket);
         }
@@ -29,7 +30,7 @@ public class WebSocketMiddleware
 public class RemoteLogger
 {
     private List<WebSocket> _clients = new List<WebSocket>();
-
+    
     public async Task AddClient(WebSocket client)
     {
         _clients.Add(client);
@@ -64,19 +65,19 @@ public class RemoteLogger
         }
     }
 
-    public virtual async void WriteLine(string message)
+    public async void WriteLine(string sessionId,string message)
     {
-        await SendMessage("log", message);
+        await SendMessage("log", new {sessionId,message});
     }
 
-    public virtual async void SendMarkdDown(string markdown)
+    public async void SendMarkdDown(string sessionId,string markdown)
     {
-        await SendMessage("markdown", markdown);
+        await SendMessage("markdown", new {sessionId, markdown});
     }
 
-    public virtual async void Clear()
+    public virtual async void Clear(string sessionId)
     {
-        await SendMessage("clear", null);
+        await SendMessage("clear", new {sessionId});
     }
 
     public async void SendObject(string cmd, dynamic dataObject)

@@ -1,7 +1,9 @@
+using System.Text;
 using System.Text.RegularExpressions;
 using funcscript;
 using funcscript.core;
 using funcscript.funcs.text;
+using funcscript.host;
 using funcscript.model;
 
 namespace fsstudio.server.fileSystem.exec;
@@ -40,7 +42,7 @@ public class ExecutionSession : KeyValueCollection
         this._context = new DefaultFsDataProvider(
             new []
             {
-                KeyValuePair.Create<string,object>("md",new MarkDownFunction(this.logger))
+                KeyValuePair.Create<string,object>("md",new MarkDownFunction(this.logger,this.SessionId.ToString()))
             }
         );
     }
@@ -248,6 +250,7 @@ public class ExecutionSession : KeyValueCollection
     object EvaluateNodeInternal(string nodePath)
     {
         ClearCache();
+        FsLogger.SetDefaultLogger(new SessionManager.RemoteLoggerForFs(logger,SessionId.ToString()));
         var segments = nodePath.Split('.');
         var parentNodePath = string.Join(".", segments.Take(segments.Length - 1));
         var provider = (segments.Length > 1) ? (KeyValueCollection)FindNodeByPath(parentNodePath)! : this;
@@ -288,9 +291,11 @@ public class ExecutionSession : KeyValueCollection
             else
             {
                 _evaluationResult = task.Result;
+                var sb = new StringBuilder();
+                FuncScript.Format(sb,_evaluationResult,asJsonLiteral:true);
                 logger.SendObject("evaluation_success", new {
                     sessionId = SessionId,
-                    result = _evaluationResult
+                    result = sb.ToString()
                 });
             }
         }, TaskContinuationOptions.ExecuteSynchronously);

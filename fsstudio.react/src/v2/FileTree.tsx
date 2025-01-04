@@ -25,14 +25,7 @@ const FileTree: React.FC<FileTreeProps> = ({
   };
 
   return (
-    <Drawer
-      variant="permanent"
-      sx={{
-        width: drawerWidth,
-        flexShrink: 0,
-        [`& .MuiDrawer-paper`]: { width: drawerWidth, boxSizing: 'border-box' },
-      }}
-    >
+    
       <Box sx={{ overflow: 'auto' }}>
         <FileItemComponent
           item={{ path: '/', name: 'root', isFolder: true }}
@@ -42,7 +35,7 @@ const FileTree: React.FC<FileTreeProps> = ({
           onSelect={handleSelect}
         />
       </Box>
-    </Drawer>
+    
   );
 };
 

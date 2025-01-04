@@ -11,8 +11,12 @@ interface Token {
 
 function getLeafNodes(node: ParseNode): Token[] {
   const tokens: Token[] = [];
+  if(!node)
+    return tokens;
 
   function traverse(node: ParseNode) {
+    if(!node)
+      return
     if (!node.Children || node.Children.length === 0) {
       tokens.push({
         start: node.Pos,

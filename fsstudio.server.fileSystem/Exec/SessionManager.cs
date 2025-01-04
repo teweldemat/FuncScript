@@ -23,25 +23,24 @@ namespace fsstudio.server.fileSystem.exec
             return Path.Combine(_rootPath, relativePath);
         }
 
-        class RemoteLoggerForFs(RemoteLogger rl) : FsLogger
+        public class RemoteLoggerForFs(RemoteLogger rl,string sessionId) : FsLogger
         {
+            
             public override void WriteLine(string text)
             {
-                rl.WriteLine(text);
+                rl.WriteLine(sessionId,text);
             }
 
             public override void Clear()
             {
                 Console.WriteLine("Clearing console");
-                rl.Clear();
+                rl.Clear(sessionId);
             }
         }
 
         public SessionManager(IConfiguration configuration, RemoteLogger remoteLogger)
         {
             _remoteLogger = remoteLogger;
-            FsLogger.SetDefaultLogger(new RemoteLoggerForFs(remoteLogger));
-
             var appDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             var appFolder = Path.Combine(appDataFolder, "fs-studio");
             if(!Directory.Exists(appFolder)) Directory.CreateDirectory(appFolder);

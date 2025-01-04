@@ -65,7 +65,6 @@ const ExpressionNodeItem: React.FC<ExpressionNodeItemProps> = ({
         return;
     e.stopPropagation();
     toggleNodeExpanded?.(sessionId, nodePath);
-    console.log('open '+isOpen)
     if (!isOpen ) {
       await loadChildNodeList?.(sessionId, nodePath);
     }
