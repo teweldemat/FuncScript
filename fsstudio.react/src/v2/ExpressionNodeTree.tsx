@@ -1,6 +1,5 @@
-import React, { useEffect, useState, useCallback } from 'react';
 import { Box, CircularProgress } from '@mui/material';
-import { NodeState, SessionState, useExecutionSession } from './ExecutionSessionProvider';
+import { SessionState } from './SessionContext';
 import ExpressionNodeItem from './ExpressionNodeItem';
 
 interface ExpressionNodeTreeProps {

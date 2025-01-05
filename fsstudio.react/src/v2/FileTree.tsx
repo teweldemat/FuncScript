@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Box } from '@mui/material';
 import FileItemComponent from './FileItemComponent';
-import { useExecutionSession } from './ExecutionSessionProvider';
+import { useExecutionSession } from './SessionContext';
 
 export interface FileNode {
   path: string;

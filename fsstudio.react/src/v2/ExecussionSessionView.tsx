@@ -9,11 +9,12 @@ import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import SaveIcon from '@mui/icons-material/Save';
 import axios from 'axios';
 import { SERVER_URL } from '../backend';
-import { findNodeByPath, SessionState, useExecutionSession } from './ExecutionSessionProvider';
+import { SessionState, useExecutionSession } from './SessionContext';
 import ExpressionNodeTree from './ExpressionNodeTree';
 import { ExpressionType } from '../FsStudioProvider';
 import FileTree from './FileTree';
 import ExecussionContent from './ExecussionContent';
+import { findNodeByPath } from './SessionUtils';
 
 export function ExecussionSessionView() {
     const {

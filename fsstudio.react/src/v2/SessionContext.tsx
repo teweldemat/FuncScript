@@ -1,5 +1,14 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { SERVER_URL, SERVER_WS_URL } from '../backend';
+import {
+    findNodeByPath,
+    updateSessionNode,
+    listDirectory,
+    fetchChildren,
+    createFolder,
+    createFile,
+    duplicateFile
+} from './SessionUtils';
 
 export enum ExpressionType {
     ClearText = 'ClearText',
@@ -83,51 +92,6 @@ interface SessionsContextValue {
 }
 
 const ExecutionSessionContext = createContext<SessionsContextValue | null>(null);
-
-export function findNodeByPath(sesion: SessionState, nodePath: string): NodeState | null {
-    if (!nodePath || nodePath.trim() === '') {
-        return sesion.rootNode;
-    }
-    const parts = nodePath.split('.');
-    let current: NodeState = sesion.rootNode;
-
-    for (const part of parts) {
-        if (!current.childNodes) return null;
-        const next = current.childNodes.find((n) => n.name === part);
-        if (!next) return null;
-        current = next;
-    }
-    return current;
-}
-
-function updateSessionNode(rootNode: NodeState, nodePath: string, newNode: NodeState): NodeState {
-    if (!nodePath || nodePath.trim() === '') {
-        return newNode;
-    }
-
-    const clonedRoot = { ...rootNode };
-    const parts = nodePath.split('.');
-    let current = clonedRoot;
-
-    for (let i = 0; i < parts.length; i++) {
-        const part = parts[i];
-        if (!current.childNodes) current.childNodes = [];
-        const index = current.childNodes.findIndex((n) => n.name === part);
-        if (index < 0) {
-            return clonedRoot;
-        }
-        if (i === parts.length - 1) {
-            current.childNodes[index] = newNode;
-        } else {
-            const childNode = { ...current.childNodes[index] };
-            if (!childNode.childNodes) childNode.childNodes = [];
-            childNode.childNodes = [...childNode.childNodes];
-            current.childNodes[index] = childNode;
-            current = childNode;
-        }
-    }
-    return clonedRoot;
-}
 
 export function ExecutionSessionProvider({ children }: { children: React.ReactNode }) {
     const [sessions, setSessions] = useState<Record<string, SessionState>>({});
@@ -229,10 +193,8 @@ export function ExecutionSessionProvider({ children }: { children: React.ReactNo
             body: JSON.stringify({ fromFile: filePath }),
         });
         if (!res.ok) throw new Error(await res.text());
-
         const { sessionId } = await res.json();
         const children = await fetchChildren(sessionId);
-
         const rootNode: NodeState = {
             name: '',
             expressionType: ExpressionType.FsStudioParentNode,
@@ -246,7 +208,6 @@ export function ExecutionSessionProvider({ children }: { children: React.ReactNo
             isCached: false,
             childNodes: children,
         };
-
         const newSession: SessionState = {
             sessionId,
             filePath,
@@ -256,12 +217,10 @@ export function ExecutionSessionProvider({ children }: { children: React.ReactNo
             markdown: '',
             selectedNodePath: null,
         };
-
         setSessions((prev) => ({
             ...prev,
             [sessionId]: newSession,
         }));
-
         return newSession;
     };
 
@@ -287,23 +246,17 @@ export function ExecutionSessionProvider({ children }: { children: React.ReactNo
             if (data.status === 'idle') {
                 return prev;
             } else if (data.status === 'inprogress') {
-                return {
-                    ...prev,
-                };
+                return { ...prev };
             } else if (data.status === 'error') {
-                return {
-                    ...prev,
-                };
+                return { ...prev };
             } else if (data.status === 'success') {
-                return {
-                    ...prev,
-                };
+                return { ...prev };
             }
             return prev;
         });
     };
 
-    const setSelectedNodePath = async (session: SessionState, nodePath: string | null) => {
+    const setSelectedNodePath = (session: SessionState, nodePath: string | null) => {
         setSessions((prev) => {
             const current = prev[session.sessionId];
             if (!current) return prev;
@@ -487,39 +440,6 @@ export function ExecutionSessionProvider({ children }: { children: React.ReactNo
         await loadChildNodeList(session, newParentPath ?? null);
     };
 
-    const listDirectory = async (path: string) => {
-        const url = `${SERVER_URL}/api/FileSystem/ListSubFoldersAndFiles?path=${encodeURIComponent(
-            path
-        )}`;
-        const res = await fetch(url);
-        if (!res.ok) throw new Error(await res.text());
-        const result = (await res.json()) as DirectoryListResult;
-        return result;
-    };
-
-    const fetchChildren = async (sessionId: string): Promise<NodeState[]> => {
-        const res = await fetch(`${SERVER_URL}/api/sessions/${sessionId}/node/children`);
-        if (!res.ok) {
-            throw new Error(await res.text());
-        }
-        const childNodesRaw: any[] = await res.json();
-        return childNodesRaw.map((cn: any) => {
-            return {
-                name: cn.name,
-                expressionType: cn.expressionType ?? null,
-                childrenCount: cn.childrenCount ?? 0,
-                expression: null,
-                dataLoaded: false,
-                evaluating: false,
-                evaluationRes: null,
-                evaluationError: null,
-                cachedValue: null,
-                isCached: false,
-                childNodes: null,
-            };
-        });
-    };
-
     const loadChildNodeList = async (session: SessionState, nodePath: string | null) => {
         const params = new URLSearchParams();
         if (nodePath) {
@@ -619,33 +539,6 @@ export function ExecutionSessionProvider({ children }: { children: React.ReactNo
         });
     };
 
-    const createFolder = async (path: string, name: string) => {
-        const res = await fetch(`${SERVER_URL}/api/FileSystem/CreateFolder`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ path, name }),
-        });
-        if (!res.ok) throw new Error(await res.text());
-    };
-
-    const createFile = async (path: string, name: string) => {
-        const res = await fetch(`${SERVER_URL}/api/FileSystem/CreateFile`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ path, name }),
-        });
-        if (!res.ok) throw new Error(await res.text());
-    };
-
-    const duplicateFile = async (path: string, name: string) => {
-        const res = await fetch(`${SERVER_URL}/api/FileSystem/DuplicateFile`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ path, name }),
-        });
-        if (!res.ok) throw new Error(await res.text());
-    };
-
     const renameItem = async (path: string, newName: string) => {
         const res = await fetch(`${SERVER_URL}/api/FileSystem/RenameItem`, {
             method: 'PUT',
@@ -711,13 +604,13 @@ export function ExecutionSessionProvider({ children }: { children: React.ReactNo
                 changeExpressionType,
                 updateExpression,
                 moveNode,
-                listDirectory,
+                listDirectory: (path: string) => listDirectory(path),
                 loadChildNodeList,
                 toggleNodeExpanded,
                 clearSessionLog,
-                createFolder,
-                createFile,
-                duplicateFile,
+                createFolder: (path: string, name: string) => createFolder(path, name),
+                createFile: (path: string, name: string) => createFile(path, name),
+                duplicateFile: (path: string, name: string) => duplicateFile(path, name),
                 deleteItem,
                 renameItem,
                 setRootFolder,
