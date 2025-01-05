@@ -292,7 +292,9 @@ public class ExecutionSession : KeyValueCollection
             {
                 _evaluationResult = task.Result;
                 var sb = new StringBuilder();
-                FuncScript.Format(sb,_evaluationResult,asJsonLiteral:true);
+                FuncScript.Format(sb,_evaluationResult,
+                    asJsonLiteral:_evaluationResult is KeyValueCollection || _evaluationResult is FsList
+                    );
                 logger.SendObject("evaluation_success", new {
                     sessionId = SessionId,
                     result = sb.ToString()

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, MouseEvent } from 'react';
 import {
   ListItem,
   ListItemIcon,
@@ -7,217 +7,185 @@ import {
   List,
   Box,
   IconButton,
-  Menu,
-  MenuItem,
-  TextField,
+  Tooltip,
   Dialog,
   DialogTitle,
   Button,
   DialogActions,
   DialogContent,
   DialogContentText,
+  TextField,
+  Menu,
+  MenuItem,
 } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import FolderIcon from '@mui/icons-material/Folder';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { useExecutionSession } from './ExecutionSessionProvider';
+import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
+import NoteAddIcon from '@mui/icons-material/NoteAdd';
+import FolderOpenIcon from '@mui/icons-material/FolderOpen';
+import { FileNode } from './FileTree';
 
-interface FileItem {
-  name: string;
-  isFolder: boolean;
-  path: string;
-}
-
-interface FileItemComponentProps {
-  item: FileItem;
-  selectedPath?: string;
+interface FileItemProps {
+  node: FileNode;
+  selectedPath: string;
   onSelect: (path: string) => void;
-  onRename: () => void;
-  onDelete: () => void;
+  onToggleExpand: (path: string) => void;
+  onCreate: (path: string, name: string, type: 'folder' | 'file') => void;
+  onDuplicate: (path: string, newName: string) => void;
+  onDelete: (path: string) => void;
+  onRename: (path: string, newName: string) => void;
 }
 
-const FileItemComponent: React.FC<FileItemComponentProps> = ({
-  item,
-  onSelect,
+const FileItemComponent: React.FC<FileItemProps> = ({
+  node,
   selectedPath,
-  onRename,
+  onSelect,
+  onToggleExpand,
+  onCreate,
+  onDuplicate,
   onDelete,
+  onRename,
 }) => {
-  const [children, setChildren] = useState<FileItem[]>([]);
-  const [open, setOpen] = useState(item.path === '/');
-  const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
   const [newInputMode, setNewInputMode] = useState(false);
-  const [inputType, setInputType] = useState('');
+  const [inputType, setInputType] = useState<'folder' | 'file'>('folder');
   const [newName, setNewName] = useState('');
-  const [renameMode, setRenameMode] = useState<boolean>(false);
-  const [renameValue, setRenameValue] = useState<string>('');
-  const [deleteItem, setDeleteItem] = useState<boolean>(false);
-  const [duplicateMode, setDuplicateMode] = useState<boolean>(false);
-  const [duplicateValue, setDuplicateValue] = useState<string>('');
+  const [renameMode, setRenameMode] = useState(false);
+  const [renameValue, setRenameValue] = useState('');
+  const [deleteItem, setDeleteItem] = useState(false);
+  const [duplicateMode, setDuplicateMode] = useState(false);
+  const [duplicateValue, setDuplicateValue] = useState('');
+  const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null);
 
-  const renameInputRef = useRef(null);
-  const newInputRef = useRef(null);
-  const duplicateRef = useRef(null);
+  const isRoot = node.path === '/';
 
-  const { listDirectory } = useExecutionSession() ?? {};
-
-  useEffect(() => {
-    if (renameMode && renameInputRef.current) {
-      (renameInputRef.current as HTMLInputElement).focus();
-      (renameInputRef.current as HTMLInputElement).select();
-    }
-  }, [renameMode]);
-
-  useEffect(() => {
-    if (newInputMode && newInputRef.current) {
-      (newInputRef.current as HTMLInputElement).focus();
-      (newInputRef.current as HTMLInputElement).select();
-    }
-  }, [newInputMode]);
-
-  useEffect(() => {
-    if (duplicateMode && duplicateRef.current) {
-      (duplicateRef.current as HTMLInputElement).focus();
-      (duplicateRef.current as HTMLInputElement).select();
-    }
-  }, [duplicateMode]);
-
-  const fetchChildren = async () => {
-    if (!listDirectory) return;
-    try {
-      const data = await listDirectory(item.path);
-      const directories = data.directories.map((name: string) => ({
-        name,
-        isFolder: true,
-        path: `${item.path}${name}/`,
-      }));
-      const files = data.files.map((name: string) => ({
-        name,
-        isFolder: false,
-        path: `${item.path}${name}`,
-      }));
-      setChildren([...directories, ...files]);
-    } catch (error) {
-      console.error('Failed to fetch child items:', error);
-      setChildren([]);
-    }
-  };
-
-  useEffect(() => {
-    if (item.isFolder && open) {
-      fetchChildren();
-    }
-  }, [item, open]);
-
-  const handleToggleExpand = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setOpen(!open);
-  };
-
-  const handleSelect = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onSelect(item.path);
-  };
-
-  const handleMenuClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setMenuAnchorEl(event.currentTarget);
-  };
-
-  const handleCloseMenu = () => {
-    setMenuAnchorEl(null);
-  };
-
-  const handleMenuAction = (action: string) => {
-    handleCloseMenu();
+  const handleRootAction = (action: 'open-folder' | 'add-folder' | 'add-file') => {
     switch (action) {
       case 'open-folder':
         window.location.href = '/open-folder-dialog';
         break;
-      case 'add-file':
       case 'add-folder':
         setNewInputMode(true);
-        setInputType(action === 'add-file' ? 'file' : 'folder');
+        setInputType('folder');
         break;
-      case 'rename':
-        setRenameMode(true);
-        setRenameValue(item.name);
-        break;
-      case 'delete':
-        setDeleteItem(true);
-        break;
-      case 'duplicate':
-        setDuplicateMode(true);
-        setDuplicateValue(item.name + '_copy');
-        break;
-      default:
+      case 'add-file':
+        setNewInputMode(true);
+        setInputType('file');
         break;
     }
   };
 
-  const isRoot = item.path === '/';
-  const menuOptions = item.isFolder
-    ? isRoot
-      ? ['Open Folder', 'Add Folder', 'Add File']
-      : ['Add Folder', 'Add File', 'Rename', 'Delete']
-    : ['Rename', 'Duplicate', 'Delete'];
+  const handleMenuClick = (e: MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    setMenuAnchor(e.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setMenuAnchor(null);
+  };
+
+  const openRenameDialog = () => {
+    setRenameMode(true);
+    setRenameValue(node.name);
+    handleMenuClose();
+  };
+
+  const openDeleteDialog = () => {
+    setDeleteItem(true);
+    handleMenuClose();
+  };
+
+  const openDuplicateDialog = () => {
+    setDuplicateMode(true);
+    setDuplicateValue(node.name + '_copy');
+    handleMenuClose();
+  };
 
   return (
     <>
-      <ListItem
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          width: '100%',
-          backgroundColor: item.path === selectedPath ? 'lightgray' : 'inherit',
-          cursor: 'pointer',
-          '&:hover': { backgroundColor: 'lightblue' },
-        }}
-        onClick={item.isFolder ? () => {} : handleSelect}
-      >
-        <IconButton onClick={handleMenuClick} size="small">
-          <MoreVertIcon />
-        </IconButton>
-        <Menu anchorEl={menuAnchorEl} open={Boolean(menuAnchorEl)} onClose={handleCloseMenu}>
-          {menuOptions.map((option) => (
-            <MenuItem
-              key={option}
-              onClick={() => handleMenuAction(option.toLowerCase().replace(' ', '-'))}
+      {isRoot ? (
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            width: '100%',
+            backgroundColor: 'lightgray',
+            padding: '8px',
+          }}
+        >
+          <Tooltip title="Open Folder">
+            <IconButton onClick={() => handleRootAction('open-folder')}>
+              <FolderOpenIcon />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Add Folder">
+            <IconButton onClick={() => handleRootAction('add-folder')}>
+              <CreateNewFolderIcon />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Add File">
+            <IconButton onClick={() => handleRootAction('add-file')}>
+              <NoteAddIcon />
+            </IconButton>
+          </Tooltip>
+        </Box>
+      ) : (
+        <ListItem
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            width: '100%',
+            backgroundColor: node.path === selectedPath ? 'lightgray' : 'inherit',
+            cursor: 'pointer',
+            '&:hover': { backgroundColor: 'lightblue' },
+          }}
+          onClick={() => {
+            if (!node.isFolder) onSelect(node.path);
+          }}
+        >
+          {!isRoot && node.isFolder && (
+            <IconButton
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleExpand(node.path);
+              }}
+              size="small"
+              sx={{ marginRight: '8px' }}
             >
-              {option}
-            </MenuItem>
-          ))}
-        </Menu>
-        {!isRoot && (
-          <>
-            {item.isFolder && (
-              <IconButton onClick={handleToggleExpand} size="small" sx={{ marginRight: '8px' }}>
-                {open ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-              </IconButton>
-            )}
-            <ListItemIcon>{item.isFolder ? <FolderIcon /> : <FileCopyIcon />}</ListItemIcon>
-            {renameMode ? (
-              <TextField
-                size="small"
-                label="Enter name"
-                value={renameValue}
-                onChange={(e) => setRenameValue(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    // handle rename call
-                  } else if (e.key === 'Escape') setRenameMode(false);
-                }}
-                autoFocus
-                inputRef={renameInputRef}
-              />
-            ) : (
-              <ListItemText primary={item.name} sx={{ flexGrow: 1 }} />
-            )}
-          </>
-        )}
-        {isRoot && <ListItemText primary="Files" />}
-      </ListItem>
+              {node.expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+            </IconButton>
+          )}
+          <ListItemIcon>
+            {node.isFolder ? <FolderIcon /> : <FileCopyIcon />}
+          </ListItemIcon>
+          {renameMode ? (
+            <TextField
+              size="small"
+              label="Enter name"
+              value={renameValue}
+              onChange={(e) => setRenameValue(e.target.value)}
+              onKeyDown={async (e) => {
+                if (e.key === 'Enter') {
+                  await onRename(node.path, renameValue);
+                  setRenameMode(false);
+                } else if (e.key === 'Escape') {
+                  setRenameMode(false);
+                }
+              }}
+              autoFocus
+            />
+          ) : (
+            <ListItemText primary={node.name} />
+          )}
+          {!isRoot && (
+            <IconButton size="small" onClick={handleMenuClick}>
+              <MoreVertIcon />
+            </IconButton>
+          )}
+        </ListItem>
+      )}
 
       {newInputMode && (
         <Box pl={isRoot ? 0 : 4}>
@@ -226,35 +194,77 @@ const FileItemComponent: React.FC<FileItemComponentProps> = ({
             label={`Enter ${inputType} name`}
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
-            onKeyDown={(e) => {
+            onKeyDown={async (e) => {
               if (e.key === 'Enter') {
-                // handle add item
+                await onCreate(node.path, newName, inputType);
+                setNewInputMode(false);
+                setNewName('');
               } else if (e.key === 'Escape') {
                 setNewInputMode(false);
               }
             }}
             autoFocus
-            inputRef={newInputRef}
           />
         </Box>
       )}
-      {item.isFolder && (
-        <Collapse in={open} timeout="auto" unmountOnExit>
+
+      {node.isFolder && (
+        <Collapse in={node.expanded} timeout="auto" unmountOnExit>
           <List component="div" disablePadding>
-            {children.map((childItem, index) => (
-              <Box key={index} sx={{ pl: isRoot ? 0 : 4 }}>
+            {node.children.map((child, idx) => (
+              <Box key={idx} sx={{ pl: isRoot ? 0 : 4 }}>
                 <FileItemComponent
-                  item={childItem}
+                  node={child}
                   selectedPath={selectedPath}
                   onSelect={onSelect}
-                  onDelete={() => fetchChildren()}
-                  onRename={() => fetchChildren()}
+                  onToggleExpand={onToggleExpand}
+                  onCreate={onCreate}
+                  onDuplicate={onDuplicate}
+                  onDelete={onDelete}
+                  onRename={onRename}
                 />
               </Box>
             ))}
           </List>
         </Collapse>
       )}
+
+      <Menu
+        anchorEl={menuAnchor}
+        open={Boolean(menuAnchor)}
+        onClose={handleMenuClose}
+      >
+        {node.isFolder ? (
+          <>
+            <MenuItem
+              onClick={() => {
+                setNewInputMode(true);
+                setInputType('folder');
+                handleMenuClose();
+              }}
+            >
+              New Folder
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                setNewInputMode(true);
+                setInputType('file');
+                handleMenuClose();
+              }}
+            >
+              New File
+            </MenuItem>
+            <MenuItem onClick={openRenameDialog}>Rename</MenuItem>
+            <MenuItem onClick={openDeleteDialog}>Delete</MenuItem>
+          </>
+        ) : (
+          <>
+            <MenuItem onClick={openRenameDialog}>Rename</MenuItem>
+            <MenuItem onClick={openDuplicateDialog}>Duplicate</MenuItem>
+            <MenuItem onClick={openDeleteDialog}>Delete</MenuItem>
+          </>
+        )}
+      </Menu>
 
       <Dialog
         open={deleteItem}
@@ -265,7 +275,7 @@ const FileItemComponent: React.FC<FileItemComponentProps> = ({
         <DialogTitle id="alert-dialog-title">{'Confirm Deletion'}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Are you sure you want to delete {item.name}? This action cannot be undone.
+            Are you sure you want to delete {node.name}? This action cannot be undone.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -273,8 +283,9 @@ const FileItemComponent: React.FC<FileItemComponentProps> = ({
             Cancel
           </Button>
           <Button
-            onClick={() => {
-              // handle delete
+            onClick={async () => {
+              await onDelete(node.path);
+              setDeleteItem(false);
             }}
             color="primary"
             autoFocus
@@ -299,11 +310,15 @@ const FileItemComponent: React.FC<FileItemComponentProps> = ({
             size="small"
             value={duplicateValue}
             onChange={(e) => setDuplicateValue(e.target.value)}
-            onKeyDown={(e) => {
-              // handle duplicate
+            onKeyDown={async (e) => {
+              if (e.key === 'Enter') {
+                await onDuplicate(node.path, duplicateValue);
+                setDuplicateMode(false);
+              } else if (e.key === 'Escape') {
+                setDuplicateMode(false);
+              }
             }}
             autoFocus
-            inputRef={duplicateRef}
             fullWidth
           />
         </DialogContent>
@@ -312,8 +327,9 @@ const FileItemComponent: React.FC<FileItemComponentProps> = ({
             Cancel
           </Button>
           <Button
-            onClick={() => {
-              // handle duplicate
+            onClick={async () => {
+              await onDuplicate(node.path, duplicateValue);
+              setDuplicateMode(false);
             }}
             color="primary"
             autoFocus

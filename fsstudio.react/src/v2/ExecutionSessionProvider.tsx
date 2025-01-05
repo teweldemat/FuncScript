@@ -41,24 +41,55 @@ interface DirectoryListResult {
 interface SessionsContextValue {
     sessions: Record<string, SessionState>;
     createSession: (filePath: string) => Promise<string>;
+    unloadSession: (sessionId: string) => Promise<void>;
+    getEvaluationStatus: (sessionId: string) => Promise<void>;
     loadNode: (sessionId: string, nodePath: string) => Promise<NodeState>;
     evaluateNode: (sessionId: string, nodePath: string) => Promise<void>;
+    createNode: (
+        sessionId: string,
+        parentNodePath: string | null,
+        name: string,
+        expression: string,
+        expressionType: ExpressionType
+    ) => Promise<void>;
+    removeNode: (sessionId: string, nodePath: string) => Promise<void>;
+    renameNode: (sessionId: string, nodePath: string, newName: string) => Promise<void>;
+    changeExpressionType: (
+        sessionId: string,
+        nodePath: string,
+        expressionType: ExpressionType
+    ) => Promise<void>;
+    updateExpression: (
+        sessionId: string,
+        nodePath: string,
+        expression: string
+    ) => Promise<void>;
+    moveNode: (
+        sessionId: string,
+        nodePath: string,
+        newParentPath: string | null
+    ) => Promise<void>;
     listDirectory: (path: string) => Promise<DirectoryListResult>;
     loadChildNodeList: (sessionId: string, nodePath: string | null) => Promise<NodeState[]>;
     toggleNodeExpanded: (sessionId: string, nodePath: string) => void;
     clearSessionLog: (sessionId: string) => void;
+    createFolder: (path: string, name: string) => Promise<void>;
+    createFile: (path: string, name: string) => Promise<void>;
+    duplicateFile: (path: string, name: string) => Promise<void>;
+    deleteItem: (path: string) => Promise<void>;
+    renameItem: (path: string, newName: string) => Promise<void>;
+    setRootFolder: (newRootFolder: string) => Promise<void>;
 }
 
 const ExecutionSessionContext = createContext<SessionsContextValue | null>(null);
 
-
 export function findNodeByPath(rootNodes: NodeState[], nodePath: string): NodeState | null {
     const parts = nodePath.split('.');
     let currentNodes = rootNodes;
-    let currentNode: NodeState | null=null;
+    let currentNode: NodeState | null = null;
 
     for (const part of parts) {
-        currentNode = currentNodes.find((n) => n.name === part)??null;
+        currentNode = currentNodes.find((n) => n.name === part) ?? null;
         if (!currentNode) return null;
         if (!currentNode.childNodes) currentNode.childNodes = [];
         currentNodes = currentNode.childNodes;
@@ -93,7 +124,6 @@ function updateSessionNode(rootNodes: NodeState[], nodePath: string, newNode: No
 
 export function ExecutionSessionProvider({ children }: { children: React.ReactNode }) {
     const [sessions, setSessions] = useState<Record<string, SessionState>>({});
-    const [directoryCache, setDirectoryCache] = useState<Record<string, DirectoryListResult>>({});
     const wsRef = useRef<WebSocket | null>(null);
 
     useEffect(() => {
@@ -141,9 +171,7 @@ export function ExecutionSessionProvider({ children }: { children: React.ReactNo
             });
         } else if (data.cmd === 'log') {
             const { sessionId, message } = data.data;
-            console.log('log:'+message)
             if (!sessionId) return;
-            console.log(message)
             setSessions((prev) => {
                 const session = prev[sessionId];
                 if (!session) return prev;
@@ -218,6 +246,57 @@ export function ExecutionSessionProvider({ children }: { children: React.ReactNo
         return sessionId;
     };
 
+    const unloadSession = async (sessionId: string) => {
+        const res = await fetch(`${SERVER_URL}/api/sessions/unload?sessionId=${sessionId}`, {
+            method: 'POST'
+        });
+        if (!res.ok) throw new Error(await res.text());
+        setSessions((prev) => {
+            const next = { ...prev };
+            delete next[sessionId];
+            return next;
+        });
+    };
+
+    const getEvaluationStatus = async (sessionId: string) => {
+        const res = await fetch(`${SERVER_URL}/api/sessions/${sessionId}/node/evaluate/status`);
+        if (!res.ok) throw new Error(await res.text());
+        const data = await res.json();
+
+        setSessions((prev) => {
+            const session = prev[sessionId];
+            if (!session) return prev;
+
+            if (data.status === 'idle') {
+                return prev;
+            } else if (data.status === 'inprogress') {
+                return {
+                    ...prev,
+                    [sessionId]: {
+                        ...session,
+                    },
+                };
+            } else if (data.status === 'error') {
+                // Could attach the error to a known node path if needed
+                return {
+                    ...prev,
+                    [sessionId]: {
+                        ...session,
+                    },
+                };
+            } else if (data.status === 'success') {
+                // Could attach the result to a known node path if needed
+                return {
+                    ...prev,
+                    [sessionId]: {
+                        ...session,
+                    },
+                };
+            }
+            return prev;
+        });
+    };
+
     const loadNode = async (sessionId: string, nodePath: string) => {
         const params = new URLSearchParams({ nodePath });
         const res = await fetch(`${SERVER_URL}/api/sessions/${sessionId}/node?${params.toString()}`);
@@ -290,17 +369,120 @@ export function ExecutionSessionProvider({ children }: { children: React.ReactNo
         if (!res.ok) throw new Error(await res.text());
     };
 
+    const createNode = async (
+        sessionId: string,
+        parentNodePath: string | null,
+        name: string,
+        expression: string,
+        expressionType: ExpressionType
+    ) => {
+        const body = {
+            parentNodePath,
+            name,
+            expression,
+            expressionType,
+        };
+        const res = await fetch(`${SERVER_URL}/api/sessions/${sessionId}/node`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+        });
+        if (!res.ok) throw new Error(await res.text());
+
+        await loadChildNodeList(sessionId, parentNodePath);
+    };
+
+    const removeNode = async (sessionId: string, nodePath: string) => {
+        const params = new URLSearchParams({ nodePath });
+        const res = await fetch(
+            `${SERVER_URL}/api/sessions/${sessionId}/node?${params.toString()}`,
+            {
+                method: 'DELETE'
+            }
+        );
+        if (!res.ok) throw new Error(await res.text());
+
+        const parentPathParts = nodePath.split('.');
+        parentPathParts.pop();
+        const parentNodePath = parentPathParts.length > 0 ? parentPathParts.join('.') : null;
+        await loadChildNodeList(sessionId, parentNodePath);
+    };
+
+    const renameNode = async (sessionId: string, nodePath: string, newName: string) => {
+        const body = { nodePath, newName };
+        const res = await fetch(`${SERVER_URL}/api/sessions/${sessionId}/node/rename`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+        });
+        if (!res.ok) throw new Error(await res.text());
+
+        const parentPathParts = nodePath.split('.');
+        parentPathParts.pop();
+        const parentNodePath = parentPathParts.length > 0 ? parentPathParts.join('.') : null;
+        await loadChildNodeList(sessionId, parentNodePath);
+    };
+
+    const changeExpressionType = async (
+        sessionId: string,
+        nodePath: string,
+        expressionType: ExpressionType
+    ) => {
+        const params = new URLSearchParams({ nodePath, expressionType });
+        const res = await fetch(
+            `${SERVER_URL}/api/sessions/${sessionId}/node/expressionType?${params.toString()}`,
+            {
+                method: 'POST'
+            }
+        );
+        if (!res.ok) throw new Error(await res.text());
+
+        await loadNode(sessionId, nodePath);
+    };
+
+    const updateExpression = async (
+        sessionId: string,
+        nodePath: string,
+        expression: string
+    ) => {
+        const model = { expression };
+        const res = await fetch(`${SERVER_URL}/api/sessions/${sessionId}/node/expression/${encodeURIComponent(nodePath)}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(model),
+        });
+        if (!res.ok) throw new Error(await res.text());
+
+        await loadNode(sessionId, nodePath);
+    };
+
+    const moveNode = async (
+        sessionId: string,
+        nodePath: string,
+        newParentPath: string | null
+    ) => {
+        const body = { nodePath, newParentPath };
+        const res = await fetch(`${SERVER_URL}/api/sessions/${sessionId}/node/move`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+        });
+        if (!res.ok) throw new Error(await res.text());
+
+        const parentPathParts = nodePath.split('.');
+        parentPathParts.pop();
+        const oldParent = parentPathParts.length > 0 ? parentPathParts.join('.') : null;
+        if (oldParent) await loadChildNodeList(sessionId, oldParent);
+        await loadChildNodeList(sessionId, newParentPath ?? null);
+    };
+
     const listDirectory = async (path: string) => {
-        if (directoryCache[path]) {
-            return directoryCache[path];
-        }
         const url = `${SERVER_URL}/api/FileSystem/ListSubFoldersAndFiles?path=${encodeURIComponent(
             path
         )}`;
         const res = await fetch(url);
         if (!res.ok) throw new Error(await res.text());
         const result = (await res.json()) as DirectoryListResult;
-        setDirectoryCache((prev) => ({ ...prev, [path]: result }));
         return result;
     };
 
@@ -423,17 +605,111 @@ export function ExecutionSessionProvider({ children }: { children: React.ReactNo
         });
     };
 
+    const createFolder = async (path: string, name: string) => {
+        const res = await fetch(`${SERVER_URL}/api/FileSystem/CreateFolder`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ path, name }),
+        });
+        if (!res.ok) throw new Error(await res.text());
+    };
+
+    const createFile = async (path: string, name: string) => {
+        const res = await fetch(`${SERVER_URL}/api/FileSystem/CreateFile`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ path, name }),
+        });
+        if (!res.ok) throw new Error(await res.text());
+    };
+
+    const duplicateFile = async (path: string, name: string) => {
+        const res = await fetch(`${SERVER_URL}/api/FileSystem/DuplicateFile`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ path, name }),
+        });
+        if (!res.ok) throw new Error(await res.text());
+    };
+
+    const renameItem = async (path: string, newName: string) => {
+        const res = await fetch(`${SERVER_URL}/api/FileSystem/RenameItem`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ path, name: newName }),
+        });
+        if (!res.ok) throw new Error(await res.text());
+    
+        const segments = path.split('/');
+        segments[segments.length - 1] = newName;
+        const newPath = segments.join('/');
+    
+        setSessions((prev) => {
+            const next = { ...prev };
+            Object.keys(next).forEach((sessionId) => {
+                const session = next[sessionId];
+                if (session.filePath === path) {
+                    session.filePath = newPath;
+                } else if (session.filePath.startsWith(path + '/')) {
+                    session.filePath = session.filePath.replace(path, newPath);
+                }
+            });
+            return next;
+        });
+    };
+    
+    const deleteItem = async (path: string) => {
+        const url = `${SERVER_URL}/api/FileSystem/DeleteItem?path=${encodeURIComponent(path)}`;
+        const res = await fetch(url, { method: 'DELETE' });
+        if (!res.ok) throw new Error(await res.text());
+    
+        setSessions((prev) => {
+            const next = { ...prev };
+            Object.keys(next).forEach((sessionId) => {
+                const session = next[sessionId];
+                if (session.filePath === path || session.filePath.startsWith(path + '/')) {
+                    delete next[sessionId];
+                }
+            });
+            return next;
+        });
+    };
+
+    const setRootFolder = async (newRootFolder: string) => {
+        const res = await fetch(`${SERVER_URL}/api/FileSystem/SetRootFolder`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ newRootFolder }),
+        });
+        if (!res.ok) throw new Error(await res.text());
+        setSessions({});
+    };
+
     return (
         <ExecutionSessionContext.Provider
             value={{
                 sessions,
                 createSession,
+                unloadSession,
+                getEvaluationStatus,
                 loadNode,
                 evaluateNode,
+                createNode,
+                removeNode,
+                renameNode,
+                changeExpressionType,
+                updateExpression,
+                moveNode,
                 listDirectory,
                 loadChildNodeList,
                 toggleNodeExpanded,
                 clearSessionLog,
+                createFolder,
+                createFile,
+                duplicateFile,
+                deleteItem,
+                renameItem,
+                setRootFolder,
             }}
         >
             {children}

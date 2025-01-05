@@ -52,7 +52,7 @@ export function ExecussionSessionView() {
     }, [sessionId, loadNode]);
 
     const selectedNode = (sessionId && sessions && selectedNodePath)
-        ? findNodeByPath(sessions[sessionId].nodes ?? [], selectedNodePath)
+        ? findNodeByPath(sessions[sessionId]?.nodes ?? [], selectedNodePath)
         : null;
 
     const handleCopy = useCallback(() => {
@@ -147,8 +147,13 @@ export function ExecussionSessionView() {
     const displayedMarkdown = sessionId ? sessions[sessionId]?.markdown || '' : '';
 
     const handleFileSelect = useCallback(async (selectedFile: string) => {
-        const newSessionId = await createSession(selectedFile);
-        setSessionId(newSessionId);
+        if(selectedFile=='')
+            setSessionId(null)
+        else
+        {
+            const newSessionId = await createSession(selectedFile);
+            setSessionId(newSessionId);
+        }
     }, [createSession]);
 
     return (
@@ -168,7 +173,7 @@ export function ExecussionSessionView() {
                         <div>Session not selected</div>
                     )}
                 </Box>
-                <Box sx={{ height: '30%', overflow: 'auto' }}>
+                <Box sx={{ height: '50%', overflow: 'auto' }}>
                     <FileTree onSelected={handleFileSelect} initiallySelectedPath="" />
                 </Box>
             </Grid>
