@@ -29,8 +29,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import TextFieldsIcon from '@mui/icons-material/TextFields';
 import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
-import { NodeState, SessionState, useExecutionSession } from './SessionContext';
-import { ExpressionType } from '../FsStudioProvider';
+import { ExpressionType, NodeState, SessionState, useExecutionSession } from './SessionContext';
 
 interface ExpressionNodeItemProps {
   session: SessionState;

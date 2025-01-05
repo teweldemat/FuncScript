@@ -4,8 +4,8 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import ClearAllIcon from '@mui/icons-material/ClearAll';
 import ReactMarkdown from 'react-markdown';
 import CodeEditor from '../code-editor/CodeEditor';
-import TextLogger from '../components/RemoteLogger';
-import { ExpressionType } from '../FsStudioProvider';
+import TextLogger from './RemoteLogger';
+import { ExpressionType } from './SessionContext';
 
 interface ExecussionContentProps {
     expression: string | null;
