@@ -16,16 +16,15 @@ import FileTree from './FileTree';
 import ExecussionContent from './ExecussionContent';
 
 export function ExecussionSessionView() {
-    console.log('Render: ExecussionSessionView')
     const {
         createSession,
         loadNode,
         sessions,
         evaluateNode,
-        clearSessionLog
+        clearSessionLog,
+        setSelectedNodePath
     } = useExecutionSession()!;
     const [session, setSession] = useState<SessionState | null>(null);
-    const [selectedNodePath, setSelectedNode] = useState<string | null>(null);
     const [expression, setExpression] = useState<string | null>(null);
     const [lastSavedExpression, setLastSavedExpression] = useState<string | null>(null);
     const [saveStatus, setSaveStatus] = useState('All changes saved');
@@ -33,11 +32,14 @@ export function ExecussionSessionView() {
     const [queuedExpression, setQueuedExpression] = useState<string | null>(null);
     const [savingInProgress, setSavingInProgress] = useState(false);
 
-    useEffect(()=>{
-            if(!session)
-                return;
-            setSession(sessions[session?.sessionId]);
-    },[sessions]);
+    useEffect(() => {
+        if (!session) return;
+        setSession(sessions[session?.sessionId]);
+    }, [sessions]);
+    useEffect(() => {
+        loadNodeData(session?.selectedNodePath??null)
+    }, [session]);
+
     useEffect(() => {
         if (expression === lastSavedExpression) {
             setSaveStatus('All changes saved');
@@ -46,28 +48,52 @@ export function ExecussionSessionView() {
         }
     }, [expression, lastSavedExpression]);
 
-    const handleNodeSelect = useCallback(async (nodePath: string | null) => {
-        setSelectedNode(nodePath);
-        if (nodePath && session) {
-            const node = await loadNode(session, nodePath);
-            if (node) {
-                setExpression(node.expression);
-                setLastSavedExpression(node.expression);
-            }
+    function clearCurrentNode() {
+        setExpression('');
+        setLastSavedExpression('');
+
+    }
+    function loadNodeData(nodePath: string | null) {
+        if (!session || !nodePath) {
+            clearCurrentNode()
+            return;
         }
+        const node = findNodeByPath(session.nodes ?? [], nodePath)
+        if (!node) {
+            clearCurrentNode();
+            return;
+        }
+        if (!node?.dataLoaded)
+        {
+            loadNode(session, nodePath).then(newNode => {
+                setExpression(newNode?.expression ?? '');
+                setLastSavedExpression(newNode?.expression ?? '');
+            });
+        }
+        else
+        {
+            setExpression(node.expression ?? '');
+            setLastSavedExpression(node?.expression ?? '');
+
+        }
+    }
+    const handleNodeSelect = useCallback(async (nodePath: string | null) => {
+        if (session)
+            setSelectedNodePath(session, nodePath);
+        await loadNodeData(nodePath)
     }, [session, loadNode]);
 
-    const selectedNode = (session && selectedNodePath)
-        ? findNodeByPath(session.nodes ?? [], selectedNodePath)
+    const selectedNode = (session?.selectedNodePath)
+        ? findNodeByPath(session.nodes ?? [], session.selectedNodePath)
         : null;
 
     const handleCopy = useCallback(() => {
-        if (!selectedNodePath || !session) return;
+        if (!session?.selectedNodePath) return;
         const displayedResult = selectedNode?.evaluationRes || '';
         navigator.clipboard.writeText(displayedResult);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
-    }, [selectedNodePath, session, selectedNode]);
+    }, [session, selectedNode]);
 
     const handleClearLog = useCallback(() => {
         if (session) {
@@ -76,9 +102,9 @@ export function ExecussionSessionView() {
     }, [session, clearSessionLog]);
 
     const executeExpression = useCallback(async () => {
-        if (!session|| !selectedNodePath) return;
-        await evaluateNode(session, selectedNodePath);
-    }, [session, selectedNodePath, evaluateNode]);
+        if (!session || !(session?.selectedNodePath)) return;
+        await evaluateNode(session, session?.selectedNodePath);
+    }, [session, evaluateNode]);
 
     const saveExpression = useCallback(
         async (nodePath: string, newExpression: string | null, thenEvaluate: boolean) => {
@@ -106,7 +132,7 @@ export function ExecussionSessionView() {
     const saveTimerRef = useRef<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
-        if (!selectedNodePath || expression == null) return;
+        if (!session || !session?.selectedNodePath || expression == null) return;
         if (saveTimerRef.current) {
             clearTimeout(saveTimerRef.current);
         }
@@ -120,7 +146,7 @@ export function ExecussionSessionView() {
                         return;
                     }
                     if (queuedExpression && queuedExpression !== lastSavedExpression) {
-                        await saveExpression(selectedNodePath, queuedExpression, false);
+                        await saveExpression(session.selectedNodePath!, queuedExpression, false);
                         setQueuedExpression(null);
                     }
                 };
@@ -134,27 +160,25 @@ export function ExecussionSessionView() {
         };
     }, [
         expression,
-        selectedNodePath,
         lastSavedExpression,
         queuedExpression,
         savingInProgress,
         saveExpression,
     ]);
 
-    const filePath =session?.filePath?? null;
+    const filePath = session?.filePath ?? null;
 
     const isSaveDisabled = expression === lastSavedExpression;
-    const displayedResult = selectedNodePath && session
+    const displayedResult = session?.selectedNodePath && session
         ? selectedNode?.evaluationRes || ''
         : '';
     const displayedMessages = session?.messages || [];
     const displayedMarkdown = session?.markdown || '';
 
     const handleFileSelect = useCallback(async (selectedFile: string) => {
-        if(selectedFile=='')
-            setSession(null)
-        else
-        {
+        if (selectedFile == '') {
+            setSession(null);
+        } else {
             const newSession = await createSession(selectedFile);
             setSession(newSession);
         }
@@ -169,10 +193,10 @@ export function ExecussionSessionView() {
                 <Box sx={{ flex: 1, overflow: 'auto', borderBottom: 1, borderColor: 'divider' }}>
                     {session ? (
                         <ExpressionNodeTree
-                        session={session}
-                        onSelect={handleNodeSelect}
-                        selectedNode={selectedNodePath ?? ''}
-                      />
+                            session={session}
+                            onSelect={handleNodeSelect}
+                            selectedNode={session?.selectedNodePath ?? ''}
+                        />
                     ) : (
                         <div>Session not selected</div>
                     )}
@@ -198,7 +222,7 @@ export function ExecussionSessionView() {
                     >
                         <Typography variant="body1" noWrap>
                             {filePath ? `${filePath}` : '[No file path]'}
-                            {selectedNodePath ? ` : ${selectedNodePath}` : ''}
+                            {session?.selectedNodePath ? ` : ${session?.selectedNodePath}` : ''}
                         </Typography>
                         <Box>
                             <IconButton onClick={executeExpression} color="primary">
@@ -206,8 +230,8 @@ export function ExecussionSessionView() {
                             </IconButton>
                             <IconButton
                                 onClick={() =>
-                                    selectedNodePath && expression && !isSaveDisabled
-                                        ? saveExpression(selectedNodePath, expression, false)
+                                    session?.selectedNodePath && expression && !isSaveDisabled
+                                        ? saveExpression(session.selectedNodePath, expression, false)
                                         : null
                                 }
                                 color="secondary"

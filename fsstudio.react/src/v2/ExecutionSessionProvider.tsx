@@ -27,10 +27,11 @@ export interface SessionState {
     sessionId: string;
     filePath: string;
     nodes: NodeState[];
-    evaluationInProgressNodePath?: string;
     expandedNodes: Record<string, boolean>;
     messages: string[];
     markdown: string;
+    evaluationInProgressNodePath?: string;
+    selectedNodePath:string|null;
 }
 
 interface DirectoryListResult {
@@ -79,6 +80,7 @@ interface SessionsContextValue {
     deleteItem: (path: string) => Promise<void>;
     renameItem: (path: string, newName: string) => Promise<void>;
     setRootFolder: (newRootFolder: string) => Promise<void>;
+    setSelectedNodePath: (session:SessionState,nodePath:string|null)=>void;
 }
 
 const ExecutionSessionContext = createContext<SessionsContextValue | null>(null);
@@ -110,6 +112,30 @@ function updateSessionNode(rootNodes: NodeState[], nodePath: string, newNode: No
         }
         if (i === parts.length - 1) {
             currentNodes[index] = newNode;
+        } else {
+            const childNode = { ...currentNodes[index] };
+            if (!childNode.childNodes) childNode.childNodes = [];
+            childNode.childNodes = [...childNode.childNodes];
+            currentNodes[index] = childNode;
+            currentNodes = childNode.childNodes;
+        }
+    }
+
+    return clonedRootNodes;
+}
+function transactionSessionNode(rootNodes: NodeState[], nodePath: string,transition:(prev:NodeState)=>NodeState): NodeState[] {
+    const parts = nodePath.split('.');
+    const clonedRootNodes = [...rootNodes];
+
+    let currentNodes = clonedRootNodes;
+    for (let i = 0; i < parts.length; i++) {
+        const part = parts[i];
+        const index = currentNodes.findIndex((n) => n.name === part);
+        if (index < 0) {
+            return clonedRootNodes;
+        }
+        if (i === parts.length - 1) {
+            currentNodes[index] = transition(currentNodes[index]);
         } else {
             const childNode = { ...currentNodes[index] };
             if (!childNode.childNodes) childNode.childNodes = [];
@@ -238,6 +264,7 @@ export function ExecutionSessionProvider({ children }: { children: React.ReactNo
             expandedNodes: {},
             messages: [],
             markdown: '',
+            selectedNodePath:null
         };
 
         setSessions((prev) => ({
@@ -294,6 +321,22 @@ export function ExecutionSessionProvider({ children }: { children: React.ReactNo
                 };
             }
             return prev;
+        });
+    };
+
+    const setSelectedNodePath = async (session: SessionState, nodePath: string|null) => {
+        setSessions((prev) => {
+            const current = prev[session.sessionId];
+            if (!current) return prev;
+
+
+            return {
+                ...prev,
+                [session.sessionId]: {
+                    ...current,
+                    selectedNodePath: nodePath,
+                },
+            };
         });
     };
 
@@ -579,11 +622,7 @@ export function ExecutionSessionProvider({ children }: { children: React.ReactNo
         setSessions((prev) => {
             const current = prev[session.sessionId];
             if (!current) return prev;
-            console.log('tog: '+nodePath)
-            console.log(current.expandedNodes)
-            console.log(current.expandedNodes[nodePath])
             const isOpen = !!current.expandedNodes[nodePath];
-            console.log('new expand state: :'+isOpen)
             return {
                 ...prev,
                 [session.sessionId]: {
@@ -716,6 +755,7 @@ export function ExecutionSessionProvider({ children }: { children: React.ReactNo
                 deleteItem,
                 renameItem,
                 setRootFolder,
+                setSelectedNodePath,
             }}
         >
             {children}
