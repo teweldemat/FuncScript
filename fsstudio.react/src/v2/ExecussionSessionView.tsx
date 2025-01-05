@@ -9,13 +9,14 @@ import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import SaveIcon from '@mui/icons-material/Save';
 import axios from 'axios';
 import { SERVER_URL } from '../backend';
-import { findNodeByPath, useExecutionSession } from './ExecutionSessionProvider';
+import { findNodeByPath, SessionState, useExecutionSession } from './ExecutionSessionProvider';
 import ExpressionNodeTree from './ExpressionNodeTree';
 import { ExpressionType } from '../FsStudioProvider';
 import FileTree from './FileTree';
 import ExecussionContent from './ExecussionContent';
 
 export function ExecussionSessionView() {
+    console.log('Render: ExecussionSessionView')
     const {
         createSession,
         loadNode,
@@ -23,7 +24,7 @@ export function ExecussionSessionView() {
         evaluateNode,
         clearSessionLog
     } = useExecutionSession()!;
-    const [sessionId, setSessionId] = useState<string | null>(null);
+    const [session, setSession] = useState<SessionState | null>(null);
     const [selectedNodePath, setSelectedNode] = useState<string | null>(null);
     const [expression, setExpression] = useState<string | null>(null);
     const [lastSavedExpression, setLastSavedExpression] = useState<string | null>(null);
@@ -32,6 +33,11 @@ export function ExecussionSessionView() {
     const [queuedExpression, setQueuedExpression] = useState<string | null>(null);
     const [savingInProgress, setSavingInProgress] = useState(false);
 
+    useEffect(()=>{
+            if(!session)
+                return;
+            setSession(sessions[session?.sessionId]);
+    },[sessions]);
     useEffect(() => {
         if (expression === lastSavedExpression) {
             setSaveStatus('All changes saved');
@@ -42,37 +48,37 @@ export function ExecussionSessionView() {
 
     const handleNodeSelect = useCallback(async (nodePath: string | null) => {
         setSelectedNode(nodePath);
-        if (nodePath && sessionId) {
-            const node = await loadNode(sessionId, nodePath);
+        if (nodePath && session) {
+            const node = await loadNode(session, nodePath);
             if (node) {
                 setExpression(node.expression);
                 setLastSavedExpression(node.expression);
             }
         }
-    }, [sessionId, loadNode]);
+    }, [session, loadNode]);
 
-    const selectedNode = (sessionId && sessions && selectedNodePath)
-        ? findNodeByPath(sessions[sessionId]?.nodes ?? [], selectedNodePath)
+    const selectedNode = (session && selectedNodePath)
+        ? findNodeByPath(session.nodes ?? [], selectedNodePath)
         : null;
 
     const handleCopy = useCallback(() => {
-        if (!selectedNodePath || !sessionId) return;
+        if (!selectedNodePath || !session) return;
         const displayedResult = selectedNode?.evaluationRes || '';
         navigator.clipboard.writeText(displayedResult);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
-    }, [selectedNodePath, sessionId, selectedNode]);
+    }, [selectedNodePath, session, selectedNode]);
 
     const handleClearLog = useCallback(() => {
-        if (sessionId) {
-            clearSessionLog(sessionId);
+        if (session) {
+            clearSessionLog(session);
         }
-    }, [sessionId, clearSessionLog]);
+    }, [session, clearSessionLog]);
 
     const executeExpression = useCallback(async () => {
-        if (!sessionId || !selectedNodePath) return;
-        await evaluateNode(sessionId, selectedNodePath);
-    }, [sessionId, selectedNodePath, evaluateNode]);
+        if (!session|| !selectedNodePath) return;
+        await evaluateNode(session, selectedNodePath);
+    }, [session, selectedNodePath, evaluateNode]);
 
     const saveExpression = useCallback(
         async (nodePath: string, newExpression: string | null, thenEvaluate: boolean) => {
@@ -80,13 +86,13 @@ export function ExecussionSessionView() {
             try {
                 setSavingInProgress(true);
                 await axios.post(
-                    `${SERVER_URL}/api/sessions/${sessionId}/node/expression/${nodePath}`,
+                    `${SERVER_URL}/api/sessions/${session?.sessionId}/node/expression/${nodePath}`,
                     { expression: newExpression }
                 );
                 setLastSavedExpression(newExpression);
                 setSaveStatus('All changes saved');
                 if (thenEvaluate) {
-                    await evaluateNode(sessionId!, nodePath);
+                    await evaluateNode(session!, nodePath);
                 }
             } catch {
                 setSaveStatus('Failed to save changes');
@@ -94,7 +100,7 @@ export function ExecussionSessionView() {
                 setSavingInProgress(false);
             }
         },
-        [sessionId, evaluateNode]
+        [session, evaluateNode]
     );
 
     const saveTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -135,24 +141,22 @@ export function ExecussionSessionView() {
         saveExpression,
     ]);
 
-    const filePath = (sessions && sessionId)
-        ? sessions[sessionId]?.filePath
-        : null;
+    const filePath =session?.filePath?? null;
 
     const isSaveDisabled = expression === lastSavedExpression;
-    const displayedResult = selectedNodePath && sessionId
+    const displayedResult = selectedNodePath && session
         ? selectedNode?.evaluationRes || ''
         : '';
-    const displayedMessages = sessionId ? sessions[sessionId]?.messages || [] : [];
-    const displayedMarkdown = sessionId ? sessions[sessionId]?.markdown || '' : '';
+    const displayedMessages = session?.messages || [];
+    const displayedMarkdown = session?.markdown || '';
 
     const handleFileSelect = useCallback(async (selectedFile: string) => {
         if(selectedFile=='')
-            setSessionId(null)
+            setSession(null)
         else
         {
-            const newSessionId = await createSession(selectedFile);
-            setSessionId(newSessionId);
+            const newSession = await createSession(selectedFile);
+            setSession(newSession);
         }
     }, [createSession]);
 
@@ -163,12 +167,12 @@ export function ExecussionSessionView() {
                 sx={{ width: '30%', borderRight: 1, borderColor: 'divider', display: 'flex', flexDirection: 'column' }}
             >
                 <Box sx={{ flex: 1, overflow: 'auto', borderBottom: 1, borderColor: 'divider' }}>
-                    {sessionId ? (
+                    {session ? (
                         <ExpressionNodeTree
-                            sessionId={sessionId}
-                            onSelect={handleNodeSelect}
-                            selectedNode={selectedNodePath ?? ''}
-                        />
+                        session={session}
+                        onSelect={handleNodeSelect}
+                        selectedNode={selectedNodePath ?? ''}
+                      />
                     ) : (
                         <div>Session not selected</div>
                     )}

@@ -15,11 +15,11 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import FunctionsIcon from '@mui/icons-material/Functions';
 import CodeIcon from '@mui/icons-material/Code';
 import FolderIcon from '@mui/icons-material/Folder';
-import { NodeState, useExecutionSession } from './ExecutionSessionProvider';
+import { NodeState, SessionState, useExecutionSession } from './ExecutionSessionProvider';
 import { ExpressionType } from '../FsStudioProvider';
 
 interface ExpressionNodeItemProps {
-  sessionId: string;
+  session: SessionState;
   nodePath?: string;
   nodeInfo: NodeState;
   onSelect: (nodePath: string | null) => void;
@@ -47,15 +47,17 @@ function getIconForExpressionType(expressionType: ExpressionType) {
 }
 
 const ExpressionNodeItem: React.FC<ExpressionNodeItemProps> = ({
-  sessionId,
+  session,
   nodePath,
   nodeInfo,
   onSelect,
   selectedNode
 }) => {
-  const { sessions, loadChildNodeList, toggleNodeExpanded } = useExecutionSession() || {};
-  const session = sessions?.[sessionId];
+  const { loadChildNodeList, toggleNodeExpanded } = useExecutionSession() || {};
+  console.log('path: '+nodePath)
+  console.log(session?.expandedNodes)
   const isOpen =!nodePath || !!session?.expandedNodes[nodePath];
+  console.log('Is open: '+isOpen)
   const isEvaluating = nodeInfo.evaluating;
   const displayName = nodeInfo.name + (isEvaluating ? ' (evaluating ..)' : '');
   const expressionTypeIcon = getIconForExpressionType(nodeInfo.expressionType);
@@ -64,9 +66,10 @@ const ExpressionNodeItem: React.FC<ExpressionNodeItemProps> = ({
     if(!nodePath)
         return;
     e.stopPropagation();
-    toggleNodeExpanded?.(sessionId, nodePath);
+    toggleNodeExpanded?.(session, nodePath);
     if (!isOpen ) {
-      await loadChildNodeList?.(sessionId, nodePath);
+        console.log('is open now')
+      await loadChildNodeList?.(session, nodePath);
     }
   };
   return (
@@ -107,7 +110,7 @@ const ExpressionNodeItem: React.FC<ExpressionNodeItemProps> = ({
               return (
                 <Box key={childPath} pl={4}>
                   <ExpressionNodeItem
-                    sessionId={sessionId}
+                    session={session}
                     nodePath={childPath}
                     nodeInfo={childNodeInfo}
                     onSelect={onSelect}

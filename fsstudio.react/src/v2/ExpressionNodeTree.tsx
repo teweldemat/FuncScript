@@ -1,22 +1,20 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Box, CircularProgress } from '@mui/material';
-import { NodeState, useExecutionSession } from './ExecutionSessionProvider';
+import { NodeState, SessionState, useExecutionSession } from './ExecutionSessionProvider';
 import ExpressionNodeItem from './ExpressionNodeItem';
 
 interface ExpressionNodeTreeProps {
-  sessionId: string;
+  session: SessionState;
   onSelect: (nodePath: string | null) => void;
   selectedNode: string | null;
 }
 
 const ExpressionNodeTree: React.FC<ExpressionNodeTreeProps> = ({
-  sessionId,
+  session,
   onSelect,
   selectedNode,
 }) => {
-  const { sessions } = useExecutionSession() || {};
   
-  const session=sessions==null?null:sessions[sessionId];
 
   
   if (session?.nodes==null) {
@@ -38,7 +36,7 @@ const ExpressionNodeTree: React.FC<ExpressionNodeTreeProps> = ({
       {Object.values(childNodes).map((child) => (
         <ExpressionNodeItem
           key={child.name}
-          sessionId={sessionId}
+          session={session}
           nodePath={child.name}
           onSelect={onSelect}
           selectedNode={selectedNode}

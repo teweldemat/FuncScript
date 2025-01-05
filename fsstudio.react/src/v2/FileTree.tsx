@@ -164,7 +164,7 @@ const FileTree: React.FC<FileTreeProps> = ({
     <Box sx={{ overflow: 'auto' }}>
       {treeData && (
         <FileItemComponent
-          node={treeData}
+          fileNode={treeData}
           selectedPath={selectedPath}
           onSelect={handleSelect}
           onToggleExpand={toggleExpand}
