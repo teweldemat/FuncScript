@@ -16,6 +16,7 @@ interface ExecussionContentProps {
     displayedMessages: any[];
     handleClearLog: () => void;
     displayedMarkdown: string;
+    readOnly: boolean;
 }
 
 export default function ExecussionContent({
@@ -26,7 +27,8 @@ export default function ExecussionContent({
     copied,
     displayedMessages,
     handleClearLog,
-    displayedMarkdown
+    displayedMarkdown,
+    readOnly
 }: ExecussionContentProps) {
     const [tabIndex, setTabIndex] = useState(0);
 
@@ -37,6 +39,7 @@ export default function ExecussionContent({
                     expression={expression}
                     setExpression={setExpression}
                     expressionType={ExpressionType.FuncScript}
+                    readOnly={readOnly}
                 />
             </Grid>
             <Grid

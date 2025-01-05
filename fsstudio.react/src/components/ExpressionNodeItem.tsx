@@ -37,6 +37,7 @@ interface ExpressionNodeItemProps {
   nodeInfo: NodeState;
   onSelect: (nodePath: string | null) => void;
   selectedNode: string | null;
+  readonly: boolean;
 }
 
 function getParentPath(fullPath: string) {
@@ -70,6 +71,7 @@ const ExpressionNodeItem: React.FC<ExpressionNodeItemProps> = ({
   nodeInfo,
   onSelect,
   selectedNode,
+  readonly
 }) => {
   const {
     loadChildNodeList,
@@ -101,6 +103,7 @@ const ExpressionNodeItem: React.FC<ExpressionNodeItemProps> = ({
   };
 
   const handleMenuClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (readonly) return;
     e.stopPropagation();
     setMenuAnchorEl(e.currentTarget);
   };
@@ -110,6 +113,7 @@ const ExpressionNodeItem: React.FC<ExpressionNodeItemProps> = ({
   };
 
   const handleMenuAction = async (action: string) => {
+    if (readonly) return;
     handleCloseMenu();
     switch (action) {
       case 'add-standard':
@@ -135,8 +139,7 @@ const ExpressionNodeItem: React.FC<ExpressionNodeItemProps> = ({
   };
 
   const handleAddItem = async () => {
-    if (!session) return;
-    if (newName.trim() === '') return;
+    if (!session || readonly || newName.trim() === '') return;
     const parentPath = nodePath || null;
     let newType = ExpressionType.FuncScript;
     if (menuAnchorEl?.textContent?.toLowerCase().includes('text template')) {
@@ -155,7 +158,7 @@ const ExpressionNodeItem: React.FC<ExpressionNodeItemProps> = ({
   };
 
   const handleDeleteItem = async () => {
-    if (!nodePath || !session) return;
+    if (!nodePath || !session || readonly) return;
     await removeNode?.(session, nodePath);
     setDeleteItem(false);
     const parent = getParentPath(nodePath);
@@ -166,7 +169,7 @@ const ExpressionNodeItem: React.FC<ExpressionNodeItemProps> = ({
   };
 
   const handleApplyRename = async () => {
-    if (!nodePath || !session || renamedName.trim() === '') {
+    if (!nodePath || !session || renamedName.trim() === '' || readonly) {
       setRenameMode(false);
       return;
     }
@@ -177,15 +180,17 @@ const ExpressionNodeItem: React.FC<ExpressionNodeItemProps> = ({
   };
 
   const handleDragStart = (e: React.DragEvent) => {
-    if (!nodePath) return;
+    if (!nodePath || readonly) return;
     e.dataTransfer.setData('text/plain', nodePath);
   };
 
   const handleDragOver = (e: React.DragEvent) => {
+    if (readonly) return;
     e.preventDefault();
   };
 
   const handleDrop = async (e: React.DragEvent) => {
+    if (readonly) return;
     e.preventDefault();
     const sourcePath = e.dataTransfer.getData('text/plain');
     if (!sourcePath) return;
@@ -201,7 +206,7 @@ const ExpressionNodeItem: React.FC<ExpressionNodeItemProps> = ({
       <ListItem
         dense
         onClick={handleClickItem}
-        draggable={!!nodePath}
+        draggable={!!nodePath && !readonly}
         onDragStart={handleDragStart}
         onDragOver={handleDragOver}
         onDrop={handleDrop}
@@ -210,7 +215,7 @@ const ExpressionNodeItem: React.FC<ExpressionNodeItemProps> = ({
           backgroundColor: selectedNode === nodePath ? 'lightgray' : 'inherit',
         }}
       >
-        {!nodePath && (
+        {!nodePath && !readonly && (
           <Box sx={{ display: 'flex', alignItems: 'center', mr: 1 }}>
             <Tooltip title="Add Standard">
               <IconButton
@@ -251,14 +256,19 @@ const ExpressionNodeItem: React.FC<ExpressionNodeItemProps> = ({
         )}
 
         {nodePath && (
-          <IconButton onClick={handleMenuClick} size="small" sx={{ mr: 1 }}>
+          <IconButton
+            onClick={handleMenuClick}
+            size="small"
+            sx={{ mr: 1 }}
+            disabled={readonly}
+          >
             <MoreVertIcon />
           </IconButton>
         )}
 
         <Menu
           anchorEl={menuAnchorEl}
-          open={Boolean(menuAnchorEl)}
+          open={Boolean(menuAnchorEl) && !readonly}
           onClose={handleCloseMenu}
         >
           {!nodePath
@@ -350,6 +360,7 @@ const ExpressionNodeItem: React.FC<ExpressionNodeItemProps> = ({
                     nodeInfo={childNodeInfo}
                     onSelect={onSelect}
                     selectedNode={selectedNode}
+                    readonly={readonly}
                   />
                 </Box>
               );

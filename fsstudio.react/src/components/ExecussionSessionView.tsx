@@ -1,3 +1,4 @@
+//ExecussionSessionView
 import React, {
     useState,
     useEffect,
@@ -31,6 +32,9 @@ export function ExecussionSessionView() {
     const [copied, setCopied] = useState(false);
     const [queuedExpression, setQueuedExpression] = useState<string | null>(null);
     const [savingInProgress, setSavingInProgress] = useState(false);
+
+    // Track evaluation status
+    //const [evaluationInProgress, setEvaluationInProgress] = useState(false);
 
     useEffect(() => {
         if (!session) return;
@@ -98,14 +102,14 @@ export function ExecussionSessionView() {
     }, [session, selectedNode]);
 
     const handleClearLog = useCallback(() => {
-        if (session) {
+        if (session && !evaluationInProgress) {
             clearSessionLog(session);
         }
     }, [session, clearSessionLog]);
 
-    const executeExpression = useCallback(async () => {
+    const executeExpression = useCallback(() => {
         if (!session || !session.selectedNodePath) return;
-        await evaluateNode(session, session.selectedNodePath);
+        evaluateNode(session, session.selectedNodePath);
     }, [session, evaluateNode]);
 
     const saveTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -156,13 +160,15 @@ export function ExecussionSessionView() {
     ]);
 
     const filePath = session?.filePath ?? null;
-    const isSaveDisabled = expression === lastSavedExpression;
+    const evaluationInProgress = !!session?.evaluationInProgressNodePath;
+    const isSaveDisabled = expression === lastSavedExpression || evaluationInProgress;
     const displayedResult = selectedNode?.evaluationRes || '';
     const displayedMessages = session?.messages || [];
     const displayedMarkdown = session?.markdown || '';
 
     const handleFileSelect = useCallback(
         async (selectedFile: string) => {
+            if (evaluationInProgress) return;
             if (selectedFile === '') {
                 setSession(null);
             } else {
@@ -170,7 +176,7 @@ export function ExecussionSessionView() {
                 setSession(newSession);
             }
         },
-        [createSession]
+        [createSession, evaluationInProgress]
     );
 
     return (
@@ -185,13 +191,20 @@ export function ExecussionSessionView() {
                             session={session}
                             onSelect={handleNodeSelect}
                             selectedNode={session.selectedNodePath ?? ''}
+                            // You can add a `disabled` prop if ExpressionNodeTree supports it
+                            readOnly={evaluationInProgress}
                         />
                     ) : (
                         <div>Session not selected</div>
                     )}
                 </Box>
                 <Box sx={{ height: '50%', overflow: 'auto' }}>
-                    <FileTree onSelected={handleFileSelect} initiallySelectedPath="" />
+                    <FileTree
+                        onSelected={handleFileSelect}
+                        initiallySelectedPath=""
+                        // You can add a `disabled` prop if FileTree supports it
+                        disabled={evaluationInProgress}
+                    />
                 </Box>
             </Grid>
 
@@ -211,16 +224,17 @@ export function ExecussionSessionView() {
                         <Typography variant="body1" noWrap>
                             {filePath ? `${filePath}` : '[No file path]'}
                             {session?.selectedNodePath ? ` : ${session.selectedNodePath}` : ''}
+                            {evaluationInProgress ? '(Evaluating)' : ''}
                         </Typography>
                         <Box>
-                            <IconButton onClick={executeExpression} color="primary">
+                            <IconButton onClick={executeExpression} color="primary" disabled={evaluationInProgress}>
                                 <PlayArrowIcon />
                             </IconButton>
                             <IconButton
                                 onClick={() =>
                                     session?.selectedNodePath &&
-                                    expression &&
-                                    !isSaveDisabled
+                                        expression &&
+                                        !isSaveDisabled
                                         ? saveExpression(session, session.selectedNodePath, expression, false)
                                         : null
                                 }
@@ -239,13 +253,14 @@ export function ExecussionSessionView() {
                 <Box sx={{ flex: 1, overflow: 'auto' }}>
                     <ExecussionContent
                         expression={expression}
-                        setExpression={(val) => setExpression(val)}
+                        setExpression={(val) => !evaluationInProgress && setExpression(val)}
                         displayedResult={displayedResult}
                         handleCopy={handleCopy}
                         copied={copied}
                         displayedMessages={displayedMessages}
                         handleClearLog={handleClearLog}
                         displayedMarkdown={displayedMarkdown}
+                        readOnly={evaluationInProgress}
                     />
                 </Box>
             </Grid>

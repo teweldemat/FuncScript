@@ -14,11 +14,13 @@ export interface FileNode {
 interface FileTreeProps {
   onSelected: (path: string) => void;
   initiallySelectedPath: string | null;
+  disabled:boolean;
 }
 
 const FileTree: React.FC<FileTreeProps> = ({
   onSelected,
   initiallySelectedPath,
+  disabled
 }) => {
   const [treeData, setTreeData] = useState<FileNode | null>(null);
   const [selectedPath, setSelectedPath] = useState<string>(
@@ -30,7 +32,7 @@ const FileTree: React.FC<FileTreeProps> = ({
     createFile,
     duplicateFile,
     deleteItem: deleteItemFromBackend,
-    renameItem,
+    renameItem
   } = useExecutionSession() ?? {};
 
   const buildNode = async (path: string, name: string, isFolder: boolean) => {

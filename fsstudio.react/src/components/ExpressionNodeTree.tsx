@@ -6,12 +6,14 @@ interface ExpressionNodeTreeProps {
   session: SessionState;
   onSelect: (nodePath: string | null) => void;
   selectedNode: string | null;
+  readOnly:boolean
 }
 
 const ExpressionNodeTree: React.FC<ExpressionNodeTreeProps> = ({
   session,
   onSelect,
   selectedNode,
+  readOnly,
 }) => {
   
 
@@ -37,6 +39,7 @@ const ExpressionNodeTree: React.FC<ExpressionNodeTreeProps> = ({
           onSelect={onSelect}
           selectedNode={selectedNode}
           nodeInfo={session.rootNode}
+          readonly={readOnly}
         />
       );
 };
