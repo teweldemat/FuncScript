@@ -1,6 +1,6 @@
 import React from 'react';
-import { ExecutionSessionProvider, useExecutionSession } from './v2/SessionContext';
-import { ExecussionSessionView } from './v2/ExecussionSessionView';
+import { ExecutionSessionProvider, useExecutionSession } from './components/SessionContext';
+import { ExecussionSessionView } from './components/ExecussionSessionView';
 
  export function App() {
     return (
