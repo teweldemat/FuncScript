@@ -7,11 +7,9 @@ import React, {
 import { Grid, Typography, Box, IconButton } from '@mui/material';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import SaveIcon from '@mui/icons-material/Save';
-import axios from 'axios';
 import { SERVER_URL } from '../backend';
 import { SessionState, useExecutionSession } from './SessionContext';
 import ExpressionNodeTree from './ExpressionNodeTree';
-import { ExpressionType } from '../FsStudioProvider';
 import FileTree from './FileTree';
 import ExecussionContent from './ExecussionContent';
 import { findNodeByPath } from './SessionUtils';
@@ -23,7 +21,8 @@ export function ExecussionSessionView() {
         sessions,
         evaluateNode,
         clearSessionLog,
-        setSelectedNodePath
+        setSelectedNodePath,
+        saveExpression
     } = useExecutionSession()!;
     const [session, setSession] = useState<SessionState | null>(null);
     const [expression, setExpression] = useState<string | null>(null);
@@ -37,8 +36,9 @@ export function ExecussionSessionView() {
         if (!session) return;
         setSession(sessions[session?.sessionId]);
     }, [sessions]);
+
     useEffect(() => {
-        loadNodeData(session?.selectedNodePath??null)
+        loadNodeData(session?.selectedNodePath ?? null);
     }, [session]);
 
     useEffect(() => {
@@ -52,40 +52,41 @@ export function ExecussionSessionView() {
     function clearCurrentNode() {
         setExpression('');
         setLastSavedExpression('');
-
     }
+
     function loadNodeData(nodePath: string | null) {
         if (!session || !nodePath) {
-            clearCurrentNode()
+            clearCurrentNode();
             return;
         }
-        const node = findNodeByPath(session, nodePath)
+        const node = findNodeByPath(session, nodePath);
         if (!node) {
             clearCurrentNode();
             return;
         }
-        if (!node?.dataLoaded)
-        {
-            loadNode(session, nodePath).then(newNode => {
+        if (!node.dataLoaded) {
+            loadNode(session, nodePath).then((newNode) => {
                 setExpression(newNode?.expression ?? '');
                 setLastSavedExpression(newNode?.expression ?? '');
             });
-        }
-        else
-        {
+        } else {
             setExpression(node.expression ?? '');
-            setLastSavedExpression(node?.expression ?? '');
-
+            setLastSavedExpression(node.expression ?? '');
         }
     }
-    const handleNodeSelect = useCallback(async (nodePath: string | null) => {
-        if (session)
-            setSelectedNodePath(session, nodePath);
-        await loadNodeData(nodePath)
-    }, [session, loadNode]);
 
-    const selectedNode = (session?.selectedNodePath)
-        ? findNodeByPath(session ?? [], session.selectedNodePath)
+    const handleNodeSelect = useCallback(
+        async (nodePath: string | null) => {
+            if (session) {
+                setSelectedNodePath(session, nodePath);
+            }
+            await loadNodeData(nodePath);
+        },
+        [session, loadNode]
+    );
+
+    const selectedNode = session?.selectedNodePath
+        ? findNodeByPath(session, session.selectedNodePath)
         : null;
 
     const handleCopy = useCallback(() => {
@@ -103,37 +104,14 @@ export function ExecussionSessionView() {
     }, [session, clearSessionLog]);
 
     const executeExpression = useCallback(async () => {
-        if (!session || !(session?.selectedNodePath)) return;
-        await evaluateNode(session, session?.selectedNodePath);
+        if (!session || !session.selectedNodePath) return;
+        await evaluateNode(session, session.selectedNodePath);
     }, [session, evaluateNode]);
-
-    const saveExpression = useCallback(
-        async (nodePath: string, newExpression: string | null, thenEvaluate: boolean) => {
-            if (!nodePath || newExpression === null) return;
-            try {
-                setSavingInProgress(true);
-                await axios.post(
-                    `${SERVER_URL}/api/sessions/${session?.sessionId}/node/expression/${nodePath}`,
-                    { expression: newExpression }
-                );
-                setLastSavedExpression(newExpression);
-                setSaveStatus('All changes saved');
-                if (thenEvaluate) {
-                    await evaluateNode(session!, nodePath);
-                }
-            } catch {
-                setSaveStatus('Failed to save changes');
-            } finally {
-                setSavingInProgress(false);
-            }
-        },
-        [session, evaluateNode]
-    );
 
     const saveTimerRef = useRef<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
-        if (!session || !session?.selectedNodePath || expression == null) return;
+        if (!session || !session.selectedNodePath || expression == null) return;
         if (saveTimerRef.current) {
             clearTimeout(saveTimerRef.current);
         }
@@ -147,7 +125,16 @@ export function ExecussionSessionView() {
                         return;
                     }
                     if (queuedExpression && queuedExpression !== lastSavedExpression) {
-                        await saveExpression(session.selectedNodePath!, queuedExpression, false);
+                        setSavingInProgress(true);
+                        try {
+                            await saveExpression(session, session.selectedNodePath!, queuedExpression, false);
+                            setLastSavedExpression(queuedExpression);
+                            setSaveStatus('All changes saved');
+                        } catch {
+                            setSaveStatus('Failed to save changes');
+                        } finally {
+                            setSavingInProgress(false);
+                        }
                         setQueuedExpression(null);
                     }
                 };
@@ -165,25 +152,26 @@ export function ExecussionSessionView() {
         queuedExpression,
         savingInProgress,
         saveExpression,
+        session
     ]);
 
     const filePath = session?.filePath ?? null;
-
     const isSaveDisabled = expression === lastSavedExpression;
-    const displayedResult = session?.selectedNodePath && session
-        ? selectedNode?.evaluationRes || ''
-        : '';
+    const displayedResult = selectedNode?.evaluationRes || '';
     const displayedMessages = session?.messages || [];
     const displayedMarkdown = session?.markdown || '';
 
-    const handleFileSelect = useCallback(async (selectedFile: string) => {
-        if (selectedFile == '') {
-            setSession(null);
-        } else {
-            const newSession = await createSession(selectedFile);
-            setSession(newSession);
-        }
-    }, [createSession]);
+    const handleFileSelect = useCallback(
+        async (selectedFile: string) => {
+            if (selectedFile === '') {
+                setSession(null);
+            } else {
+                const newSession = await createSession(selectedFile);
+                setSession(newSession);
+            }
+        },
+        [createSession]
+    );
 
     return (
         <Grid container sx={{ height: '100vh', overflow: 'auto' }} wrap="nowrap">
@@ -196,7 +184,7 @@ export function ExecussionSessionView() {
                         <ExpressionNodeTree
                             session={session}
                             onSelect={handleNodeSelect}
-                            selectedNode={session?.selectedNodePath ?? ''}
+                            selectedNode={session.selectedNodePath ?? ''}
                         />
                     ) : (
                         <div>Session not selected</div>
@@ -206,7 +194,6 @@ export function ExecussionSessionView() {
                     <FileTree onSelected={handleFileSelect} initiallySelectedPath="" />
                 </Box>
             </Grid>
-
 
             <Grid
                 item
@@ -223,7 +210,7 @@ export function ExecussionSessionView() {
                     >
                         <Typography variant="body1" noWrap>
                             {filePath ? `${filePath}` : '[No file path]'}
-                            {session?.selectedNodePath ? ` : ${session?.selectedNodePath}` : ''}
+                            {session?.selectedNodePath ? ` : ${session.selectedNodePath}` : ''}
                         </Typography>
                         <Box>
                             <IconButton onClick={executeExpression} color="primary">
@@ -231,8 +218,10 @@ export function ExecussionSessionView() {
                             </IconButton>
                             <IconButton
                                 onClick={() =>
-                                    session?.selectedNodePath && expression && !isSaveDisabled
-                                        ? saveExpression(session.selectedNodePath, expression, false)
+                                    session?.selectedNodePath &&
+                                    expression &&
+                                    !isSaveDisabled
+                                        ? saveExpression(session, session.selectedNodePath, expression, false)
                                         : null
                                 }
                                 color="secondary"

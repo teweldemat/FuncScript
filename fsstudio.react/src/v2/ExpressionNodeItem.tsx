@@ -78,6 +78,7 @@ const ExpressionNodeItem: React.FC<ExpressionNodeItemProps> = ({
     createNode,
     removeNode,
     renameNode,
+    moveNode,
   } = useExecutionSession() || {};
 
   const [menuAnchorEl, setMenuAnchorEl] = useState<HTMLElement | null>(null);
@@ -176,11 +177,35 @@ const ExpressionNodeItem: React.FC<ExpressionNodeItemProps> = ({
     await loadChildNodeList?.(session, parent);
   };
 
+  const handleDragStart = (e: React.DragEvent) => {
+    if (!nodePath) return;
+    e.dataTransfer.setData('text/plain', nodePath);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    const sourcePath = e.dataTransfer.getData('text/plain');
+    if (!sourcePath) return;
+    if (sourcePath === nodePath) return;
+    if (!session) return;
+    const newParentPath = nodeInfo.childrenCount >= 0 ? nodePath : getParentPath(nodePath || '');
+    if (!newParentPath) return;
+    await moveNode?.(session, sourcePath, newParentPath);
+  };
+
   return (
     <>
       <ListItem
         dense
         onClick={handleClickItem}
+        draggable={!!nodePath}
+        onDragStart={handleDragStart}
+        onDragOver={handleDragOver}
+        onDrop={handleDrop}
         sx={{
           cursor: 'pointer',
           backgroundColor: selectedNode === nodePath ? 'lightgray' : 'inherit',

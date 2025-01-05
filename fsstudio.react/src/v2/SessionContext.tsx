@@ -89,6 +89,12 @@ interface SessionsContextValue {
     renameItem: (path: string, newName: string) => Promise<void>;
     setRootFolder: (newRootFolder: string) => Promise<void>;
     setSelectedNodePath: (session: SessionState, nodePath: string | null) => void;
+    saveExpression: (
+        session: SessionState,
+        nodePath: string,
+        newExpression: string,
+        thenEvaluate: boolean
+    ) => Promise<void>;
 }
 
 const ExecutionSessionContext = createContext<SessionsContextValue | null>(null);
@@ -589,6 +595,44 @@ export function ExecutionSessionProvider({ children }: { children: React.ReactNo
         setSessions({});
     };
 
+    const saveExpression = async (
+        session: SessionState,
+        nodePath: string,
+        newExpression: string,
+        thenEvaluate: boolean
+    ) => {
+        const urlPath = encodeURIComponent(nodePath);
+        const res = await fetch(
+            `${SERVER_URL}/api/sessions/${session.sessionId}/node/expression/${urlPath}`,
+            {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ expression: newExpression }),
+            }
+        );
+        if (!res.ok) throw new Error(await res.text());
+
+        setSessions((prev) => {
+            const current = prev[session.sessionId];
+            if (!current) return prev;
+            const node = findNodeByPath(current, nodePath);
+            if (!node) return prev;
+            const updatedNode = { ...node, expression: newExpression };
+            const updatedRoot = updateSessionNode(current.rootNode, nodePath, updatedNode);
+            return {
+                ...prev,
+                [session.sessionId]: {
+                    ...current,
+                    rootNode: updatedRoot,
+                },
+            };
+        });
+
+        if (thenEvaluate) {
+            await evaluateNode(session, nodePath);
+        }
+    };
+
     return (
         <ExecutionSessionContext.Provider
             value={{
@@ -615,6 +659,7 @@ export function ExecutionSessionProvider({ children }: { children: React.ReactNo
                 renameItem,
                 setRootFolder,
                 setSelectedNodePath,
+                saveExpression,
             }}
         >
             {children}
