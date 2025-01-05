@@ -58,7 +58,7 @@ export function ExecussionSessionView() {
             clearCurrentNode()
             return;
         }
-        const node = findNodeByPath(session.nodes ?? [], nodePath)
+        const node = findNodeByPath(session, nodePath)
         if (!node) {
             clearCurrentNode();
             return;
@@ -84,7 +84,7 @@ export function ExecussionSessionView() {
     }, [session, loadNode]);
 
     const selectedNode = (session?.selectedNodePath)
-        ? findNodeByPath(session.nodes ?? [], session.selectedNodePath)
+        ? findNodeByPath(session ?? [], session.selectedNodePath)
         : null;
 
     const handleCopy = useCallback(() => {

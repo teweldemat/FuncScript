@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { SERVER_URL, SERVER_WS_URL } from '../backend';
-import { cpSync } from 'fs';
 
 export enum ExpressionType {
     ClearText = 'ClearText',
@@ -26,12 +25,12 @@ export interface NodeState {
 export interface SessionState {
     sessionId: string;
     filePath: string;
-    nodes: NodeState[];
+    rootNode: NodeState;
     expandedNodes: Record<string, boolean>;
     messages: string[];
     markdown: string;
     evaluationInProgressNodePath?: string;
-    selectedNodePath:string|null;
+    selectedNodePath: string | null;
 }
 
 interface DirectoryListResult {
@@ -80,72 +79,54 @@ interface SessionsContextValue {
     deleteItem: (path: string) => Promise<void>;
     renameItem: (path: string, newName: string) => Promise<void>;
     setRootFolder: (newRootFolder: string) => Promise<void>;
-    setSelectedNodePath: (session:SessionState,nodePath:string|null)=>void;
+    setSelectedNodePath: (session: SessionState, nodePath: string | null) => void;
 }
 
 const ExecutionSessionContext = createContext<SessionsContextValue | null>(null);
 
-export function findNodeByPath(rootNodes: NodeState[], nodePath: string): NodeState | null {
+export function findNodeByPath(sesion: SessionState, nodePath: string): NodeState | null {
+    if (!nodePath || nodePath.trim() === '') {
+        return sesion.rootNode;
+    }
     const parts = nodePath.split('.');
-    let currentNodes = rootNodes;
-    let currentNode: NodeState | null = null;
+    let current: NodeState = sesion.rootNode;
 
     for (const part of parts) {
-        currentNode = currentNodes.find((n) => n.name === part) ?? null;
-        if (!currentNode) return null;
-        if (!currentNode.childNodes) currentNode.childNodes = [];
-        currentNodes = currentNode.childNodes;
+        if (!current.childNodes) return null;
+        const next = current.childNodes.find((n) => n.name === part);
+        if (!next) return null;
+        current = next;
     }
-    return currentNode;
+    return current;
 }
 
-function updateSessionNode(rootNodes: NodeState[], nodePath: string, newNode: NodeState): NodeState[] {
-    const parts = nodePath.split('.');
-    const clonedRootNodes = [...rootNodes];
-
-    let currentNodes = clonedRootNodes;
-    for (let i = 0; i < parts.length; i++) {
-        const part = parts[i];
-        const index = currentNodes.findIndex((n) => n.name === part);
-        if (index < 0) {
-            return clonedRootNodes;
-        }
-        if (i === parts.length - 1) {
-            currentNodes[index] = newNode;
-        } else {
-            const childNode = { ...currentNodes[index] };
-            if (!childNode.childNodes) childNode.childNodes = [];
-            childNode.childNodes = [...childNode.childNodes];
-            currentNodes[index] = childNode;
-            currentNodes = childNode.childNodes;
-        }
+function updateSessionNode(rootNode: NodeState, nodePath: string, newNode: NodeState): NodeState {
+    if (!nodePath || nodePath.trim() === '') {
+        return newNode;
     }
 
-    return clonedRootNodes;
-}
-function transactionSessionNode(rootNodes: NodeState[], nodePath: string,transition:(prev:NodeState)=>NodeState): NodeState[] {
+    const clonedRoot = { ...rootNode };
     const parts = nodePath.split('.');
-    const clonedRootNodes = [...rootNodes];
+    let current = clonedRoot;
 
-    let currentNodes = clonedRootNodes;
     for (let i = 0; i < parts.length; i++) {
         const part = parts[i];
-        const index = currentNodes.findIndex((n) => n.name === part);
+        if (!current.childNodes) current.childNodes = [];
+        const index = current.childNodes.findIndex((n) => n.name === part);
         if (index < 0) {
-            return clonedRootNodes;
+            return clonedRoot;
         }
         if (i === parts.length - 1) {
-            currentNodes[index] = transition(currentNodes[index]);
+            current.childNodes[index] = newNode;
         } else {
-            const childNode = { ...currentNodes[index] };
+            const childNode = { ...current.childNodes[index] };
             if (!childNode.childNodes) childNode.childNodes = [];
             childNode.childNodes = [...childNode.childNodes];
-            currentNodes[index] = childNode;
-            currentNodes = childNode.childNodes;
+            current.childNodes[index] = childNode;
+            current = childNode;
         }
     }
-
-    return clonedRootNodes;
+    return clonedRoot;
 }
 
 export function ExecutionSessionProvider({ children }: { children: React.ReactNode }) {
@@ -168,13 +149,10 @@ export function ExecutionSessionProvider({ children }: { children: React.ReactNo
             setSessions((prev) => {
                 const session = prev[sessionId];
                 if (!session) return prev;
-
                 const nodePath = session.evaluationInProgressNodePath;
                 if (!nodePath) return prev;
-
-                const node = findNodeByPath(session.nodes, nodePath);
+                const node = findNodeByPath(session, nodePath);
                 if (!node) return prev;
-
                 const newNode = { ...node, evaluating: false };
                 if (data.cmd === 'evaluation_success') {
                     newNode.evaluationRes = data.data.result;
@@ -183,15 +161,13 @@ export function ExecutionSessionProvider({ children }: { children: React.ReactNo
                     newNode.evaluationError = data.data.error;
                     newNode.evaluationRes = null;
                 }
-
-                const updatedNodes = updateSessionNode(session.nodes, nodePath, newNode);
-
+                const updatedRoot = updateSessionNode(session.rootNode, nodePath, newNode);
                 return {
                     ...prev,
                     [sessionId]: {
                         ...session,
                         evaluationInProgressNodePath: undefined,
-                        nodes: updatedNodes,
+                        rootNode: updatedRoot,
                     },
                 };
             });
@@ -257,14 +233,28 @@ export function ExecutionSessionProvider({ children }: { children: React.ReactNo
         const { sessionId } = await res.json();
         const children = await fetchChildren(sessionId);
 
+        const rootNode: NodeState = {
+            name: '',
+            expressionType: ExpressionType.FsStudioParentNode,
+            childrenCount: children.length,
+            expression: null,
+            dataLoaded: true,
+            evaluating: false,
+            evaluationRes: null,
+            evaluationError: null,
+            cachedValue: null,
+            isCached: false,
+            childNodes: children,
+        };
+
         const newSession: SessionState = {
             sessionId,
             filePath,
-            nodes: children,
+            rootNode,
             expandedNodes: {},
             messages: [],
             markdown: '',
-            selectedNodePath:null
+            selectedNodePath: null,
         };
 
         setSessions((prev) => ({
@@ -291,45 +281,32 @@ export function ExecutionSessionProvider({ children }: { children: React.ReactNo
         const res = await fetch(`${SERVER_URL}/api/sessions/${session.sessionId}/node/evaluate/status`);
         if (!res.ok) throw new Error(await res.text());
         const data = await res.json();
-
         setSessions((prev) => {
             const current = prev[session.sessionId];
             if (!current) return prev;
-
             if (data.status === 'idle') {
                 return prev;
             } else if (data.status === 'inprogress') {
                 return {
                     ...prev,
-                    [session.sessionId]: {
-                        ...current,
-                    },
                 };
             } else if (data.status === 'error') {
                 return {
                     ...prev,
-                    [session.sessionId]: {
-                        ...current,
-                    },
                 };
             } else if (data.status === 'success') {
                 return {
                     ...prev,
-                    [session.sessionId]: {
-                        ...current,
-                    },
                 };
             }
             return prev;
         });
     };
 
-    const setSelectedNodePath = async (session: SessionState, nodePath: string|null) => {
+    const setSelectedNodePath = async (session: SessionState, nodePath: string | null) => {
         setSessions((prev) => {
             const current = prev[session.sessionId];
             if (!current) return prev;
-
-
             return {
                 ...prev,
                 [session.sessionId]: {
@@ -346,7 +323,6 @@ export function ExecutionSessionProvider({ children }: { children: React.ReactNo
             `${SERVER_URL}/api/sessions/${session.sessionId}/node?${params.toString()}`
         );
         if (!res.ok) throw new Error(await res.text());
-
         const nodeInfo = await res.json();
         const newNode: NodeState = {
             name: nodeInfo.name,
@@ -361,21 +337,18 @@ export function ExecutionSessionProvider({ children }: { children: React.ReactNo
             isCached: false,
             childNodes: [],
         };
-
         setSessions((prev) => {
             const current = prev[session.sessionId];
             if (!current) return prev;
-
-            const updatedNodes = updateSessionNode(current.nodes, nodePath, newNode);
+            const updatedRoot = updateSessionNode(current.rootNode, nodePath, newNode);
             return {
                 ...prev,
                 [session.sessionId]: {
                     ...current,
-                    nodes: updatedNodes,
+                    rootNode: updatedRoot,
                 },
             };
         });
-
         return newNode;
     };
 
@@ -383,29 +356,24 @@ export function ExecutionSessionProvider({ children }: { children: React.ReactNo
         setSessions((prev) => {
             const current = prev[session.sessionId];
             if (!current) return prev;
-
-            const node = findNodeByPath(current.nodes, nodePath);
+            const node = findNodeByPath(current, nodePath);
             if (!node) return prev;
-
             const newNode = {
                 ...node,
                 evaluating: true,
                 evaluationError: null,
                 evaluationRes: null,
             };
-
-            const updatedNodes = updateSessionNode(current.nodes, nodePath, newNode);
-
+            const updatedRoot = updateSessionNode(current.rootNode, nodePath, newNode);
             return {
                 ...prev,
                 [session.sessionId]: {
                     ...current,
                     evaluationInProgressNodePath: nodePath,
-                    nodes: updatedNodes,
+                    rootNode: updatedRoot,
                 },
             };
         });
-
         const params = new URLSearchParams({ nodePath });
         const res = await fetch(
             `${SERVER_URL}/api/sessions/${session.sessionId}/node/evaluate?${params.toString()}`,
@@ -433,7 +401,6 @@ export function ExecutionSessionProvider({ children }: { children: React.ReactNo
             body: JSON.stringify(body),
         });
         if (!res.ok) throw new Error(await res.text());
-
         await loadChildNodeList(session, parentNodePath);
     };
 
@@ -446,7 +413,6 @@ export function ExecutionSessionProvider({ children }: { children: React.ReactNo
             }
         );
         if (!res.ok) throw new Error(await res.text());
-
         const parentPathParts = nodePath.split('.');
         parentPathParts.pop();
         const parentNodePath = parentPathParts.length > 0 ? parentPathParts.join('.') : null;
@@ -461,7 +427,6 @@ export function ExecutionSessionProvider({ children }: { children: React.ReactNo
             body: JSON.stringify(body),
         });
         if (!res.ok) throw new Error(await res.text());
-
         const parentPathParts = nodePath.split('.');
         parentPathParts.pop();
         const parentNodePath = parentPathParts.length > 0 ? parentPathParts.join('.') : null;
@@ -481,7 +446,6 @@ export function ExecutionSessionProvider({ children }: { children: React.ReactNo
             }
         );
         if (!res.ok) throw new Error(await res.text());
-
         await loadNode(session, nodePath);
     };
 
@@ -501,7 +465,6 @@ export function ExecutionSessionProvider({ children }: { children: React.ReactNo
             }
         );
         if (!res.ok) throw new Error(await res.text());
-
         await loadNode(session, nodePath);
     };
 
@@ -517,7 +480,6 @@ export function ExecutionSessionProvider({ children }: { children: React.ReactNo
             body: JSON.stringify(body),
         });
         if (!res.ok) throw new Error(await res.text());
-
         const parentPathParts = nodePath.split('.');
         parentPathParts.pop();
         const oldParent = parentPathParts.length > 0 ? parentPathParts.join('.') : null;
@@ -541,8 +503,7 @@ export function ExecutionSessionProvider({ children }: { children: React.ReactNo
             throw new Error(await res.text());
         }
         const childNodesRaw: any[] = await res.json();
-
-        return childNodesRaw.map((cn: any): NodeState => {
+        return childNodesRaw.map((cn: any) => {
             return {
                 name: cn.name,
                 expressionType: cn.expressionType ?? null,
@@ -569,11 +530,9 @@ export function ExecutionSessionProvider({ children }: { children: React.ReactNo
         );
         if (!res.ok) throw new Error(await res.text());
         const childNodesRaw = await res.json();
-
         setSessions((prev) => {
             let updatedSession = prev[session.sessionId];
             if (!updatedSession) return prev;
-
             const children: NodeState[] = childNodesRaw.map((cn: any) => {
                 return {
                     name: cn.name,
@@ -589,33 +548,43 @@ export function ExecutionSessionProvider({ children }: { children: React.ReactNo
                     childNodes: null,
                 };
             });
-
             if (nodePath) {
-                const parentNode = findNodeByPath(updatedSession.nodes, nodePath);
+                const parentNode = findNodeByPath(updatedSession, nodePath);
                 if (parentNode) {
                     const newParentNode: NodeState = {
                         ...parentNode,
                         childNodes: children,
                     };
-                    const updatedNodes = updateSessionNode(updatedSession.nodes, nodePath, newParentNode);
-                    updatedSession = { ...updatedSession, nodes: updatedNodes };
+                    const updatedRoot = updateSessionNode(
+                        updatedSession.rootNode,
+                        nodePath,
+                        newParentNode
+                    );
+                    updatedSession = { ...updatedSession, rootNode: updatedRoot };
                 }
             } else {
-                updatedSession = { ...updatedSession, nodes: children };
+                updatedSession = {
+                    ...updatedSession,
+                    rootNode: {
+                        ...updatedSession.rootNode,
+                        childNodes: children,
+                        childrenCount: children.length,
+                    },
+                };
             }
-
             return {
                 ...prev,
                 [session.sessionId]: updatedSession,
             };
         });
-
         return nodePath
             ? childNodesRaw.map((cn: any) => {
                   const fullPath = nodePath ? `${nodePath}.${cn.name}` : cn.name;
-                  return findNodeByPath(sessions[session.sessionId].nodes, fullPath)!;
+                  return findNodeByPath(sessions[session.sessionId], fullPath)!;
               })
-            : childNodesRaw.map((cn: any) => findNodeByPath(sessions[session.sessionId].nodes, cn.name)!);
+            : childNodesRaw.map(
+                  (cn: any) => findNodeByPath(sessions[session.sessionId], cn.name)!
+              );
     };
 
     const toggleNodeExpanded = (session: SessionState, nodePath: string) => {
@@ -684,11 +653,9 @@ export function ExecutionSessionProvider({ children }: { children: React.ReactNo
             body: JSON.stringify({ path, name: newName }),
         });
         if (!res.ok) throw new Error(await res.text());
-    
         const segments = path.split('/');
         segments[segments.length - 1] = newName;
         const newPath = segments.join('/');
-    
         setSessions((prev) => {
             const next = { ...prev };
             Object.keys(next).forEach((sessionId) => {
@@ -702,12 +669,11 @@ export function ExecutionSessionProvider({ children }: { children: React.ReactNo
             return next;
         });
     };
-    
+
     const deleteItem = async (path: string) => {
         const url = `${SERVER_URL}/api/FileSystem/DeleteItem?path=${encodeURIComponent(path)}`;
         const res = await fetch(url, { method: 'DELETE' });
         if (!res.ok) throw new Error(await res.text());
-    
         setSessions((prev) => {
             const next = { ...prev };
             Object.keys(next).forEach((sessionId) => {

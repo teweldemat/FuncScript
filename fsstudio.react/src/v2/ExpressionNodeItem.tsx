@@ -17,6 +17,7 @@ import {
   DialogActions,
   Button,
   TextField,
+  Tooltip,
 } from '@mui/material';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
@@ -25,6 +26,9 @@ import FunctionsIcon from '@mui/icons-material/Functions';
 import CodeIcon from '@mui/icons-material/Code';
 import FolderIcon from '@mui/icons-material/Folder';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import TextFieldsIcon from '@mui/icons-material/TextFields';
+import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
 import { NodeState, SessionState, useExecutionSession } from './ExecutionSessionProvider';
 import { ExpressionType } from '../FsStudioProvider';
 
@@ -82,7 +86,6 @@ const ExpressionNodeItem: React.FC<ExpressionNodeItemProps> = ({
   const [newInputMode, setNewInputMode] = useState(false);
   const [newName, setNewName] = useState('');
   const [deleteItem, setDeleteItem] = useState(false);
-
   const isOpen = !nodePath ? true : !!session?.expandedNodes[nodePath];
   const isEvaluating = nodeInfo.evaluating;
   const displayName = nodeInfo.name + (isEvaluating ? ' (evaluating ..)' : '');
@@ -132,7 +135,7 @@ const ExpressionNodeItem: React.FC<ExpressionNodeItemProps> = ({
   };
 
   const handleAddItem = async () => {
-    if (!nodePath && !session) return;
+    if (!session) return;
     if (newName.trim() === '') return;
     const parentPath = nodePath || null;
     let newType = ExpressionType.FuncScript;
@@ -183,9 +186,52 @@ const ExpressionNodeItem: React.FC<ExpressionNodeItemProps> = ({
           backgroundColor: selectedNode === nodePath ? 'lightgray' : 'inherit',
         }}
       >
-        <IconButton onClick={handleMenuClick} size="small" sx={{ mr: 1 }}>
-          <MoreVertIcon />
-        </IconButton>
+        {!nodePath && (
+          <Box sx={{ display: 'flex', alignItems: 'center', mr: 1 }}>
+            <Tooltip title="Add Standard">
+              <IconButton
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleMenuAction('add-standard');
+                }}
+                size="small"
+                sx={{ mr: 1 }}
+              >
+                <AddCircleOutlineIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Add Text">
+              <IconButton
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleMenuAction('add-text');
+                }}
+                size="small"
+                sx={{ mr: 1 }}
+              >
+                <TextFieldsIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Add Text Template">
+              <IconButton
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleMenuAction('add-text-template');
+                }}
+                size="small"
+              >
+                <LibraryAddIcon />
+              </IconButton>
+            </Tooltip>
+          </Box>
+        )}
+
+        {nodePath && (
+          <IconButton onClick={handleMenuClick} size="small" sx={{ mr: 1 }}>
+            <MoreVertIcon />
+          </IconButton>
+        )}
+
         <Menu
           anchorEl={menuAnchorEl}
           open={Boolean(menuAnchorEl)}
@@ -218,15 +264,17 @@ const ExpressionNodeItem: React.FC<ExpressionNodeItemProps> = ({
               )}
         </Menu>
 
-        {nodeInfo.childrenCount > 0 && (
+        {nodePath && nodeInfo.childrenCount > 0 && (
           <IconButton onClick={handleToggle} size="small" sx={{ mr: 1 }}>
             {isOpen ? <ExpandLess /> : <ExpandMore />}
           </IconButton>
         )}
 
-        <ListItemIcon>
-          {isEvaluating ? <CircularProgress size="1rem" /> : expressionTypeIcon}
-        </ListItemIcon>
+        {nodePath && (
+          <ListItemIcon>
+            {isEvaluating ? <CircularProgress size="1rem" /> : expressionTypeIcon}
+          </ListItemIcon>
+        )}
 
         {!renameMode ? (
           <ListItemText primary={displayName} />
@@ -245,7 +293,7 @@ const ExpressionNodeItem: React.FC<ExpressionNodeItemProps> = ({
       </ListItem>
 
       {newInputMode && (
-        <Box pl={4}>
+        <Box pl={nodePath ? 4 : 0}>
           <TextField
             size="small"
             label="Enter name"
@@ -264,12 +312,14 @@ const ExpressionNodeItem: React.FC<ExpressionNodeItemProps> = ({
       )}
 
       {nodeInfo.childrenCount > 0 && nodeInfo.childNodes && (
-        <Collapse in={isOpen} timeout="auto" unmountOnExit>
-          <List component="div" disablePadding dense>
+        <Collapse in={nodePath ? isOpen : true} timeout="auto" unmountOnExit>
+          <List component="div" disablePadding dense sx={{ pl: nodePath ? 4 : 0 }}>
             {nodeInfo.childNodes.map((childNodeInfo) => {
-              const childPath = nodePath ? `${nodePath}.${childNodeInfo.name}` : childNodeInfo.name;
+              const childPath = nodePath
+                ? `${nodePath}.${childNodeInfo.name}`
+                : childNodeInfo.name;
               return (
-                <Box key={childPath} pl={4}>
+                <Box key={childPath} pl={nodePath ? 4 : 0}>
                   <ExpressionNodeItem
                     session={session}
                     nodePath={childPath}
@@ -295,11 +345,7 @@ const ExpressionNodeItem: React.FC<ExpressionNodeItemProps> = ({
           <Button onClick={() => setDeleteItem(false)} color="primary">
             Cancel
           </Button>
-          <Button
-            onClick={handleDeleteItem}
-            color="primary"
-            autoFocus
-          >
+          <Button onClick={handleDeleteItem} color="primary" autoFocus>
             Confirm
           </Button>
         </DialogActions>

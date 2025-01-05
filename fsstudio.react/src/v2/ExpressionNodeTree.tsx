@@ -17,7 +17,7 @@ const ExpressionNodeTree: React.FC<ExpressionNodeTreeProps> = ({
   
 
   
-  if (session?.nodes==null) {
+  if (session?.rootNode.childNodes==null) {
     return (
       <Box sx={{ p: 1 }}>
         <CircularProgress size="1rem" />
@@ -26,25 +26,20 @@ const ExpressionNodeTree: React.FC<ExpressionNodeTreeProps> = ({
     );
   }
 
- const childNodes=session.nodes;
+ const childNodes=session?.rootNode?.childNodes;
   if (childNodes==null) {
     return <Box sx={{ p: 1 }}>No child nodes found.</Box>;
   }
 
   return (
-    <Box>
-      {Object.values(childNodes).map((child) => (
         <ExpressionNodeItem
-          key={child.name}
           session={session}
-          nodePath={child.name}
+          nodePath={''}
           onSelect={onSelect}
           selectedNode={selectedNode}
-          nodeInfo={child}
+          nodeInfo={session.rootNode}
         />
-      ))}
-    </Box>
-  );
+      );
 };
 
 export default ExpressionNodeTree;
