@@ -16,7 +16,7 @@ namespace funcscript.funcs.math
         public object EvaluateList(FsList pars)
         {
             if (pars.Length != MAX_PARS_COUNT)
-                return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, "One parameter expected");
+                return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, $"{this.Symbol}: one parameter expected");
 
             var param = pars[0];
 
@@ -27,7 +27,7 @@ namespace funcscript.funcs.math
             if (param is double doubleValue)
                 return -doubleValue;
 
-            return null;
+            return new FsError(FsError.ERROR_TYPE_MISMATCH,$"{this.Symbol}: number expected");
         }
 
         public string ParName(int index)

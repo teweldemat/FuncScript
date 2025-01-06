@@ -10,8 +10,8 @@ import { ExpressionType } from './SessionContext';
 interface ExecussionContentProps {
     expression: string | null;
     setExpression: (val: string | null) => void;
-    displayedResult: string|null;
-    displayedError: string|null;
+    displayedResult: string | null;
+    displayedError: string | null;
     handleCopy: () => void;
     copied: boolean;
     displayedMessages: any[];
@@ -85,13 +85,17 @@ export default function ExecussionContent({
                     )}
                 </Box>
                 <Box sx={{ flex: 1, overflow: 'auto' }}>
-                    {tabIndex === 0 && (
+                    <Box
+                        sx={{
+                            display: tabIndex === 0 ? 'block' : 'none',
+                            height: '100%'
+                        }}
+                    >
                         <Box sx={{ height: '100%', padding: 2 }}>
                             <pre
                                 style={{
                                     whiteSpace: 'pre-wrap',
-                                    wordWrap: 'break-word',
-                                    overflowWrap: 'break-word',
+                                    overflowWrap: 'anywhere',
                                     border: '1px solid #ccc',
                                     padding: '10px',
                                     fontFamily: '"Lucida Console", monospace',
@@ -102,17 +106,25 @@ export default function ExecussionContent({
                                 {displayedError || displayedResult}
                             </pre>
                         </Box>
-                    )}
-                    {tabIndex === 1 && (
-                        <Box sx={{ height: '100%' }}>
-                            <TextLogger messages={displayedMessages} />
-                        </Box>
-                    )}
-                    {tabIndex === 2 && (
+                    </Box>
+                    <Box
+                        sx={{
+                            display: tabIndex === 1 ? 'block' : 'none',
+                            height: '100%'
+                        }}
+                    >
+                        <TextLogger messages={displayedMessages} />
+                    </Box>
+                    <Box
+                        sx={{
+                            display: tabIndex === 2 ? 'block' : 'none',
+                            height: '100%'
+                        }}
+                    >
                         <Box sx={{ padding: 2 }}>
                             <ReactMarkdown>{displayedMarkdown}</ReactMarkdown>
                         </Box>
-                    )}
+                    </Box>
                 </Box>
             </Grid>
         </Grid>

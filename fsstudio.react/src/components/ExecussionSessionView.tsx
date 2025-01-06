@@ -1,4 +1,3 @@
-//ExecussionSessionView
 import React, {
     useState,
     useEffect,

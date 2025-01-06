@@ -35,7 +35,7 @@ async function createWindow(isDev) {
   });
 
   mainWindow.webContents.on('will-navigate', (event, url) => {
-    if (url.endsWith('/open-folder-dialog')) {
+    if (url.endsWith('/open-dialog-native')) {
       event.preventDefault();
       dialog.showOpenDialog(mainWindow, {
         properties: ['openDirectory'],
@@ -55,7 +55,7 @@ async function createWindow(isDev) {
           .catch(err => console.error(err));
         }
       });
-    } else if (url.endsWith('/create-folder-dialog')) {
+    } else if (url.endsWith('/create-dialog-native')) {
       event.preventDefault();
       dialog.showSaveDialog(mainWindow, {
         title: 'Create Folder',

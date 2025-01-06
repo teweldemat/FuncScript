@@ -33,6 +33,7 @@ import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutli
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import { FileNode } from './FileTree';
+import { APP_TYPE } from '../backend';
 
 interface FileItemProps {
     fileNode: FileNode;
@@ -72,10 +73,10 @@ const FileItemComponent: React.FC<FileItemProps> = ({
     ) => {
         switch (action) {
             case 'open-project':
-                window.location.href = '/open-folder-dialog';
+                window.location.href = APP_TYPE=="web"?"/open-dialog-web":"/open-dialog-native";
                 break;
             case 'create-project':
-                window.location.href = '/create-folder-dialog';
+                window.location.href =  APP_TYPE=="web"?"/create-folder-web":'/create-folder-dialog';
                 break;
             case 'add-folder':
                 setNewInputMode(true);

@@ -1,25 +1,26 @@
-
-// RemoteLogger.tsx
 import React, { useEffect, useRef } from 'react';
 
 const RemoteLogger: React.FC<{ messages: string[] }> = ({ messages }) => {
   const bottomRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (bottomRef.current) {
-      bottomRef.current.scrollIntoView({ behavior: 'smooth' });
+    if (containerRef.current) {
+      containerRef.current.scrollTop = containerRef.current.scrollHeight;
     }
   }, [messages]);
 
   return (
-    <div style={{ maxHeight: '100%', overflowY: 'auto' }}>
+    <div
+      ref={containerRef}
+      style={{ maxHeight: '300px', overflowY: 'auto' }}
+    >
       <ul>
         {messages.map((message, index) => (
           <pre
             style={{
               whiteSpace: 'pre-wrap',
-              wordWrap: 'break-word',
-              overflowWrap: 'break-word',
+              overflowWrap: 'anywhere',
               border: '1px solid #ccc',
               padding: '10px',
               fontFamily: '"Lucida Console", monospace',
