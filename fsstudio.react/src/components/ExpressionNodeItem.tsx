@@ -56,6 +56,16 @@ function getIconForExpressionType(expressionType: ExpressionType) {
   }
 }
 
+function isParentNode(source: string, target: string) {
+  const sourceSegments = source.split('.');
+  const targetSegments = target.split('.');
+  // if there's only one segment, it's the root – no parent to compare
+  if (sourceSegments.length <= 1) return false;
+  // parent path is everything except the last segment
+  const parentPath = sourceSegments.slice(0, -1).join('.');
+  return parentPath === target;
+}
+
 interface ExpressionNodeItemProps {
   session: SessionState;
   nodePath?: string;
@@ -90,6 +100,8 @@ const ExpressionNodeItem: React.FC<ExpressionNodeItemProps> = ({
   const [newInputMode, setNewInputMode] = useState(false);
   const [newName, setNewName] = useState('');
   const [deleteItem, setDeleteItem] = useState(false);
+
+  const [isDragOver, setIsDragOver] = useState(false);
 
   const isOpen = !nodePath ? true : !!session?.expandedNodes[nodePath];
   const isEvaluating = nodeInfo.evaluating;
@@ -163,15 +175,12 @@ const ExpressionNodeItem: React.FC<ExpressionNodeItemProps> = ({
 
     await createNode?.(session, parentPath, newName, '', newType);
 
-    // Expand the parent if it's not open
     if (nodePath && !session.expandedNodes[nodePath]) {
       toggleNodeExpanded?.(session, nodePath);
     }
 
-    // Reload child list
-    await loadChildNodeList?.(session, nodePath??'');
+    await loadChildNodeList?.(session, nodePath ?? '');
 
-    // Select the newly created node
     const newChildPath = nodePath ? `${nodePath}.${newName}` : newName;
     onSelect(newChildPath);
 
@@ -205,22 +214,53 @@ const ExpressionNodeItem: React.FC<ExpressionNodeItemProps> = ({
     await loadChildNodeList?.(session, parentPath);
   };
 
+  // Drag handlers
   const handleDragStart = (e: React.DragEvent) => {
     if (!nodePath || readonly) return;
     e.dataTransfer.setData('text/plain', nodePath);
   };
 
+  const handleDragEnter = (e: React.DragEvent) => {
+    if (readonly) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const sourcePath = e.dataTransfer.getData('text/plain');
+
+    // If dragging over itself or its own parent, don't highlight
+    if (
+      !sourcePath ||
+      sourcePath === nodePath ||
+      isParentNode(sourcePath, nodePath ?? '')
+    ) {
+      setIsDragOver(false);
+      return;
+    }
+    setIsDragOver(true);
+  };
+
   const handleDragOver = (e: React.DragEvent) => {
     if (readonly) return;
     e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    if (readonly) return;
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(false);
   };
 
   const handleDrop = async (e: React.DragEvent) => {
     if (readonly) return;
     e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(false);
+
     const sourcePath = e.dataTransfer.getData('text/plain');
     if (!sourcePath || !session || sourcePath === nodePath) return;
 
+    // If this node can contain children, the new parent is this node; otherwise the parent of this node
     const canContainChildren = nodeInfo.childrenCount >= 0;
     const newParentPath = canContainChildren
       ? nodePath
@@ -237,11 +277,18 @@ const ExpressionNodeItem: React.FC<ExpressionNodeItemProps> = ({
         onClick={handleClickItem}
         draggable={!!nodePath && !readonly}
         onDragStart={handleDragStart}
+        onDragEnter={handleDragEnter}
         onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         sx={{
           cursor: 'pointer',
-          backgroundColor: selectedNode === nodePath ? 'lightgray' : 'inherit',
+          backgroundColor:
+            selectedNode === nodePath
+              ? 'lightgray'
+              : isDragOver
+              ? 'rgba(0, 255, 0, 0.2)' // highlight color
+              : 'inherit',
         }}
       >
         {!nodePath && !readonly && (

@@ -104,11 +104,44 @@
         const wsRef = useRef<WebSocket | null>(null);
 
         useEffect(() => {
-            const ws = new WebSocket(SERVER_WS_URL);
-            wsRef.current = ws;
-            ws.onmessage = (evt) => handleWsMessage(evt);
+            let retryTimeoutId: number | null = null;
+            let retryDelay = 1000;
+            let ws: WebSocket | null = null;
+        
+            const connectWebSocket = () => {
+                console.log("Connecting to the server...");
+                ws = new WebSocket(SERVER_WS_URL);
+                wsRef.current = ws;
+        
+                ws.onopen = () => {
+                    console.log("Connected to the server");
+                    retryDelay = 1000;
+                };
+        
+                ws.onmessage = (evt) => handleWsMessage(evt);
+        
+                ws.onerror = (err) => {
+                    console.error("WebSocket error:", err);
+                };
+        
+                ws.onclose = () => {
+                    console.log("Disconnected from the server, reconnecting...");
+                    retryTimeoutId = window.setTimeout(() => {
+                        connectWebSocket();
+                        if (retryDelay < 16000) {
+                            retryDelay *= 2; 
+                        }
+                    }, retryDelay);
+                };
+            };
+        
+            connectWebSocket();
+        
             return () => {
-                ws.close();
+                if (retryTimeoutId !== null) {
+                    clearTimeout(retryTimeoutId);
+                }
+                ws?.close();
             };
         }, []);
 
