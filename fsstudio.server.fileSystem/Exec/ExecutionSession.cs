@@ -278,7 +278,7 @@ public class ExecutionSession : KeyValueCollection
         {
             try
             {
-                var res = EvaluateNodeInternal(nodePath);
+                var res = EvaluateNodeInternal(nodePath.ToLowerInvariant());
                 return res;
             }
             catch (Exception ex)
@@ -311,10 +311,13 @@ public class ExecutionSession : KeyValueCollection
                 FuncScript.Format(sb,_evaluationResult,
                     asJsonLiteral:_evaluationResult is KeyValueCollection || _evaluationResult is FsList
                     );
-                logger.SendObject("evaluation_success", new {
+                if(logger!=null)
+                {
+                    logger.SendObject("evaluation_success", new {
                     sessionId = SessionId,
                     result = sb.ToString()
                 });
+                }
             }
         }, TaskContinuationOptions.ExecuteSynchronously);
 

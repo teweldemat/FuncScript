@@ -182,4 +182,39 @@ public class Tests
         Assert.That(FuncScript.FormatToJson(FuncScript.NormalizeDataType(new {r="2y",m="2z"})),Is.EqualTo(json));
 
     }
+    [Test]
+    public async Task EvaluateFileFunctionWithEmptyPath_ShouldReturnErrorInPProperty()
+    {
+        // The expression creates x = file(''),
+        // then attempts to format x via p = f'{x}',
+        // finally returns an object { p }.
+        var expression = "{ x: file(''); p: f'{x}'; } { p }";
+
+        // Prepare our single ExecutionNode.
+        var node = new ExecutionNode
+        {
+            Name = "testNode",
+            Expression = expression,
+            ExpressionType = ExpressionType.FuncScript,
+            Children = new ExecutionNode[0]
+        };
+
+        // Build the session.
+        var session = new ExecutionSession(new[] { node },  null);
+
+        // Evaluate the node by name.
+        var result = await session.EvaluateNodeAsync("testNode");
+
+        // We expect an object with one key: "p".
+        Assert.That(result, Is.InstanceOf<KeyValueCollection>(), 
+            "Result should be an FsObject (key-value structure in FuncScript).");
+
+        var fsObj = (KeyValueCollection)result;
+        Assert.That(fsObj.IsDefined("p"), 
+            "Returned object should contain a key 'p'.");
+
+        var pValue = fsObj.Get("p");
+        Assert.That(pValue, Is.InstanceOf<FsError>(), 
+            "The 'p' value should be an FsError due to file('') being invalid.");
+    }
 }

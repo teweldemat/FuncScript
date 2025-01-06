@@ -55,7 +55,7 @@ namespace funcscript.block
 
         public override void SetReferenceProvider(KeyValueCollection provider)
         {
-            
+            Source.SetReferenceProvider(provider);
         }
         public override ExpressionBlock CloneExpression()
         {
