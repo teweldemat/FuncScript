@@ -1,11 +1,26 @@
 using funcscript.core;
 using funcscript.model;
 using System;
+using System.Collections.Concurrent;
 using System.Diagnostics;
-using System.Text;
+using System.Linq;
+using System.Threading;
+using System.Collections.Generic;
 
 namespace funcscript.funcs.os
 {
+    public class ShellResult
+    {
+        public int exitCode { get; set; }
+        public List<ShellMessage> output { get; set; } = new List<ShellMessage>();
+    }
+
+    public class ShellMessage
+    {
+        public string msg { get; set; }
+        public bool error { get; set; }
+    }
+
     internal class ShellFunction : IFsFunction
     {
         public CallType CallType => CallType.Prefix;
@@ -24,7 +39,7 @@ namespace funcscript.funcs.os
             var cmdParam = pars[0];
             var timeoutParam = pars.Length == 2 ? pars[1] : null;
 
-            if (!(cmdParam is string))
+            if (cmdParam is not string)
                 return new FsError(
                     FsError.ERROR_TYPE_MISMATCH,
                     $"Function {Symbol}: Type mismatch. First parameter (command) must be string."
@@ -60,11 +75,30 @@ namespace funcscript.funcs.os
 
                 using (var process = new Process { StartInfo = psi })
                 {
-                    var stdoutBuilder = new StringBuilder();
+                    var messages = new ConcurrentBag<(int index, bool error, string msg)>();
+                    int counter = 0;
+
+                    process.OutputDataReceived += (_, args) =>
+                    {
+                        if (args.Data != null)
+                        {
+                            int myIndex = System.Threading.Interlocked.Increment(ref counter);
+                            messages.Add((myIndex, false, args.Data));
+                        }
+                    };
+
+                    process.ErrorDataReceived += (_, args) =>
+                    {
+                        if (args.Data != null)
+                        {
+                            int myIndex = System.Threading.Interlocked.Increment(ref counter);
+                            messages.Add((myIndex, true, args.Data));
+                        }
+                    };
+
                     process.Start();
-                    
-                    stdoutBuilder.AppendLine(process.StandardOutput.ReadToEnd());
-                    stdoutBuilder.AppendLine(process.StandardError.ReadToEnd());
+                    process.BeginOutputReadLine();
+                    process.BeginErrorReadLine();
 
                     if (timeoutMs.HasValue)
                     {
@@ -82,7 +116,18 @@ namespace funcscript.funcs.os
                         process.WaitForExit();
                     }
 
-                    return stdoutBuilder.ToString();
+                    var exitCode = process.ExitCode;
+                    var ordered = messages.OrderBy(x => x.index);
+
+                    var result = new ShellResult
+                    {
+                        exitCode = exitCode,
+                        output = ordered
+                            .Select(o => new ShellMessage { msg = o.msg, error = o.error })
+                            .ToList()
+                    };
+
+                    return FuncScript.NormalizeDataType(result);
                 }
             }
             catch (Exception ex)
