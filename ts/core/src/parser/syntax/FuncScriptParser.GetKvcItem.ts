@@ -14,158 +14,142 @@ export function GetKvcItem(
     allowImplicitReturn: boolean
 ): ParseResult {
 
-    const originalIndex = index;
     let parseNode: ParseNode | null = null;
-
-    // Try to parse a simple string as key
-    const simpleStringResult = GetSimpleString(context, index);
     let name: string | null = null;
+    let nameLower: string | null = null;
     let nodeName: ParseNode | null = null;
-    let i = simpleStringResult.NextIndex;
+    const tokenStart = index;
 
+    const simpleStringResult = GetSimpleString(context, index);
+    let i = simpleStringResult.NextIndex;
     if (i === index) {
-        // No simple string => try identifier
         const idResult = GetIdentifier(context, index, false);
         i = idResult.NextIndex;
         if (i === index) {
-            // No identifier => fallback to return definition if allowed
-            if (allowReturn) {
-                const returnDefResult = GetReturnDefinition(context, index);
-                if (returnDefResult.NextIndex > index) {
-                    // We found a return definition
-                    return {
-                        ParseNode: returnDefResult.ParseNode,
-                        NextIndex: returnDefResult.NextIndex
-                    };
-                }
+            if (!allowReturn) {
+                return {
+                    ParseNode: null,
+                    NextIndex: index
+                };
+            }
+            const returnDefResult = GetReturnDefinition(context, index, allowImplicitReturn);
+            if (returnDefResult.NextIndex > index) {
+                return {
+                    ParseNode: returnDefResult.ParseNode,
+                    NextIndex: returnDefResult.NextIndex
+                };
+            }
+            if (!allowKeyOnly) {
+                return {
+                    ParseNode: null,
+                    NextIndex: index
+                };
             }
 
-            // No return or key => if key-only is allowed, re-check identifier or string
-            if (allowKeyOnly) {
-                // Re-check identifier
-                const idRes2 = GetIdentifier(context, index, false);
-                if (idRes2.NextIndex > index) {
-                    // Key-only identifier
-                    const singleNode = new ParseNode(
-                        ParseNodeType.Identifier,
-                        index,
-                        idRes2.NextIndex - index
-                    );
-                    return {
-                        ParseNode: singleNode,
-                        NextIndex: idRes2.NextIndex
-                    };
-                }
-
-                // Re-check simple string
-                const strRes2 = GetSimpleString(context, index);
-                if (strRes2.NextIndex > index) {
-                    // Key-only simple string
-                    const singleNode = new ParseNode(
-                        ParseNodeType.LiteralString,
-                        index,
-                        strRes2.NextIndex - index
-                    );
-                    return {
-                        ParseNode: singleNode,
-                        NextIndex: strRes2.NextIndex
-                    };
-                }
+            const identifierResult = GetIdentifier(context, index, false);
+            if (identifierResult.NextIndex > index) {
+                const singleNode = new ParseNode(
+                    ParseNodeType.Identifier,
+                    index,
+                    identifierResult.NextIndex - index
+                );
+                return {
+                    ParseNode: singleNode,
+                    NextIndex: identifierResult.NextIndex
+                };
             }
 
-            // Could not parse anything
+            const strRes2 = GetSimpleString(context, index);
+            if (strRes2.NextIndex > index) {
+                const singleNode = new ParseNode(
+                    ParseNodeType.LiteralString,
+                    index,
+                    strRes2.NextIndex - index
+                );
+                return {
+                    ParseNode: singleNode,
+                    NextIndex: strRes2.NextIndex
+                };
+            }
+
             return {
                 ParseNode: null,
                 NextIndex: index
             };
         } else {
-            // We have an identifier as key
             name = idResult.Iden;
+            nameLower = idResult.IdenLower;
             nodeName = idResult.ParseNode;
         }
     } else {
-        // We have a simple string as key
         name = simpleStringResult.Str;
+        nameLower = name!.toLowerCase();
         nodeName = simpleStringResult.ParseNode;
-        // We may want to set NodeType to LiteralString or Key here.
     }
 
-    // We have a key (string or identifier). Check for colon
     i = SkipSpace(context, i).NextIndex;
     const colonMatch = GetLiteralMatch(context, i, ":");
     if (colonMatch.NextIndex === i) {
-        // No colon => check if key-only is allowed
         if (!allowKeyOnly) {
-            // Possibly parse the entire expression as an implicit return?
             if (allowImplicitReturn) {
-                const exprResult = GetExpression(context, originalIndex);
-                if (exprResult.NextIndex > i) {
-                    // We recognized an expression from originalIndex
+                const exprResult = GetExpression(context, tokenStart);
+                if (exprResult.NextIndex > tokenStart) {
                     return {
                         ParseNode: exprResult.ParseNode,
                         NextIndex: exprResult.NextIndex
                     };
                 }
             }
-            // Still no parse => error
-            context.SyntaxErrors.push(
-                new SyntaxErrorData(i, 0, "':' expected")
-            );
+            context.SyntaxErrors.push(new SyntaxErrorData(i, 0, "':' expected"));
             return {
                 ParseNode: null,
-                NextIndex: originalIndex
+                NextIndex: index
             };
         }
 
-        // Key-only is allowed => just return the key parse node
         if (nodeName) {
             nodeName.NodeType = ParseNodeType.Key;
-            nodeName.Pos = originalIndex;
-            nodeName.Length = i - originalIndex;
         }
+        parseNode = new ParseNode(
+            ParseNodeType.Identifier,
+            index,
+            i - index,
+            nodeName ? [nodeName] : []
+        );
         return {
-            ParseNode: nodeName,
+            ParseNode: parseNode,
             NextIndex: i
         };
     }
 
-    // Consume the colon
     i = colonMatch.NextIndex;
     i = SkipSpace(context, i).NextIndex;
-
-    // Parse the value expression
     const valueResult = GetExpression(context, i);
     if (valueResult.NextIndex === i) {
-        // No value expression
-        context.SyntaxErrors.push(
-            new SyntaxErrorData(i, 0, "value expression expected")
-        );
+        context.SyntaxErrors.push(new SyntaxErrorData(i, 0, "value expression expected"));
         return {
             ParseNode: null,
-            NextIndex: originalIndex
+            NextIndex: index
         };
     }
     i = valueResult.NextIndex;
     i = SkipSpace(context, i).NextIndex;
 
-    // Construct the key node
     if (nodeName) {
         nodeName.NodeType = ParseNodeType.Key;
     }
-
-    // Construct the key-value pair node
-    const pairNode = new ParseNode(
+    parseNode = new ParseNode(
         ParseNodeType.KeyValuePair,
-        originalIndex,
-        i - originalIndex,
+        tokenStart,
+        i - tokenStart,
         [
-            nodeName ? nodeName : new ParseNode(ParseNodeType.Key, originalIndex, 0),
+            nodeName ? nodeName : new ParseNode(ParseNodeType.Key, tokenStart, 0),
             valueResult.ParseNode!
         ]
     );
 
     return {
-        ParseNode: pairNode,
+        ParseNode: parseNode,
         NextIndex: i
     };
 }
