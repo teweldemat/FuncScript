@@ -29,6 +29,8 @@ namespace funcscript.funcs.math
                         isLong = true;
                     else if (d is double)
                         isDouble = true;
+                    else
+                        return new FsError(FsError.ERROR_TYPE_MISMATCH, $"{this.Symbol}: type mismatch");
                 }
 
                 if (isInt)
@@ -47,6 +49,7 @@ namespace funcscript.funcs.math
                         isDouble = true;
                         doubleTotal = intTotal;
                     }
+
                 }
 
                 if (isLong)
@@ -64,6 +67,7 @@ namespace funcscript.funcs.math
                         isDouble = true;
                         doubleTotal = longTotal;
                     }
+
                 }
 
                 if (isDouble)
@@ -80,6 +84,7 @@ namespace funcscript.funcs.math
                     {
                         doubleTotal *= (double)d;
                     }
+
                 }
             }
 
