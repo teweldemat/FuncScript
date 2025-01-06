@@ -206,14 +206,23 @@ public class ExecutionSession : KeyValueCollection
         if (node == null)
             return null;
         var c = node.GetCache();
-        
+
+        string? json = null;
+        try
+        {
+            json=c==null?null:FuncScript.FormatToJson(c);
+        }
+        catch (Exception e)
+        {
+            json = e.Message;
+        }
         return new ExpressionNodeInfoWithExpression
         {
             Name = node.Name,
             ExpressionType = node.ExpressionType,
             ChildrenCount = node.Children.Count,
             Expression = node.Expression,
-            CachedValue = c==null?null:FuncScript.FormatToJson(c),
+            CachedValue = json,
             IsCached = node.IsCached()
         };
     }
@@ -283,9 +292,16 @@ public class ExecutionSession : KeyValueCollection
             if (task.IsFaulted && task.Exception != null)
             {
                 _evaluationException = task.Exception.GetBaseException();
+                var msg = _evaluationException.Message + "\n" + _evaluationException.StackTrace;
+                var ex = _evaluationException.InnerException;
+                while (ex!=null)
+                {
+                    msg += $"\n{ex.Message}\n{ex.StackTrace}";
+                    ex = ex.InnerException;
+                }
                 logger.SendObject("evaluation_error", new {
                     sessionId = SessionId,
-                    error = _evaluationException.Message
+                    error = msg
                 });
             }
             else

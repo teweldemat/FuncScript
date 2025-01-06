@@ -14,13 +14,13 @@ export interface FileNode {
 interface FileTreeProps {
   onSelected: (path: string) => void;
   initiallySelectedPath: string | null;
-  disabled:boolean;
+  readOnly:boolean;
 }
 
 const FileTree: React.FC<FileTreeProps> = ({
   onSelected,
   initiallySelectedPath,
-  disabled
+  readOnly: disabled
 }) => {
   const [treeData, setTreeData] = useState<FileNode | null>(null);
   const [selectedPath, setSelectedPath] = useState<string>(

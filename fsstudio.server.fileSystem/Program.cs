@@ -93,6 +93,7 @@ internal class Program
     private static void InitFuncScript()
     {
         DefaultFsDataProvider.LoadFromAssembly(typeof(funcscript.openai.ChatGptFunction).Assembly);
+        DefaultFsDataProvider.LoadFromAssembly(typeof(funcscript.sql.core.PgSqlFunction).Assembly);
     }
 
 }

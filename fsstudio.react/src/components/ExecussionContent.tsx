@@ -10,7 +10,8 @@ import { ExpressionType } from './SessionContext';
 interface ExecussionContentProps {
     expression: string | null;
     setExpression: (val: string | null) => void;
-    displayedResult: string;
+    displayedResult: string|null;
+    displayedError: string|null;
     handleCopy: () => void;
     copied: boolean;
     displayedMessages: any[];
@@ -23,6 +24,7 @@ export default function ExecussionContent({
     expression,
     setExpression,
     displayedResult,
+    displayedError,
     handleCopy,
     copied,
     displayedMessages,
@@ -94,9 +96,10 @@ export default function ExecussionContent({
                                     padding: '10px',
                                     fontFamily: '"Lucida Console", monospace',
                                     flex: 1,
+                                    color: displayedError ? 'red' : 'inherit'
                                 }}
                             >
-                                {displayedResult}
+                                {displayedError || displayedResult}
                             </pre>
                         </Box>
                     )}

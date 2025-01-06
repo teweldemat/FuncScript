@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using funcscript;
 using funcscript.host;
 
 namespace fsstudio.server.fileSystem.exec

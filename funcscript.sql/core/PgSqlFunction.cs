@@ -19,33 +19,40 @@ namespace funcscript.sql.core
 
             if (pars[1] is not string query)
                 throw new InvalidOperationException($"{Symbol} - {ParName(1)} is required");
-
-            using var conn = new NpgsqlConnection(connectionStr);
-            conn.Open();
-
-            using var cmd = new NpgsqlCommand(query, conn);
-            cmd.CommandTimeout = 0;
-
-            if (pars.Length > 2 && pars[2] is not null)
+            try
             {
-                cmd.Parameters.AddWithValue("@param", pars[2]);
-            }
+                using var conn = new NpgsqlConnection(connectionStr);
+                conn.Open();
 
-            using var reader = cmd.ExecuteReader();
-            var results = new List<SimpleKeyValueCollection>();
-            while (reader.Read())
-            {
-                var row = new List<KeyValuePair<string, object?>>();
-                for (var i = 0; i < reader.FieldCount; i++)
+                using var cmd = new NpgsqlCommand(query, conn);
+                cmd.CommandTimeout = 0;
+
+                if (pars.Length > 2 && pars[2] is not null)
                 {
-                    var value = FuncScriptSql.NormalizeDataType(reader.GetValue(i));
-                    row.Add(new KeyValuePair<string, object?>(reader.GetName(i), value));
+                    cmd.Parameters.AddWithValue("@param", pars[2]);
                 }
-                results.Add(new SimpleKeyValueCollection(null,row.ToArray()));
+
+                using var reader = cmd.ExecuteReader();
+                var results = new List<SimpleKeyValueCollection>();
+                while (reader.Read())
+                {
+                    var row = new List<KeyValuePair<string, object?>>();
+                    for (var i = 0; i < reader.FieldCount; i++)
+                    {
+                        var value = FuncScriptSql.NormalizeDataType(reader.GetValue(i));
+                        row.Add(new KeyValuePair<string, object?>(reader.GetName(i), value));
+                    }
+                    results.Add(new SimpleKeyValueCollection(null,row.ToArray()));
+                }
+
+                var normalizedResults = FuncScript.NormalizeDataType(results);
+                return normalizedResults ?? "null";
+            }
+            catch (Exception e)
+            {
+                return new FsError(e);
             }
 
-            var normalizedResults = FuncScript.NormalizeDataType(results);
-            return normalizedResults ?? "null";
         }
 
         public string? ParName(int index)

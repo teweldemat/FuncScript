@@ -162,13 +162,13 @@ export function ExecussionSessionView() {
     const filePath = session?.filePath ?? null;
     const evaluationInProgress = !!session?.evaluationInProgressNodePath;
     const isSaveDisabled = expression === lastSavedExpression || evaluationInProgress;
-    const displayedResult = selectedNode?.evaluationRes || '';
+    const displayedResult = selectedNode?.evaluationRes || null;
+    const displayedError = selectedNode?.evaluationError || null;
     const displayedMessages = session?.messages || [];
     const displayedMarkdown = session?.markdown || '';
 
     const handleFileSelect = useCallback(
         async (selectedFile: string) => {
-            if (evaluationInProgress) return;
             if (selectedFile === '') {
                 setSession(null);
             } else {
@@ -176,7 +176,7 @@ export function ExecussionSessionView() {
                 setSession(newSession);
             }
         },
-        [createSession, evaluationInProgress]
+        [createSession]
     );
 
     return (
@@ -202,8 +202,7 @@ export function ExecussionSessionView() {
                     <FileTree
                         onSelected={handleFileSelect}
                         initiallySelectedPath=""
-                        // You can add a `disabled` prop if FileTree supports it
-                        disabled={evaluationInProgress}
+                        readOnly={false}
                     />
                 </Box>
             </Grid>
@@ -255,6 +254,7 @@ export function ExecussionSessionView() {
                         expression={expression}
                         setExpression={(val) => !evaluationInProgress && setExpression(val)}
                         displayedResult={displayedResult}
+                        displayedError={displayedError}
                         handleCopy={handleCopy}
                         copied={copied}
                         displayedMessages={displayedMessages}

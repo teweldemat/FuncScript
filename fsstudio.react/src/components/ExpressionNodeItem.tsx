@@ -29,21 +29,12 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import TextFieldsIcon from '@mui/icons-material/TextFields';
 import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
-import { ExpressionType, NodeState, SessionState, useExecutionSession } from './SessionContext';
-
-interface ExpressionNodeItemProps {
-  session: SessionState;
-  nodePath?: string;
-  nodeInfo: NodeState;
-  onSelect: (nodePath: string | null) => void;
-  selectedNode: string | null;
-  readonly: boolean;
-}
-
-function getParentPath(fullPath: string) {
-  const idx = fullPath.lastIndexOf('.');
-  return idx > 0 ? fullPath.slice(0, idx) : null;
-}
+import {
+  ExpressionType,
+  NodeState,
+  SessionState,
+  useExecutionSession,
+} from './SessionContext';
 
 function getIconForExpressionType(expressionType: ExpressionType) {
   switch (expressionType) {
@@ -65,13 +56,22 @@ function getIconForExpressionType(expressionType: ExpressionType) {
   }
 }
 
+interface ExpressionNodeItemProps {
+  session: SessionState;
+  nodePath?: string;
+  nodeInfo: NodeState;
+  onSelect: (nodePath: string | null) => void;
+  selectedNode: string | null;
+  readonly: boolean;
+}
+
 const ExpressionNodeItem: React.FC<ExpressionNodeItemProps> = ({
   session,
   nodePath,
   nodeInfo,
   onSelect,
   selectedNode,
-  readonly
+  readonly,
 }) => {
   const {
     loadChildNodeList,
@@ -82,12 +82,18 @@ const ExpressionNodeItem: React.FC<ExpressionNodeItemProps> = ({
     moveNode,
   } = useExecutionSession() || {};
 
+  // -------------------------------------------------------------------------
+  // 1) Track which menu action was clicked
+  // -------------------------------------------------------------------------
+  const [menuAction, setMenuAction] = useState<string | null>(null);
   const [menuAnchorEl, setMenuAnchorEl] = useState<HTMLElement | null>(null);
+
   const [renameMode, setRenameMode] = useState(false);
   const [renamedName, setRenamedName] = useState(nodeInfo.name);
   const [newInputMode, setNewInputMode] = useState(false);
   const [newName, setNewName] = useState('');
   const [deleteItem, setDeleteItem] = useState(false);
+
   const isOpen = !nodePath ? true : !!session?.expandedNodes[nodePath];
   const isEvaluating = nodeInfo.evaluating;
   const displayName = nodeInfo.name + (isEvaluating ? ' (evaluating ..)' : '');
@@ -112,9 +118,14 @@ const ExpressionNodeItem: React.FC<ExpressionNodeItemProps> = ({
     setMenuAnchorEl(null);
   };
 
+  // -------------------------------------------------------------------------
+  // 2) Set the menuAction directly instead of trying to read from the DOM
+  // -------------------------------------------------------------------------
   const handleMenuAction = async (action: string) => {
     if (readonly) return;
+    setMenuAction(action);
     handleCloseMenu();
+
     switch (action) {
       case 'add-standard':
       case 'add-text':
@@ -138,18 +149,37 @@ const ExpressionNodeItem: React.FC<ExpressionNodeItemProps> = ({
     onSelect(nodePath);
   };
 
+  // -------------------------------------------------------------------------
+  // 3) Use menuAction to decide the ExpressionType
+  // -------------------------------------------------------------------------
   const handleAddItem = async () => {
-    if (!session || readonly || newName.trim() === '') return;
+    if (!session || readonly || newName.trim() === '' || !menuAction) return;
+
     const parentPath = nodePath || null;
-    let newType = ExpressionType.FuncScript;
-    if (menuAnchorEl?.textContent?.toLowerCase().includes('text template')) {
-      newType = ExpressionType.FuncScriptTextTemplate;
-    } else if (menuAnchorEl?.textContent?.toLowerCase().includes('text')) {
-      newType = ExpressionType.ClearText;
+    let newType: ExpressionType;
+
+    switch (menuAction) {
+      case 'add-text':
+        newType = ExpressionType.ClearText;
+        break;
+      case 'add-text-template':
+        newType = ExpressionType.FuncScriptTextTemplate;
+        break;
+      case 'add-standard':
+      default:
+        newType = ExpressionType.FuncScript;
+        break;
     }
+
+    // Create the new node
     await createNode?.(session, parentPath, newName, '', newType);
+
+    // Reset states
     setNewName('');
     setNewInputMode(false);
+    setMenuAction(null);
+
+    // Reload children
     if (nodePath) {
       await loadChildNodeList?.(session, nodePath);
     } else {
@@ -161,8 +191,10 @@ const ExpressionNodeItem: React.FC<ExpressionNodeItemProps> = ({
     if (!nodePath || !session || readonly) return;
     await removeNode?.(session, nodePath);
     setDeleteItem(false);
-    const parent = getParentPath(nodePath);
-    await loadChildNodeList?.(session, parent);
+    // Reload the parent after deletion
+    const parentPath = nodePath.includes('.') ? nodePath.split('.').slice(0, -1).join('.') : null;
+    await loadChildNodeList?.(session, parentPath);
+    // If we were viewing the deleted node, deselect it
     if (selectedNode === nodePath) {
       onSelect(null);
     }
@@ -175,8 +207,9 @@ const ExpressionNodeItem: React.FC<ExpressionNodeItemProps> = ({
     }
     await renameNode?.(session, nodePath, renamedName);
     setRenameMode(false);
-    const parent = getParentPath(nodePath);
-    await loadChildNodeList?.(session, parent);
+    // Reload the parent so we see the updated name
+    const parentPath = nodePath.includes('.') ? nodePath.split('.').slice(0, -1).join('.') : null;
+    await loadChildNodeList?.(session, parentPath);
   };
 
   const handleDragStart = (e: React.DragEvent) => {
@@ -193,10 +226,15 @@ const ExpressionNodeItem: React.FC<ExpressionNodeItemProps> = ({
     if (readonly) return;
     e.preventDefault();
     const sourcePath = e.dataTransfer.getData('text/plain');
-    if (!sourcePath) return;
-    if (sourcePath === nodePath) return;
-    if (!session) return;
-    const newParentPath = nodeInfo.childrenCount >= 0 ? nodePath : getParentPath(nodePath || '');
+    if (!sourcePath || !session || sourcePath === nodePath) return;
+
+    // If this node is a folder-like node, we can drop inside it;
+    // otherwise, we drop it alongside (its parent).
+    const canContainChildren = nodeInfo.childrenCount >= 0;
+    const newParentPath = canContainChildren
+      ? nodePath
+      : nodePath?.split('.').slice(0, -1).join('.') || null;
+
     if (!newParentPath) return;
     await moveNode?.(session, sourcePath, newParentPath);
   };
@@ -215,6 +253,7 @@ const ExpressionNodeItem: React.FC<ExpressionNodeItemProps> = ({
           backgroundColor: selectedNode === nodePath ? 'lightgray' : 'inherit',
         }}
       >
+        {/* Top-level add buttons, displayed if there's NO nodePath */}
         {!nodePath && !readonly && (
           <Box sx={{ display: 'flex', alignItems: 'center', mr: 1 }}>
             <Tooltip title="Add Standard">
@@ -277,6 +316,7 @@ const ExpressionNodeItem: React.FC<ExpressionNodeItemProps> = ({
                   key={mi}
                   onClick={(event) => {
                     event.stopPropagation();
+                    // Translate the text into the action string you want.
                     handleMenuAction(mi.toLowerCase().replaceAll(' ', '-'));
                   }}
                 >
@@ -338,6 +378,7 @@ const ExpressionNodeItem: React.FC<ExpressionNodeItemProps> = ({
               if (e.key === 'Escape') {
                 setNewInputMode(false);
                 setNewName('');
+                setMenuAction(null);
               }
             }}
             autoFocus

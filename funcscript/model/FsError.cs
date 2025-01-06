@@ -12,6 +12,19 @@ public class FsError
     public string ErrorMessage { get; set; }
     public object ErrorData { get; set; }
 
+    public FsError(Exception ex)
+    {
+        var msg = ex.Message + "\n" + ex.StackTrace;
+        var inner = ex.InnerException;
+        while (inner != null)
+        {
+            msg += "\n" + ex.Message + "\n" + ex.StackTrace;
+            inner = inner.InnerException;
+        }
+
+        ErrorType = ERROR_TYPE_EVALUATION;
+        ErrorMessage = msg;
+    }
     public FsError(string messsage) : this(ERROR_DEFAULT, messsage, null)
     {
         
