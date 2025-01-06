@@ -82,9 +82,6 @@ const ExpressionNodeItem: React.FC<ExpressionNodeItemProps> = ({
     moveNode,
   } = useExecutionSession() || {};
 
-  // -------------------------------------------------------------------------
-  // 1) Track which menu action was clicked
-  // -------------------------------------------------------------------------
   const [menuAction, setMenuAction] = useState<string | null>(null);
   const [menuAnchorEl, setMenuAnchorEl] = useState<HTMLElement | null>(null);
 
@@ -118,9 +115,6 @@ const ExpressionNodeItem: React.FC<ExpressionNodeItemProps> = ({
     setMenuAnchorEl(null);
   };
 
-  // -------------------------------------------------------------------------
-  // 2) Set the menuAction directly instead of trying to read from the DOM
-  // -------------------------------------------------------------------------
   const handleMenuAction = async (action: string) => {
     if (readonly) return;
     setMenuAction(action);
@@ -149,12 +143,8 @@ const ExpressionNodeItem: React.FC<ExpressionNodeItemProps> = ({
     onSelect(nodePath);
   };
 
-  // -------------------------------------------------------------------------
-  // 3) Use menuAction to decide the ExpressionType
-  // -------------------------------------------------------------------------
   const handleAddItem = async () => {
     if (!session || readonly || newName.trim() === '' || !menuAction) return;
-
     const parentPath = nodePath || null;
     let newType: ExpressionType;
 
@@ -171,30 +161,33 @@ const ExpressionNodeItem: React.FC<ExpressionNodeItemProps> = ({
         break;
     }
 
-    // Create the new node
     await createNode?.(session, parentPath, newName, '', newType);
 
-    // Reset states
+    // Expand the parent if it's not open
+    if (nodePath && !session.expandedNodes[nodePath]) {
+      toggleNodeExpanded?.(session, nodePath);
+    }
+
+    // Reload child list
+    await loadChildNodeList?.(session, nodePath??'');
+
+    // Select the newly created node
+    const newChildPath = nodePath ? `${nodePath}.${newName}` : newName;
+    onSelect(newChildPath);
+
     setNewName('');
     setNewInputMode(false);
     setMenuAction(null);
-
-    // Reload children
-    if (nodePath) {
-      await loadChildNodeList?.(session, nodePath);
-    } else {
-      await loadChildNodeList?.(session, null);
-    }
   };
 
   const handleDeleteItem = async () => {
     if (!nodePath || !session || readonly) return;
     await removeNode?.(session, nodePath);
     setDeleteItem(false);
-    // Reload the parent after deletion
+
     const parentPath = nodePath.includes('.') ? nodePath.split('.').slice(0, -1).join('.') : null;
     await loadChildNodeList?.(session, parentPath);
-    // If we were viewing the deleted node, deselect it
+
     if (selectedNode === nodePath) {
       onSelect(null);
     }
@@ -207,7 +200,7 @@ const ExpressionNodeItem: React.FC<ExpressionNodeItemProps> = ({
     }
     await renameNode?.(session, nodePath, renamedName);
     setRenameMode(false);
-    // Reload the parent so we see the updated name
+
     const parentPath = nodePath.includes('.') ? nodePath.split('.').slice(0, -1).join('.') : null;
     await loadChildNodeList?.(session, parentPath);
   };
@@ -228,8 +221,6 @@ const ExpressionNodeItem: React.FC<ExpressionNodeItemProps> = ({
     const sourcePath = e.dataTransfer.getData('text/plain');
     if (!sourcePath || !session || sourcePath === nodePath) return;
 
-    // If this node is a folder-like node, we can drop inside it;
-    // otherwise, we drop it alongside (its parent).
     const canContainChildren = nodeInfo.childrenCount >= 0;
     const newParentPath = canContainChildren
       ? nodePath
@@ -253,7 +244,6 @@ const ExpressionNodeItem: React.FC<ExpressionNodeItemProps> = ({
           backgroundColor: selectedNode === nodePath ? 'lightgray' : 'inherit',
         }}
       >
-        {/* Top-level add buttons, displayed if there's NO nodePath */}
         {!nodePath && !readonly && (
           <Box sx={{ display: 'flex', alignItems: 'center', mr: 1 }}>
             <Tooltip title="Add Standard">
@@ -316,26 +306,23 @@ const ExpressionNodeItem: React.FC<ExpressionNodeItemProps> = ({
                   key={mi}
                   onClick={(event) => {
                     event.stopPropagation();
-                    // Translate the text into the action string you want.
                     handleMenuAction(mi.toLowerCase().replaceAll(' ', '-'));
                   }}
                 >
                   {mi}
                 </MenuItem>
               ))
-            : ['Add Standard', 'Add Text', 'Add Text Template', 'Rename', 'Delete'].map(
-                (mi) => (
-                  <MenuItem
-                    key={mi}
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      handleMenuAction(mi.toLowerCase().replaceAll(' ', '-'));
-                    }}
-                  >
-                    {mi}
-                  </MenuItem>
-                )
-              )}
+            : ['Add Standard', 'Add Text', 'Add Text Template', 'Rename', 'Delete'].map((mi) => (
+                <MenuItem
+                  key={mi}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    handleMenuAction(mi.toLowerCase().replaceAll(' ', '-'));
+                  }}
+                >
+                  {mi}
+                </MenuItem>
+              ))}
         </Menu>
 
         {nodePath && nodeInfo.childrenCount > 0 && (

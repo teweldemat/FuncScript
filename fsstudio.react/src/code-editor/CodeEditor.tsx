@@ -11,7 +11,6 @@ const CodeEditor: React.FC<{
   // Add this prop
 }> = ({ expression, setExpression, expressionType,readOnly }) => {
   const editorRef = useRef<HTMLDivElement | null>(null);
-  console.log(readOnly)
   useCodeMirror({
     container: editorRef.current,
     value: expression ?? '',

@@ -360,6 +360,8 @@
                 body: JSON.stringify(body),
             });
             if (!res.ok) throw new Error(await res.text());
+            if(parentNodePath && parentNodePath!='')
+                await loadNode(session,parentNodePath)
             await loadChildNodeList(session, parentNodePath);
         };
 
@@ -375,8 +377,6 @@
             const parentPathParts = nodePath.split('.');
             parentPathParts.pop();
             const parentNodePath = parentPathParts.length > 0 ? parentPathParts.join('.') : null;
-            if(parentNodePath && parentNodePath!='')
-                await loadNode(session,parentNodePath)
             await loadChildNodeList(session, parentNodePath);
         };
 
