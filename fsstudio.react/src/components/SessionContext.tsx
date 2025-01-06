@@ -477,11 +477,14 @@
             const parentPathParts = nodePath.split('.');
             parentPathParts.pop();
             const oldParent = parentPathParts.length > 0 ? parentPathParts.join('.') : null;
-            if (oldParent) await loadChildNodeList(session, oldParent);
+            await loadChildNodeList(session, oldParent);
             await loadChildNodeList(session, newParentPath ?? null);
         };
 
         const loadChildNodeList = async (session: SessionState, nodePath: string | null) => {
+            console.log('loadChildNodeList')
+            console.log(nodePath)
+
             const params = new URLSearchParams();
             if (nodePath) {
                 params.set('nodePath', nodePath);
@@ -524,6 +527,8 @@
                         updatedSession = { ...updatedSession, rootNode: updatedRoot };
                     }
                 } else {
+                    console.log('updated parent')
+                    console.log(children)
                     updatedSession = {
                         ...updatedSession,
                         rootNode: {
