@@ -100,7 +100,7 @@ namespace funcscript.core
                     if (allowImplicitReturn)
                     {
                         var retExp = GetExpression(context, tokenStart);
-                        if (retExp.NextIndex > i)
+                        if (retExp.NextIndex > tokenStart)
                         {
                             item = new KvcExpression.KeyValueExpression
                             {

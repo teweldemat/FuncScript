@@ -33,6 +33,7 @@ async function createWindow(isDev) {
     }
     mainWindow = null;
   });
+
   mainWindow.webContents.on('will-navigate', (event, url) => {
     if (url.endsWith('/open-folder-dialog')) {
       event.preventDefault();
@@ -54,13 +55,36 @@ async function createWindow(isDev) {
           .catch(err => console.error(err));
         }
       });
+    } else if (url.endsWith('/create-folder-dialog')) {
+      event.preventDefault();
+      dialog.showSaveDialog(mainWindow, {
+        title: 'Create Folder',
+        buttonLabel: 'Create'
+      }).then(result => {
+        if (!result.canceled && result.filePath) {
+          fs.mkdir(result.filePath, { recursive: true }, err => {
+            if (!err) {
+              const port = isDev ? 5099 : 5091;
+              fetch(`http://localhost:${port}/api/FileSystem/SetRootFolder`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ newRootFolder: result.filePath })
+              })
+              .then(response => {
+                if (response.ok) {
+                  mainWindow.reload();
+                }
+              })
+              .catch(err => console.error(err));
+            }
+          });
+        }
+      });
     }
   });
 }
 
 app.whenReady().then(async () => {
-  //const { default: isDev } = await import('electron-is-dev');
-  //const isDev=false;
   const isDev = !app.isPackaged;
   if (isDev) {
     await createWindow(isDev);
@@ -71,7 +95,6 @@ app.whenReady().then(async () => {
       'server',
       'fsstudio.server.fileSystem'
     );
-
     fs.access(serverExec, fs.constants.F_OK, async (err) => {
       if (err) {
         await createWindow();
@@ -83,7 +106,6 @@ app.whenReady().then(async () => {
         serverProcess.stderr.on('data', (data) => {
           console.error(`Server Error: ${data}`);
         });
-
         await createWindow();
         waitForServerAndLoadUrl('http://localhost:5091', mainWindow);
       }

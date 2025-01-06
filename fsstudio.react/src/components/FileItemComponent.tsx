@@ -1,3 +1,5 @@
+// FileItemComponent.tsx
+
 import React, { useState, MouseEvent } from 'react';
 import {
     ListItem,
@@ -25,7 +27,11 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
 import NoteAddIcon from '@mui/icons-material/NoteAdd';
-import FolderOpenIcon from '@mui/icons-material/FolderOpen';
+import ImportContactsIcon from '@mui/icons-material/ImportContacts';
+import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
+import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import { FileNode } from './FileTree';
 
 interface FileItemProps {
@@ -61,10 +67,15 @@ const FileItemComponent: React.FC<FileItemProps> = ({
 
     const isRoot = fileNode.path === '/';
 
-    const handleRootAction = (action: 'open-folder' | 'add-folder' | 'add-file') => {
+    const handleRootAction = (
+        action: 'open-project' | 'create-project' | 'add-folder' | 'add-file'
+    ) => {
         switch (action) {
-            case 'open-folder':
+            case 'open-project':
                 window.location.href = '/open-folder-dialog';
+                break;
+            case 'create-project':
+                window.location.href = '/create-folder-dialog';
                 break;
             case 'add-folder':
                 setNewInputMode(true);
@@ -115,9 +126,14 @@ const FileItemComponent: React.FC<FileItemProps> = ({
                         padding: '8px',
                     }}
                 >
-                    <Tooltip title="Open Folder">
-                        <IconButton onClick={() => handleRootAction('open-folder')}>
-                            <FolderOpenIcon />
+                    <Tooltip title="Open Project">
+                        <IconButton onClick={() => handleRootAction('open-project')}>
+                            <ImportContactsIcon />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Create Project">
+                        <IconButton onClick={() => handleRootAction('create-project')}>
+                            <LibraryAddIcon />
                         </IconButton>
                     </Tooltip>
                     <Tooltip title="Add Folder">
@@ -137,7 +153,8 @@ const FileItemComponent: React.FC<FileItemProps> = ({
                         display: 'flex',
                         alignItems: 'center',
                         width: '100%',
-                        backgroundColor: fileNode.path === selectedPath ? 'lightgray' : 'inherit',
+                        backgroundColor:
+                            fileNode.path === selectedPath ? 'lightgray' : 'inherit',
                         cursor: 'pointer',
                         '&:hover': { backgroundColor: 'lightblue' },
                     }}
@@ -145,20 +162,20 @@ const FileItemComponent: React.FC<FileItemProps> = ({
                         if (!fileNode.isFolder) onSelect(fileNode.path);
                     }}
                 >
-                    {!isRoot && fileNode.isFolder && (
-                        <IconButton
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                onToggleExpand(fileNode.path);
-                            }}
-                            size="small"
-                            sx={{ marginRight: '8px' }}
-                        >
-                            {fileNode.expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-                        </IconButton>
-                    )}
-                    <ListItemIcon>
+                    <ListItemIcon sx={{ display: 'flex', alignItems: 'center' }}>
                         {fileNode.isFolder ? <FolderIcon /> : <FileCopyIcon />}
+                        {!isRoot && fileNode.isFolder && (
+                            <IconButton
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    onToggleExpand(fileNode.path);
+                                }}
+                                size="small"
+                                sx={{ marginLeft: 1 }}
+                            >
+                                {fileNode.expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                            </IconButton>
+                        )}
                     </ListItemIcon>
                     {renameMode ? (
                         <TextField
@@ -229,53 +246,69 @@ const FileItemComponent: React.FC<FileItemProps> = ({
                 </Collapse>
             )}
 
-            <Menu
-                anchorEl={menuAnchor}
-                open={Boolean(menuAnchor)}
-                onClose={handleMenuClose}
-            >
+            <Menu anchorEl={menuAnchor} open={Boolean(menuAnchor)} onClose={handleMenuClose}>
                 {fileNode.isFolder
                     ? [
-                        <MenuItem
-                            key="new-folder"
-                            onClick={() => {
-                                setNewInputMode(true);
-                                setInputType('folder');
-                                handleMenuClose();
-                            }}
-                        >
-                            New Folder
-                        </MenuItem>,
-                        <MenuItem
-                            key="new-file"
-                            onClick={() => {
-                                setNewInputMode(true);
-                                setInputType('file');
-                                handleMenuClose();
-                            }}
-                        >
-                            New File
-                        </MenuItem>,
-                        <MenuItem key="rename" onClick={openRenameDialog}>
-                            Rename
-                        </MenuItem>,
-                        <MenuItem key="delete" onClick={openDeleteDialog}>
-                            Delete
-                        </MenuItem>,
-                    ]
+                          <MenuItem
+                              key="new-folder"
+                              onClick={() => {
+                                  setNewInputMode(true);
+                                  setInputType('folder');
+                                  handleMenuClose();
+                              }}
+                          >
+                              <ListItemIcon>
+                                  <CreateNewFolderIcon fontSize="small" />
+                              </ListItemIcon>
+                              New Folder
+                          </MenuItem>,
+                          <MenuItem
+                              key="new-file"
+                              onClick={() => {
+                                  setNewInputMode(true);
+                                  setInputType('file');
+                                  handleMenuClose();
+                              }}
+                          >
+                              <ListItemIcon>
+                                  <NoteAddIcon fontSize="small" />
+                              </ListItemIcon>
+                              New File
+                          </MenuItem>,
+                          <MenuItem key="rename" onClick={openRenameDialog}>
+                              <ListItemIcon>
+                                  <DriveFileRenameOutlineIcon fontSize="small" />
+                              </ListItemIcon>
+                              Rename
+                          </MenuItem>,
+                          <MenuItem key="delete" onClick={openDeleteDialog}>
+                              <ListItemIcon>
+                                  <DeleteForeverIcon fontSize="small" />
+                              </ListItemIcon>
+                              Delete
+                          </MenuItem>,
+                      ]
                     : [
-                        <MenuItem key="rename" onClick={openRenameDialog}>
-                            Rename
-                        </MenuItem>,
-                        <MenuItem key="duplicate" onClick={openDuplicateDialog}>
-                            Duplicate
-                        </MenuItem>,
-                        <MenuItem key="delete" onClick={openDeleteDialog}>
-                            Delete
-                        </MenuItem>,
-                    ]}
+                          <MenuItem key="rename" onClick={openRenameDialog}>
+                              <ListItemIcon>
+                                  <DriveFileRenameOutlineIcon fontSize="small" />
+                              </ListItemIcon>
+                              Rename
+                          </MenuItem>,
+                          <MenuItem key="duplicate" onClick={openDuplicateDialog}>
+                              <ListItemIcon>
+                                  <ContentCopyIcon fontSize="small" />
+                              </ListItemIcon>
+                              Duplicate
+                          </MenuItem>,
+                          <MenuItem key="delete" onClick={openDeleteDialog}>
+                              <ListItemIcon>
+                                  <DeleteForeverIcon fontSize="small" />
+                              </ListItemIcon>
+                              Delete
+                          </MenuItem>,
+                      ]}
             </Menu>
-
 
             <Dialog
                 open={deleteItem}

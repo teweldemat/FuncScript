@@ -260,7 +260,7 @@ export function ExecussionSessionView() {
                         displayedMessages={displayedMessages}
                         handleClearLog={handleClearLog}
                         displayedMarkdown={displayedMarkdown}
-                        readOnly={evaluationInProgress}
+                        readOnly={evaluationInProgress || !!!selectedNode}
                     />
                 </Box>
             </Grid>

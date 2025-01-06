@@ -16,11 +16,36 @@ public class AdvancedSyntax
     }
     
     [Test]
+    public void NakedKeyValuePairTrailingSpace()
+    {
+        var exp = "a:4,b:5 ";
+        var res = FuncScript.Evaluate(exp);
+        var expected = new ObjectKvc(new { a = 4, b = 5 });
+        Assert.That(FuncScript.FormatToJson(res),Is.EqualTo(FuncScript.FormatToJson(expected)));
+    }
+    
+    [Test]
     public void NakedWithImplicitReturn()
     {
         var exp = "a:4; a*3";
         var res = FuncScript.Evaluate(exp);
         var expected = 12;
+        Assert.That(FuncScript.FormatToJson(res),Is.EqualTo(FuncScript.FormatToJson(expected)));
+    }
+    [Test]
+    public void NakedWithImplicitReturn2()
+    {
+        var exp = "x:30; x;";
+        var res = FuncScript.Evaluate(exp);
+        var expected = 30;
+        Assert.That(FuncScript.FormatToJson(res),Is.EqualTo(FuncScript.FormatToJson(expected)));
+    }
+    [Test]
+    public void NakedWithExplicitReturn2()
+    {
+        var exp = "x:30; return x;";
+        var res = FuncScript.Evaluate(exp);
+        var expected = 30;
         Assert.That(FuncScript.FormatToJson(res),Is.EqualTo(FuncScript.FormatToJson(expected)));
     }
     [Test]
