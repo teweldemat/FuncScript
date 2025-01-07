@@ -47,6 +47,21 @@ namespace funcscript.core
                 Message = message;
                 Length = length;
             }
+            public override bool Equals(object obj)
+            {
+                if (obj is SyntaxErrorData other)
+                {
+                    return Loc == other.Loc &&
+                           Length == other.Length &&
+                           Message == other.Message;
+                }
+                return false;
+            }
+
+            public override int GetHashCode()
+            {
+                return HashCode.Combine(Loc, Length, Message);
+            }
         }
 
         public class ParseNode

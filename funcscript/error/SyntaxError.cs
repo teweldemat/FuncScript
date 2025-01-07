@@ -16,6 +16,8 @@ namespace funcscript.error
     {
         private readonly List<FuncScriptParser.SyntaxErrorData> data;
         private readonly string exp;
+        public List<FuncScriptParser.SyntaxErrorData> GetData() => data;
+        public string TargetExpression => exp;
         public SyntaxError(string exp,List<FuncScriptParser.SyntaxErrorData> data):base("Syntax error")
         {
             this.data= data;

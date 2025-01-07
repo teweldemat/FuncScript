@@ -11,7 +11,8 @@ namespace funcscript.model
         public bool IsDefined(string key);
         //public IList<KeyValuePair<string, object>> GetAll();
         public IList<String> GetAllKeys();
-        public static KeyValueCollection Merge(KeyValueCollection col1, KeyValueCollection col2)
+
+        static KeyValueCollection MergeInternal(KeyValueCollection col1, KeyValueCollection col2,bool assertSameContext)
         {
             if (col1 == null && col2 == null)
                 return null;
@@ -19,6 +20,10 @@ namespace funcscript.model
                 return col2;
             if (col2 == null)
                 return col1;
+            if (assertSameContext && col1.ParentContext != col2.ParentContext)
+                throw new error.EvaluationTimeException(
+                    "Key value collections from different contexts can't be merged");
+
             var dict = new OrderedDictionary();
             foreach (var key in col1.GetAllKeys())
                 dict[key] = col1.Get(key);
@@ -28,9 +33,9 @@ namespace funcscript.model
                 if (dict.Contains(key))
                 {
                     var left = dict[key] as KeyValueCollection;
-                    if (left != null && val is KeyValueCollection)
+                    if (left != null && val is KeyValueCollection right)
                     {
-                        dict[key] = KeyValueCollection.Merge(left, (KeyValueCollection)val);
+                        dict[key] = KeyValueCollection.MergeInternal(left, right,false);
                     }
                     else
                         dict[key] = val;
@@ -48,10 +53,11 @@ namespace funcscript.model
                 k++;
             }
 
-            if (col1.ParentContext != col2.ParentContext)
-                throw new error.EvaluationTimeException(
-                    "Key value collections from different contexts can't be merged");
             return new SimpleKeyValueCollection(col1.ParentContext, kvs);
+        }
+        public static KeyValueCollection Merge(KeyValueCollection col1, KeyValueCollection col2)
+        {
+            return MergeInternal(col1, col2, true);
         }
 
         

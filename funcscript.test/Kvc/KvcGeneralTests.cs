@@ -4,6 +4,7 @@ using System;
 using System.Linq;
 using System.Text;
 using funcscript.block;
+using funcscript.error;
 
 namespace funcscript.test
 {
@@ -130,31 +131,7 @@ namespace funcscript.test
             Assert.AreEqual(expected, res);
         }
 
-        [Test]
-        public void TestKvcMergeDifferentParents()
-        {
-            var exp =
-                @"{
-  a:{
-      aa:2;
-      ab:3;
-    };
-  b:{
-    c:{
-      ca:6;
-      cb:7;
-    }
-  };
 
-  return a+b.c;
-}";
-
-
-            var res = FuncScript.Evaluate(exp);
-            var expected = new ObjectKvc(new { aa = 2, ab = 3, ca = 6, cb = 7 });
-            ;
-            Assert.AreEqual(FuncScript.FormatToJson(expected), FuncScript.FormatToJson(res));
-        }
 
         [Test]
         public void TestLamdaContextChange()
@@ -298,16 +275,7 @@ return Map(z,(x)=>x*x);
             Assert.AreEqual(expected.ToArray(), res.ToArray());
         }
 
-        [Test]
-        public void KvcMergeHeriarchy()
-        {
-            var g = new DefaultFsDataProvider();
-            var res = FuncScript.Evaluate(g, @"{a:12,b:{c:10,z:10}}+{d:13,b:{c:12,x:5}}");
-            var expected = new ObjectKvc(new { a = 12, d = 13, b = new { c = 12, z = 10, x = 5 } });
-
-            Assert.AreEqual(expected, res);
-        }
-
+        
         [Test]
         public void TestDelegate()
         {

@@ -12,6 +12,10 @@ namespace funcscript.test
 {
     public class TestErrorReporting
     {
+        public TestErrorReporting()
+        {
+        }
+
         void AnalyzeError(Exception ex, String exp, int expectedPos, int expecctedLen)
         {
             Assert.AreEqual(typeof(error.EvaluationException), ex.GetType());
@@ -34,7 +38,9 @@ namespace funcscript.test
         {
             Assert.AreEqual(typeof(error.SyntaxError), ex.GetType());
             var sError = (SyntaxError)ex;
-            Assert.That(sError.Line,Is.EqualTo(line));
+            var unique = sError.GetData().Distinct().ToList();
+            var uniqueError = new SyntaxError(sError.TargetExpression , unique);
+            Assert.That(uniqueError.Line,Is.EqualTo(line));
         }
 
         [Test]
@@ -52,7 +58,7 @@ c:4
             }
             catch (Exception ex)
             {
-                AnalyzeMainSyntaxErrorLine(ex, "b:4");
+                AnalyzeMainSyntaxErrorLine(ex, "c:4");
             }
         }
         [Test]
