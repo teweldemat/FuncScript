@@ -54,6 +54,8 @@ public class RemoteLogger
         var clientsCopy = _clients.ToList();
         foreach (var client in clientsCopy)
         {
+            if(client==null)
+                continue;
             if (client.State == WebSocketState.Open)
             {
                 await client.SendAsync(new ArraySegment<byte>(msg), WebSocketMessageType.Text, true, CancellationToken.None);

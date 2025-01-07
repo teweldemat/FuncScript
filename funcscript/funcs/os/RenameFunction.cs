@@ -43,7 +43,8 @@ namespace funcscript.funcs.os
 
                 var directory = Path.GetDirectoryName(oldPath);
                 var newPath = Path.Combine(directory ?? "", newName);
-
+                if (oldPath == newPath)
+                    return newPath;
                 if (File.Exists(oldPath))
                 {
                     File.Move(oldPath, newPath);
