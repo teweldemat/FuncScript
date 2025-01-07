@@ -1,4 +1,4 @@
-using FuncScript.Error;
+﻿using FuncScript.Error;
 using FuncScript.Model;
 using Microsoft.VisualBasic;
 using NuGet.Frameworks;
@@ -15,6 +15,16 @@ namespace FuncScript.Test
 {
     public class Syntax2
     {
+        [Test]
+        public void TestMapSquare()
+        {
+            var exp="ap([1,2,4],(x)=>x*x)";
+            var res = FuncScript.Evaluate(exp);
+            Assert.That(res is FsList);
+            var list = (FsList)res;
+            Assert.That(list ,Is.EquivalentTo(new []{1,4,16}));
+        }
+
         [Test]
         public void StringInterpolationBasic()
         {

@@ -1,10 +1,7 @@
 using FuncScript.Model;
 using FuncScript.Error;
 using NUnit.Framework;
-using System;
-using System.Numerics;
 using System.Text;
-using FuncScript.Block;
 
 namespace FuncScript.Test
 {
