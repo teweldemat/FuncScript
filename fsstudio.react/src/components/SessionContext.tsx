@@ -640,38 +640,41 @@
             nodePath: string,
             newExpression: string,
             thenEvaluate: boolean
-        ) => {
+          ) => {
+            setSessions((prev) => {
+              const current = prev[session.sessionId];
+              if (!current) return prev;
+              const node = findNodeByPath(current, nodePath);
+              if (!node) return prev;
+              const updatedNode = { ...node, expression: newExpression };
+              const updatedRoot = updateSessionNode(current.rootNode, nodePath, updatedNode);
+              return {
+                ...prev,
+                [session.sessionId]: {
+                  ...current,
+                  rootNode: updatedRoot,
+                },
+              };
+            });
+          
             const urlPath = encodeURIComponent(nodePath);
             const res = await fetch(
-                `${SERVER_URL}/api/sessions/${session.sessionId}/node/expression/${urlPath}`,
-                {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ expression: newExpression }),
-                }
+              `${SERVER_URL}/api/sessions/${session.sessionId}/node/expression/${urlPath}`,
+              {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ expression: newExpression }),
+              }
             );
-            if (!res.ok) throw new Error(await res.text());
-
-            setSessions((prev) => {
-                const current = prev[session.sessionId];
-                if (!current) return prev;
-                const node = findNodeByPath(current, nodePath);
-                if (!node) return prev;
-                const updatedNode = { ...node, expression: newExpression };
-                const updatedRoot = updateSessionNode(current.rootNode, nodePath, updatedNode);
-                return {
-                    ...prev,
-                    [session.sessionId]: {
-                        ...current,
-                        rootNode: updatedRoot,
-                    },
-                };
-            });
-
-            if (thenEvaluate) {
-                await evaluateNode(session, nodePath);
+            if (!res.ok) {
+              // Optionally revert here if needed
+              throw new Error(await res.text());
             }
-        };
+          
+            if (thenEvaluate) {
+              await evaluateNode(session, nodePath);
+            }
+          };
 
         return (
             <ExecutionSessionContext.Provider
