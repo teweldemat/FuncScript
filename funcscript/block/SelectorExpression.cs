@@ -1,13 +1,13 @@
-﻿using funcscript.core;
-using funcscript.model;
+using FuncScript.Core;
+using FuncScript.Model;
 
-namespace funcscript.block
+namespace FuncScript.Block
 {
-    internal class SelectorExpression: ExpressionBlock
+    internal class SelectorExpression : ExpressionBlock
     {
-        
         public ExpressionBlock Source;
         public KvcExpression Selector;
+
         public override object Evaluate()
         {
             var sourceVal = Source.Evaluate();
@@ -15,7 +15,7 @@ namespace funcscript.block
             {
                 var ret = new object[lst.Length];
                 int i = 0;
-                
+
                 foreach (var l in lst)
                 {
                     if (l is KeyValueCollection e)
@@ -24,13 +24,13 @@ namespace funcscript.block
                         clone.SetReferenceProvider(e);
                         ret[i] = clone.Evaluate();
                     }
-                    else 
+                    else
                         ret[i] = null;
                     i++;
                 }
                 return new ArrayFsList(ret);
             }
-            
+
             if (sourceVal is KeyValueCollection kvcSource)
             {
                 Selector.SetReferenceProvider(kvcSource);

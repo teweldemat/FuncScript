@@ -1,11 +1,11 @@
-using funcscript.core;
-using funcscript.model;
+using FuncScript.Core;
+using FuncScript.Model;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace funcscript.funcs.os
+namespace FuncScript.Funcs.OS
 {
     internal class DirectoryListFunction : IFsFunction
     {
@@ -18,16 +18,16 @@ namespace funcscript.funcs.os
         public object EvaluateList(FsList pars)
         {
             if (pars.Length != ExpectedParameterCount)
-                throw new error.EvaluationTimeException($"{this.Symbol} function: invalid parameter count. {ExpectedParameterCount} expected, got {pars.Length}");
+                throw new Error.EvaluationTimeException($"{this.Symbol} function: invalid parameter count. {ExpectedParameterCount} expected, got {pars.Length}");
 
             var par0 = pars[0];
             if (par0 == null || !(par0 is string))
-                throw new error.TypeMismatchError($"Function {this.Symbol}. Invalid parameter type, expected a string");
+                throw new Error.TypeMismatchError($"Function {this.Symbol}. Invalid parameter type, expected a string");
 
             var directoryPath = (string)par0;
 
             if (!Directory.Exists(directoryPath))
-                throw new error.TypeMismatchError($"Function {this.Symbol}. Directory '{directoryPath}' does not exist");
+                throw new Error.TypeMismatchError($"Function {this.Symbol}. Directory '{directoryPath}' does not exist");
             try
             {
                 var files = Directory.GetDirectories(directoryPath).Concat(Directory.GetFiles(directoryPath)).ToArray();
@@ -35,7 +35,7 @@ namespace funcscript.funcs.os
             }
             catch (Exception ex)
             {
-                throw new error.EvaluationTimeException($"Function {this.Symbol}. Error retrieving files from '{directoryPath}': {ex.Message}");
+                throw new Error.EvaluationTimeException($"Function {this.Symbol}. Error retrieving files from '{directoryPath}': {ex.Message}");
             }
         }
 

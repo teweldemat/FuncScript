@@ -1,7 +1,7 @@
-using funcscript.core;
-using funcscript.model;
+using FuncScript.Core;
+using FuncScript.Model;
 
-namespace funcscript.funcs.logic
+namespace FuncScript.Funcs.Logic
 {
     public class TicksToDateFunction : IFsFunction
     {
@@ -14,7 +14,7 @@ namespace funcscript.funcs.logic
         public object EvaluateList(FsList pars)
         {
             if (pars.Length > MaxParameters)
-                throw new error.EvaluationTimeException($"{this.Symbol} function: Invalid parameter count. Expected a maximum of {MaxParameters}, but got {pars.Length}");
+                throw new Error.EvaluationTimeException($"{this.Symbol} function: Invalid parameter count. Expected a maximum of {MaxParameters}, but got {pars.Length}");
 
             var par0 = pars[0];
 
@@ -22,7 +22,7 @@ namespace funcscript.funcs.logic
                 return null;
 
             if (!(par0 is long))
-                throw new error.TypeMismatchError($"Function {this.Symbol}: Type mismatch. Expected a long.");
+                throw new Error.TypeMismatchError($"Function {this.Symbol}: Type mismatch. Expected a long.");
 
             var ticks = (long)par0;
 

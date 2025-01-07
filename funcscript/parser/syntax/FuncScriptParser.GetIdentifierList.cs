@@ -1,13 +1,12 @@
-using funcscript.block;
-using funcscript.funcs.math;
-using funcscript.model;
-namespace funcscript.core
+using FuncScript.Block;
+using FuncScript.Funcs.Math;
+using FuncScript.Model;
+namespace FuncScript.Core
 {
     public partial class FuncScriptParser
     {
-
         record GetIdentifierListResult(List<string> IdenList, ParseNode ParseNode, int NextIndex)
-            :ParseResult(ParseNode,NextIndex);
+            :ParseResult(ParseNode, NextIndex);
 
         static GetIdentifierListResult GetIdentifierList(ParseContext context, int index)
         {
@@ -36,7 +35,7 @@ namespace funcscript.core
 
                     i++;
                     i = SkipSpace(context, i).NextIndex;
-                    (iden,  idenLower, _, nodeIden,i2) = GetIdentifier(context, i, false);
+                    (iden,  idenLower, _, nodeIden, i2) = GetIdentifier(context, i, false);
 
                     if (i2 == i)
                         return new GetIdentifierListResult(null, null, index);

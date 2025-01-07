@@ -1,7 +1,7 @@
-using funcscript.core;
-using funcscript.model;
+using FuncScript.Core;
+using FuncScript.Model;
 
-namespace funcscript.funcs.os
+namespace FuncScript.Funcs.OS
 {
     internal class FileTextFunction : IFsFunction
     {

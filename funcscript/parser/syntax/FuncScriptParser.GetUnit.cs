@@ -1,13 +1,14 @@
-using funcscript.block;
-using funcscript.model;
-using funcscript.model;
-namespace funcscript.core
+using FuncScript.Block;
+using FuncScript.Core;
+using FuncScript.Model;
+using FuncScript.Model;
+namespace FuncScript.Core
 {
     public partial class FuncScriptParser
     {
-        static ExpressionBlockResult GetUnit(ParseContext context, int index)
+        static Core.FuncScriptParser.ExpressionBlockResult GetUnit(Core.FuncScriptParser.ParseContext context, int index)
         {
-            ParseNode parseNode = null;
+            Core.FuncScriptParser.ParseNode parseNode = null;
             ExpressionBlock expBlock = null;
             int i;
 
@@ -20,7 +21,7 @@ namespace funcscript.core
                 expBlock = templateResult.Block;
                 expBlock.CodePos = index;
                 expBlock.CodeLength = i - index;
-                return new ExpressionBlockResult(expBlock, parseNode, i);
+                return new Core.FuncScriptParser.ExpressionBlockResult(expBlock, parseNode, i);
             }
 
             //get string 
@@ -32,7 +33,7 @@ namespace funcscript.core
                 expBlock = new LiteralBlock(simpleStrResult.Str);
                 expBlock.CodePos = index;
                 expBlock.CodeLength = i - index;
-                return new ExpressionBlockResult(expBlock, parseNode, i);
+                return new Core.FuncScriptParser.ExpressionBlockResult(expBlock, parseNode, i);
             }
 
             //get number
@@ -44,7 +45,7 @@ namespace funcscript.core
                 expBlock = new LiteralBlock(numberResult.Number);
                 expBlock.CodePos = index;
                 expBlock.CodeLength = i - index;
-                return new ExpressionBlockResult(expBlock, parseNode, i);
+                return new Core.FuncScriptParser.ExpressionBlockResult(expBlock, parseNode, i);
             }
 
             //list expression
@@ -56,7 +57,7 @@ namespace funcscript.core
                 expBlock = listExprResult.Block;
                 expBlock.CodePos = index;
                 expBlock.CodeLength = i - index;
-                return new ExpressionBlockResult(expBlock, parseNode, i);
+                return new Core.FuncScriptParser.ExpressionBlockResult(expBlock, parseNode, i);
             }
 
             //kvc expression
@@ -68,7 +69,7 @@ namespace funcscript.core
                 expBlock = kvcExprResult.Block;
                 expBlock.CodePos = index;
                 expBlock.CodeLength = i - index;
-                return new ExpressionBlockResult(expBlock, parseNode, i);
+                return new Core.FuncScriptParser.ExpressionBlockResult(expBlock, parseNode, i);
             }
 
             var caseExprResult = GetCaseExpression(context, i);
@@ -79,7 +80,7 @@ namespace funcscript.core
                 expBlock = caseExprResult.Block;
                 expBlock.CodePos = index;
                 expBlock.CodeLength = i - index;
-                return new ExpressionBlockResult(expBlock, parseNode, i);
+                return new Core.FuncScriptParser.ExpressionBlockResult(expBlock, parseNode, i);
             }
 
             var switchExprResult = GetSwitchExpression(context, i);
@@ -90,7 +91,7 @@ namespace funcscript.core
                 expBlock = switchExprResult.Block;
                 expBlock.CodePos = index;
                 expBlock.CodeLength = i - index;
-                return new ExpressionBlockResult(expBlock, parseNode, i);
+                return new Core.FuncScriptParser.ExpressionBlockResult(expBlock, parseNode, i);
             }
 
             //expression function
@@ -102,7 +103,7 @@ namespace funcscript.core
                 expBlock = new LiteralBlock(lambdaExprResult.Block);
                 expBlock.CodePos = index;
                 expBlock.CodeLength = i - index;
-                return new ExpressionBlockResult(expBlock, parseNode, i);
+                return new Core.FuncScriptParser.ExpressionBlockResult(expBlock, parseNode, i);
             }
 
             //null, true, false
@@ -114,7 +115,7 @@ namespace funcscript.core
                 expBlock = new LiteralBlock(keywordLiteralResult.Literal);
                 expBlock.CodePos = index;
                 expBlock.CodeLength = i - index;
-                return new ExpressionBlockResult(expBlock, parseNode, i);
+                return new Core.FuncScriptParser.ExpressionBlockResult(expBlock, parseNode, i);
             }
 
             //get identifier
@@ -126,7 +127,7 @@ namespace funcscript.core
                 expBlock = new ReferenceBlock(identResult.Iden, identResult.IdenLower, identResult.ParentRef);
                 expBlock.CodePos = index;
                 expBlock.CodeLength = i - index;
-                return new ExpressionBlockResult(expBlock, parseNode, i);
+                return new Core.FuncScriptParser.ExpressionBlockResult(expBlock, parseNode, i);
             }
 
             var expInParenResult = GetExpInParenthesis(context, index);
@@ -137,7 +138,7 @@ namespace funcscript.core
                 expBlock = expInParenResult.Block;
                 expBlock.CodePos = index;
                 expBlock.CodeLength = i - index;
-                return new ExpressionBlockResult(expBlock, parseNode, i);
+                return new Core.FuncScriptParser.ExpressionBlockResult(expBlock, parseNode, i);
             }
 
             //get prefix operator
@@ -149,10 +150,10 @@ namespace funcscript.core
                 expBlock = prefixOpResult.Block;
                 expBlock.CodePos = index;
                 expBlock.CodeLength = i - index;
-                return new ExpressionBlockResult(expBlock, parseNode, i);
+                return new Core.FuncScriptParser.ExpressionBlockResult(expBlock, parseNode, i);
             }
 
-            return new ExpressionBlockResult(expBlock, parseNode, index);
+            return new Core.FuncScriptParser.ExpressionBlockResult(expBlock, parseNode, index);
         }
     }
 }

@@ -1,6 +1,7 @@
+using FsStudio.Server.FileSystem.Exec;
 using Microsoft.Extensions.Configuration;
 
-namespace fsstudio.server.fileSystem.exec.Tests
+namespace FsStudio.Server.FileSystem.Tests
 {
     [TestFixture]
     public class SessionManagerTests

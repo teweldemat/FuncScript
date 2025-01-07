@@ -1,7 +1,7 @@
-﻿using System.Text;
-using funcscript.model;
+using System.Text;
+using FuncScript.Model;
 
-namespace funcscript.core
+namespace FuncScript.Core
 {
     
     public interface IFsFunction

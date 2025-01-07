@@ -1,12 +1,12 @@
-using funcscript.block;
-using funcscript.funcs.math;
-using funcscript.model;
-namespace funcscript.core
+using FuncScript.Block;
+using FuncScript.Funcs.Math;
+using FuncScript.Model;
+namespace FuncScript.Core
 {
     public partial class FuncScriptParser
     {
         record GetNumberResult(object Number, ParseNode ParseNode, int NextIndex)
-            :ParseResult(ParseNode,NextIndex);
+            : ParseResult(ParseNode, NextIndex);
 
         static GetNumberResult GetNumber(ParseContext context, int index)
         {
@@ -16,7 +16,7 @@ namespace funcscript.core
             var hasLong = false;
             object number = null;
             int i = index;
-            var(intDigits,nodeDigits, i2) = GetInt(context, true, i);
+            var (intDigits, nodeDigits, i2) = GetInt(context, true, i);
             if (i2 == i)
                 return new GetNumberResult(null, null, index);
             i = i2;
@@ -37,7 +37,7 @@ namespace funcscript.core
             string expDigits = null;
             ParseNode nodeExpDigits;
             if (hasExp)
-                (expDigits,nodeExpDigits, i) = GetInt(context, true, i);
+                (expDigits, nodeExpDigits, i) = GetInt(context, true, i);
 
             if (!hasDecimal)
             {

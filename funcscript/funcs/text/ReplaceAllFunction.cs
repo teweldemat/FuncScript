@@ -1,7 +1,7 @@
-using funcscript.core;
-using funcscript.model;
+using FuncScript.Core;
+using FuncScript.Model;
 
-namespace funcscript.funcs.text
+namespace FuncScript.Funcs.Text
 {
     public class ReplaceAllFunction : IFsFunction
     {
@@ -11,14 +11,14 @@ namespace funcscript.funcs.text
         public object EvaluateList(FsList pars)
         {
             if (pars.Length < 3)
-                throw new error.EvaluationTimeException($"{this.Symbol} requires exactly three parameters: input string, search string, and replacement string.");
+                throw new Error.EvaluationTimeException($"{this.Symbol} requires exactly three parameters: input string, search string, and replacement string.");
 
             var input = pars[0] as string;
             var search = pars[1] as string;
             var replacement = pars[2] as string;
 
             if (input == null || search == null || replacement == null)
-                throw new error.EvaluationTimeException($"{this.Symbol} parameters must all be strings.");
+                throw new Error.EvaluationTimeException($"{this.Symbol} parameters must all be strings.");
 
             return input.Replace(search, replacement);
         }

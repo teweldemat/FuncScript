@@ -1,10 +1,10 @@
 using System.ClientModel;
-using funcscript.core;
-using funcscript.model;
+using FuncScript.Core;
+using FuncScript.Model;
 using OpenAI;
 using OpenAI.Chat;
 
-namespace funcscript.openai
+namespace FuncScript.Openai
 {
     public class ChatGptFunction : IFsFunction
     {
@@ -57,7 +57,6 @@ namespace funcscript.openai
                 messages.Add(ChatMessage.CreateUserMessage(instruction));
 
                 ClientResult<ChatCompletion> response = api.GetChatClient(model).CompleteChat(messages);
-
 
                 if (response == null)
                 {

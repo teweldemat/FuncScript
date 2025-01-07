@@ -1,7 +1,7 @@
-using funcscript.core;
-using funcscript.model;
+using FuncScript.Core;
+using FuncScript.Model;
 
-namespace funcscript.funcs.math
+namespace FuncScript.Funcs.Math
 {
     public class SineFunction : IFsFunction
     {
@@ -21,20 +21,20 @@ namespace funcscript.funcs.math
 
             if (val is int intValue)
             {
-                return Math.Sin((double)intValue);
+                return System.Math.Sin((double)intValue);
             }
 
             if (val is double doubleValue)
             {
-                return Math.Sin(doubleValue);
+                return System.Math.Sin(doubleValue);
             }
 
             if (val is long longValue)
             {
-                return Math.Sin((double)longValue);
+                return System.Math.Sin((double)longValue);
             }
 
-            throw new error.TypeMismatchError($"{this.Symbol}: A number was expected.");
+            throw new Error.TypeMismatchError($"{this.Symbol}: A number was expected.");
         }
 
         public string ParName(int index)
@@ -60,17 +60,17 @@ namespace funcscript.funcs.math
             var val = pars[0];
             if (val is int intValue)
             {
-                return Math.Cos((double)intValue);
+                return System.Math.Cos((double)intValue);
             }
             if (val is double doubleValue)
             {
-                return Math.Cos(doubleValue);
+                return System.Math.Cos(doubleValue);
             }
             if (val is long longValue)
             {
-                return Math.Cos((double)longValue);
+                return System.Math.Cos((double)longValue);
             }
-            throw new error.TypeMismatchError($"{this.Symbol}: number expected");
+            throw new Error.TypeMismatchError($"{this.Symbol}: number expected");
         }
 
         public string ParName(int index)

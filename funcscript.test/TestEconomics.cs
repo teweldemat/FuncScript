@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
-using funcscript.core;
-using funcscript.host;
-using funcscript.model;
+using FuncScript.Core;
+using FuncScript.Host;
+using FuncScript.Model;
 using NUnit.Framework;
 
-namespace funcscript.test;
+namespace FuncScript.Test;
 
 public class TestEconomics
 {
@@ -14,18 +14,18 @@ public class TestEconomics
     {
         
         var exp = @"{
-  f:(c)=>c;
-  return [f(log(""x"",'start'))]
+  F:(c)=>c;
+  return [F(log(""x"",'start'))]
 }";
         var logger = new StringLogger();
         FsLogger.SetDefaultLogger(logger);
-        var res=FuncScript.Evaluate(new DefaultFsDataProvider(), exp);
+        var res = FuncScript.Evaluate(new DefaultFsDataProvider(), exp);
         var str = FuncScript.FormatToJson(res);
         Assert.That(res is FsList);
         var l = (FsList)res;
-        Assert.That(l.Length,Is.EqualTo(1));
-        Assert.That(l[0],Is.EqualTo("x"));
-        Assert.That(logger.GetLogContent().Trim(),Is.EqualTo("start"));
+        Assert.That(l.Length, Is.EqualTo(1));
+        Assert.That(l[0], Is.EqualTo("x"));
+        Assert.That(logger.GetLogContent().Trim(), Is.EqualTo("start"));
     }
     
     [Test]
@@ -35,8 +35,8 @@ public class TestEconomics
         var exp = @"([log('x','x')] filter (a)=>a!=2) map (x)=>1=1";
         var logger = new StringLogger();
         FsLogger.SetDefaultLogger(logger);
-        var res=FuncScript.Evaluate(new DefaultFsDataProvider(), exp);
+        var res = FuncScript.Evaluate(new DefaultFsDataProvider(), exp);
         var str = FuncScript.FormatToJson(res);
-        Assert.That(logger.GetLogContent().Trim(),Is.EqualTo("x"));
+        Assert.That(logger.GetLogContent().Trim(), Is.EqualTo("x"));
     }
 }

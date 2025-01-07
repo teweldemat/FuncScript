@@ -1,8 +1,8 @@
 using System.Linq;
-using funcscript.model;
+using FuncScript.Model;
 using NUnit.Framework;
 
-namespace funcscript.test;
+namespace FuncScript.Test;
 
 public class FlattenBug
 {
@@ -19,7 +19,7 @@ public class FlattenBug
   f:(l)=>reduce(l, (x,m)=>m+if(type(x)=""List"",f(x),x),[]);
   return f(d)
 }},
-    return flatten(data);    
+    return Flatten(data);    
 }}
 ");
         Assert.That(res is FsList);

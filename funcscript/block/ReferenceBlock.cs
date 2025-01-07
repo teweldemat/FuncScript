@@ -1,7 +1,7 @@
-﻿using funcscript.core;
-using funcscript.model;
+using FuncScript.Core;
+using FuncScript.Model;
 
-namespace funcscript.block
+namespace FuncScript.Block
 {
     public class ReferenceBlock : ExpressionBlock
     {
@@ -38,11 +38,11 @@ namespace funcscript.block
             _nameLower = nameLower;
             _fromParent = false;
         }
-        public ReferenceBlock(string name, string nameLower,bool fromParent)
+        public ReferenceBlock(string name, string nameLower, bool fromParent)
         {
             Name = name;
             _nameLower = nameLower;
-            _fromParent =fromParent;
+            _fromParent = fromParent;
         }
         public override object Evaluate()
         {
@@ -70,7 +70,7 @@ namespace funcscript.block
         }
         public override ExpressionBlock CloneExpression()
         {
-            return new ReferenceBlock(_name,_nameLower)
+            return new ReferenceBlock(_name, _nameLower)
             {
                 _fromParent = this._fromParent,
                 CodePos = this.CodePos,
@@ -78,5 +78,4 @@ namespace funcscript.block
             };
         }
     }
-
 }

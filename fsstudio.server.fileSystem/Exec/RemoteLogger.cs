@@ -1,7 +1,7 @@
 using System.Net.WebSockets;
 using System.Text;
 
-namespace fsstudio.server.fileSystem.exec;
+namespace FsStudio.Server.FileSystem.Exec;
 public class WebSocketMiddleware
 {
     private readonly RequestDelegate _next;

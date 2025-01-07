@@ -1,8 +1,8 @@
-﻿using System.Text;
-using funcscript.core;
-using funcscript.model;
+using System.Text;
+using FuncScript.Core;
+using FuncScript.Model;
 
-namespace funcscript.block
+namespace FuncScript.Block
 {
     public class LiteralBlock : ExpressionBlock
     {
@@ -47,5 +47,4 @@ namespace funcscript.block
             return new LiteralBlock(this.Value);
         }
     }
-
 }

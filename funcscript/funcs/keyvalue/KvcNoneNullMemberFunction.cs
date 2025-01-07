@@ -1,7 +1,7 @@
-using funcscript.core;
-using funcscript.model;
+using FuncScript.Core;
+using FuncScript.Model;
 
-namespace funcscript.funcs.keyvalue
+namespace FuncScript.Funcs.KeyValue
 {
     public class KvcNoneNullMemberFunction : IFsFunction
     {
@@ -14,13 +14,13 @@ namespace funcscript.funcs.keyvalue
         private object EvaluateInternal(object target, object key)
         {
             if (!(key is string))
-                throw new error.TypeMismatchError($"{Symbol} function: The second parameter should be a string (Member key).");
+                throw new Error.TypeMismatchError($"{Symbol} function: The second parameter should be a string (Member key).");
 
             if (target == null)
                 return null;
 
             if (!(target is KeyValueCollection))
-                throw new error.TypeMismatchError($"{Symbol} function: Cannot access member '{key}' on non-KeyValueCollection type '{FuncScript.GetFsDataType(target)}'.");
+                throw new Error.TypeMismatchError($"{Symbol} function: Cannot access member '{key}' on non-KeyValueCollection type '{FuncScript.GetFsDataType(target)}'.");
 
             return ((KeyValueCollection)target).Get(((string)key).ToLower());
         }
@@ -28,7 +28,7 @@ namespace funcscript.funcs.keyvalue
         public object EvaluateList(FsList pars)
         {
             if (pars.Length != MaxParametersCount)
-                throw new error.TypeMismatchError($"{Symbol} function: Expected {MaxParametersCount} parameters, received {pars.Length}.");
+                throw new Error.TypeMismatchError($"{Symbol} function: Expected {MaxParametersCount} parameters, received {pars.Length}.");
 
             var key = pars[1];
             var target = pars[0];

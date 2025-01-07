@@ -1,10 +1,9 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using fsstudio.server.fileSystem.exec;
-using funcscript;
+using FsStudio.Server.FileSystem.Exec;
+using FuncScript;
 
-
-namespace fsstudio.server.fileSystem;
+namespace FsStudio.Server.FileSystem;
 internal class Program
 {
     private static void Main(string[] args)
@@ -13,7 +12,7 @@ internal class Program
         var options = new WebApplicationOptions
         {
             Args = args,
-            ApplicationName = "fsstudio.server.fileSystem",
+            ApplicationName = "FsStudio.Server.FileSystem",
             ContentRootPath = AppContext.BaseDirectory,
             WebRootPath =  "wwwroot"
         };
@@ -92,8 +91,8 @@ internal class Program
 
     private static void InitFuncScript()
     {
-        DefaultFsDataProvider.LoadFromAssembly(typeof(funcscript.openai.ChatGptFunction).Assembly);
-        DefaultFsDataProvider.LoadFromAssembly(typeof(funcscript.sql.core.PgSqlFunction).Assembly);
+        DefaultFsDataProvider.LoadFromAssembly(typeof(FuncScript.Openai.ChatGptFunction).Assembly);
+        DefaultFsDataProvider.LoadFromAssembly(typeof(FuncScript.Sql.Core.PgSqlFunction).Assembly);
     }
 
 }

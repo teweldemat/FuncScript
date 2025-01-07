@@ -1,10 +1,10 @@
-using funcscript.core;
-using funcscript.model;
+using FuncScript.Core;
+using FuncScript.Model;
 using System.Linq;
 using System.Globalization;
 using System.Text;
 
-namespace funcscript.funcs.text
+namespace FuncScript.Funcs.Text
 {
     public class ChangeCaseFunction : IFsFunction
     {
@@ -14,13 +14,13 @@ namespace funcscript.funcs.text
         public object EvaluateList(FsList pars)
         {
             if (pars.Length < 2)
-                throw new error.EvaluationTimeException($"{this.Symbol} requires at least two parameters: text and case type.");
+                throw new Error.EvaluationTimeException($"{this.Symbol} requires at least two parameters: text and case type.");
 
             var input = pars[0] as string;
             var caseType = pars[1] as string;
 
             if (input == null || caseType == null)
-                throw new error.EvaluationTimeException($"{this.Symbol} requires the first parameter to be a string and the second parameter to specify a valid case type.");
+                throw new Error.EvaluationTimeException($"{this.Symbol} requires the first parameter to be a string and the second parameter to specify a valid case type.");
 
             return caseType.ToLower() switch
             {
@@ -29,7 +29,7 @@ namespace funcscript.funcs.text
                 "pascal" => ToPascalCase(input),
                 "snake"  => ToSnakeCase(input),
                 "kebab"  => ToKebabCase(input),
-                _ => throw new error.EvaluationTimeException(
+                _ => throw new Error.EvaluationTimeException(
                         $"{this.Symbol} does not support the case type '{caseType}'. " +
                         "Supported types: lower, upper, pascal, snake, kebab."
                      )

@@ -1,4 +1,4 @@
-namespace fsstudio.server.fileSystem;
+namespace FsStudio.Server.FileSystem;
 
 public class ErrorData
 {
@@ -14,7 +14,7 @@ public class ErrorData
     {
         var errors = new List<ErrorItem>();
         var cur = ex;
-        while (cur!=null)
+        while (cur != null)
         {
             errors.Add(new ErrorItem(cur));
             cur = cur.InnerException;

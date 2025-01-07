@@ -1,12 +1,12 @@
-﻿using funcscript.model;
+using FuncScript.Model;
 using NUnit.Framework;
 using System;
 using System.Linq;
 using System.Text;
-using funcscript.block;
-using funcscript.error;
+using FuncScript.Block;
+using FuncScript.Error;
 
-namespace funcscript.test
+namespace FuncScript.Test
 {
     delegate void VoidDelegate(int x);
 
@@ -131,8 +131,6 @@ namespace funcscript.test
             Assert.AreEqual(expected, res);
         }
 
-
-
         [Test]
         public void TestLamdaContextChange()
         {
@@ -145,7 +143,6 @@ namespace funcscript.test
     };
   return a.f(2);
 }";
-
 
             var res = FuncScript.Evaluate(exp);
             var expected = 8;
@@ -165,7 +162,6 @@ namespace funcscript.test
     r:2;
     return a.f(2);
 }";
-
 
             var res = FuncScript.Evaluate(exp);
             var expected = 8;
@@ -290,7 +286,7 @@ return Map(z,(x)=>x*x);
         [Test]
         public void TestDelegateRejectOut()
         {
-            Assert.Throws(typeof(funcscript.error.TypeMismatchError)
+            Assert.Throws(typeof(TypeMismatchError)
                 , () =>
                 {
                     var vars = new
@@ -309,7 +305,7 @@ return Map(z,(x)=>x*x);
         [Test]
         public void TestDelegateRejectVoid()
         {
-            Assert.Throws(typeof(funcscript.error.TypeMismatchError)
+            Assert.Throws(typeof(TypeMismatchError)
                 , () =>
                 {
                     var vars = new

@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace funcscript.host;
+namespace FuncScript.Host;
 
 public class StringLogger : FsLogger
 {

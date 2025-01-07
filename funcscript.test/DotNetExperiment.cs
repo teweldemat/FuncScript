@@ -1,12 +1,12 @@
 using NUnit.Framework;
 
-namespace funcscript.test;
+namespace FuncScript.Test;
 
 public class DotNetExperiment
 {
     [Test]
     public void AreTwoNullsEqual()
     {
-        Assert.That(null==null);
+        Assert.That(null == null);
     }
 }

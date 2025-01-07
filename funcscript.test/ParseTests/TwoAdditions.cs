@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using funcscript.core;
+using FuncScript.Core;
 using NUnit.Framework;
 
-namespace funcscript.test
+namespace FuncScript.Test
 {
     public class AdditionExpressionParse
     {
@@ -37,7 +37,7 @@ namespace funcscript.test
 
             var secondOp = parseNode.Children[3];
             Assert.AreEqual(FuncScriptParser.ParseNodeType.Operator, secondOp.NodeType);
-                Assert.AreEqual(3, secondOp.Pos);
+            Assert.AreEqual(3, secondOp.Pos);
             Assert.AreEqual(1, secondOp.Length);
 
             var thirdNum = parseNode.Children[4];

@@ -1,8 +1,8 @@
-using funcscript.error;
-using funcscript.model;
+using FuncScript.Error;
+using FuncScript.Model;
 using NUnit.Framework;
 
-namespace funcscript.test;
+namespace FuncScript.Test;
 
 public class KvcMerge
 {
@@ -11,7 +11,7 @@ public class KvcMerge
     {
         var g = new DefaultFsDataProvider();
         var res = FuncScript.Evaluate(g, @"{a:12,b:{c:10,z:10}}+{d:13,b:{c:12,x:5}}");
-        var expected = new ObjectKvc(new { a = 12, b = new { c = 12, z = 10, x = 5 } , d = 13});
+        var expected = new ObjectKvc(new { a = 12, b = new { c = 12, z = 10, x = 5 }, d = 13 });
 
         Assert.AreEqual(FuncScript.FormatToJson(expected), FuncScript.FormatToJson(res));
     }

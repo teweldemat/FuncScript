@@ -1,7 +1,7 @@
-using funcscript.block;
-using funcscript.model;
+using FuncScript.Block;
+using FuncScript.Model;
 
-namespace funcscript.core
+namespace FuncScript.Core
 {
     public partial class FuncScriptParser
     {
@@ -58,11 +58,11 @@ namespace funcscript.core
             var ret= GetKvcBody(context, index, false,true,true);
             if (ret.Block is KvcExpression kvc)
             {
-                if (kvc.KeyValues.Count == 0 && kvc.singleReturn != null)
+                if (kvc.KeyValues.Count == 0 && kvc.SingleReturn != null)
                 {
                     return new ExpressionBlockResult
                     (
-                        Block:kvc.singleReturn,
+                        Block:kvc.SingleReturn,
                         ParseNode:ret.ParseNode.Children[0],
                         NextIndex: ret.NextIndex
                     );

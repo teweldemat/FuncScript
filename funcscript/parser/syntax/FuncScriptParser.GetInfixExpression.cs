@@ -1,8 +1,8 @@
-using funcscript.block;
-using funcscript.funcs.math;
-using funcscript.model;
+using FuncScript.Block;
+using FuncScript.Funcs.Math;
+using FuncScript.Model;
 
-namespace funcscript.core
+namespace FuncScript.Core
 {
     public partial class FuncScriptParser
     {

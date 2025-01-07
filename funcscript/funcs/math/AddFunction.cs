@@ -1,12 +1,12 @@
-using funcscript.core;
-using funcscript.model;
+using FuncScript.Core;
+using FuncScript.Model;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace funcscript.funcs.math
+namespace FuncScript.Funcs.Math
 {
     public class SumList : FsList
     {

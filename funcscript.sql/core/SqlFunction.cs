@@ -1,8 +1,8 @@
-﻿using funcscript.core;
-using funcscript.model;
+﻿using FuncScript.Core;
+using FuncScript.Model;
 using System.Data.SqlClient;
 
-namespace funcscript.sql.core
+namespace FuncScript.Sql.Core
 {
     public class SqlFunction : IFsFunction
     {
@@ -38,10 +38,10 @@ namespace funcscript.sql.core
                 var row = new List<KeyValuePair<string, object?>>();
                 for (var i = 0; i < reader.FieldCount; i++)
                 {
-                    var value = FuncScriptSql.NormalizeDataType(reader.GetValue(i));
+                    var value = FuncScript.NormalizeDataType(reader.GetValue(i));
                     row.Add(new KeyValuePair<string, object?>(reader.GetName(i), value));
                 }
-                results.Add(new SimpleKeyValueCollection(null,row.ToArray()));
+                results.Add(new SimpleKeyValueCollection(null, row.ToArray()));
             }
 
             var normalizedResults = FuncScript.NormalizeDataType(results);

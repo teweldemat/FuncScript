@@ -1,7 +1,7 @@
-using funcscript.core;
-using funcscript.model;
+using FuncScript.Core;
+using FuncScript.Model;
 
-namespace funcscript.funcs.math
+namespace FuncScript.Funcs.Math
 {
     public class IsBlankFunction : IFsFunction
     {
@@ -15,7 +15,7 @@ namespace funcscript.funcs.math
         public object EvaluateList(FsList pars)
         {
             if (pars.Length < MAX_PARS_COUNT)
-                throw new error.TypeMismatchError($"{this.Symbol}: argument expected");
+                throw new Error.TypeMismatchError($"{this.Symbol}: argument expected");
 
             var parameter = pars[0];
 
@@ -23,7 +23,7 @@ namespace funcscript.funcs.math
                 return true;
 
             if (parameter is not string str)
-                throw new error.TypeMismatchError($"{this.Symbol}: string expected");
+                throw new Error.TypeMismatchError($"{this.Symbol}: string expected");
 
             return string.IsNullOrEmpty(str.Trim());
         }

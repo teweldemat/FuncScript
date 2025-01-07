@@ -1,9 +1,9 @@
-using funcscript.core;
+using FuncScript.Core;
 using System;
 using System.IO;
-using funcscript.model;
+using FuncScript.Model;
 
-namespace funcscript.funcs.os
+namespace FuncScript.Funcs.OS
 {
     internal class SaveFileFunction : IFsFunction
     {

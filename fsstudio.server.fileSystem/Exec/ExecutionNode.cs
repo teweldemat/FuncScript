@@ -1,9 +1,9 @@
-using funcscript;
-using funcscript.core;
-using funcscript.error;
-using funcscript.model;
+using FuncScript;
+using FuncScript.Core;
+using FuncScript.Error;
+using FuncScript.Model;
 
-namespace fsstudio.server.fileSystem.exec;
+namespace FsStudio.Server.FileSystem.Exec;
 
 public class ExpressionNodeInfo
 {
@@ -80,7 +80,6 @@ public class ExecutionNode : KeyValueCollection
         }
     }
 
-
     public object Evaluate(KeyValueCollection provider)
     {
         if (Children.Count > 0)
@@ -96,7 +95,7 @@ public class ExecutionNode : KeyValueCollection
                 _cache= this.Expression;
                 break;
             case ExpressionType.FuncScript:
-                _cache=FuncScript.Evaluate(provider, Expression);
+                _cache=FuncScript.FuncScript.Evaluate(provider, Expression);
                 break;
             case ExpressionType.FuncScriptTextTemplate:
                 var serrors = new List<FuncScriptParser.SyntaxErrorData>();

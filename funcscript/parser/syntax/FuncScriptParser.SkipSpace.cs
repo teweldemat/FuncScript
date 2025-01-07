@@ -1,4 +1,4 @@
-namespace funcscript.core
+namespace FuncScript.Core
 {
     public partial class FuncScriptParser
     {
@@ -10,7 +10,7 @@ namespace funcscript.core
             var expression = context.Expression;
             while (index < expression.Length)
             {
-                if (isCharWhiteSpace(expression[index]))
+                if (IsCharWhiteSpace(expression[index]))
                 {
                     index++;
                 }

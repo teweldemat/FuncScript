@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using System.Linq;
-using funcscript.core;
+using FuncScript.Core;
 using NUnit.Framework;
 
-namespace funcscript.test
+namespace FuncScript.Test
 {
     [TestFixture]
     public class TestGetLiteralMatch
@@ -12,7 +12,7 @@ namespace funcscript.test
         public void TestExactMatch()
         {
             string exp = "Hello, world!";
-            int index = FuncScriptParser.GetLiteralMatchInternal( exp, 0, new[] {"Hello"}).NextIndex;
+            int index = FuncScriptParser.GetLiteralMatchInternal(exp, 0, new[] { "Hello" }).NextIndex;
             Assert.AreEqual(5, index);
         }
 
@@ -20,7 +20,7 @@ namespace funcscript.test
         public void TestNoMatch()
         {
             string exp = "Hello, world!";
-            int index = FuncScriptParser.GetLiteralMatchInternal(exp, 0, new[] {"Goodbye"}).NextIndex;
+            int index = FuncScriptParser.GetLiteralMatchInternal(exp, 0, new[] { "Goodbye" }).NextIndex;
             Assert.AreEqual(0, index);
         }
 
@@ -28,7 +28,7 @@ namespace funcscript.test
         public void TestCaseInsensitive()
         {
             string exp = "Hello, world!";
-            int index = FuncScriptParser.GetLiteralMatchInternal(exp, 0, new[] {"HELLO"}).NextIndex;
+            int index = FuncScriptParser.GetLiteralMatchInternal(exp, 0, new[] { "HELLO" }).NextIndex;
             Assert.AreEqual(5, index);
         }
 
@@ -36,7 +36,7 @@ namespace funcscript.test
         public void TestMultipleKeywords()
         {
             string exp = "Hello, world!";
-            int index = FuncScriptParser.GetLiteralMatchInternal(exp, 0, new[] {"Goodbye", "Hello", "Hi"}).NextIndex;
+            int index = FuncScriptParser.GetLiteralMatchInternal(exp, 0, new[] { "Goodbye", "Hello", "Hi" }).NextIndex;
             Assert.AreEqual(5, index);
         }
 
@@ -44,7 +44,7 @@ namespace funcscript.test
         public void TestIndexOutOfBounds()
         {
             string exp = "Hello, world!";
-            int index = FuncScriptParser.GetLiteralMatchInternal(exp, 20, new[] {"Hello"}).NextIndex;
+            int index = FuncScriptParser.GetLiteralMatchInternal(exp, 20, new[] { "Hello" }).NextIndex;
             Assert.AreEqual(20, index);
         }
 
@@ -52,7 +52,7 @@ namespace funcscript.test
         public void TestEmptyString()
         {
             string exp = "";
-            int index = FuncScriptParser.GetLiteralMatchInternal(exp, 0, new[] {"Hello"}).NextIndex;
+            int index = FuncScriptParser.GetLiteralMatchInternal(exp, 0, new[] { "Hello" }).NextIndex;
             Assert.AreEqual(0, index);
         }
 
@@ -60,7 +60,7 @@ namespace funcscript.test
         public void TestStartIndexWithinSubstring()
         {
             string exp = "Hello, world!";
-            int index = FuncScriptParser.GetLiteralMatchInternal(exp, 7, new[] {"world"}).NextIndex;
+            int index = FuncScriptParser.GetLiteralMatchInternal(exp, 7, new[] { "world" }).NextIndex;
             Assert.AreEqual(12, index);
         }
 
@@ -68,7 +68,7 @@ namespace funcscript.test
         public void TestKeywordAtEndOfSubstring()
         {
             string exp = "Hello, world!";
-            int index = FuncScriptParser.GetLiteralMatchInternal(exp, 12, new[] {"!"}).NextIndex;
+            int index = FuncScriptParser.GetLiteralMatchInternal(exp, 12, new[] { "!" }).NextIndex;
             Assert.AreEqual(13, index);
         }
 
@@ -76,7 +76,7 @@ namespace funcscript.test
         public void TestNullString()
         {
             string exp = null;
-            Assert.Throws<ArgumentNullException>(() => FuncScriptParser.GetLiteralMatchInternal(exp, 0, new[] {"Hello"}));
+            Assert.Throws<ArgumentNullException>(() => FuncScriptParser.GetLiteralMatchInternal(exp, 0, new[] { "Hello" }));
         }
 
         [Test]
@@ -117,7 +117,5 @@ namespace funcscript.test
             return new string(Enumerable.Repeat(chars, length)
                 .Select(s => s[rnd.Next(s.Length)]).ToArray());
         }
-
     }
 }
-

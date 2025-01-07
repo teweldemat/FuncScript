@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using funcscript.block;
-using funcscript.core;
-using funcscript.funcs.math;
-using funcscript.model;
+using FuncScript.Block;
+using FuncScript.Core;
+using FuncScript.Funcs.Math;
+using FuncScript.Model;
 using NUnit.Framework;
 
-namespace funcscript.test;
+namespace FuncScript.Test;
 
 public class Fundamentals
 {
@@ -79,7 +79,7 @@ public class Fundamentals
         Assert.That(exp is KvcExpression);
         var block = (KvcExpression)exp;
         Assert.That(block.KeyValues.Count, Is.EqualTo(1));
-        Assert.IsNull(block.singleReturn);
+        Assert.IsNull(block.SingleReturn);
         var kv = block.KeyValues.First();
         Assert.That(kv.Key, Is.EqualTo("x"));
         AssertLiteralBlock(kv.ValueExpression, 5);
@@ -109,8 +109,8 @@ public class Fundamentals
         Assert.That(exp is KvcExpression);
         var block = (KvcExpression)exp;
         Assert.That(block.KeyValues.Count, Is.EqualTo(0));
-        Assert.IsNotNull(block.singleReturn);
-        AssertLiteralBlock(block.singleReturn, 5);
+        Assert.IsNotNull(block.SingleReturn);
+        AssertLiteralBlock(block.SingleReturn, 5);
 
         var res = exp.Evaluate();
         Assert.That(res, Is.EqualTo(5));
@@ -131,8 +131,8 @@ public class Fundamentals
         Assert.That(exp is KvcExpression);
         var block = (KvcExpression)exp;
         Assert.That(block.KeyValues.Count, Is.EqualTo(1));
-        Assert.IsNotNull(block.singleReturn);
-        AssertReferenceBlock(block.singleReturn, "a");
+        Assert.IsNotNull(block.SingleReturn);
+        AssertReferenceBlock(block.SingleReturn, "a");
 
         var res = exp.Evaluate();
         Assert.That(res, Is.EqualTo(5));
@@ -236,7 +236,7 @@ public class Fundamentals
         Assert.That(exp is KvcExpression);
         var block = (KvcExpression)exp;
         Assert.That(block.KeyValues.Count, Is.EqualTo(2));
-        Assert.IsNull(block.singleReturn);
+        Assert.IsNull(block.SingleReturn);
 
         var kv0 = block.KeyValues[0];
         Assert.That(kv0.Key, Is.EqualTo("x"));

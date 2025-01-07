@@ -1,7 +1,7 @@
-﻿using funcscript.core;
-using funcscript.model;
+using FuncScript.Core;
+using FuncScript.Model;
 
-namespace funcscript.block
+namespace FuncScript.Block
 {
     public class NullExpressionBlock : ExpressionBlock
     {
@@ -31,5 +31,4 @@ namespace funcscript.block
             };
         }
     }
-
 }

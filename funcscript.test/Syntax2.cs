@@ -1,5 +1,5 @@
-﻿using funcscript.error;
-using funcscript.model;
+using FuncScript.Error;
+using FuncScript.Model;
 using Microsoft.VisualBasic;
 using NuGet.Frameworks;
 using NUnit.Framework;
@@ -11,20 +11,18 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace funcscript.test
+namespace FuncScript.Test
 {
     public class Syntax2
     {
-
         [Test]
         public void StringInterpolationBasic()
         {
-            var p = new KvcProvider(new ObjectKvc(new{x = 100}),
+            var p = new KvcProvider(new ObjectKvc(new { x = 100 }),
                 new DefaultFsDataProvider());
             var res = FuncScript.Evaluate(p, @"f'y={x+2}'");
             Assert.AreEqual("y=102", res);
         }
-
 
         [Test]
         public void StringInterpolationEscape()
@@ -42,7 +40,7 @@ namespace funcscript.test
             var p = new KvcProvider(new ObjectKvc(new { x = 100 }),
                 new DefaultFsDataProvider());
             var res = FuncScript.Evaluate(p, exp);
-            Assert.That(res,Is.EqualTo("test''"));
+            Assert.That(res, Is.EqualTo("test''"));
         }
 
         [Test]
@@ -50,8 +48,9 @@ namespace funcscript.test
         {
             var exp = @"'test\u0020'";
             var res = FuncScript.Evaluate(exp);
-            Assert.That(res,Is.EqualTo("test "));
+            Assert.That(res, Is.EqualTo("test "));
         }
+        
         [Test]
         public void NullSafeGetMemberNullValue()
         {
@@ -76,9 +75,6 @@ namespace funcscript.test
             Assert.AreEqual(null, res);
         }
 
-
-        
-
         [Test]
         public void NullSafeExpressionNoneNullValue()
         {
@@ -94,6 +90,7 @@ namespace funcscript.test
             var res = FuncScript.Evaluate(p, @"[4,5,6][1]");
             Assert.AreEqual(5, res);
         }
+
         [Test]
         public void EmptyParameterList()
         {
@@ -115,51 +112,45 @@ namespace funcscript.test
         public void TestFSTemplate1()
         {
             var template = "abc";
-            var expeced = "abc";
+            var expected = "abc";
             var res = FuncScript.Evaluate(template, new DefaultFsDataProvider(), null, FuncScript.ParseMode.FsTemplate);
-            Assert.That(res, Is.EqualTo(expeced));
+            Assert.That(res, Is.EqualTo(expected));
         }
 
         [Test]
         public void TestFSTemplate2()
         {
             var template = "abc${'1'}";
-            var expeced = "abc1";
+            var expected = "abc1";
             var res = FuncScript.Evaluate(template, new DefaultFsDataProvider(), null, FuncScript.ParseMode.FsTemplate);
-            Assert.That(res, Is.EqualTo(expeced));
+            Assert.That(res, Is.EqualTo(expected));
         }
+
         [Test]
         public void TestFSTemplate3()
         {
             var template = "abc${['d',1,['e',2]]}f";
-            var expeced = "abcd1e2f";
+            var expected = "abcd1e2f";
             var res = FuncScript.Evaluate(template, new DefaultFsDataProvider(), null, FuncScript.ParseMode.FsTemplate);
-            Assert.That(res, Is.EqualTo(expeced));
+            Assert.That(res, Is.EqualTo(expected));
         }
+
         [Test]
         public void TestFSTemplate4()
         {
-
             var template = "abc${['d',1] map (x)=>'>'+x}f";
-            var expeced = "abc>d>1f";
+            var expected = "abc>d>1f";
             var res = FuncScript.Evaluate(template, new DefaultFsDataProvider(), null, FuncScript.ParseMode.FsTemplate);
-            Assert.That(res, Is.EqualTo(expeced));
+            Assert.That(res, Is.EqualTo(expected));
         }
-        //[Test]
-        //public void ListParsingBug_23_6_17()
-        //{
-        //    var expr = "[[1][2]]";
-        //    Assert.Throws<SyntaxError>(()=>FuncScript.Evaluate(expr));
-
-        //}
 
         [Test]
         [TestCase("case 30", 30)]
-        [TestCase("case 1>2:1, 2>3:2, 10",10)]
+        [TestCase("case 1>2:1, 2>3:2, 10", 10)]
         [TestCase("case 1>2:1, 2>1:2, 10", 2)]
         [TestCase("case 1>2:1, 10", 10)]
         [TestCase("(case 1>2:[1], [10])[0]", 10)]
-        public void CaseExpression(string exp,object expected)
+        public void CaseExpression(string exp, object expected)
         {
             Assert.AreEqual(expected, FuncScript.Evaluate(exp));
         }
@@ -169,10 +160,11 @@ namespace funcscript.test
         [TestCase("switch 4, 1:'a', 2:'b', 4:'c'", "c")]
         [TestCase("switch 4, 1:'a', 2:'b', 3:'c'", null)]
         [TestCase("switch 4, 1:'a', 2:'b', 3:'c','that'", "that")]
-        public void SwtichExpression(string exp, object expected)
+        public void SwitchExpression(string exp, object expected)
         {
             Assert.AreEqual(expected, FuncScript.Evaluate(exp));
         }
+
         [Test]
         [TestCase("If(true,30,2)", 30)]
         public void IfFunction(string exp, object expected)

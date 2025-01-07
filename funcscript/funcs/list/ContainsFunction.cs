@@ -1,7 +1,7 @@
-using funcscript.core;
-using funcscript.model;
+using FuncScript.Core;
+using FuncScript.Model;
 
-namespace funcscript.funcs.list
+namespace FuncScript.Funcs.List
 {
     public class ContainsFunction : IFsFunction
     {
@@ -14,7 +14,7 @@ namespace funcscript.funcs.list
         public object EvaluateList(FsList pars)
         {
             if (pars.Length != MaxParsCountValue)
-                throw new error.TypeMismatchError($"{this.Symbol} function: Invalid parameter count. Expected {MaxParsCountValue}, but got {pars.Length}");
+                throw new Error.TypeMismatchError($"{this.Symbol} function: Invalid parameter count. Expected {MaxParsCountValue}, but got {pars.Length}");
 
             var container = pars[0];
             var item = pars[1];
@@ -34,7 +34,7 @@ namespace funcscript.funcs.list
                 return str.Contains(substr, StringComparison.OrdinalIgnoreCase);
             }
 
-            throw new error.TypeMismatchError($"{this.Symbol} function: Invalid types for parameters");
+            throw new Error.TypeMismatchError($"{this.Symbol} function: Invalid types for parameters");
         }
 
         public string ParName(int index)

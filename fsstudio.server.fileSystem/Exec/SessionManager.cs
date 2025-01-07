@@ -1,8 +1,8 @@
 using System.Collections.Concurrent;
-using funcscript;
-using funcscript.host;
+using FuncScript;
+using FuncScript.Host;
 
-namespace fsstudio.server.fileSystem.exec
+namespace FsStudio.Server.FileSystem.Exec
 {
     public class SessionManager
     {
@@ -19,17 +19,16 @@ namespace fsstudio.server.fileSystem.exec
                 throw new InvalidOperationException("Root path not set");
             if (relativePath.StartsWith("/"))
                 return GetAbsolutePath(relativePath.Substring(1));
-            if(relativePath.EndsWith("/"))
-                return GetAbsolutePath(relativePath.Substring(0,relativePath.Length-1));
+            if (relativePath.EndsWith("/"))
+                return GetAbsolutePath(relativePath.Substring(0, relativePath.Length - 1));
             return Path.Combine(_rootPath, relativePath);
         }
 
-        public class RemoteLoggerForFs(RemoteLogger rl,string sessionId) : FsLogger
+        public class RemoteLoggerForFs(RemoteLogger rl, string sessionId) : FsLogger
         {
-            
             public override void WriteLine(string text)
             {
-                rl.WriteLine(sessionId,text);
+                rl.WriteLine(sessionId, text);
             }
 
             public override void Clear()
@@ -44,9 +43,9 @@ namespace fsstudio.server.fileSystem.exec
             _remoteLogger = remoteLogger;
             var appDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             var appFolder = Path.Combine(appDataFolder, "fs-studio");
-            if(!Directory.Exists(appFolder)) Directory.CreateDirectory(appFolder);
+            if (!Directory.Exists(appFolder)) Directory.CreateDirectory(appFolder);
             _lastRootFolderFilePath = Path.Combine(appFolder, "last-root-folder.txt");
-            if(File.Exists(_lastRootFolderFilePath))
+            if (File.Exists(_lastRootFolderFilePath))
             {
                 _rootPath = File.ReadAllText(_lastRootFolderFilePath).Trim();
                 if (string.IsNullOrWhiteSpace(_rootPath))
@@ -61,7 +60,7 @@ namespace fsstudio.server.fileSystem.exec
 
             var appDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             var appFolder = Path.Combine(appDataFolder, "fs-studio");
-            if(!Directory.Exists(appFolder)) Directory.CreateDirectory(appFolder);
+            if (!Directory.Exists(appFolder)) Directory.CreateDirectory(appFolder);
             File.WriteAllText(_lastRootFolderFilePath, newRootPath);
         }
 

@@ -1,16 +1,16 @@
-namespace funcscript.core
+namespace FuncScript.Core
 {
     public partial class FuncScriptParser
     {
         record GetCommentBlockResult(ParseNode ParseNode, int NextIndex)
-            :ParseResult(ParseNode,NextIndex);
+            : ParseResult(ParseNode, NextIndex);
         static GetCommentBlockResult GetCommentBlock(ParseContext context, int index)
         {
             ParseNode parseNode = null;
             var i = GetLiteralMatchMultiple(context, index, new string[] { "//" }).NextIndex;
             if (i == index)
                 return new GetCommentBlockResult(parseNode, index);
-            var i2 = context.Expression.IndexOf("\n", i,StringComparison.InvariantCulture);
+            var i2 = context.Expression.IndexOf("\n", i, StringComparison.InvariantCulture);
             if (i2 == -1)
                 i = context.Expression.Length;
             else

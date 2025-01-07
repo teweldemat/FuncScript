@@ -1,5 +1,5 @@
-﻿using funcscript.core;
-using funcscript.error;
+using FuncScript.Core;
+using FuncScript.Error;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace funcscript.test
+namespace FuncScript.Test
 {
     public class TestErrorReporting
     {
@@ -18,7 +18,7 @@ namespace funcscript.test
 
         void AnalyzeError(Exception ex, String exp, int expectedPos, int expecctedLen)
         {
-            Assert.AreEqual(typeof(error.EvaluationException), ex.GetType());
+            Assert.AreEqual(typeof(Error.EvaluationException), ex.GetType());
             var evalError = (EvaluationException)ex;
             Console.WriteLine(evalError.Message);
             if (evalError.InnerException != null)
@@ -28,19 +28,19 @@ namespace funcscript.test
         }
         void AnalyzeSyntaxError(Exception ex, String exp)
         {
-            Assert.AreEqual(typeof(error.SyntaxError), ex.GetType());
+            Assert.AreEqual(typeof(Error.SyntaxError), ex.GetType());
             var sError = (SyntaxError)ex;
             Console.WriteLine(sError.Message);
             if (sError.InnerException != null)
                 Console.WriteLine(sError.InnerException.Message);
         }
-        void AnalyzeMainSyntaxErrorLine(Exception ex,string line)
+        void AnalyzeMainSyntaxErrorLine(Exception ex, string line)
         {
-            Assert.AreEqual(typeof(error.SyntaxError), ex.GetType());
+            Assert.AreEqual(typeof(Error.SyntaxError), ex.GetType());
             var sError = (SyntaxError)ex;
             var unique = sError.GetData().Distinct().ToList();
-            var uniqueError = new SyntaxError(sError.TargetExpression , unique);
-            Assert.That(uniqueError.Line,Is.EqualTo(line));
+            var uniqueError = new SyntaxError(sError.TargetExpression, unique);
+            Assert.That(uniqueError.Line, Is.EqualTo(line));
         }
 
         [Test]
@@ -103,7 +103,7 @@ c:4
             catch (Exception ex)
             {
                 AnalyzeError(ex, exp, exp.IndexOf(error_exp), error_exp.Length);
-                Assert.AreEqual(typeof(error.TypeMismatchError), ex.InnerException.GetType());
+                Assert.AreEqual(typeof(Error.TypeMismatchError), ex.InnerException.GetType());
             }
         }
         [Test]
@@ -119,7 +119,7 @@ c:4
             catch (Exception ex)
             {
                 AnalyzeError(ex, exp, exp.IndexOf(error_exp), error_exp.Length);
-                Assert.AreEqual(typeof(error.TypeMismatchError), ex.InnerException.GetType());
+                Assert.AreEqual(typeof(Error.TypeMismatchError), ex.InnerException.GetType());
             }
         }
         [Test]
@@ -135,7 +135,7 @@ c:4
             catch (Exception ex)
             {
                 AnalyzeError(ex, exp, exp.IndexOf(error_exp), error_exp.Length);
-                Assert.AreEqual(typeof(error.TypeMismatchError), ex.InnerException.GetType());
+                Assert.AreEqual(typeof(Error.TypeMismatchError), ex.InnerException.GetType());
             }
 
         }

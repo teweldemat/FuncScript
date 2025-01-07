@@ -1,9 +1,9 @@
-using funcscript.block;
-using funcscript.funcs.math;
-using funcscript.funcs.logic;
-using funcscript.model;
+using FuncScript.Block;
+using FuncScript.Funcs.Math;
+using FuncScript.Funcs.Logic;
+using FuncScript.Model;
 
-namespace funcscript.core
+namespace FuncScript.Core
 {
     public partial class FuncScriptParser
     {
@@ -117,7 +117,7 @@ namespace funcscript.core
         }
 
         public record ParseResult(ParseNode ParseNode, int NextIndex);
-        public record ExpressionBlockResult(ExpressionBlock Block, ParseNode ParseNode, int NextIndex):ParseResult(ParseNode,NextIndex);
+        public record ExpressionBlockResult(ExpressionBlock Block, ParseNode ParseNode, int NextIndex) : ParseResult(ParseNode, NextIndex);
         public record ParseContext(KeyValueCollection ReferenceProvider, string Expression, List<SyntaxErrorData> SyntaxErrors);
     }
 }

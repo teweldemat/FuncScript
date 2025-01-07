@@ -1,7 +1,7 @@
-using funcscript.core;
-using funcscript.model;
+using FuncScript.Core;
+using FuncScript.Model;
 
-namespace funcscript.funcs.logic
+namespace FuncScript.Funcs.Logic
 {
     public class GreaterThanOrEqualFunction : IFsFunction
     {
@@ -14,7 +14,7 @@ namespace funcscript.funcs.logic
         public object EvaluateList(FsList pars)
         {
             if (pars.Length != MaxParameterCount)
-                throw new error.TypeMismatchError($"{this.Symbol} function: Invalid parameter count. Expected {MaxParameterCount}, but got {pars.Length}");
+                throw new Error.TypeMismatchError($"{this.Symbol} function: Invalid parameter count. Expected {MaxParameterCount}, but got {pars.Length}");
 
             var par0 = pars[0];
             var par1 = pars[1];

@@ -1,11 +1,11 @@
-using funcscript.core;
-using funcscript.model;
-using System;
-using fsstudio.server.fileSystem.exec;
+using FuncScript.Core;
+using FuncScript.Model;
 
-namespace funcscript.funcs.text
+using System.Runtime.InteropServices.JavaScript;
+
+namespace FsStudio.Server.FileSystem.Exec.Funcs
 {
-    internal class MarkDownFunction(RemoteLogger remoteLogger,string sessionId) : IFsFunction
+    internal class MarkDownFunction(RemoteLogger remoteLogger, string sessionId) : IFsFunction
     {
         private const int MaxParameters = 1;
         public CallType CallType => CallType.Prefix;
@@ -20,8 +20,8 @@ namespace funcscript.funcs.text
                 );
 
             var par0 = pars[0];
-            if(par0 is null)
-                remoteLogger.SendMarkdDown(sessionId,"");
+            if (par0 is null)
+                remoteLogger.SendMarkdDown(sessionId, "");
             else if (par0 is string str)
             {
                 string content = (string)par0;
@@ -29,7 +29,7 @@ namespace funcscript.funcs.text
             }
             else
             {
-                remoteLogger.SendMarkdDown(sessionId,$"Unsupported type {FuncScript.GetFsDataType(par0)} for markdown");
+                remoteLogger.SendMarkdDown(sessionId, $"Unsupported type {FuncScript.FuncScript.GetFsDataType(par0)} for markdown");
             }
             return par0;
         }

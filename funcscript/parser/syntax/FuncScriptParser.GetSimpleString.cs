@@ -1,28 +1,28 @@
 using System.Text;
-using funcscript.model;
+using FuncScript.Model;
 
-namespace funcscript.core
+namespace FuncScript.Core
 {
     public partial class FuncScriptParser
     {
         record GetStringResult(string Str, ParseNode ParseNode, int NextIndex)
-            :ParseResult(ParseNode,NextIndex);
+            : ParseResult(ParseNode, NextIndex);
 
         static GetStringResult GetSimpleString(ParseContext context, int index)
         {
-            var res = GetSimpleString(context,  "\"", index);
+            var res = GetSimpleString(context, "\"", index);
             if (res.NextIndex > index)
                 return res;
-            return GetSimpleString(context,  "'", index);
+            return GetSimpleString(context, "'", index);
         }
 
-        static GetStringResult GetSimpleString(ParseContext context,  string delimator, int index)
+        static GetStringResult GetSimpleString(ParseContext context, string delimator, int index)
         {
             ParseNode parseNode = null;
             String str = null;
             var i = GetLiteralMatch(context, index, delimator).NextIndex;
             if (i == index)
-                return new GetStringResult(null,null,index);
+                return new GetStringResult(null, null, index);
             int i2;
             var sb = new StringBuilder();
             while (true)
@@ -85,13 +85,13 @@ namespace funcscript.core
             if (i2 == i)
             {
                 context.SyntaxErrors.Add(new SyntaxErrorData(i, 0, $"'{delimator}' expected"));
-                return new GetStringResult(null,null,index);
+                return new GetStringResult(null, null, index);
             }
 
             i = i2;
             str = sb.ToString();
             parseNode = new ParseNode(ParseNodeType.LiteralString, index, i - index);
-            return new GetStringResult(str,parseNode,i);
+            return new GetStringResult(str, parseNode, i);
         }
     }
 }

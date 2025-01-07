@@ -1,8 +1,8 @@
-﻿using funcscript.core;
-using funcscript.model;
+using FuncScript.Core;
+using FuncScript.Model;
 using Npgsql;
 
-namespace funcscript.sql.core
+namespace FuncScript.Sql.Core
 {
     public class PgSqlFunction : IFsFunction
     {

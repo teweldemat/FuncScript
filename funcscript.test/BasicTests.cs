@@ -1,12 +1,12 @@
-using funcscript.model;
-using funcscript.error;
+using FuncScript.Model;
+using FuncScript.Error;
 using NUnit.Framework;
 using System;
 using System.Numerics;
 using System.Text;
-using funcscript.block;
+using FuncScript.Block;
 
-namespace funcscript.test
+namespace FuncScript.Test
 {
     public class TestSet2
     {
@@ -14,7 +14,6 @@ namespace funcscript.test
         [Test]
         public void CallingNoneFunction()
         {
-            
             Assert.Throws(typeof(EvaluationException), () =>
             {
                 var g = new DefaultFsDataProvider();
@@ -24,14 +23,11 @@ namespace funcscript.test
         [Test]
         public void DuplicateKeyInCollection()
         {
-
             Assert.Throws(typeof(SyntaxError), () =>
             {
                 FuncScript.Evaluate("{a:5;a:6;return 5;}");
             });
         }
-
-
     }
     public class Tests
     {
@@ -81,17 +77,14 @@ namespace funcscript.test
         [TestCase("12.0", 12.0)]
         [TestCase("12e1", 120)]
         [TestCase("12.0e1", 120.0)]
-
         [TestCase("-12", -12)]
         [TestCase("-12.", -12.0)]
         [TestCase("-12.0", -12.0)]
         [TestCase("-12e1", -120)]
         [TestCase("-12.0e1", -120.0)]
-
         [TestCase("-12l", -12L)]
         [TestCase("-12e1l", -120L)]
         [TestCase("-1", -1)]
-
         [TestCase("12+12l", 24L)]
         [TestCase("\"12\"", "12")]
         [TestCase("3+\"12\"", "312")]
@@ -120,10 +113,8 @@ namespace funcscript.test
         [TestCase("3+\"12\"", "312")]
         [TestCase("\"12\"+3", "123")]
         [TestCase("\"a\\\"b\"", "a\"b")]
-
         [TestCase("{x:5; return f\"a{x}b\"; }", "a5b")]
         [TestCase("{x:5; return f\"a\\{x}b\"; }", "a{x}b")]
-
         [TestCase("{return 3}", 3)] //single white space
         [TestCase("{return\t3}", 3)] //tab white space
         [TestCase("{return\n3}", 3)] //line break
@@ -153,7 +144,7 @@ namespace funcscript.test
         [Test]
         public void TestOverflow()
         {
-            Assert.Throws<error.SyntaxError>(() =>
+            Assert.Throws<SyntaxError>(() =>
             {
                 FuncScript.Evaluate($"{long.MaxValue}0");
             });
@@ -162,7 +153,7 @@ namespace funcscript.test
         [TestCase("12e-")]
         public void TestInvalid(string exp)
         {
-            Assert.Throws<error.SyntaxError>(() =>
+            Assert.Throws<SyntaxError>(() =>
             {
                 FuncScript.Evaluate(exp);
             });
@@ -176,7 +167,6 @@ namespace funcscript.test
         [Test]
         public void TestMapList()
         {
-
             var res = AssertSingleResultType("Map([1,2,4],(x)=>x*x)", typeof(FsList));
             Assert.IsTrue(((FsList)res)[2].Equals(16), "Result  not correct");
         }
@@ -184,21 +174,18 @@ namespace funcscript.test
         [Test]
         public void SumListWthNoInitialInt()
         {
-
             var res = AssertSingleResultType("Reduce(Map([1,2,4],(x)=>x*x),(c,p)=>p+c)", typeof(int));
             Assert.AreEqual(1 * 1 + 2 * 2 + 4 * 4, res);
         }
         [Test]
         public void SumListWthInitial()
         {
-
             var res = AssertSingleResultType("Reduce(Map([1,2,4],(x)=>x*x),(c,t)=>t+c,0)", typeof(int));
             Assert.AreEqual(1 * 1 + 2 * 2 + 4 * 4, res);
         }
         [Test]
         public void TestListParser()
         {
-
             var res = AssertSingleResultType("[1,2,4]", typeof(FsList));
             Assert.IsTrue(res is FsList, ".net data type not ListData");
         }
@@ -213,7 +200,6 @@ namespace funcscript.test
         [TestCase("12.E-12")]
         public void TesDoubleParser(string exp)
         {
-
             var res = AssertSingleResultType(exp, typeof(double));
             Assert.IsTrue(res is double, ".net data type not double");
             Assert.AreEqual((double)res, double.Parse(exp));
@@ -226,7 +212,6 @@ namespace funcscript.test
         [TestCase(@"'\\n'", @"\n")]
         public void TesStringParser(string exp, string expected)
         {
-
             var res = AssertSingleResultType(exp, typeof(string));
             Assert.IsTrue(res is string, ".net data type not string");
             Assert.AreEqual(expected, (string)res);
@@ -238,7 +223,6 @@ namespace funcscript.test
         [TestCase("12.0E-2+2", "2.12")]
         public void TesDoubleParser(string exp, double resVal)
         {
-
             var res = AssertSingleResultType(exp, typeof(double));
             Assert.IsTrue(res is double, ".net data type not double");
             Assert.AreEqual((double)res, resVal);
@@ -247,7 +231,6 @@ namespace funcscript.test
         [Test]
         public void TestJsonMemberAccess()
         {
-
             var res = AssertSingleResultType("{x:{\"a\":23}; return x.a;}", typeof(int));
             Assert.IsTrue(res != null && (int)res == 23, "Incorrect result");
         }
@@ -281,7 +264,6 @@ namespace funcscript.test
         [TestCase("1/2", 0)]
         [TestCase("If(1=0,10,5-1)", 4)]
         [TestCase("((a)=>a*a)(3)", 9)]
-
         [TestCase(
 @"{
     x:3;
@@ -353,7 +335,6 @@ return j;
         [Test]
         public void MapNull()
         {
-
             Assert.IsNull(FuncScript.Evaluate("null map (x)=>x"));
             Assert.IsNull(FuncScript.Evaluate("y map (x)=>x"));
         }
@@ -369,7 +350,6 @@ return j;
 
         [Test]
         public void NegativeOperatorBug()
-
         {
             var exp = @"{
             x:-5;
@@ -411,7 +391,7 @@ return j;
     f:(x)=>g(x)+3;
     return f(3);
 }";
-            var res=FuncScript.Evaluate(exp);
+            var res = FuncScript.Evaluate(exp);
             Assert.That(res,Is.EqualTo(9));
         }
         [Test]
@@ -422,7 +402,7 @@ return j;
     f:(x)=>if(x=0,f(1),2);
     return f(3);
 }";
-            var res=FuncScript.Evaluate(exp);
+            var res = FuncScript.Evaluate(exp);
             Assert.That(res,Is.EqualTo(2));
         }
         [Test]
@@ -433,7 +413,7 @@ return j;
     fib:(x)=>if(x<2,1,fib(x-2)+fib(x-1));
     return fib(3);
 }";
-            var res=FuncScript.Evaluate(exp);
+            var res = FuncScript.Evaluate(exp);
             Assert.That(res,Is.EqualTo(3));
         }
 

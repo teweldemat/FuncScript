@@ -1,7 +1,7 @@
-using funcscript.core;
-using funcscript.model;
+using FuncScript.Core;
+using FuncScript.Model;
 
-namespace funcscript.funcs.logic
+namespace FuncScript.Funcs.Logic
 {
     public class EvaluateIfNotNull : IFsFunction
     {
@@ -14,7 +14,7 @@ namespace funcscript.funcs.logic
         public object EvaluateList(FsList pars)
         {
             if (pars.Length != MaxParameters)
-                throw new error.TypeMismatchError($"{Symbol} function expects exactly two parameters.");
+                throw new Error.TypeMismatchError($"{Symbol} function expects exactly two parameters.");
 
             var val = pars[0];
             if (val == null)

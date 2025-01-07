@@ -1,5 +1,5 @@
-﻿using funcscript.core;
-using funcscript.model;
+using FuncScript.Core;
+using FuncScript.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +7,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace funcscript
+namespace FuncScript
 {
     public class DefaultFsDataProvider : KeyValueCollection
     {

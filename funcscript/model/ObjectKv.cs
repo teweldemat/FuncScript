@@ -1,39 +1,38 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Reflection;
-using funcscript.core;
+using FuncScript.Core;
 
-namespace funcscript.model
+namespace FuncScript.Model
 {
-    public class ObjectKvc:KeyValueCollection
+    public class ObjectKvc : KeyValueCollection
     {
         class PropInfo
         {
-            public String Name;
-            public PropertyInfo Prop=null;
-            public FieldInfo Field=null;
+            public string Name;
+            public PropertyInfo Prop = null;
+            public FieldInfo Field = null;
         }
         class TypeInfo
         {
-            public Dictionary<String, PropInfo> Properties = new Dictionary<string, PropInfo>();
-
+            public Dictionary<string, PropInfo> Properties = new Dictionary<string, PropInfo>();
         }
         static Dictionary<Type, TypeInfo> s_typeInfos = new Dictionary<Type, TypeInfo>();
         static TypeInfo GetTypeInfo(Type t)
         {
-            lock(s_typeInfos)
+            lock (s_typeInfos)
             {
                 if (s_typeInfos.TryGetValue(t, out var info))
                     return info;
                 var tinfo = new TypeInfo();
                 foreach (var prop in t.GetProperties().Where(p => p.CanRead && p.GetMethod.GetParameters().Length == 0))
                 {
-                        tinfo.Properties.Add(prop.Name.ToLower(), new PropInfo { Name = prop.Name, Prop = prop });
+                    tinfo.Properties.Add(prop.Name.ToLower(), new PropInfo { Name = prop.Name, Prop = prop });
                 }
                 foreach (var field in t.GetFields())
                 {
                     if (field.IsStatic)
                         continue;
-                    tinfo.Properties.Add(field.Name.ToLower(), new PropInfo { Name = field.Name, Field= field});
+                    tinfo.Properties.Add(field.Name.ToLower(), new PropInfo { Name = field.Name, Field = field });
                 }
                 s_typeInfos.Add(t, tinfo);
                 return tinfo;
@@ -43,7 +42,6 @@ namespace funcscript.model
 
         protected ObjectKvc()
         {
-            
         }
         public ObjectKvc(object val)
         {
@@ -71,7 +69,7 @@ namespace funcscript.model
             var tInfo = GetTypeInfo(t);
             if (!tInfo.Properties.TryGetValue(key, out var val))
                 return null;
-            if(val.Prop!=null)
+            if (val.Prop != null)
                 return FuncScript.NormalizeDataType(val.Prop.GetValue(_val));
             return FuncScript.NormalizeDataType(val.Field.GetValue(_val));
         }
@@ -94,6 +92,5 @@ namespace funcscript.model
             }
             return list;
         }
-        
     }
 }

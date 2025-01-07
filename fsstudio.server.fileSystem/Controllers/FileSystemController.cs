@@ -1,10 +1,7 @@
+using FsStudio.Server.FileSystem.Exec;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using System;
-using System.IO;
-using fsstudio.server.fileSystem.exec;
 
-namespace fsstudio.server.fileSystem
+namespace FsStudio.Server.FileSystem.Controllers
 {
     public class FileOperationModel
     {

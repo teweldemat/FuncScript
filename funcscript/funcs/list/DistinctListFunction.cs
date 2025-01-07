@@ -1,8 +1,8 @@
-using funcscript.core;
-using funcscript.model;
+using FuncScript.Core;
+using FuncScript.Model;
 using System.Collections.Generic;
 
-namespace funcscript.funcs.list
+namespace FuncScript.Funcs.List
 {
     public class DistinctListFunction : IFsFunction
     {
@@ -15,7 +15,7 @@ namespace funcscript.funcs.list
         public object EvaluateList(FsList pars)
         {
             if (pars.Length != MaxParameters)
-                throw new error.EvaluationTimeException($"{this.Symbol} function: Invalid parameter count. Expected {MaxParameters}, but got {pars.Length}");
+                throw new Error.EvaluationTimeException($"{this.Symbol} function: Invalid parameter count. Expected {MaxParameters}, but got {pars.Length}");
 
             var par0 = pars[0];
 
@@ -23,7 +23,7 @@ namespace funcscript.funcs.list
                 return null;
 
             if (!(par0 is FsList))
-                throw new error.TypeMismatchError($"{this.Symbol} function: The parameter should be {this.ParName(0)}");
+                throw new Error.TypeMismatchError($"{this.Symbol} function: The parameter should be {this.ParName(0)}");
 
             var lst = (FsList)par0;
 

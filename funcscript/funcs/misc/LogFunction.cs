@@ -1,8 +1,8 @@
-using funcscript.core;
-using funcscript.host;
-using funcscript.model;
+using FuncScript.Core;
+using FuncScript.Host;
+using FuncScript.Model;
 
-namespace funcscript.funcs.misc
+namespace FuncScript.Funcs.Misc
 {
     public class LogFunction : IFsFunction
     {
@@ -14,7 +14,7 @@ namespace funcscript.funcs.misc
         public object EvaluateList(FsList pars)
         {
             if (pars.Length == 0)
-                throw new error.EvaluationTimeException($"{this.Symbol} function: {this.ParName(0)} expected");
+                throw new Error.EvaluationTimeException($"{this.Symbol} function: {this.ParName(0)} expected");
 
             var anchor = pars[0];
             var second = pars.Length > 1 ? pars[1] : null;

@@ -1,10 +1,10 @@
-using funcscript.model;
-namespace funcscript.core
+using FuncScript.Model;
+namespace FuncScript.Core
 {
     public partial class FuncScriptParser
     {
         record GetKeyWordLiteralResult(object Literal, ParseNode ParseNode, int NextIndex)
-            :ParseResult(ParseNode,NextIndex);
+            : ParseResult(ParseNode, NextIndex);
 
         static GetKeyWordLiteralResult GetKeyWordLiteral(ParseContext context, int index)
         {

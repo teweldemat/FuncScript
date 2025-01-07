@@ -1,5 +1,5 @@
-﻿using funcscript.core;
-namespace funcscript.model
+﻿using FuncScript.Core;
+namespace FuncScript.Model
 {
     internal class ByteArray 
     {
@@ -15,12 +15,12 @@ namespace funcscript.model
             this.f = f;
             var m = f.Method;
             if (m.ReturnType == typeof(void))
-                throw new error.TypeMismatchError("Delegate with no return is not supported");
+                throw new Error.TypeMismatchError("Delegate with no return is not supported");
             _pars = m.GetParameters();
             foreach(var p in _pars)
             {
                 if(p.IsOut)
-                    throw new error.TypeMismatchError($"Delegate with output parameters not supported. Par:{p.Name}");
+                    throw new Error.TypeMismatchError($"Delegate with output parameters not supported. Par:{p.Name}");
             }
         }
 

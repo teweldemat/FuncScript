@@ -1,22 +1,21 @@
 using ArgumentNullException = System.ArgumentNullException;
-using funcscript.block;
-using funcscript.funcs.math;
+using FuncScript.Block;
+using FuncScript.Funcs.Math;
 
-namespace funcscript.core
+namespace FuncScript.Core
 {
     public partial class FuncScriptParser
     {
-
         public record GetLiteralMatchResult(string Matched, int NextIndex);
-        static GetLiteralMatchResult GetLiteralMatch(ParseContext context, int index,  string candidate)
+        static GetLiteralMatchResult GetLiteralMatch(ParseContext context, int index, string candidate)
         {
-            return GetLiteralMatchMultiple(context, index, new []{candidate});
+            return GetLiteralMatchMultiple(context, index, new[] { candidate });
         }
         static GetLiteralMatchResult GetLiteralMatchMultiple(ParseContext context, int index, string[] candidates)
         {
             return GetLiteralMatchInternal(context.Expression, index, candidates);
         }
-        public static GetLiteralMatchResult GetLiteralMatchInternal(String expression, int index, string[] candidates)
+        public static GetLiteralMatchResult GetLiteralMatchInternal(string expression, int index, string[] candidates)
         {
             if (expression == null)
             {

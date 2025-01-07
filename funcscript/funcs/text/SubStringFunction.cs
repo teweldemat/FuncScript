@@ -1,7 +1,7 @@
-using funcscript.core;
-using funcscript.model;
+using FuncScript.Core;
+using FuncScript.Model;
 
-namespace funcscript.funcs.text
+namespace FuncScript.Funcs.Text
 {
     public class SubStringFunction : IFsFunction
     {
@@ -13,7 +13,7 @@ namespace funcscript.funcs.text
         public object EvaluateList(FsList pars)
         {
             if (pars.Length == 0)
-                throw new error.EvaluationTimeException($"{this.Symbol} requires at least one parameter.");
+                throw new Error.EvaluationTimeException($"{this.Symbol} requires at least one parameter.");
 
             var par0 = pars[0] as string;
             if (par0 == null)

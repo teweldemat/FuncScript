@@ -1,8 +1,8 @@
 using System.Text;
-using funcscript.core;
-using funcscript.model;
+using FuncScript.Core;
+using FuncScript.Model;
 
-namespace funcscript.funcs.text
+namespace FuncScript.Funcs.Text
 {
     public class ParseText : IFsFunction, KeyValueCollection
     {
@@ -16,7 +16,7 @@ namespace funcscript.funcs.text
         public object EvaluateList(FsList pars)
         {
             if (pars.Length == 0)
-                throw new error.TypeMismatchError($"{this.Symbol} requires at least one parameter");
+                throw new Error.TypeMismatchError($"{this.Symbol} requires at least one parameter");
 
             var par0 = pars[0];
             
@@ -60,14 +60,14 @@ namespace funcscript.funcs.text
             catch (Exception e)
             {
                 var sb = new StringBuilder();
-                while (e!=null)
+                while (e != null)
                 {
                     sb.Append(e.Message);
                     e = e.InnerException;
-                    if(e!=null)
+                    if (e != null)
                         sb.Append("\n");
                 }
-                return new FsError(FsError.ERROR_TYPE_EVALUATION,  sb.ToString());
+                return new FsError(FsError.ERROR_TYPE_EVALUATION, sb.ToString());
             }
 
         }

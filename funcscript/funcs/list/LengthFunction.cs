@@ -1,7 +1,7 @@
-using funcscript.core;
-using funcscript.model;
+using FuncScript.Core;
+using FuncScript.Model;
 
-namespace funcscript.funcs.list
+namespace FuncScript.Funcs.List
 {
     public class LengthFunction : IFsFunction
     {
@@ -14,7 +14,7 @@ namespace funcscript.funcs.list
         public object EvaluateList(FsList pars)
         {
             if (pars.Length != MaxParameters)
-                throw new error.TypeMismatchError($"{this.Symbol} function: Invalid parameter count. Expected {MaxParameters}, but got {pars.Length}");
+                throw new Error.TypeMismatchError($"{this.Symbol} function: Invalid parameter count. Expected {MaxParameters}, but got {pars.Length}");
 
             var par0 = pars[0];
 
@@ -28,7 +28,7 @@ namespace funcscript.funcs.list
                 null => 0,
                 FsList list => list.Length,
                 string s => s.Length,
-                _ => throw new error.TypeMismatchError($"{this.Symbol} function doesn't apply to {par0.GetType()}")
+                _ => throw new Error.TypeMismatchError($"{this.Symbol} function doesn't apply to {par0.GetType()}")
             };
         }
 

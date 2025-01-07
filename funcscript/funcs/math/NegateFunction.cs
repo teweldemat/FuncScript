@@ -1,9 +1,8 @@
-using funcscript.core;
-using funcscript.model;
+using FuncScript.Core;
+using FuncScript.Model;
 
-namespace funcscript.funcs.math
+namespace FuncScript.Funcs.Math
 {
-    
     public class NegateFunction : IFsFunction
     {
         public const string SYMBOL = "neg";

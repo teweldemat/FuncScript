@@ -1,8 +1,8 @@
-using funcscript.core;
-using funcscript.model;
+using FuncScript.Core;
+using FuncScript.Model;
 using System;
 
-namespace funcscript.funcs.list
+namespace FuncScript.Funcs.List
 {
     public class ReduceListFunction : IFsFunction
     {
@@ -29,11 +29,11 @@ namespace funcscript.funcs.list
         private object EvaluateInternal(object par0, object par1, object par2, bool dref)
         {
             if (!(par0 is FsList lst))
-                throw new error.TypeMismatchError($"{this.Symbol} function: The first parameter should be {this.ParName(0)}");
+                throw new Error.TypeMismatchError($"{this.Symbol} function: The first parameter should be {this.ParName(0)}");
 
             var func = par1 as IFsFunction;
             if (func == null)
-                throw new error.TypeMismatchError($"{this.Symbol} function: The second parameter didn't evaluate to a function");
+                throw new Error.TypeMismatchError($"{this.Symbol} function: The second parameter didn't evaluate to a function");
 
             var total = par2;
             

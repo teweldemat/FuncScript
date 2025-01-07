@@ -1,8 +1,8 @@
-using funcscript.core;
-using funcscript.model;
+using FuncScript.Core;
+using FuncScript.Model;
 using System;
 
-namespace funcscript.funcs.strings
+namespace FuncScript.Funcs.Strings
 {
     internal class EndsWithFunction : IFsFunction
     {
@@ -15,7 +15,7 @@ namespace funcscript.funcs.strings
         public object EvaluateList(FsList pars)
         {
             if (pars.Length != MaxParameters)
-                throw new error.TypeMismatchError($"{this.Symbol} function: Invalid parameter count. Expected {MaxParameters}, but got {pars.Length}");
+                throw new Error.TypeMismatchError($"{this.Symbol} function: Invalid parameter count. Expected {MaxParameters}, but got {pars.Length}");
 
             var par0 = pars[0];
             var par1 = pars[1];
@@ -29,7 +29,7 @@ namespace funcscript.funcs.strings
                 return false;
 
             if (!(par0 is string) || !(par1 is string))
-                throw new error.TypeMismatchError($"Function {this.Symbol}. Both parameters must be strings");
+                throw new Error.TypeMismatchError($"Function {this.Symbol}. Both parameters must be strings");
 
             var mainString = (string)par0;
             var ending = (string)par1;

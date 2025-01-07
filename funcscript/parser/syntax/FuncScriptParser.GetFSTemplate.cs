@@ -1,8 +1,8 @@
 using System.Text;
-using funcscript.block;
-using funcscript.funcs.math;
-using funcscript.model;
-namespace funcscript.core
+using FuncScript.Block;
+using FuncScript.Funcs.Math;
+using FuncScript.Model;
+namespace FuncScript.Core
 {
     public partial class FuncScriptParser
     {

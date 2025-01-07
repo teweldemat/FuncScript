@@ -1,9 +1,9 @@
-using funcscript.core;
+using FuncScript.Core;
 using System;
 using System.Text;
-using funcscript.model;
+using FuncScript.Model;
 
-namespace funcscript.funcs.text
+namespace FuncScript.Funcs.Text
 {
     public class FormatValueFunction : IFsFunction
     {
@@ -14,7 +14,7 @@ namespace funcscript.funcs.text
         public object EvaluateList(FsList pars)
         {
             if (pars.Length < 1)
-                throw new error.EvaluationTimeException($"{this.Symbol} requires at least one parameter.");
+                throw new Error.EvaluationTimeException($"{this.Symbol} requires at least one parameter.");
 
             var par0 = pars[0];
             var par1 = pars.Length > 1 ? pars[1] : null;

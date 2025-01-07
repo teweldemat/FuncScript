@@ -1,7 +1,7 @@
-using funcscript.core;
-using funcscript.model;
+using FuncScript.Core;
+using FuncScript.Model;
 
-namespace funcscript.funcs.html
+namespace FuncScript.Funcs.Html
 {
     internal class HtmlEncodeFunction : IFsFunction
     {

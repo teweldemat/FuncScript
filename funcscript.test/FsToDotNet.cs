@@ -1,8 +1,8 @@
-using funcscript.model;
+using FuncScript.Model;
 using NUnit.Framework;
 using System.Collections.Generic;
 
-namespace funcscript.test;
+namespace FuncScript.Test;
 
 public class FsToDotNet
 {
@@ -59,7 +59,7 @@ public class FsToDotNet
         Assert.That(res is KeyValueCollection);
         var kvc = (KeyValueCollection)res;
         var m = kvc.ConvertTo<TestModel1>();
-        Assert.That(m.X,Is.EqualTo("15"));
+        Assert.That(m.X, Is.EqualTo("15"));
     }
 
     [Test]
@@ -140,7 +140,7 @@ public class FsToDotNet
         Assert.That(res is KeyValueCollection);
         var kvc = (KeyValueCollection)res;
         var m = kvc.ConvertTo<TestModel3>();
-        Assert.That(m.A,Is.EqualTo(6.6).Within(0.0000001));
+        Assert.That(m.A, Is.EqualTo(6.6).Within(0.0000001));
         Assert.That(m.B == "FuncScript");
     }
 

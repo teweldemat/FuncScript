@@ -1,8 +1,8 @@
-using funcscript.core;
-using funcscript.model;
+using FuncScript.Core;
+using FuncScript.Model;
 using System;
 
-namespace funcscript.funcs.list
+namespace FuncScript.Funcs.List
 {
     public class TakeFunction : IFsFunction
     {
@@ -15,7 +15,7 @@ namespace funcscript.funcs.list
         public object EvaluateList(FsList pars)
         {
             if (pars.Length != MaxParameters)
-                throw new error.TypeMismatchError($"{Symbol} function: Invalid parameter count. Expected {MaxParameters}, but got {pars.Length}");
+                throw new Error.TypeMismatchError($"{Symbol} function: Invalid parameter count. Expected {MaxParameters}, but got {pars.Length}");
 
             var par0 = pars[0];
             var par1 = pars[1];
@@ -29,10 +29,10 @@ namespace funcscript.funcs.list
                 return null;
 
             if (!(par0 is FsList))
-                throw new error.TypeMismatchError($"{Symbol} function: The first parameter should be {ParName(0)}");
+                throw new Error.TypeMismatchError($"{Symbol} function: The first parameter should be {ParName(0)}");
 
             if (!(par1 is int))
-                throw new error.TypeMismatchError($"{Symbol} function: The second parameter should be {ParName(1)}");
+                throw new Error.TypeMismatchError($"{Symbol} function: The second parameter should be {ParName(1)}");
 
             var lst = (FsList)par0;
             int n = (int)par1;

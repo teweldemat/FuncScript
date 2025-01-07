@@ -1,31 +1,31 @@
-﻿using System.Text;
-using funcscript.core;
+using System.Text;
+using FuncScript.Core;
 
-namespace funcscript.model
+namespace FuncScript.Model
 {
-    public class SimpleKeyValueCollection: KeyValueCollection
+    public class SimpleKeyValueCollection : KeyValueCollection
     {
         private KeyValueCollection _parent;
-        KeyValuePair<String, object>[] _data;
-        Dictionary<String, object> _index;
+        KeyValuePair<string, object>[] _data;
+        Dictionary<string, object> _index;
         public SimpleKeyValueCollection(KeyValuePair<string, object>[] kv)
-        :this(null,kv)
+            : this(null, kv)
         {
 
         }
-        
+
         public SimpleKeyValueCollection(KeyValueCollection parent, KeyValuePair<string, object>[] kv)
         {
             this.Data = kv;
             this._parent = parent;
         }
 
-        public KeyValuePair<String,object>[] Data 
-        { 
+        public KeyValuePair<string, object>[] Data
+        {
             set
             {
-                _data=value;
-                if(value == null)
+                _data = value;
+                if (value == null)
                 {
                     _index = null;
                     return;
@@ -50,7 +50,7 @@ namespace funcscript.model
 
         public IList<string> GetAllKeys()
         {
-            return this._data.Select(x=>x.Key).ToList();
+            return this._data.Select(x => x.Key).ToList();
         }
     }
 }

@@ -1,9 +1,9 @@
 using System;
 using System.Text.RegularExpressions;
-using funcscript.core;
-using funcscript.model;
+using FuncScript.Core;
+using FuncScript.Model;
 
-namespace funcscript.openai
+namespace FuncScript.Openai
 {
     public class FindCodeBlocksFunction : IFsFunction
     {
@@ -14,7 +14,7 @@ namespace funcscript.openai
         public object EvaluateList(FsList pars)
         {
             if (pars.Length == 0)
-                throw new error.EvaluationTimeException($"{Symbol} requires at least one parameter.");
+                throw new Error.EvaluationTimeException($"{Symbol} requires at least one parameter.");
 
             var input = pars[0] as string;
             if (input == null)
@@ -24,7 +24,6 @@ namespace funcscript.openai
             var matches = codeBlockRegex.Matches(input);
             var result = new List<LangCode>();
 
-            
             foreach (Match match in matches)
             {
                 var language = match.Groups[1].Value;

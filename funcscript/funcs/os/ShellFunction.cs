@@ -1,5 +1,5 @@
-using funcscript.core;
-using funcscript.model;
+using FuncScript.Core;
+using FuncScript.Model;
 using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
@@ -7,18 +7,18 @@ using System.Linq;
 using System.Threading;
 using System.Collections.Generic;
 
-namespace funcscript.funcs.os
+namespace FuncScript.Funcs.OS
 {
     public class ShellResult
     {
-        public int exitCode { get; set; }
-        public List<ShellMessage> output { get; set; } = new List<ShellMessage>();
+        public int ExitCode { get; set; }
+        public List<ShellMessage> Output { get; set; } = new List<ShellMessage>();
     }
 
     public class ShellMessage
     {
-        public string msg { get; set; }
-        public bool error { get; set; }
+        public string Msg { get; set; }
+        public bool Error { get; set; }
     }
 
     internal class ShellFunction : IFsFunction
@@ -121,9 +121,9 @@ namespace funcscript.funcs.os
 
                     var result = new ShellResult
                     {
-                        exitCode = exitCode,
-                        output = ordered
-                            .Select(o => new ShellMessage { msg = o.msg, error = o.error })
+                        ExitCode = exitCode,
+                        Output = ordered
+                            .Select(o => new ShellMessage { Msg = o.msg, Error = o.error })
                             .ToList()
                     };
 

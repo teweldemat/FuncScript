@@ -1,12 +1,12 @@
-﻿using funcscript.error;
+using FuncScript.Error;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using funcscript.model;
+using FuncScript.Model;
 
-namespace funcscript.core
+namespace FuncScript.Core
 {
     /// <summary>
     /// Represents is FuncScript expression block

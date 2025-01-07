@@ -1,5 +1,5 @@
-using funcscript.model;
-namespace funcscript.core
+using FuncScript.Model;
+namespace FuncScript.Core
 {
     public partial class FuncScriptParser
     {
@@ -13,11 +13,11 @@ namespace funcscript.core
 
             var i = index;
 
-            if (i >= context.Expression.Length || isCharWhiteSpace(context.Expression[i]))
+            if (i >= context.Expression.Length || IsCharWhiteSpace(context.Expression[i]))
                 return new GetSpaceLessStringResult(null, null, index);
 
             i++;
-            while (i < context.Expression.Length && !isCharWhiteSpace(context.Expression[i]))
+            while (i < context.Expression.Length && !IsCharWhiteSpace(context.Expression[i]))
                 i++;
 
             var text = context.Expression.Substring(index, i - index);

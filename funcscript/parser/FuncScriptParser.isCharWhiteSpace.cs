@@ -1,10 +1,10 @@
-using funcscript.model;
+using FuncScript.Model;
 
-namespace funcscript.core
+namespace FuncScript.Core
 {
     public partial class FuncScriptParser
     {
-        static bool isCharWhiteSpace(char ch)
+        static bool IsCharWhiteSpace(char ch)
             => ch == ' ' ||
                ch == '\r' ||
                ch == '\t' ||

@@ -1,9 +1,9 @@
-using funcscript.core;
-using funcscript.model;
+using FuncScript.Core;
+using FuncScript.Model;
 using System;
 using System.Text;
 
-namespace funcscript.funcs.math
+namespace FuncScript.Funcs.Math
 {
     public class TemplateMergeMergeFunction : IFsFunction
     {

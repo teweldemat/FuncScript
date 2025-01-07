@@ -1,5 +1,5 @@
-using funcscript.model;
-namespace funcscript.core
+using FuncScript.Model;
+namespace FuncScript.Core
 {
     public partial class FuncScriptParser
     {

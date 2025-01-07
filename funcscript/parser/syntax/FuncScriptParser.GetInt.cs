@@ -1,10 +1,10 @@
-using funcscript.model;
-namespace funcscript.core
+using FuncScript.Model;
+namespace FuncScript.Core
 {
     public partial class FuncScriptParser
     {
         record GetIntResult(string IntVal, ParseNode ParseNode, int NextIndex)
-            :ParseResult(ParseNode,NextIndex);
+            :ParseResult(ParseNode, NextIndex);
 
         static GetIntResult GetInt(ParseContext context, bool allowNegative, int index)
         {
@@ -25,7 +25,7 @@ namespace funcscript.core
             i = i2;
 
             string intVal = context.Expression.Substring(index, i - index);
-            parseNode = new ParseNode(ParseNodeType.LiteralInteger, index,   i-index);
+            parseNode = new ParseNode(ParseNodeType.LiteralInteger, index, i - index);
             return new GetIntResult(intVal, parseNode, i);
         }
     }

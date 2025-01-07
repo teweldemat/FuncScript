@@ -1,7 +1,7 @@
-using funcscript.core;
-using funcscript.model;
+using FuncScript.Core;
+using FuncScript.Model;
 
-namespace funcscript.funcs.logic
+namespace FuncScript.Funcs.Logic
 {
     public class InFunction : IFsFunction
     {
@@ -14,7 +14,7 @@ namespace funcscript.funcs.logic
         public object EvaluateList(FsList pars)
         {
             if (pars.Length != MaxParameterCount)
-                throw new error.EvaluationTimeException(
+                throw new Error.EvaluationTimeException(
                     $"{Symbol} function: Invalid parameter count. Expected {MaxParameterCount}, but got {pars.Length}");
 
             var par0 = pars[0];
@@ -24,7 +24,7 @@ namespace funcscript.funcs.logic
                 return null;
 
             if (!(par1 is FsList))
-                throw new error.EvaluationTimeException(
+                throw new Error.EvaluationTimeException(
                     $"{Symbol} function: {ParName(1)} should be a list");
 
             bool par0Numeric = FuncScript.IsNumeric(par0);

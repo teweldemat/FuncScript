@@ -1,19 +1,19 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Runtime.CompilerServices;
-using funcscript.core;
-using funcscript.model;
+using FuncScript.Core;
+using FuncScript.Model;
 using System.Text;
 using Newtonsoft.Json.Serialization;
 
-namespace funcscript.block
+namespace FuncScript.Block
 {
-    public class ListExpression:ExpressionBlock,FsList
+    public class ListExpression : ExpressionBlock, FsList
     {
        
         public ExpressionBlock[] ValueExpressions;
 
        
-        public override object Evaluate( )
+        public override object Evaluate()
         {
             return this;
         }
@@ -25,9 +25,9 @@ namespace funcscript.block
         }
 
         public object this[int index] 
-            =>index<0 || index>=this.ValueExpressions.Length?
+            => index < 0 || index >= this.ValueExpressions.Length ?
                 null
-                :this.ValueExpressions[index].Evaluate();
+                : this.ValueExpressions[index].Evaluate();
 
         public int Length => this.ValueExpressions.Length;
         public IEnumerator<object> GetEnumerator()
@@ -56,7 +56,6 @@ namespace funcscript.block
             return GetEnumerator();
         }
 
-
         public override string AsExpString()
         {
             var sb = new StringBuilder();
@@ -78,6 +77,5 @@ namespace funcscript.block
             
             return ret;
         }
-
     }
 }

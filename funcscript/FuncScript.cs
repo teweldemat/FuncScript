@@ -1,14 +1,14 @@
-﻿using funcscript.core;
-using funcscript.error;
-using funcscript.model;
+using FuncScript.Core;
+using FuncScript.Error;
+using FuncScript.Model;
 using Newtonsoft.Json.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Xml.XPath;
-using funcscript.block;
+using FuncScript.Block;
 using Newtonsoft.Json.Serialization;
 
-namespace funcscript
+namespace FuncScript
 {
     public static partial class FuncScript
     {
@@ -84,14 +84,14 @@ namespace funcscript
                     return null;
             }
         }
-        static KeyValueCollection FromJObject( JObject jobj)
+        static KeyValueCollection FromJObject(JObject jobj)
         {
             var pairs = new List<KeyValuePair<string, object>>();
             foreach (var p in jobj)
             {
                 pairs.Add(new KeyValuePair<string, object>(p.Key, FromJToken(p.Value)));
             }
-            return new SimpleKeyValueCollection(null,pairs.ToArray());
+            return new SimpleKeyValueCollection(null, pairs.ToArray());
 
         }
         public static object FromJson(String json)
@@ -169,7 +169,7 @@ namespace funcscript
             {
                 return new ArrayFsList(value);
             }
-            
+
             return new ObjectKvc(value);
         }
         static object collect(JsonElement el)
@@ -178,7 +178,7 @@ namespace funcscript
             {
                 JsonValueKind.Array => new ArrayFsList(el.EnumerateArray().Select(x => collect(x)).ToArray()),
                 JsonValueKind.String => el.GetString(),
-                JsonValueKind.Object => new SimpleKeyValueCollection(null,el.EnumerateObject().Select(x =>
+                JsonValueKind.Object => new SimpleKeyValueCollection(null, el.EnumerateObject().Select(x =>
                                     new KeyValuePair<string, object>(x.Name, collect(x.Value))
                                     ).ToArray()),
                 JsonValueKind.Number => el.GetDouble(),
@@ -217,7 +217,7 @@ namespace funcscript
                     }
                 }
                 if (kv)
-                    return new SimpleKeyValueCollection(null,arr.Select(x => (KeyValuePair<string, object>)x).ToArray());
+                    return new SimpleKeyValueCollection(null, arr.Select(x => (KeyValuePair<string, object>)x).ToArray());
                 return arr;
             }
             if (obj is JArray)
@@ -230,7 +230,7 @@ namespace funcscript
         }
 
         const string TAB = "  ";
-        private const int BREAK_LINE_THRUSHOLD = 80;
+        private const int BREAK_LINE_THRESHOLD = 80;
         public static bool IsAttomicType(object val)
         {
             return val == null ||
@@ -267,7 +267,7 @@ namespace funcscript
                 return FSDataType.Function;
             if (value is FsError)
                 return FSDataType.Error;
-            throw new error.UnsupportedUnderlyingType($"Unsupported .net type {value.GetType()}");
+            throw new Error.UnsupportedUnderlyingType($"Unsupported .net type {value.GetType()}");
         }
         public static bool IsNumeric(object val)
         {
@@ -398,20 +398,20 @@ namespace funcscript
             switch (mode)
             {
                 case ParseMode.Standard:
-                    exp = core.FuncScriptParser.Parse(context).Block;
+                    exp = Core.FuncScriptParser.Parse(context).Block;
                     break;
                 case ParseMode.SpaceSeparatedList:
-                    return core.FuncScriptParser.ParseSpaceSepratedList(context);
+                    return Core.FuncScriptParser.ParseSpaceSepratedList(context);
                 case ParseMode.FsTemplate:
-                    exp = core.FuncScriptParser.ParseFsTemplate(context).Block;
+                    exp = Core.FuncScriptParser.ParseFsTemplate(context).Block;
                     break;
-                default:    
+                default:
                     exp = null;
                     break;
             }
 
             if (exp == null)
-                throw new error.SyntaxError(context.Expression, context.SyntaxErrors);
+                throw new Error.SyntaxError(context.Expression, context.SyntaxErrors);
             return Evaluate(exp, expression, provider, vars);
         }
         public static object Evaluate(ExpressionBlock exp, string expression, KeyValueCollection provider, object vars)
@@ -419,7 +419,7 @@ namespace funcscript
             try
             {
                 exp.SetReferenceProvider(provider);
-                var ret=exp.Evaluate();
+                var ret = exp.Evaluate();
                 return ret;
             }
             catch (EvaluationException ex)
@@ -443,7 +443,7 @@ namespace funcscript
                 return true;
             if (val1 == null ^ val2 == null)
                 return false;
-            
+
             if (val1 is KeyValueCollection kv1 && val2 is KeyValueCollection kv2)
             {
                 foreach (var key in kv1.GetAllKeys())

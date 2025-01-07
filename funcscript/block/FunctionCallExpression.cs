@@ -1,12 +1,12 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Linq.Expressions;
 using System.Runtime.InteropServices;
-using funcscript.core;
-using funcscript.error;
-using funcscript.model;
+using FuncScript.Core;
+using FuncScript.Error;
+using FuncScript.Model;
 using System.Text;
 
-namespace funcscript.block
+namespace FuncScript.Block
 {
     public class FunctionCallExpression : ExpressionBlock
     {
@@ -18,7 +18,6 @@ namespace funcscript.block
         class FuncParameterList : FsList
         {
             public FunctionCallExpression parent;
-
 
             public object this[int index] => index < 0 || index >= parent.Parameters.Length
                 ? null
@@ -41,9 +40,7 @@ namespace funcscript.block
             }
         }
 
-
         public int Count => Parameters.Length;
-
 
         private KeyValueCollection _context = null;
 
@@ -54,7 +51,6 @@ namespace funcscript.block
             foreach (var p in Parameters)
                 p.SetReferenceProvider(provider);
         }
-
 
         public override object Evaluate()
         {
@@ -72,18 +68,18 @@ namespace funcscript.block
                 {
                     if (func is ExpressionFunction expfn)
                     {
-                        res= expfn.EvaluateWithContext(_context, paramList);
+                        res = expfn.EvaluateWithContext(_context, paramList);
                     }
                     else
-                        res=fn.EvaluateList(paramList);
+                        res = fn.EvaluateList(paramList);
                 }
-                catch (error.EvaluationException)
+                catch (Error.EvaluationException)
                 {
                     throw;
                 }
                 catch (Exception ex)
                 {
-                    throw new error.EvaluationException(this.CodePos, this.CodeLength, ex);
+                    throw new Error.EvaluationException(this.CodePos, this.CodeLength, ex);
                 }
 
             }
@@ -124,8 +120,6 @@ namespace funcscript.block
             return res;
         }
 
-
-
         public override IList<ExpressionBlock> GetChilds()
         {
             var ret = new List<ExpressionBlock>();
@@ -141,23 +135,20 @@ namespace funcscript.block
 
         public override string AsExpString()
         {
-            
-
             var sb = new StringBuilder();
-                sb.Append(this.Function.AsExpString());
-                sb.Append("(");
-                if (Parameters.Length > 0)
+            sb.Append(this.Function.AsExpString());
+            sb.Append("(");
+            if (Parameters.Length > 0)
+            {
+                sb.Append(this.Parameters[0].AsExpString());
+                for (int i = 1; i < Parameters.Length; i++)
                 {
-                    sb.Append(this.Parameters[0].AsExpString());
-                    for (int i = 1; i < Parameters.Length; i++)
-                    {
-                        sb.Append(",");
-                        sb.Append(this.Parameters[i].AsExpString());
-                    }
+                    sb.Append(",");
+                    sb.Append(this.Parameters[i].AsExpString());
                 }
+            }
 
-                sb.Append(")");
-            
+            sb.Append(")");
 
             return sb.ToString();
         }
@@ -168,10 +159,7 @@ namespace funcscript.block
             {
                 Function = this.Function.CloneExpression(),
                 Parameters = this.Parameters.Select(p => p.CloneExpression()).ToArray()
-
             };
         }
-
-        
     }
 }

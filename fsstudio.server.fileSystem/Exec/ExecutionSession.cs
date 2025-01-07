@@ -1,12 +1,13 @@
 using System.Text;
 using System.Text.RegularExpressions;
-using funcscript;
-using funcscript.core;
-using funcscript.funcs.text;
-using funcscript.host;
-using funcscript.model;
+using FsStudio.Server.FileSystem.Exec.Funcs;
+using FuncScript;
+using FuncScript.Core;
+using FuncScript.Funcs.Text;
+using FuncScript.Host;
+using FuncScript.Model;
 
-namespace fsstudio.server.fileSystem.exec;
+namespace FsStudio.Server.FileSystem.Exec;
 
 public class ExecutionSession : KeyValueCollection
 {
@@ -30,23 +31,23 @@ public class ExecutionSession : KeyValueCollection
     {
         this.logger = logger;
         this.fileName = fileName;
-        var json=System.IO.File.ReadAllText(fileName);
-        InitFromNodes(System.Text.Json.JsonSerializer.Deserialize<List<ExecutionNode>>(json)??[]);
+        var json = System.IO.File.ReadAllText(fileName);
+        InitFromNodes(System.Text.Json.JsonSerializer.Deserialize<List<ExecutionNode>>(json) ?? []);
     }
 
     void InitFromNodes(IEnumerable<ExecutionNode> nodes)
     {
-        _nodes =nodes.ToList() ;
-        foreach(var n in _nodes)
+        _nodes = nodes.ToList();
+        foreach (var n in _nodes)
             n.SetParent(this);
         this._context = new DefaultFsDataProvider(
-            new []
+            new[]
             {
-                KeyValuePair.Create<string,object>("md",new MarkDownFunction(this.logger,this.SessionId.ToString()))
+                KeyValuePair.Create<string, object>("md", new MarkDownFunction(this.logger, this.SessionId.ToString()))
             }
         );
     }
-    public ExecutionSession(IEnumerable<ExecutionNode> nodes,RemoteLogger logger)
+    public ExecutionSession(IEnumerable<ExecutionNode> nodes, RemoteLogger logger)
     {
         this.logger = logger;
         InitFromNodes(nodes);
@@ -55,7 +56,7 @@ public class ExecutionSession : KeyValueCollection
     {
         System.IO.File.WriteAllText(fileName, System.Text.Json.JsonSerializer.Serialize(_nodes));
     }
-   
+
     private ExecutionNode? FindNodeByPath(string nodePath)
     {
         var segments = nodePath.Split('.');
@@ -78,7 +79,7 @@ public class ExecutionSession : KeyValueCollection
         if (!ValidName(name))
             throw new InvalidOperationException($"{name} is invalid");
 
-        var parentNode = parentNodePath==null?null:FindNodeByPath(parentNodePath);
+        var parentNode = parentNodePath == null ? null : FindNodeByPath(parentNodePath);
         var nodes = parentNodePath == null ? _nodes : parentNode?.Children;
         if (nodes == null)
             throw new InvalidOperationException($"Path {parentNodePath} not found");
@@ -93,7 +94,7 @@ public class ExecutionSession : KeyValueCollection
         };
         if (parentNode != null)
         {
-            if(!string.IsNullOrEmpty(parentNode.Expression))
+            if (!string.IsNullOrEmpty(parentNode.Expression))
             {
                 var backupChild = new ExecutionNode
                 {
@@ -106,7 +107,7 @@ public class ExecutionSession : KeyValueCollection
             parentNode.ExpressionType = ExpressionType.FsStudioParentNode;
             parentNode.Expression = null;
         }
-        n.SetParent(parentNode==null?this:parentNode);
+        n.SetParent(parentNode == null ? this : parentNode);
         nodes.Add(n);
         UpdateFile();
     }
@@ -115,13 +116,13 @@ public class ExecutionSession : KeyValueCollection
     {
         var segments = nodePath.Split('.');
         var parentNodePath = string.Join(".", segments.Take(segments.Length - 1));
-        ExecutionNode? parentNode=null;
-        var nodes=segments.Length==1? _nodes : (parentNode=FindNodeByPath(parentNodePath))?.Children;
+        ExecutionNode? parentNode = null;
+        var nodes = segments.Length == 1 ? _nodes : (parentNode = FindNodeByPath(parentNodePath))?.Children;
         if (nodes == null)
             throw new InvalidOperationException($"Path {parentNodePath} not found");
 
         var nodeName = segments.Last().ToLower();
-        var index = nodes.Select(n=>n.NameLower).ToList().IndexOf(nodeName);
+        var index = nodes.Select(n => n.NameLower).ToList().IndexOf(nodeName);
         if (index != -1)
         {
             nodes.RemoveAt(index);
@@ -202,7 +203,7 @@ public class ExecutionSession : KeyValueCollection
 
     public ExpressionNodeInfoWithExpression? GetExpression(string nodePath)
     {
-        var node= FindNodeByPath(nodePath);
+        var node = FindNodeByPath(nodePath);
         if (node == null)
             return null;
         var c = node.GetCache();
@@ -210,7 +211,7 @@ public class ExecutionSession : KeyValueCollection
         string? json = null;
         try
         {
-            json=c==null?null:FuncScript.FormatToJson(c);
+            json = c == null ? null : FuncScript.FuncScript.FormatToJson(c);
         }
         catch (Exception e)
         {
@@ -227,7 +228,7 @@ public class ExecutionSession : KeyValueCollection
         };
     }
 
-    public  object Get(string name)
+    public object Get(string name)
     {
         var n = _nodes.FirstOrDefault(c => c.NameLower == name);
         if (n == null)
@@ -235,7 +236,7 @@ public class ExecutionSession : KeyValueCollection
         return n.Evaluate(this);
     }
 
-    public  bool IsDefined(string name)
+    public bool IsDefined(string name)
     {
         var n = _nodes.FirstOrDefault(c => c.NameLower == name);
         if (n != null)
@@ -243,7 +244,7 @@ public class ExecutionSession : KeyValueCollection
         return _context.IsDefined(name);
     }
 
-    public  IList<string> GetAllKeys()
+    public IList<string> GetAllKeys()
     {
         return _nodes.Select(x => x.Name).ToList();
     }
@@ -259,7 +260,7 @@ public class ExecutionSession : KeyValueCollection
     object EvaluateNodeInternal(string nodePath)
     {
         ClearCache();
-        FsLogger.SetDefaultLogger(new SessionManager.RemoteLoggerForFs(logger,SessionId.ToString()));
+        FsLogger.SetDefaultLogger(new SessionManager.RemoteLoggerForFs(logger, SessionId.ToString()));
         var segments = nodePath.Split('.');
         var parentNodePath = string.Join(".", segments.Take(segments.Length - 1));
         var provider = (segments.Length > 1) ? (KeyValueCollection)FindNodeByPath(parentNodePath)! : this;
@@ -294,12 +295,13 @@ public class ExecutionSession : KeyValueCollection
                 _evaluationException = task.Exception.GetBaseException();
                 var msg = _evaluationException.Message + "\n" + _evaluationException.StackTrace;
                 var ex = _evaluationException.InnerException;
-                while (ex!=null)
+                while (ex != null)
                 {
                     msg += $"\n{ex.Message}\n{ex.StackTrace}";
                     ex = ex.InnerException;
                 }
-                logger.SendObject("evaluation_error", new {
+                logger.SendObject("evaluation_error", new
+                {
                     sessionId = SessionId,
                     error = msg
                 });
@@ -308,15 +310,16 @@ public class ExecutionSession : KeyValueCollection
             {
                 _evaluationResult = task.Result;
                 var sb = new StringBuilder();
-                FuncScript.Format(sb,_evaluationResult,
-                    asJsonLiteral:_evaluationResult is KeyValueCollection || _evaluationResult is FsList
-                    );
-                if(logger!=null)
+                FuncScript.FuncScript.Format(sb, _evaluationResult,
+                    asJsonLiteral: _evaluationResult is KeyValueCollection || _evaluationResult is FsList
+                );
+                if (logger != null)
                 {
-                    logger.SendObject("evaluation_success", new {
-                    sessionId = SessionId,
-                    result = sb.ToString()
-                });
+                    logger.SendObject("evaluation_success", new
+                    {
+                        sessionId = SessionId,
+                        result = sb.ToString()
+                    });
                 }
             }
         }, TaskContinuationOptions.ExecuteSynchronously);

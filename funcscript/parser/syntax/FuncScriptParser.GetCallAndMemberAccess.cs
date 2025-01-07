@@ -1,5 +1,5 @@
-using funcscript.block;
-namespace funcscript.core
+using FuncScript.Block;
+namespace FuncScript.Core
 {
     public partial class FuncScriptParser
     {
@@ -7,13 +7,13 @@ namespace funcscript.core
         {
             ExpressionBlock prog = null;
             var i1 = SkipSpace(context, index).NextIndex;
-            var (theUnit,parseNode,i) = GetUnit(context, i1);
+            var (theUnit, parseNode, i) = GetUnit(context, i1);
             if (i == index)
                 return new ExpressionBlockResult(prog, parseNode, index);
 
             do
             {
-                var (funcCall, nodeParList,i2) = GetFunctionCallParametersList(context, theUnit, i);
+                var (funcCall, nodeParList, i2) = GetFunctionCallParametersList(context, theUnit, i);
                 if (i2 > i)
                 {
                     i = i2;
@@ -22,7 +22,7 @@ namespace funcscript.core
                     continue;
                 }
 
-                (var memberAccess, var nodeMemberAccess,i2) = GetMemberAccess(context, theUnit, i);
+                (var memberAccess, var nodeMemberAccess, i2) = GetMemberAccess(context, theUnit, i);
                 if (i2 > i)
                 {
                     i = i2;
@@ -31,7 +31,7 @@ namespace funcscript.core
                     continue;
                 }
 
-                (var kvc,var nodeKvc,i2) = GetSelectKvcExpression(context,  i);
+                (var kvc, var nodeKvc, i2) = GetSelectKvcExpression(context, i);
                 if (i2 > i)
                 {
                     i = i2;

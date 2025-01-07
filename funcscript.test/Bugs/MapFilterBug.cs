@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using funcscript.core;
+using FuncScript.Core;
 using NUnit.Framework;
 
-namespace funcscript.test.Bugs;
+namespace FuncScript.Test.Bugs;
 
 public class MapFilterBug
 {
@@ -15,23 +15,23 @@ public class MapFilterBug
         var context = new FuncScriptParser.ParseContext(new DefaultFsDataProvider(), expStr, errors);
         var (exp, node, _) = FuncScriptParser.Parse(context);
         Assert.NotNull(node);
-        Assert.That(node.NodeType,Is.EqualTo(FuncScriptParser.ParseNodeType.InfixExpression));
-        Assert.That(node.Pos,Is.EqualTo(0));
-        Assert.That(node.Length,Is.EqualTo(expStr.Length));
-        Assert.That(node.Children.Count,Is.EqualTo(5));
+        Assert.That(node.NodeType, Is.EqualTo(FuncScriptParser.ParseNodeType.InfixExpression));
+        Assert.That(node.Pos, Is.EqualTo(0));
+        Assert.That(node.Length, Is.EqualTo(expStr.Length));
+        Assert.That(node.Children.Count, Is.EqualTo(5));
         
-        Assert.That(node.Children[0].NodeType,Is.EqualTo(FuncScriptParser.ParseNodeType.List));
-        Assert.That(node.Children[1].NodeType,Is.EqualTo(FuncScriptParser.ParseNodeType.Identifier));
-        Assert.That(node.Children[2].NodeType,Is.EqualTo(FuncScriptParser.ParseNodeType.ExpressionInBrace));
-        Assert.That(node.Children[3].NodeType,Is.EqualTo(FuncScriptParser.ParseNodeType.Identifier));
+        Assert.That(node.Children[0].NodeType, Is.EqualTo(FuncScriptParser.ParseNodeType.List));
+        Assert.That(node.Children[1].NodeType, Is.EqualTo(FuncScriptParser.ParseNodeType.Identifier));
+        Assert.That(node.Children[2].NodeType, Is.EqualTo(FuncScriptParser.ParseNodeType.ExpressionInBrace));
+        Assert.That(node.Children[3].NodeType, Is.EqualTo(FuncScriptParser.ParseNodeType.Identifier));
         var lambda = node.Children[4];
-        Assert.That(lambda.NodeType,Is.EqualTo(FuncScriptParser.ParseNodeType.LambdaExpression));
+        Assert.That(lambda.NodeType, Is.EqualTo(FuncScriptParser.ParseNodeType.LambdaExpression));
         
-        Assert.That(lambda.Children[1].Children[2].NodeType,Is.EqualTo(FuncScriptParser.ParseNodeType.LiteralInteger));
+        Assert.That(lambda.Children[1].Children[2].NodeType, Is.EqualTo(FuncScriptParser.ParseNodeType.LiteralInteger));
         
         ParseTreeTests.AssertNoOverlappingSpans(node);
         exp.SetReferenceProvider(context.ReferenceProvider);
         var res = exp.Evaluate();
-        Assert.That(FuncScript.FormatToJson(res).Replace(" ",""), Is.EqualTo("[]"));
+        Assert.That(FuncScript.FormatToJson(res).Replace(" ", ""), Is.EqualTo("[]"));
     }
 }

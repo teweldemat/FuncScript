@@ -1,12 +1,11 @@
-// SessionsController.cs
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Concurrent;
 using System.Text;
-using fsstudio.server.fileSystem.exec;
-using funcscript;
+using FsStudio.Server.FileSystem.Exec;
+using FuncScript;
 using Microsoft.Net.Http.Headers;
 
-namespace fsstudio.server.fileSystem.Controllers
+namespace FsStudio.Server.FileSystem.Controllers
 {
     [ApiController]
     [Route("api/sessions")]

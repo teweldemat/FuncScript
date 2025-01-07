@@ -1,8 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Specialized;
-using funcscript.core;
+using FuncScript.Core;
 
-namespace funcscript.model
+namespace FuncScript.Model
 {
     public interface KeyValueCollection 
     {
@@ -21,7 +21,7 @@ namespace funcscript.model
             if (col2 == null)
                 return col1;
             if (assertSameContext && col1.ParentContext != col2.ParentContext)
-                throw new error.EvaluationTimeException(
+                throw new Error.EvaluationTimeException(
                     "Key value collections from different contexts can't be merged");
 
             var dict = new OrderedDictionary();

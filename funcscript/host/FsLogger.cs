@@ -1,4 +1,4 @@
-namespace funcscript.host;
+namespace FuncScript.Host;
 
 public class ConsoleLogger : FsLogger
 {

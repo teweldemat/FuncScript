@@ -1,9 +1,9 @@
-namespace funcscript.model;
+namespace FuncScript.Model;
 
 public class FsError
 {
     public const string ERROR_DEFAULT = "Default";
-    public const string ERROR_PARAMETER_COUNT_MISMATCH="TOO_FEW_PARAMETER";
+    public const string ERROR_PARAMETER_COUNT_MISMATCH = "TOO_FEW_PARAMETER";
     public const string ERROR_TYPE_MISMATCH = "TYPE_MISMATCH";
     public const string ERROR_TYPE_INVALID_PARAMETER = "TYPE_INVALID_PARAMETER";
     public const string ERROR_TYPE_EVALUATION = "TYPE_TYPE_EVALUATION";
@@ -29,7 +29,7 @@ public class FsError
     {
         
     }
-    public FsError(string type,string messsage) : this(type, messsage, null)
+    public FsError(string type, string messsage) : this(type, messsage, null)
     {
         
     }
