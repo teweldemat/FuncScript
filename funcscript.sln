@@ -11,11 +11,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fsstudio.Server.FileSystem"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FsStudio.Test", "FsStudio.Test\FsStudio.Test.csproj", "{1E697E63-8EA9-42A6-AF9E-5B61EABD678D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FuncScript.Openai", "FuncScript.Openai\funcscript.openai.csproj", "{55F8D1D2-8B7E-4A68-8EC0-398AEB796C7E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FuncScript.Openai", "FuncScript.Openai\FuncScript.Openai.csproj", "{55F8D1D2-8B7E-4A68-8EC0-398AEB796C7E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FuncScript.Sql", "FuncScript.Sql\funcscript.sql.csproj", "{2D8561FD-BA78-4DB1-8A14-015A58F4905C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FuncScript.Sql", "FuncScript.Sql\FuncScript.Sql.csproj", "{2D8561FD-BA78-4DB1-8A14-015A58F4905C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "funcscript.test", "FuncScript.Test\funcscript.test.csproj", "{FC5AC0DE-9841-461F-BE2B-898512865F22}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FuncScript.test", "FuncScript.Test\FuncScript.Test.csproj", "{FC5AC0DE-9841-461F-BE2B-898512865F22}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
