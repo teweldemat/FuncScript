@@ -5,17 +5,15 @@ namespace FuncScript.Funcs.Logic
 {
     public class LessThanOrEqualFunction : IFsFunction
     {
-        private const int MaxParameterCount = 2;
-
         public CallType CallType => CallType.Infix;
 
         public string Symbol => "<=";
 
         public object EvaluateList(FsList pars)
         {
-            if (pars.Length != MaxParameterCount)
+            if (pars.Length != 2)
                 throw new Error.EvaluationTimeException(
-                    $"{this.Symbol} function: Invalid parameter count. Expected {MaxParameterCount}, but got {pars.Length}");
+                    $"{this.Symbol} function: Invalid parameter count. Expected 2, but got {pars.Length}");
 
             var par0 = pars[0];
             var par1 = pars[1];

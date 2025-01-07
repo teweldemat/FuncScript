@@ -5,17 +5,15 @@ namespace FuncScript.Funcs.Math
 {
     public class SineFunction : IFsFunction
     {
-        private const int MaxParameters = 1;
-
         public CallType CallType => CallType.Prefix;
 
         public string Symbol => "Sin";
 
         public object EvaluateList(FsList pars)
         {
-            if (pars.Length != MaxParameters)
+            if (pars.Length != 1)
                 return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH,
-                    $"{this.Symbol}: expected {MaxParameters} got {pars.Length}");
+                    $"{this.Symbol}: expected 1 got {pars.Length}");
 
             var val = pars[0];
 
@@ -45,17 +43,15 @@ namespace FuncScript.Funcs.Math
 
     public class CosineFunction : IFsFunction
     {
-        private const int MaxParameters = 1;
-
         public CallType CallType => CallType.Prefix;
 
         public string Symbol => "Cos";
 
         public object EvaluateList(FsList pars)
         {
-            if (pars.Length != MaxParameters)
+            if (pars.Length != 1)
                 return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH,
-                    $"{this.Symbol}: expected {MaxParameters} got {pars.Length}");
+                    $"{this.Symbol}: expected 1 got {pars.Length}");
 
             var val = pars[0];
             if (val is int intValue)

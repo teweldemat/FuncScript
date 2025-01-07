@@ -7,16 +7,16 @@ namespace FuncScript.Funcs.OS
 {
     internal class RenameFunction : IFsFunction
     {
-        private const int MaxParameters = 2;
         public CallType CallType => CallType.Prefix;
         public string Symbol => "RenameFile";
 
         public object EvaluateList(FsList pars)
         {
-            if (pars.Length != MaxParameters)
+            const int maxParameters = 2;
+            if (pars.Length != maxParameters)
                 return new FsError(
                     FsError.ERROR_PARAMETER_COUNT_MISMATCH,
-                    $"{Symbol} function: invalid parameter count. {MaxParameters} expected, got {pars.Length}");
+                    $"{Symbol} function: invalid parameter count. {maxParameters} expected, got {pars.Length}");
 
             var par0 = pars[0];
             var par1 = pars[1];

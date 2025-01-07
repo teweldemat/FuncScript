@@ -7,16 +7,14 @@ namespace FuncScript.Funcs.Logic
 {
     public class DateFunction : IFsFunction
     {
-        private const int MaxParameters = 2;
-
         public CallType CallType => CallType.Prefix;
 
         public string Symbol => "Date";
 
         public object EvaluateList(FsList pars)
         {
-            if (pars.Length > MaxParameters)
-                throw new Error.EvaluationTimeException($"{this.Symbol} function: invalid parameter count. Max of {MaxParameters} expected, got {pars.Length}");
+            if (pars.Length > 2)
+                throw new Error.EvaluationTimeException($"{this.Symbol} function: invalid parameter count. Max of 2 expected, got {pars.Length}");
 
             var par0 = pars[0];
 

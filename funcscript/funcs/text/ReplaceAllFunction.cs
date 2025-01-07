@@ -10,7 +10,9 @@ namespace FuncScript.Funcs.Text
 
         public object EvaluateList(FsList pars)
         {
-            if (pars.Length < 3)
+            const int requiredParameters = 3;
+
+            if (pars.Length < requiredParameters)
                 throw new Error.EvaluationTimeException($"{this.Symbol} requires exactly three parameters: input string, search string, and replacement string.");
 
             var input = pars[0] as string;

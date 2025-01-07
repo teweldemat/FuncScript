@@ -1,19 +1,19 @@
 using FuncScript.Core;
 using FuncScript.Model;
 using System;
+using System.Linq;
 
 namespace FuncScript.Funcs.List
 {
     public class TakeFunction : IFsFunction
     {
-        private const int MaxParameters = 2;
-
         public CallType CallType => CallType.Dual;
 
         public string Symbol => "Take";
 
         public object EvaluateList(FsList pars)
         {
+            const int MaxParameters = 2;
             if (pars.Length != MaxParameters)
                 throw new Error.TypeMismatchError($"{Symbol} function: Invalid parameter count. Expected {MaxParameters}, but got {pars.Length}");
 

@@ -5,15 +5,13 @@ namespace FuncScript.Funcs.Logic
 {
     public class IfConditionFunction : IFsFunction
     {
-        private const int MaxParameters = 3;
-
         public CallType CallType => CallType.Infix;
 
         public string Symbol => "If";
 
         public object EvaluateList(FsList pars)
         {
-            if (pars.Length < MaxParameters)
+            if (pars.Length < 3)
                 throw new Error.TypeMismatchError("IfConditionFunction requires three parameters: condition, trueResult, and falseResult.");
 
             var condition = pars[0];

@@ -6,7 +6,6 @@ namespace FuncScript.Funcs.Logic
     public class IsErrorFunction : IFsFunction
     {
         public const string SYMBOL = "isError";
-        private const int MAX_PARS_COUNT = 1;
 
         public CallType CallType => CallType.Prefix;
 
@@ -14,9 +13,9 @@ namespace FuncScript.Funcs.Logic
 
         public object EvaluateList(FsList pars)
         {
-            if (pars.Length != MAX_PARS_COUNT)
+            if (pars.Length != 1)
                 return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH,
-                    $"{this.Symbol}: expected {MAX_PARS_COUNT} parameters, got {pars.Length}");
+                    $"{this.Symbol}: expected 1 parameters, got {pars.Length}");
 
             var par0 = pars[0];
 

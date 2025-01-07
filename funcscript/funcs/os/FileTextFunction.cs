@@ -5,14 +5,13 @@ namespace FuncScript.Funcs.OS
 {
     internal class FileTextFunction : IFsFunction
     {
-        private const int MaxParameters = 1;
-
         public CallType CallType => CallType.Prefix;
 
         public string Symbol => "file";
 
         public object EvaluateList(FsList pars)
         {
+            const int MaxParameters = 1; // Moved const declaration in method scope
             if (pars.Length != MaxParameters)
                 return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, $"{this.Symbol} function: invalid parameter count. {MaxParameters} expected got {pars.Length}");
             var par0 = pars[0];

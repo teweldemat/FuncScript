@@ -1,20 +1,20 @@
-﻿using FuncScript.Core;
+using FuncScript.Core;
 using FuncScript.Model;
 
 namespace FuncScript.Funcs.KeyValue
 {
     internal class KvSelectFunction : IFsFunction
     {
-        private const int MaxParameters = 2;
-
         public CallType CallType => CallType.Prefix;
 
         public string Symbol => "Select";
 
         public object EvaluateList(FsList pars)
         {
-            if (pars.Length != MaxParameters)
-                throw new Error.TypeMismatchError($"{Symbol} function: Invalid parameter count. Expected {MaxParameters}, but got {pars.Length}");
+            const int ExpectedParameters = 2; // Updated to replace MaxParameters
+            
+            if (pars.Length != ExpectedParameters)
+                throw new Error.TypeMismatchError($"{Symbol} function: Invalid parameter count. Expected {ExpectedParameters}, but got {pars.Length}");
 
             var par0 = pars[0];
             var par1 = pars[1];

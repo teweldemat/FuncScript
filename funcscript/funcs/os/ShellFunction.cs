@@ -26,14 +26,12 @@ namespace FuncScript.Funcs.OS
         public CallType CallType => CallType.Prefix;
         public string Symbol => "shell";
 
-        private const int MaxParameters = 2;
-
         public object EvaluateList(FsList pars)
         {
-            if (pars.Length < 1 || pars.Length > MaxParameters)
+            if (pars.Length < 1 || pars.Length > 2)
                 return new FsError(
                     FsError.ERROR_PARAMETER_COUNT_MISMATCH,
-                    $"{Symbol} function: invalid parameter count. 1 or {MaxParameters} expected, got {pars.Length}"
+                    $"{Symbol} function: invalid parameter count. 1 or 2 expected, got {pars.Length}"
                 );
 
             var cmdParam = pars[0];

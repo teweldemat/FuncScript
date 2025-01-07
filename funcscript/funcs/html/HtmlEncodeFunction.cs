@@ -5,8 +5,6 @@ namespace FuncScript.Funcs.Html
 {
     internal class HtmlEncodeFunction : IFsFunction
     {
-        private const int MaxParameters = 1;
-
         public CallType CallType => CallType.Infix;
 
         public string Symbol => "HEncode";

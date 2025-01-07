@@ -10,7 +10,7 @@ namespace FuncScript.Funcs.Text
 
         public object EvaluateList(FsList pars)
         {
-            if (pars.Length == 0)
+            if (pars.Length < 1)
                 throw new Error.EvaluationTimeException($"{Symbol} requires at least one parameter.");
 
             var input = pars[0] as string;

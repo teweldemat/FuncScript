@@ -24,11 +24,11 @@ namespace FuncScript.Funcs.Text
 
             return caseType.ToLower() switch
             {
-                "lower"     => input.ToLower(),
+                "lower" => input.ToLower(),
                 "upper" => input.ToUpper(),
                 "pascal" => ToPascalCase(input),
-                "snake"  => ToSnakeCase(input),
-                "kebab"  => ToKebabCase(input),
+                "snake" => ToSnakeCase(input),
+                "kebab" => ToKebabCase(input),
                 _ => throw new Error.EvaluationTimeException(
                         $"{this.Symbol} does not support the case type '{caseType}'. " +
                         "Supported types: lower, upper, pascal, snake, kebab."

@@ -5,14 +5,14 @@ namespace FuncScript.Funcs.Logic
 {
     public class TicksToDateFunction : IFsFunction
     {
-        private const int MaxParameters = 1;
-
         public CallType CallType => CallType.Prefix;
 
         public string Symbol => "TicksToDate";
 
         public object EvaluateList(FsList pars)
         {
+            const int MaxParameters = 1;
+
             if (pars.Length > MaxParameters)
                 throw new Error.EvaluationTimeException($"{this.Symbol} function: Invalid parameter count. Expected a maximum of {MaxParameters}, but got {pars.Length}");
 

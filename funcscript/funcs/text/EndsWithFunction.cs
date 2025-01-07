@@ -6,16 +6,14 @@ namespace FuncScript.Funcs.Strings
 {
     internal class EndsWithFunction : IFsFunction
     {
-        private const int MaxParameters = 2;
-
         public CallType CallType => CallType.Prefix;
 
         public string Symbol => "endswith";
 
         public object EvaluateList(FsList pars)
         {
-            if (pars.Length != MaxParameters)
-                throw new Error.TypeMismatchError($"{this.Symbol} function: Invalid parameter count. Expected {MaxParameters}, but got {pars.Length}");
+            if (pars.Length != 2)
+                throw new Error.TypeMismatchError($"{this.Symbol} function: Invalid parameter count. Expected 2, but got {pars.Length}");
 
             var par0 = pars[0];
             var par1 = pars[1];

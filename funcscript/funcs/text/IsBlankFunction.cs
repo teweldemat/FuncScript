@@ -6,7 +6,7 @@ namespace FuncScript.Funcs.Math
     public class IsBlankFunction : IFsFunction
     {
         public const string SYMBOL = "isBlank";
-        private const int MAX_PARS_COUNT = 1;
+        private const int MIN_PARS_COUNT = 1;
 
         public CallType CallType => CallType.Prefix;
 
@@ -14,7 +14,7 @@ namespace FuncScript.Funcs.Math
 
         public object EvaluateList(FsList pars)
         {
-            if (pars.Length < MAX_PARS_COUNT)
+            if (pars.Length < MIN_PARS_COUNT)
                 throw new Error.TypeMismatchError($"{this.Symbol}: argument expected");
 
             var parameter = pars[0];

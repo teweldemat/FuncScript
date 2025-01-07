@@ -5,8 +5,6 @@ namespace FuncScript.Funcs.Logic
 {
     public class OrFunction : IFsFunction
     {
-        private const int MaxParametersCount = -1; // Replacing MaxParsCount property
-
         public CallType CallType => CallType.Infix;
 
         public string Symbol => "or";

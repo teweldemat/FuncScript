@@ -6,7 +6,6 @@ namespace FuncScript.Funcs.Misc
     public class ErrorFunction : IFsFunction
     {
         public const string SYMBOL = "error";
-        private const int MAX_PARS_COUNT = 1;
 
         public CallType CallType => CallType.Prefix;
 
@@ -14,7 +13,7 @@ namespace FuncScript.Funcs.Misc
 
         public object EvaluateList(FsList pars)
         {
-            if (pars.Length != MAX_PARS_COUNT)
+            if (pars.Length != 1)
                 return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, "One parameter expected");
 
             var param = pars[0];

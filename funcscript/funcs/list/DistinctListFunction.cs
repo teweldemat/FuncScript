@@ -6,14 +6,14 @@ namespace FuncScript.Funcs.List
 {
     public class DistinctListFunction : IFsFunction
     {
-        private const int MaxParameters = 1;
-
         public CallType CallType => CallType.Prefix;
 
         public string Symbol => "Distinct";
 
         public object EvaluateList(FsList pars)
         {
+            const int MaxParameters = 1; // Move this declaration inside the method
+
             if (pars.Length != MaxParameters)
                 throw new Error.EvaluationTimeException($"{this.Symbol} function: Invalid parameter count. Expected {MaxParameters}, but got {pars.Length}");
 

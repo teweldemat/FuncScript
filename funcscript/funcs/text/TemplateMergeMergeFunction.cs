@@ -8,7 +8,6 @@ namespace FuncScript.Funcs.Math
     public class TemplateMergeMergeFunction : IFsFunction
     {
         public const string SYMBOL = "_templatemerge";
-        private const int MAX_PARS_COUNT = -1; // Replaced MaxParsCount
 
         public CallType CallType => CallType.Infix;
 

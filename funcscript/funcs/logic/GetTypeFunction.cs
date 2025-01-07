@@ -6,16 +6,14 @@ namespace FuncScript.Funcs.OS
 {
     internal class GetTypeFunction : IFsFunction
     {
-        private const int MaxParsCountValue = 1;
-
         public CallType CallType => CallType.Prefix;
 
         public string Symbol => "type";
 
         public object EvaluateList(FsList pars)
         {
-            if (pars.Length != MaxParsCountValue)
-                throw new Error.EvaluationTimeException($"{this.Symbol} function: invalid parameter count. {MaxParsCountValue} expected, got {pars.Length}");
+            if (pars.Length != 1)
+                throw new Error.EvaluationTimeException($"{this.Symbol} function: invalid parameter count. 1 expected, got {pars.Length}");
 
             var par0 = pars[0];
             if (par0 == null)

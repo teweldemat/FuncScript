@@ -7,7 +7,6 @@ namespace FuncScript.Funcs.Text
     public class ParseText : IFsFunction, KeyValueCollection
     {
         private KeyValueCollection _parentContext;
-        private const int MaxParameters = 2;
 
         public CallType CallType => CallType.Dual;
 

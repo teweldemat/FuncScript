@@ -7,16 +7,16 @@ namespace FuncScript.Funcs.List
 {
     public class ReverseListFunction : IFsFunction
     {
-        private const int MaxParameters = 1;
-
         public CallType CallType => CallType.Prefix;
 
         public string Symbol => "Reverse";
 
         public object EvaluateList(FsList pars)
         {
-            if (pars.Length != MaxParameters)
-                throw new Error.TypeMismatchError($"{this.Symbol} function: Invalid parameter count. Expected {MaxParameters}, but got {pars.Length}");
+            const int maxParameters = 1; // Updated
+
+            if (pars.Length != maxParameters)
+                throw new Error.TypeMismatchError($"{this.Symbol} function: Invalid parameter count. Expected {maxParameters}, but got {pars.Length}");
 
             var par0 = pars[0];
 

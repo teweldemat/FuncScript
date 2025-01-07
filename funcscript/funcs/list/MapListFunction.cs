@@ -6,16 +6,15 @@ namespace FuncScript.Funcs.List
 {
     public class MapListFunction : IFsFunction
     {
-        private const int MaxParameters = 2;
-
         public CallType CallType => CallType.Dual;
 
         public string Symbol => "Map";
 
         public object EvaluateList(FsList pars)
         {
-            if (pars.Length != MaxParameters)
-                throw new Error.TypeMismatchError($"{this.Symbol} function: Invalid parameter count. Expected {MaxParameters}, but got {pars.Length}");
+            const int expectedParameters = 2;
+            if (pars.Length != expectedParameters)
+                throw new Error.TypeMismatchError($"{this.Symbol} function: Invalid parameter count. Expected {expectedParameters}, but got {pars.Length}");
 
             var par0 = pars[0];
             var par1 = pars[1];

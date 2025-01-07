@@ -14,7 +14,7 @@ namespace FuncScript.Funcs.Text
 
         public object EvaluateList(FsList pars)
         {
-            if (pars.Length < 2 || pars.Length > MAX_PARS_COUNT)
+            if (pars.Length < 2 || pars.Length > 3)
                 throw new Error.TypeMismatchError($"{this.Symbol}: Two or three parameters expected");
 
             var par0 = pars[0];

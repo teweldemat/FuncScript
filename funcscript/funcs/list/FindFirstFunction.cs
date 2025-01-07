@@ -6,16 +6,14 @@ namespace FuncScript.Funcs.List
 {
     public class FindFirstFunction : IFsFunction
     {
-        private const int MaxParameterCount = 2;
-
         public CallType CallType => CallType.Dual;
 
         public string Symbol => "First";
 
         public object EvaluateList(FsList pars)
         {
-            if (pars.Length != MaxParameterCount)
-                throw new Error.EvaluationTimeException($"{this.Symbol} function: Invalid parameter count. Expected {MaxParameterCount}, but got {pars.Length}");
+            if (pars.Length != 2)
+                throw new Error.EvaluationTimeException($"{this.Symbol} function: Invalid parameter count. Expected 2, but got {pars.Length}");
 
             var par0 = pars[0];
             var par1 = pars[1];

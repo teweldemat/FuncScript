@@ -6,8 +6,6 @@ namespace FuncScript.Funcs.Misc
 {
     public class LogFunction : IFsFunction
     {
-        private const int MaxParameters = 2;
-
         public CallType CallType => CallType.Dual;
         public string Symbol => "log";
 

@@ -47,7 +47,6 @@ namespace FuncScript.Funcs.Math
         {
             return GetEnumerator();
         }
-
     }
     
     public class AddFunction : IFsFunction

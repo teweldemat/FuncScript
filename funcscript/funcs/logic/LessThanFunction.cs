@@ -6,14 +6,13 @@ namespace FuncScript.Funcs.Logic
 
     public class LessThanFunction : IFsFunction
     {
-        private const int MaxParameters = 2;
-
         public CallType CallType => CallType.Infix;
 
         public string Symbol => "<";
 
         public object EvaluateList(FsList pars)
         {
+            const int MaxParameters = 2;
             if (pars.Length != MaxParameters)
                 return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH,
                     $"{this.Symbol}: expected {MaxParameters} got {pars.Length}");

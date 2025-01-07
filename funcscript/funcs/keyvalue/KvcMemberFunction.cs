@@ -27,8 +27,8 @@ namespace FuncScript.Funcs.KeyValue
 
         public object EvaluateList(FsList pars)
         {
-            if (pars.Length != MaxParameterCount)
-                throw new Error.TypeMismatchError($"{Symbol} function: Invalid parameter count. Expected {MaxParameterCount}, but got {pars.Length}");
+            if (pars.Length != 2)
+                throw new Error.TypeMismatchError($"{Symbol} function: Invalid parameter count. Expected 2, but got {pars.Length}");
 
             var par0 = pars[0];
             var par1 = pars[1];

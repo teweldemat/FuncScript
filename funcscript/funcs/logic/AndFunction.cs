@@ -6,8 +6,6 @@ namespace FuncScript.Funcs.Logic
 
     public class AndFunction : IFsFunction
     {
-        private const int MaxParameters = -1;
-
         public CallType CallType => CallType.Infix;
 
         public string Symbol => "and";

@@ -7,14 +7,13 @@ namespace FuncScript.Funcs.OS
 {
     internal class FileExistsFunction : IFsFunction
     {
-        private const int MaxParameters = 1;
-
         public CallType CallType => CallType.Prefix;
 
         public string Symbol => "fileexists";
 
         public object EvaluateList(FsList pars)
         {
+            const int MaxParameters = 1; // Moved the constant declaration here
             if (pars.Length != MaxParameters)
                 throw new Error.EvaluationTimeException($"{this.Symbol} function: invalid parameter count. {MaxParameters} expected, got {pars.Length}");
 

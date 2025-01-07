@@ -5,14 +5,13 @@ namespace FuncScript.Funcs.List
 {
     public class LengthFunction : IFsFunction
     {
-        private const int MaxParameters = 1;
-
         public CallType CallType => CallType.Prefix;
 
         public string Symbol => "Len";
 
         public object EvaluateList(FsList pars)
         {
+            const int MaxParameters = 1;
             if (pars.Length != MaxParameters)
                 throw new Error.TypeMismatchError($"{this.Symbol} function: Invalid parameter count. Expected {MaxParameters}, but got {pars.Length}");
 

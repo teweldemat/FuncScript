@@ -5,14 +5,14 @@ namespace FuncScript.Funcs.List
 {
     public class AnyMatchFunction : IFsFunction
     {
-        private const int MaxParameters = 2;
-
         public CallType CallType => CallType.Dual;
 
         public string Symbol => "Any";
 
         public object EvaluateList(FsList pars)
         {
+            const int MaxParameters = 2;
+
             if (pars.Length != MaxParameters)
                 throw new Error.EvaluationTimeException($"{this.Symbol} function: Invalid parameter count. Expected {MaxParameters}, but got {pars.Length}");
 

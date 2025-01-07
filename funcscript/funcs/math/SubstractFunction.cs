@@ -5,8 +5,6 @@ namespace FuncScript.Funcs.Math
 {
     public class SubstractFunction : IFsFunction
     {
-        private const int MaxParsCountValue = -1;
-
         public CallType CallType => CallType.Infix;
 
         public string Symbol => "-";

@@ -5,15 +5,13 @@ namespace FuncScript.Funcs.List
 {
     public class SeriesFunction : IFsFunction
     {
-        private const int MaxParameters = 2;
-
         public CallType CallType => CallType.Prefix;
 
         public string Symbol => "Series";
 
         public object EvaluateList(FsList pars)
         {
-            if (pars.Length < 2 || pars.Length > MaxParameters)
+            if (pars.Length < 2 || pars.Length > 2)
                 throw new Error.TypeMismatchError($"{this.Symbol}: Two parameters expected");
 
             var par0 = pars[0];

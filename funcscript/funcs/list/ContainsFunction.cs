@@ -5,16 +5,14 @@ namespace FuncScript.Funcs.List
 {
     public class ContainsFunction : IFsFunction
     {
-        private const int MaxParsCountValue = 2;
-
         public CallType CallType => CallType.Prefix;
 
         public string Symbol => "Contains";
 
         public object EvaluateList(FsList pars)
         {
-            if (pars.Length != MaxParsCountValue)
-                throw new Error.TypeMismatchError($"{this.Symbol} function: Invalid parameter count. Expected {MaxParsCountValue}, but got {pars.Length}");
+            if (pars.Length != 2)
+                throw new Error.TypeMismatchError($"{this.Symbol} function: Invalid parameter count. Expected 2, but got {pars.Length}");
 
             var container = pars[0];
             var item = pars[1];

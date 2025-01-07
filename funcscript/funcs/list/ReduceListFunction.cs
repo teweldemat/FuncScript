@@ -6,7 +6,6 @@ namespace FuncScript.Funcs.List
 {
     public class ReduceListFunction : IFsFunction
     {
-
         public CallType CallType => CallType.Dual;
 
         public string Symbol => "Reduce";
@@ -21,12 +20,12 @@ namespace FuncScript.Funcs.List
             if (par0 is null) return null;
 
             var par1 = pars[1];
-            var par2 = pars[2];
+            var par2 =pars.Length>2?pars[2]:null;
 
-            return EvaluateInternal(par0, par1, par2, false);
+            return EvaluateInternal(par0, par1, par2);
         }
 
-        private object EvaluateInternal(object par0, object par1, object par2, bool dref)
+        private object EvaluateInternal(object par0, object par1, object par2)
         {
             if (!(par0 is FsList lst))
                 throw new Error.TypeMismatchError($"{this.Symbol} function: The first parameter should be {this.ParName(0)}");
@@ -39,7 +38,7 @@ namespace FuncScript.Funcs.List
             
             for (int i = 0; i < lst.Length; i++)
             {
-                total = func.EvaluateList(new ArrayFsList(new object[] { lst[i], total,  i }));
+                total = func.EvaluateList(new ArrayFsList(new object[] { lst[i], total, i }));
             }
 
             return FuncScript.NormalizeDataType(total);
@@ -51,6 +50,7 @@ namespace FuncScript.Funcs.List
             {
                 0 => "List",
                 1 => "Transform Function",
+                2 => "Initial Value",
                 _ => ""
             };
         }

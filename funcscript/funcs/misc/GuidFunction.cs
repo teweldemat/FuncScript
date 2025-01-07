@@ -5,17 +5,15 @@ namespace FuncScript.Funcs.Logic
 {
     public class GuidFunction : IFsFunction
     {
-        private const int MaxParametersCount = 1;
-
         public CallType CallType => CallType.Prefix;
 
         public string Symbol => "guid";
 
         public object EvaluateList(FsList pars)
         {
-            if (pars.Length != MaxParametersCount)
+            if (pars.Length != 1)
                 throw new Error.EvaluationTimeException(
-                    $"{this.Symbol} function: Invalid parameter count. Expected {MaxParametersCount}, but got {pars.Length}");
+                    $"{this.Symbol} function: Invalid parameter count. Expected 1, but got {pars.Length}");
 
             var par0 = pars[0];
 

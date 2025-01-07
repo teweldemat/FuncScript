@@ -5,8 +5,6 @@ namespace FuncScript.Funcs.Logic
 {
     public class SwitchFunction : IFsFunction
     {
-        private const int MaxParameters = -1;
-
         public CallType CallType => CallType.Prefix;
 
         public string Symbol => "switch";

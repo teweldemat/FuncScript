@@ -6,7 +6,6 @@ namespace FuncScript.Funcs.Math
     public class NegateFunction : IFsFunction
     {
         public const string SYMBOL = "neg";
-        private const int MAX_PARS_COUNT = 1;
 
         public CallType CallType => CallType.Prefix;
 
@@ -14,7 +13,7 @@ namespace FuncScript.Funcs.Math
 
         public object EvaluateList(FsList pars)
         {
-            if (pars.Length != MAX_PARS_COUNT)
+            if (pars.Length != 1)
                 return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, $"{this.Symbol}: one parameter expected");
 
             var param = pars[0];
@@ -26,7 +25,7 @@ namespace FuncScript.Funcs.Math
             if (param is double doubleValue)
                 return -doubleValue;
 
-            return new FsError(FsError.ERROR_TYPE_MISMATCH,$"{this.Symbol}: number expected");
+            return new FsError(FsError.ERROR_TYPE_MISMATCH, $"{this.Symbol}: number expected");
         }
 
         public string ParName(int index)

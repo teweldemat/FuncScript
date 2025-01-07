@@ -5,15 +5,13 @@ namespace FuncScript.Funcs.Logic
 {
     public class EvaluateIfNotNull : IFsFunction
     {
-        private const int MaxParameters = 2;
-
         public CallType CallType => CallType.Infix;
 
         public string Symbol => "?!";
 
         public object EvaluateList(FsList pars)
         {
-            if (pars.Length != MaxParameters)
+            if (pars.Length != 2)
                 throw new Error.TypeMismatchError($"{Symbol} function expects exactly two parameters.");
 
             var val = pars[0];

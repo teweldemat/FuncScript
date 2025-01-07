@@ -5,8 +5,6 @@ namespace FuncScript.Funcs.Math
 {
     public class ModuloFunction : IFsFunction
     {
-        private const int MaxParameters = -1;
-
         public CallType CallType => CallType.Infix;
 
         public string Symbol => "%";

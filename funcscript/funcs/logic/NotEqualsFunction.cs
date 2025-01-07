@@ -5,14 +5,14 @@ namespace FuncScript.Funcs.Logic
 {
     public class NotEqualsFunction : IFsFunction
     {
-        private const int MaxParameterCount = 2;
-
         public CallType CallType => CallType.Infix;
 
         public string Symbol => "!=";
 
         public object EvaluateList(FsList pars)
         {
+            const int MaxParameterCount = 2;
+
             if (pars.Length != MaxParameterCount)
                 return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH,
                     $"{this.Symbol}: expected {MaxParameterCount} got {pars.Length}");

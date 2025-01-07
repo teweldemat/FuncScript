@@ -7,7 +7,6 @@ namespace FuncScript.Funcs.Text
     public class JoinTextFunction : IFsFunction
     {
         public const string SYMBOL = "join";
-        private const int MAX_PAR_COUNT = 2;
 
         public CallType CallType => CallType.Dual;
 
@@ -15,7 +14,7 @@ namespace FuncScript.Funcs.Text
 
         public object EvaluateList(FsList pars)
         {
-            if (pars.Length != MAX_PAR_COUNT)
+            if (pars.Length != 2)
                 throw new Error.TypeMismatchError($"{this.Symbol}: Two parameters expected");
 
             var par0 = pars[0];

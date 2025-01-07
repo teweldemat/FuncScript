@@ -6,17 +6,15 @@ namespace FuncScript.Funcs.Logic
 {
     public class GreaterThanFunction : IFsFunction
     {
-        private const int MaxParameters = 2;
-
         public CallType CallType => CallType.Infix;
 
         public string Symbol => ">";
 
         public object EvaluateList(FsList pars)
         {
-            if (pars.Length != MaxParameters)
+            if (pars.Length != 2)
                 return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH,
-                    $"{this.Symbol}: expected {MaxParameters} got {pars.Length}");
+                    $"{this.Symbol}: expected 2 got {pars.Length}");
 
             var par0 = pars[0];
             var par1 = pars[1];
