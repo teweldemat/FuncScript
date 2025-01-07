@@ -7,8 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\funcscript.openai\funcscript.openai.csproj" />
-    <ProjectReference Include="..\funcscript.sql\funcscript.sql.csproj" />
+    <ProjectReference Include="..\FuncScript.Openai\funcscript.openai.csproj" />
+    <ProjectReference Include="..\FuncScript.Sql\funcscript.sql.csproj" />
     <ProjectReference Include="..\funcscript\funcscript.csproj" />
   </ItemGroup>
 
