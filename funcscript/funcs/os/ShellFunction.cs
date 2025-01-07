@@ -39,7 +39,7 @@ namespace FuncScript.Funcs.OS
 
             if (cmdParam is not string)
                 return new FsError(
-                    FsError.ERROR_TYPE_MISMATCH,
+                    FsError.ERROR_TYPE_INVALID_PARAMETER,
                     $"Function {Symbol}: Type mismatch. First parameter (command) must be string."
                 );
 
@@ -51,7 +51,7 @@ namespace FuncScript.Funcs.OS
                     timeoutMs = i;
                 else
                     return new FsError(
-                        FsError.ERROR_TYPE_MISMATCH,
+                        FsError.ERROR_TYPE_INVALID_PARAMETER,
                         $"Function {Symbol}: Type mismatch. Second parameter (timeout) must be int."
                     );
             }
@@ -130,10 +130,7 @@ namespace FuncScript.Funcs.OS
             }
             catch (Exception ex)
             {
-                return new FsError(
-                    FsError.ERROR_TYPE_EVALUATION,
-                    $"Function {Symbol}: Failed to execute shell command. Error: {ex.Message}"
-                );
+                return new FsError(ex);
             }
         }
 

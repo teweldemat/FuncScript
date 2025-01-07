@@ -18,20 +18,20 @@ namespace FuncScript.Openai
 
             var apiKey = pars[0]?.ToString();
             if (string.IsNullOrWhiteSpace(apiKey))
-                return new FsError(FsError.ERROR_TYPE_MISMATCH,
+                return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER,
                     $"{this.Symbol}: invalid OpenAI API key.");
 
             var model = pars[1]?.ToString();
             if (string.IsNullOrWhiteSpace(model))
-                return new FsError(FsError.ERROR_TYPE_MISMATCH,
+                return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER,
                     $"{this.Symbol}: invalid model.");
             if (!SupportedModels.Contains(model, StringComparer.OrdinalIgnoreCase))
-                return new FsError(FsError.ERROR_TYPE_MISMATCH,
+                return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER,
                     $"{this.Symbol}: unsupported model '{model}'.");
 
             var instruction = pars[2]?.ToString();
             if (string.IsNullOrWhiteSpace(instruction))
-                return new FsError(FsError.ERROR_TYPE_MISMATCH,
+                return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER,
                     $"{this.Symbol}: invalid instruction.");
 
             string systemInstruction = null;
@@ -39,7 +39,7 @@ namespace FuncScript.Openai
             {
                 systemInstruction = pars[3]?.ToString();
                 if (systemInstruction == null)
-                    return new FsError(FsError.ERROR_TYPE_MISMATCH,
+                    return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER,
                         $"{this.Symbol}: invalid system instruction.");
             }
 

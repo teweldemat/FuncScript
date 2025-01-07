@@ -15,23 +15,23 @@ namespace FuncScript.Funcs.Text
         public object EvaluateList(FsList pars)
         {
             if (pars.Length < 2 || pars.Length > 3)
-                throw new Error.TypeMismatchError($"{this.Symbol}: Two or three parameters expected");
+                return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, $"{this.Symbol}: Two or three parameters expected");
 
             var par0 = pars[0];
             var par1 = pars[1];
             var par2 = pars.Length > 2 ? pars[2] : null;
 
             if (par0 == null || par1 == null)
-                throw new Error.TypeMismatchError($"{this.Symbol}: Two strings and optionally an index expected as parameters");
+                return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"{this.Symbol}: Two strings and optionally an index expected as parameters");
 
             if (!(par0 is string text))
-                return new FsError(FsError.ERROR_TYPE_MISMATCH, $"{this.Symbol}: first parameter should be string");
+                return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"{this.Symbol}: first parameter should be string");
             if (!(par1 is string search))
-                return new FsError(FsError.ERROR_TYPE_MISMATCH, $"{this.Symbol}: second parameter should be string");
+                return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"{this.Symbol}: second parameter should be string");
 
             int startIndex = 0;
             if (par2 != null && !(par2 is int))
-                return new FsError(FsError.ERROR_TYPE_MISMATCH, $"{this.Symbol}: third parameter should be an integer");
+                return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"{this.Symbol}: third parameter should be an integer");
             if (par2 != null)
                 startIndex = (int)par2;
 

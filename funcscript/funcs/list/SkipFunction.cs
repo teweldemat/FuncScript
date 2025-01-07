@@ -12,7 +12,7 @@ namespace FuncScript.Funcs.List
         public object EvaluateList(FsList pars)
         {
             if (pars.Length != 2)
-                throw new Error.TypeMismatchError($"{this.Symbol} function: Invalid parameter count. Expected 2, but got {pars.Length}");
+                return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, $"{this.Symbol} function: Invalid parameter count. Expected 2, but got {pars.Length}");
 
             var par0 = pars[0];
             var par1 = pars[1];
@@ -26,10 +26,10 @@ namespace FuncScript.Funcs.List
                 return null;
 
             if (!(par0 is FsList))
-                throw new Error.TypeMismatchError($"{this.Symbol} function: The first parameter should be {this.ParName(0)}");
+                return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"{this.Symbol} function: The first parameter should be {this.ParName(0)}");
 
             if (!(par1 is int))
-                throw new Error.TypeMismatchError($"{this.Symbol} function: The second parameter should be {this.ParName(1)}");
+                return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"{this.Symbol} function: The second parameter should be {this.ParName(1)}");
 
             var lst = (FsList)par0;
             int n = (int)par1;

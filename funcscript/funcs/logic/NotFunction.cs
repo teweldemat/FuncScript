@@ -16,18 +16,19 @@ namespace FuncScript.Funcs.Logic
         {
             if (pars.Length != 1)
                 return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH,
-                    $"{this.Symbol}: expected 1 parameters got {pars.Length}");
+                    $"{this.Symbol}: one parameter expected");
 
             var par0 = pars[0];
 
             if (par0 == null)
-                return new FsError(FsError.ERROR_TYPE_MISMATCH,
-                    $"Function {this.Symbol} doesn't apply on null data");
+                return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER,
+                    $"{this.Symbol}: non-null parameter expected");
 
             if (par0 is bool)
                 return !(bool)par0;
-            return new FsError(FsError.ERROR_TYPE_MISMATCH,
-                $"Function {this.Symbol} doesn't apply to data type: {par0.GetType()}");
+            
+            return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER,
+                $"{this.Symbol}: boolean expected");
         }
 
         public string ParName(int index)

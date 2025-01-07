@@ -13,7 +13,7 @@ namespace FuncScript.Funcs.List
         {
             const int MaxParameters = 1;
             if (pars.Length != MaxParameters)
-                throw new Error.TypeMismatchError($"{this.Symbol} function: Invalid parameter count. Expected {MaxParameters}, but got {pars.Length}");
+                return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, $"{this.Symbol} function: Invalid parameter count. Expected {MaxParameters}, but got {pars.Length}");
 
             var par0 = pars[0];
 
@@ -27,7 +27,7 @@ namespace FuncScript.Funcs.List
                 null => 0,
                 FsList list => list.Length,
                 string s => s.Length,
-                _ => throw new Error.TypeMismatchError($"{this.Symbol} function doesn't apply to {par0.GetType()}")
+                _ => new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"{this.Symbol} function doesn't apply to {par0.GetType()}")
             };
         }
 

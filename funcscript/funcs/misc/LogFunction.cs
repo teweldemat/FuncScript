@@ -12,7 +12,7 @@ namespace FuncScript.Funcs.Misc
         public object EvaluateList(FsList pars)
         {
             if (pars.Length == 0)
-                throw new Error.EvaluationTimeException($"{this.Symbol} function: {this.ParName(0)} expected");
+                return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, $"{this.Symbol} function: {this.ParName(0)} expected");
 
             var anchor = pars[0];
             var second = pars.Length > 1 ? pars[1] : null;

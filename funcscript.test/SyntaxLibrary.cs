@@ -1,4 +1,4 @@
-using FuncScript.Core;
+﻿using FuncScript.Core;
 using FuncScript.Error;
 using FuncScript.Model;
 using NUnit.Framework;
@@ -59,14 +59,14 @@ namespace FuncScript.Test
         [TestCase(@"""99""<""98""", false)]
         [TestCase(@"""90"">""99""", false)]
         [TestCase(@"null!=""99""", true)]  //null to the mix
-        [TestCase(@"null<""98""", null)]
+        [TestCase(@"null<""98""", null,FsError.ERROR_TYPE_INVALID_PARAMETER)]
         [TestCase(@"""90"">null", null)]
         [TestCase(@"null=null", true)]
         [TestCase(@"12=[1,2,3,4]", false)] //list data to the mix
-        [TestCase(@"12>[1,2,3,4]", null, FsError.ERROR_TYPE_MISMATCH)]
-        [TestCase(@"12>=[1,2,3,4]", null, FsError.ERROR_TYPE_MISMATCH)]
-        [TestCase(@"12<[1,2,3,4]", null, FsError.ERROR_TYPE_MISMATCH)]
-        [TestCase(@"12<=[1,2,3,4]", null, FsError.ERROR_TYPE_MISMATCH)]
+        [TestCase(@"12>[1,2,3,4]", null, FsError.ERROR_TYPE_INVALID_PARAMETER)]
+        [TestCase(@"12>=[1,2,3,4]", null, FsError.ERROR_TYPE_INVALID_PARAMETER)]
+        [TestCase(@"12<[1,2,3,4]", null, FsError.ERROR_TYPE_INVALID_PARAMETER)]
+        [TestCase(@"12<=[1,2,3,4]", null, FsError.ERROR_TYPE_INVALID_PARAMETER)]
         [TestCase(@"1>2>3", null, FsError.ERROR_PARAMETER_COUNT_MISMATCH)] //chained comparision
         [TestCase(@"1<2<3", null, FsError.ERROR_PARAMETER_COUNT_MISMATCH)]
         [TestCase(@"1=2=3", null, FsError.ERROR_PARAMETER_COUNT_MISMATCH)]
@@ -74,8 +74,8 @@ namespace FuncScript.Test
         [TestCase(@"if(2=null,0,1)", 1)]  //how would if deal with null condition
         [TestCase(@"not(1=1)", false)] //not function
         [TestCase(@"not(3=1)", true)]
-        [TestCase(@"not(null)", null, FsError.ERROR_TYPE_MISMATCH)]
-        [TestCase(@"not(""0"")", null, FsError.ERROR_TYPE_MISMATCH)]
+        [TestCase(@"not(null)", null, FsError.ERROR_TYPE_INVALID_PARAMETER)]
+        [TestCase(@"not(""0"")", null, FsError.ERROR_TYPE_INVALID_PARAMETER)]
         [TestCase("{\"a\":45}.A", 45)] //json accesor case insensitve
         [TestCase("{\"A\":45}.a", 45)]
         [TestCase("1+2//that is it", 3)]
@@ -114,8 +114,8 @@ namespace FuncScript.Test
         [TestCase(@"true and true or false and false", false)] //and or preciden function
         [TestCase(@"true or false and true", true)]
         [TestCase(@"false and ([34]>5)", false)] //don't evaluate uncessary
-        [TestCase(@"true and ([34]>5)", null, FsError.ERROR_TYPE_MISMATCH)]
-        [TestCase(@"false or  ([34]>5)", null, FsError.ERROR_TYPE_MISMATCH)]
+        [TestCase(@"true and ([34]>5)", null, FsError.ERROR_TYPE_INVALID_PARAMETER)]
+        [TestCase(@"false or  ([34]>5)", null, FsError.ERROR_TYPE_INVALID_PARAMETER)]
         [TestCase(@"true or ([34]>5)", true)]
         [TestCase(@"2*3 in [4,6]", true)] //the precidence bonanza
         [TestCase(@"2=2 and 3=4", false)]
@@ -265,10 +265,9 @@ namespace FuncScript.Test
         [Test]
         public void MemberofNull()
         {
-            Assert.Throws<EvaluationException>(() =>
-            {
-                var res = FuncScript.Evaluate("x.a");
-            });
+            var res = FuncScript.Evaluate("x.a");
+            
+            Assert.That(res,Is.TypeOf<FsError>());
         }
     }
 }

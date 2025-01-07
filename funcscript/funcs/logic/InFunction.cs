@@ -12,8 +12,7 @@ namespace FuncScript.Funcs.Logic
         public object EvaluateList(FsList pars)
         {
             if (pars.Length != 2)
-                throw new Error.EvaluationTimeException(
-                    $"{Symbol} function: Invalid parameter count. Expected 2, but got {pars.Length}");
+                return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, $"{Symbol} function: Invalid parameter count. Expected 2, but got {pars.Length}");
 
             var par0 = pars[0];
             var par1 = pars[1];
@@ -22,8 +21,7 @@ namespace FuncScript.Funcs.Logic
                 return null;
 
             if (!(par1 is FsList))
-                throw new Error.EvaluationTimeException(
-                    $"{Symbol} function: {ParName(1)} should be a list");
+                return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"{Symbol} function: {ParName(1)} should be a list");
 
             bool par0Numeric = FuncScript.IsNumeric(par0);
 

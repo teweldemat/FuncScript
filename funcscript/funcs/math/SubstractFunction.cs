@@ -11,12 +11,18 @@ namespace FuncScript.Funcs.Math
 
         public object EvaluateList(FsList pars)
         {
+            if (pars.Length == 0)
+                return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, $"{this.Symbol}: at least one parameter expected");
+
             var ret = EvaluateInternal(pars, (i) => 
             {
                 if (i >= pars.Length) return (false, null);
                 var ret = pars[i];
                 return (true, ret);
             });
+            if (ret == null)
+                return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"{this.Symbol}: number expected");
+            
             return ret;
         }
 
@@ -50,6 +56,10 @@ namespace FuncScript.Funcs.Math
                     isDouble = true;
                     doubleTotal = (double)d;
                 }
+                else
+                {
+                    return null;
+                }
             }
 
             for (int i = 1; i < count; i++)
@@ -79,6 +89,10 @@ namespace FuncScript.Funcs.Math
                         doubleTotal = intTotal;
                         doubleTotal -= (double)d;
                     }
+                    else
+                    {
+                        return null;
+                    }
                 }
                 else if (isLong)
                 {
@@ -97,6 +111,10 @@ namespace FuncScript.Funcs.Math
                         doubleTotal = longTotal;
                         doubleTotal -= (double)d;
                     }
+                    else
+                    {
+                        return null;
+                    }
                 }
                 else if (isDouble)
                 {
@@ -111,6 +129,10 @@ namespace FuncScript.Funcs.Math
                     else if (d is double)
                     {
                         doubleTotal -= (double)d;
+                    }
+                    else
+                    {
+                        return null;
                     }
                 }
             }

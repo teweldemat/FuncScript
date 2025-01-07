@@ -12,7 +12,7 @@ namespace FuncScript.Funcs.Logic
         public object EvaluateList(FsList pars)
         {
             if (pars.Length != 2)
-                throw new Error.TypeMismatchError($"{this.Symbol} function: Invalid parameter count. Expected 2, but got {pars.Length}");
+                return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, $"{this.Symbol} function: Invalid parameter count. Expected 2, but got {pars.Length}");
 
             var par0 = pars[0];
             var par1 = pars[1];
@@ -31,12 +31,12 @@ namespace FuncScript.Funcs.Logic
             }
 
             if (par0.GetType() != par1.GetType())
-                return new FsError(FsError.ERROR_TYPE_MISMATCH, $"{this.Symbol}: Can't compare incompatible types");
+                return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"{this.Symbol}: Can't compare incompatible types");
 
             if (par0 is IComparable comparable)
                 return comparable.CompareTo(par1) >= 0;
 
-            return new FsError(FsError.ERROR_TYPE_MISMATCH, $"{this.Symbol} function can't compare these data types: {par0.GetType()}");
+            return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"{this.Symbol} function can't compare these data types: {par0.GetType()}");
         }
 
         public string ParName(int index)

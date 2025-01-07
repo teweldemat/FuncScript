@@ -100,7 +100,7 @@ public class AdvancedSyntax
     }
     
     [Test]
-    [TestCase("!null", FsError.ERROR_TYPE_MISMATCH)]
+    [TestCase("!null", FsError.ERROR_TYPE_INVALID_PARAMETER)]
     public void ErrorResults(string exp, string type)
     {
         var res = FuncScript.Evaluate(exp);

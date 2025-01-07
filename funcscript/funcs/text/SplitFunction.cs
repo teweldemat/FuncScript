@@ -11,11 +11,11 @@ namespace FuncScript.Funcs.Text
         public object EvaluateList(FsList pars)
         {
             if (pars.Length < 1)
-                throw new Error.EvaluationTimeException($"{Symbol} requires at least one parameter.");
+                return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, $"{Symbol} requires at least one parameter.");
 
             var input = pars[0] as string;
             if (input == null)
-                return null;
+                return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"{Symbol}: first parameter must be a string");
 
             var separator = (pars.Length > 1 ? pars[1] as string : null) ?? "";
             var parts = input.Split(new[] { separator }, StringSplitOptions.None);

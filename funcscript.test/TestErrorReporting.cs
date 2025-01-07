@@ -1,4 +1,4 @@
-using FuncScript.Core;
+﻿using FuncScript.Core;
 using FuncScript.Error;
 using NUnit.Framework;
 using System;
@@ -7,6 +7,7 @@ using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
+using FuncScript.Model;
 
 namespace FuncScript.Test
 {
@@ -95,49 +96,24 @@ c:4
         {
             var error_exp = "len(5)";
             var exp = $"10+{error_exp}";
-            try
-            {
-                FuncScript.Evaluate(exp);
-                throw new Exception("No error");
-            }
-            catch (Exception ex)
-            {
-                AnalyzeError(ex, exp, exp.IndexOf(error_exp), error_exp.Length);
-                Assert.AreEqual(typeof(Error.TypeMismatchError), ex.InnerException.GetType());
-            }
+            var res=FuncScript.Evaluate(exp);
+            Assert.That(res,Is.TypeOf<FsError>());        
         }
         [Test]
         public void TestNullMemberAccessError()
         {
             var error_exp = "x.l";
             var exp = $"10+{error_exp}";
-            try
-            {
-                FuncScript.Evaluate(exp);
-                throw new Exception("No error");
-            }
-            catch (Exception ex)
-            {
-                AnalyzeError(ex, exp, exp.IndexOf(error_exp), error_exp.Length);
-                Assert.AreEqual(typeof(Error.TypeMismatchError), ex.InnerException.GetType());
-            }
+            var res=FuncScript.Evaluate(exp);
+            Assert.That(res,Is.TypeOf<FsError>());
         }
         [Test]
         public void TestListMemberAccessError()
         {
             var error_exp = "[5,6].l";
             var exp = $"10+{error_exp}";
-            try
-            {
-                FuncScript.Evaluate(exp);
-                throw new Exception("No error");
-            }
-            catch (Exception ex)
-            {
-                AnalyzeError(ex, exp, exp.IndexOf(error_exp), error_exp.Length);
-                Assert.AreEqual(typeof(Error.TypeMismatchError), ex.InnerException.GetType());
-            }
-
+            var res=FuncScript.Evaluate(exp);
+            Assert.That(res,Is.TypeOf<FsError>());
         }
 
         [Test]

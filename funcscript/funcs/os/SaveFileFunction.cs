@@ -21,11 +21,11 @@ namespace FuncScript.Funcs.OS
             var par1 = pars[1];
 
             if (par0 == null || par1 == null)
-                return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH,
+                return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER,
                     $"Function {this.Symbol}: parameters cannot be null");
 
             if (!(par0 is string) || !(par1 is string))
-                return new FsError(FsError.ERROR_TYPE_MISMATCH,
+                return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER,
                     $"Function {this.Symbol}: Type mismatch. Both parameters must be strings");
 
             var fileName = (string)par0;
@@ -43,8 +43,7 @@ namespace FuncScript.Funcs.OS
             }
             catch (Exception ex)
             {
-                return new FsError(FsError.ERROR_TYPE_EVALUATION,
-                    $"Function {this.Symbol}: Failed to save file '{fileName}'. Error: {ex.Message}");
+                return new FsError(ex);
             }
         }
 

@@ -21,7 +21,8 @@ namespace FuncScript.Funcs.Logic
             var par1 = pars[1];
 
             if (par0 == null || par1 == null)
-                return null;
+                return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER,
+                    $"{this.Symbol}: null value(s) not allowed");
 
             if (FuncScript.IsNumeric(par0) && FuncScript.IsNumeric(par1))
             {
@@ -29,12 +30,12 @@ namespace FuncScript.Funcs.Logic
             }
 
             if (par0.GetType() != par1.GetType())
-                return new FsError(FsError.ERROR_TYPE_MISMATCH, $"{this.Symbol}: Can't compare incompatible types");
+                return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"{this.Symbol}: Can't compare incompatible types");
 
             if (par0 is IComparable)
                 return ((IComparable)par0).CompareTo(par1) < 0;
 
-            return new FsError(FsError.ERROR_TYPE_MISMATCH, $"{this.Symbol} function can't compare these data types: {par0.GetType()}");
+            return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"{this.Symbol} function can't compare these data types: {par0.GetType()}");
         }
 
         public string ParName(int index)

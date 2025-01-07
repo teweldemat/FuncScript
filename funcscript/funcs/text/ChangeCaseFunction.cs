@@ -14,13 +14,13 @@ namespace FuncScript.Funcs.Text
         public object EvaluateList(FsList pars)
         {
             if (pars.Length < 2)
-                throw new Error.EvaluationTimeException($"{this.Symbol} requires at least two parameters: text and case type.");
+                return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, $"{this.Symbol} requires at least two parameters: text and case type.");
 
             var input = pars[0] as string;
             var caseType = pars[1] as string;
 
             if (input == null || caseType == null)
-                throw new Error.EvaluationTimeException($"{this.Symbol} requires the first parameter to be a string and the second parameter to specify a valid case type.");
+                return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"{this.Symbol} requires the first parameter to be a string and the second parameter to specify a valid case type.");
 
             return caseType.ToLower() switch
             {
@@ -29,7 +29,7 @@ namespace FuncScript.Funcs.Text
                 "pascal" => ToPascalCase(input),
                 "snake" => ToSnakeCase(input),
                 "kebab" => ToKebabCase(input),
-                _ => throw new Error.EvaluationTimeException(
+                _ => new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER,
                         $"{this.Symbol} does not support the case type '{caseType}'. " +
                         "Supported types: lower, upper, pascal, snake, kebab."
                      )

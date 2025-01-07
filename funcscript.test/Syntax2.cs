@@ -18,7 +18,7 @@ namespace FuncScript.Test
         [Test]
         public void TestMapSquare()
         {
-            var exp="ap([1,2,4],(x)=>x*x)";
+            var exp="map([1,2,4],(x)=>x*x)";
             var res = FuncScript.Evaluate(exp);
             Assert.That(res is FsList);
             var list = (FsList)res;

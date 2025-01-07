@@ -20,7 +20,14 @@ namespace FuncScript.Funcs.Logic
             var par0 = pars[0];
             var par1 = pars[1];
 
-            return EvaluateInternal(par0, par1);
+            try
+            {
+                return EvaluateInternal(par0, par1);
+            }
+            catch (Exception ex)
+            {
+                return new FsError(ex);
+            }
         }
 
         private object EvaluateInternal(object par0, object par1)

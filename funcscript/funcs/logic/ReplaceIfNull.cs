@@ -12,7 +12,7 @@ namespace FuncScript.Funcs.Logic
         public object EvaluateList(FsList pars)
         {
             if (pars.Length != 2)
-                throw new Error.TypeMismatchError($"{Symbol} function expects exactly 2 parameters.");
+                return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, $"{Symbol}: function expects exactly 2 parameters.");
 
             var val = pars[0];
 

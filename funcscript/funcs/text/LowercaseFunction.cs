@@ -11,11 +11,11 @@ namespace FuncScript.Funcs.Text
         public object EvaluateList(FsList pars)
         {
             if (pars.Length == 0)
-                throw new Error.EvaluationTimeException($"{this.Symbol} requires at least one parameter.");
+                return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, $"{this.Symbol} requires at least one parameter.");
 
             var input = pars[0] as string;
             if (input == null)
-                return null;
+                return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"{this.Symbol}: string expected");
 
             return input.ToLower();
         }

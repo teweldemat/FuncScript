@@ -19,7 +19,7 @@ namespace FuncScript.Funcs.Logic
                 var par = pars[i];
 
                 if (!(par is bool b))
-                    return new FsError(FsError.ERROR_TYPE_MISMATCH,
+                    return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER,
                         $"{this.Symbol} doesn't apply to this type:{(par == null ? "null" : par.GetType())} ");
 
                 if(!b)

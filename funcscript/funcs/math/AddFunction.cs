@@ -23,7 +23,7 @@ namespace FuncScript.Funcs.Math
             get
             {
                 if (index < 0)
-                    return null;
+                    return new FsError(FsError.ERROR_DEFAULT, "Index cannot be negative");
                 foreach (var list in _lists)
                 {
                     if (index < list.Length)
@@ -31,7 +31,7 @@ namespace FuncScript.Funcs.Math
                     index -= list.Length;
                 }
 
-                return null;
+                return new FsError(FsError.ERROR_DEFAULT, "Index out of range");
             }
         }
 
@@ -80,7 +80,7 @@ namespace FuncScript.Funcs.Math
             {
                 var p = getPar(i);
                 if (!p.Item1)
-                    return null;
+                    return new FsError(FsError.ERROR_DEFAULT, "Failed to retrieve parameter");
                 var d = p.Item2;
                 if (isNull)
                 {
@@ -145,6 +145,9 @@ namespace FuncScript.Funcs.Math
                         isInt = false;
                         listTotal = new List<FsList>(new[] { new ArrayFsList(new object[] { intTotal }) });
                     }
+                    else
+                        return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER,
+                            $"{this.Symbol}: invalid type for addition");
                 }
                 if (isLong)
                 {
@@ -176,8 +179,11 @@ namespace FuncScript.Funcs.Math
                     }
                     else if (d is KeyValueCollection)
                     {
-                        return new FsError(FsError.ERROR_TYPE_MISMATCH, $"{this.Symbol}: Keyvalue collection not expected");
+                        return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"{this.Symbol}: Keyvalue collection not expected");
                     }
+                    else
+                        return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER,
+                            $"{this.Symbol}: invalid type for addition");
                 }
                 if (isDouble)
                 {
@@ -205,10 +211,9 @@ namespace FuncScript.Funcs.Math
                         isDouble = false;
                         listTotal = new List<FsList>(new[] { new ArrayFsList(new object[] { longTotal }) });
                     }
-                    else if (d is KeyValueCollection)
-                    {
-                        return new FsError(FsError.ERROR_TYPE_MISMATCH, $"{this.Symbol}: Keyvalue collection not expected");
-                    }
+                    else
+                        return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER,
+                            $"{this.Symbol}: invalid type for addition");
                 }
                 if (isString)
                 {
@@ -230,12 +235,6 @@ namespace FuncScript.Funcs.Math
                             stringTotal = new StringBuilder();
                         stringTotal.Append((string)d);
                     }
-                    else if (d is FsList)
-                    {
-                        isList = true;
-                        isString = false;
-                        listTotal = new List<FsList>(new[] { new ArrayFsList(new object[] { stringTotal.ToString() }) });
-                    }
                     else if (d is FsError)
                     {
                         return d;
@@ -249,7 +248,7 @@ namespace FuncScript.Funcs.Math
                 {
                     var kv = d as KeyValueCollection;
                     if (kv == null)
-                        return new FsError(FsError.ERROR_TYPE_MISMATCH, "Keyvalue collection expected");
+                        return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, "Keyvalue collection expected");
                     if (kvTotal == null)
                         kvTotal = kv;
                     else
@@ -282,7 +281,7 @@ namespace FuncScript.Funcs.Math
             {
                 return kvTotal;
             }
-            return null;
+            return new FsError(FsError.ERROR_DEFAULT, "Unexpected null value");
         }
 
         public string ParName(int index)

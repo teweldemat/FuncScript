@@ -15,7 +15,7 @@ namespace FuncScript.Funcs.Text
         public object EvaluateList(FsList pars)
         {
             if (pars.Length == 0)
-                throw new Error.TypeMismatchError($"{this.Symbol} requires at least one parameter");
+                return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, $"{this.Symbol} requires at least one parameter");
 
             var par0 = pars[0];
             
@@ -58,17 +58,8 @@ namespace FuncScript.Funcs.Text
             }
             catch (Exception e)
             {
-                var sb = new StringBuilder();
-                while (e != null)
-                {
-                    sb.Append(e.Message);
-                    e = e.InnerException;
-                    if (e != null)
-                        sb.Append("\n");
-                }
-                return new FsError(FsError.ERROR_TYPE_EVALUATION, sb.ToString());
+                return new FsError(e);
             }
-
         }
 
         public string ParName(int index)
@@ -85,7 +76,6 @@ namespace FuncScript.Funcs.Text
         {
             return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"The parsed function script should have no variables");
         }
-
 
         public KeyValueCollection ParentContext { get; }
         public bool IsDefined(string key)

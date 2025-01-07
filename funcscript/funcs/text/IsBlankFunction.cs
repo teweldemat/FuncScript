@@ -15,7 +15,7 @@ namespace FuncScript.Funcs.Math
         public object EvaluateList(FsList pars)
         {
             if (pars.Length < MIN_PARS_COUNT)
-                throw new Error.TypeMismatchError($"{this.Symbol}: argument expected");
+                return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, $"{this.Symbol}: argument expected");
 
             var parameter = pars[0];
 
@@ -23,7 +23,7 @@ namespace FuncScript.Funcs.Math
                 return true;
 
             if (parameter is not string str)
-                throw new Error.TypeMismatchError($"{this.Symbol}: string expected");
+                return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"{this.Symbol}: string expected");
 
             return string.IsNullOrEmpty(str.Trim());
         }

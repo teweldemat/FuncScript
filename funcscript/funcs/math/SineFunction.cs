@@ -32,7 +32,7 @@ namespace FuncScript.Funcs.Math
                 return System.Math.Sin((double)longValue);
             }
 
-            throw new Error.TypeMismatchError($"{this.Symbol}: A number was expected.");
+            return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"{this.Symbol}: A number was expected.");
         }
 
         public string ParName(int index)
@@ -66,7 +66,7 @@ namespace FuncScript.Funcs.Math
             {
                 return System.Math.Cos((double)longValue);
             }
-            throw new Error.TypeMismatchError($"{this.Symbol}: number expected");
+            return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"{this.Symbol}: number expected");
         }
 
         public string ParName(int index)

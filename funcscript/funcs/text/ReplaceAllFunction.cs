@@ -13,14 +13,14 @@ namespace FuncScript.Funcs.Text
             const int requiredParameters = 3;
 
             if (pars.Length < requiredParameters)
-                throw new Error.EvaluationTimeException($"{this.Symbol} requires exactly three parameters: input string, search string, and replacement string.");
+                return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, $"{this.Symbol} requires exactly three parameters: input string, search string, and replacement string.");
 
             var input = pars[0] as string;
             var search = pars[1] as string;
             var replacement = pars[2] as string;
 
             if (input == null || search == null || replacement == null)
-                throw new Error.EvaluationTimeException($"{this.Symbol} parameters must all be strings.");
+                return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"{this.Symbol} parameters must all be strings.");
 
             return input.Replace(search, replacement);
         }

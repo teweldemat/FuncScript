@@ -28,15 +28,26 @@ namespace FuncScript.Funcs.Math
 
         public object EvaluateList(FsList pars)
         {
+            if (pars == null)
+                return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, $"{this.Symbol}: parameters cannot be null");
+
             StringBuilder sb = new StringBuilder();
             int c = pars.Length;
             for (int i = 0; i < c; i++)
             {
                 var o = pars[i];
                 if (o is FsList)
+                {
                     MergeList(sb, (FsList)o);
+                }
+                else if (o == null)
+                {
+                    sb.Append("");
+                }
                 else
-                    sb.Append(o == null ? "" : o.ToString());
+                {
+                    sb.Append(o.ToString());
+                }
             }
             return sb.ToString();
         }

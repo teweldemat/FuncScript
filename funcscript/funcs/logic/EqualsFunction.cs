@@ -13,7 +13,7 @@ namespace FuncScript.Funcs.Logic
         {
             if (pars.Length != 2)
                 return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH,
-                    $"{this.Symbol}: expected 2 got {pars.Length}");
+                    $"{this.Symbol}: expected 2 parameters but got {pars.Length}");
 
             var par0 = pars[0];
             var par1 = pars[1];
@@ -34,7 +34,10 @@ namespace FuncScript.Funcs.Logic
                 FuncScript.ConvertToCommonNumericType(par0, par1, out par0, out par1);
             }
 
-            return par0?.GetType() == par1?.GetType() && par0.Equals(par1);
+            if (par0?.GetType() != par1?.GetType())
+                return false;
+
+            return par0.Equals(par1);
         }
 
         public string ParName(int index)

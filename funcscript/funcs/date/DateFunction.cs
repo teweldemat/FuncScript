@@ -14,7 +14,7 @@ namespace FuncScript.Funcs.Logic
         public object EvaluateList(FsList pars)
         {
             if (pars.Length > 2)
-                throw new Error.EvaluationTimeException($"{this.Symbol} function: invalid parameter count. Max of 2 expected, got {pars.Length}");
+                return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, $"{this.Symbol} function: invalid parameter count. Max of 2 expected, got {pars.Length}");
 
             var par0 = pars[0];
 
@@ -22,7 +22,7 @@ namespace FuncScript.Funcs.Logic
                 return null;
 
             if (!(par0 is string))
-                throw new Error.TypeMismatchError($"Function {this.Symbol}: Type mismatch, expected string");
+                return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"Function {this.Symbol}: Type mismatch, expected string");
 
             var str = (string)par0;
             DateTime date;
@@ -32,13 +32,13 @@ namespace FuncScript.Funcs.Logic
             if (par1 == null)
             {
                 if (!DateTime.TryParse(str, out date))
-                    throw new Error.TypeMismatchError($"Function {this.Symbol}: String '{str}' can't be converted to date");
+                    return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"Function {this.Symbol}: String '{str}' can't be converted to date");
             }
             else
             {
                 var f = new DateTimeFormat(par1);
                 if (!DateTime.TryParse(str, f.FormatProvider, System.Globalization.DateTimeStyles.AssumeUniversal, out date))
-                    throw new Error.TypeMismatchError($"Function {this.Symbol}: String '{str}' can't be converted to date with format '{par1}'");
+                    return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"Function {this.Symbol}: String '{str}' can't be converted to date with format '{par1}'");
             }
 
             return date;

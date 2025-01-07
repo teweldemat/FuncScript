@@ -25,7 +25,7 @@ namespace FuncScript.Funcs.Math
             if (param is double doubleValue)
                 return -doubleValue;
 
-            return new FsError(FsError.ERROR_TYPE_MISMATCH, $"{this.Symbol}: number expected");
+            return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"{this.Symbol}: number expected");
         }
 
         public string ParName(int index)

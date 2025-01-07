@@ -12,13 +12,13 @@ namespace FuncScript.Funcs.KeyValue
         private object EvaluateInternal(object target, object key)
         {
             if (!(key is string))
-                throw new Error.TypeMismatchError($"{Symbol} function: The second parameter should be a string (Member key).");
+                return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"{Symbol} function: The second parameter should be a string (Member key).");
 
             if (target == null)
                 return null;
 
             if (!(target is KeyValueCollection))
-                throw new Error.TypeMismatchError($"{Symbol} function: Cannot access member '{key}' on non-KeyValueCollection type '{FuncScript.GetFsDataType(target)}'.");
+                return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"{Symbol} function: Cannot access member '{key}' on non-KeyValueCollection type '{FuncScript.GetFsDataType(target)}'.");
 
             return ((KeyValueCollection)target).Get(((string)key).ToLower());
         }
@@ -26,7 +26,7 @@ namespace FuncScript.Funcs.KeyValue
         public object EvaluateList(FsList pars)
         {
             if (pars.Length != 2)
-                throw new Error.TypeMismatchError($"{Symbol} function: Expected 2 parameters, received {pars.Length}.");
+                return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, $"{Symbol} function: Expected 2 parameters, received {pars.Length}.");
 
             var key = pars[1];
             var target = pars[0];

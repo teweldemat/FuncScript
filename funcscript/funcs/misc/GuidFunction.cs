@@ -12,8 +12,7 @@ namespace FuncScript.Funcs.Logic
         public object EvaluateList(FsList pars)
         {
             if (pars.Length != 1)
-                throw new Error.EvaluationTimeException(
-                    $"{this.Symbol} function: Invalid parameter count. Expected 1, but got {pars.Length}");
+                return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, $"{this.Symbol} function: Invalid parameter count. Expected 1, but got {pars.Length}");
 
             var par0 = pars[0];
 
@@ -21,14 +20,12 @@ namespace FuncScript.Funcs.Logic
                 return null;
 
             if (!(par0 is string))
-                throw new Error.TypeMismatchError(
-                    $"Function {this.Symbol}: Type mismatch. Expected a string.");
+                return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"Function {this.Symbol}: Type mismatch. Expected a string.");
 
             var str = (string)par0;
 
             if (!Guid.TryParse(str, out var guid))
-                throw new Error.TypeMismatchError(
-                    $"Function {this.Symbol}: String '{par0}' is not a valid GUID.");
+                return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"Function {this.Symbol}: String '{par0}' is not a valid GUID.");
 
             return guid;
         }

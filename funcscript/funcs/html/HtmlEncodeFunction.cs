@@ -11,8 +11,14 @@ namespace FuncScript.Funcs.Html
 
         public object EvaluateList(FsList pars)
         {
-            var str = pars.Length > 0 ? pars[0] : null;
-            return str == null ? null : System.Web.HttpUtility.HtmlEncode(str.ToString());
+            if (pars.Length != 1)
+                return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, $"{this.Symbol}: one parameter expected");
+
+            var str = pars[0];
+            if (str == null)
+                return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"{this.Symbol}: non-null string expected");
+
+            return System.Web.HttpUtility.HtmlEncode(str.ToString());
         }
 
         public string ParName(int index)

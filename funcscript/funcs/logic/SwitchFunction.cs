@@ -11,6 +11,7 @@ namespace FuncScript.Funcs.Logic
 
         public object EvaluateList(FsList pars)
         {
+
             var selector = pars[0];
 
             for (var i = 1; i < pars.Length - 1; i += 2)

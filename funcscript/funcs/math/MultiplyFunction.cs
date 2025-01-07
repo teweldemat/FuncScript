@@ -11,6 +11,9 @@ namespace FuncScript.Funcs.Math
 
         public object EvaluateList(FsList pars)
         {
+            if (pars.Length == 0)
+                return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, $"{this.Symbol}: at least one parameter expected");
+
             bool isNull = true, isInt = false, isLong = false, isDouble = false;
             int intTotal = 1;
             long longTotal = 1;
@@ -30,7 +33,9 @@ namespace FuncScript.Funcs.Math
                     else if (d is double)
                         isDouble = true;
                     else
-                        return new FsError(FsError.ERROR_TYPE_MISMATCH, $"{this.Symbol}: type mismatch");
+                        return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"{this.Symbol}: number expected");
+                    
+                    isNull = false;
                 }
 
                 if (isInt)
@@ -41,15 +46,21 @@ namespace FuncScript.Funcs.Math
                     }
                     else if (d is long)
                     {
+                        isInt = false;
                         isLong = true;
-                        longTotal = intTotal;
+                        longTotal = intTotal * (long)d;
                     }
                     else if (d is double)
                     {
+                        isInt = false;
                         isDouble = true;
-                        doubleTotal = intTotal;
+                        doubleTotal = intTotal * (double)d;
                     }
-
+                    else
+                    {
+                        return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"{this.Symbol}: number expected");
+                    }
+                    continue;
                 }
 
                 if (isLong)
@@ -64,10 +75,15 @@ namespace FuncScript.Funcs.Math
                     }
                     else if (d is double)
                     {
+                        isLong = false;
                         isDouble = true;
-                        doubleTotal = longTotal;
+                        doubleTotal = longTotal * (double)d;
                     }
-
+                    else
+                    {
+                        return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"{this.Symbol}: number expected");
+                    }
+                    continue;
                 }
 
                 if (isDouble)
@@ -84,7 +100,11 @@ namespace FuncScript.Funcs.Math
                     {
                         doubleTotal *= (double)d;
                     }
-
+                    else
+                    {
+                        return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"{this.Symbol}: number expected");
+                    }
+                    continue;
                 }
             }
 
@@ -97,7 +117,7 @@ namespace FuncScript.Funcs.Math
             if (isInt)
                 return intTotal;
 
-            return null;
+            return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"{this.Symbol}: number expected");
         }
 
         public string ParName(int index)

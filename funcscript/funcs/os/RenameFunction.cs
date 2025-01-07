@@ -23,12 +23,12 @@ namespace FuncScript.Funcs.OS
 
             if (par0 == null || par1 == null)
                 return new FsError(
-                    FsError.ERROR_PARAMETER_COUNT_MISMATCH,
+                    FsError.ERROR_TYPE_INVALID_PARAMETER,
                     $"Function {Symbol}: parameters cannot be null");
 
             if (!(par0 is string) || !(par1 is string))
                 return new FsError(
-                    FsError.ERROR_TYPE_MISMATCH,
+                    FsError.ERROR_TYPE_INVALID_PARAMETER,
                     $"Function {Symbol}: Type mismatch. Both parameters must be strings");
 
             var oldPath = (string)par0;
@@ -60,9 +60,7 @@ namespace FuncScript.Funcs.OS
             }
             catch (Exception ex)
             {
-                return new FsError(
-                    FsError.ERROR_TYPE_EVALUATION,
-                    $"Function {Symbol}: Failed to rename '{oldPath}'. Error: {ex.Message}");
+                return new FsError(ex);
             }
         }
 

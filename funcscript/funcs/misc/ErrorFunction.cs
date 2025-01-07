@@ -21,7 +21,7 @@ namespace FuncScript.Funcs.Misc
             if (param is string str)
                 return new FsError(FsError.ERROR_DEFAULT, str);    
 
-            return new FsError(FsError.ERROR_TYPE_MISMATCH, "Parameter is not a valid string object");
+            return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, "Parameter is not a valid string object");
         }
 
         public string ParName(int index)

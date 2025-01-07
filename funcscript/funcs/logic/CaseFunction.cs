@@ -13,6 +13,11 @@ namespace FuncScript.Funcs.Logic
         {
             int count = pars.Length;
 
+            if (count == 0)
+            {
+                return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, "Case: at least one parameter expected");
+            }
+
             for (int i = 0; i < count / 2; i++)
             {
                 var cond = pars[i * 2];
@@ -21,6 +26,11 @@ namespace FuncScript.Funcs.Logic
                 {
                     return pars[i * 2 + 1];
                 }
+
+                if (!(cond is bool))
+                {
+                    return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, "Case: boolean condition expected");
+                }
             }
 
             if (count % 2 == 1)
@@ -28,7 +38,7 @@ namespace FuncScript.Funcs.Logic
                 return pars[count - 1];
             }
 
-            return null;
+            return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, "Case: no conditions were true and no default case provided");
         }
 
         public string ParName(int index)

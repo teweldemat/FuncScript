@@ -12,12 +12,16 @@ namespace FuncScript.Funcs.List
         public object EvaluateList(FsList pars)
         {
             if (pars.Length != 2)
-                throw new Error.TypeMismatchError($"{this.Symbol} function: Invalid parameter count. Expected 2, but got {pars.Length}");
+                return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, $"{this.Symbol} function: Invalid parameter count. Expected 2, but got {pars.Length}");
 
             var container = pars[0];
             var item = pars[1];
 
-            return EvaluateInternal(container, item);
+            var result = EvaluateInternal(container, item);
+            if (result is FsError error)
+                return error;
+            
+            return result;
         }
 
         private object EvaluateInternal(object container, object item)
@@ -32,7 +36,7 @@ namespace FuncScript.Funcs.List
                 return str.Contains(substr, StringComparison.OrdinalIgnoreCase);
             }
 
-            throw new Error.TypeMismatchError($"{this.Symbol} function: Invalid types for parameters");
+            return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"{this.Symbol} function: Invalid types for parameters");
         }
 
         public string ParName(int index)

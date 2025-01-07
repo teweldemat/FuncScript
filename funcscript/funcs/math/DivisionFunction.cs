@@ -11,6 +11,9 @@ namespace FuncScript.Funcs.Math
 
         public object EvaluateList(FsList pars)
         {
+            if (pars.Length == 0)
+                return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, $"{this.Symbol}: at least one parameter expected");
+
             var ret = EvaluateInternal(pars, i => (true, pars[i]));
 
             return ret;
@@ -28,7 +31,7 @@ namespace FuncScript.Funcs.Math
             {
                 var p = getPar(0);
                 if (!p.Item1)
-                    return null;
+                    return new FsError(FsError.ERROR_TYPE_EVALUATION, $"{this.Symbol}: invalid parameter");
                 var d = p.Item2;
 
                 if (d is int)
@@ -48,8 +51,7 @@ namespace FuncScript.Funcs.Math
                 }
                 else
                 {
-                    isInt = true;
-                    intTotal = 1;
+                    return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"{this.Symbol}: number expected");
                 }
             }
 
@@ -57,8 +59,11 @@ namespace FuncScript.Funcs.Math
             {
                 var p = getPar(i);
                 if (!p.Item1)
-                    return null;
+                    return new FsError(FsError.ERROR_TYPE_EVALUATION, $"{this.Symbol}: invalid parameter");
                 var d = p.Item2;
+
+                if (d.Equals(0))
+                    return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"{this.Symbol}: division by zero");
 
                 if (isInt)
                 {
@@ -119,7 +124,7 @@ namespace FuncScript.Funcs.Math
             if (isInt)
                 return intTotal;
 
-            return null;
+            return new FsError(FsError.ERROR_TYPE_EVALUATION, $"{this.Symbol}: evaluation error");
         }
 
         public string ParName(int index)

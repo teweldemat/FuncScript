@@ -14,16 +14,16 @@ namespace FuncScript.Funcs.KeyValue
             const int ExpectedParameters = 2; // Updated to replace MaxParameters
             
             if (pars.Length != ExpectedParameters)
-                throw new Error.TypeMismatchError($"{Symbol} function: Invalid parameter count. Expected {ExpectedParameters}, but got {pars.Length}");
+                return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, $"{Symbol} function: Invalid parameter count. Expected {ExpectedParameters}, but got {pars.Length}");
 
             var par0 = pars[0];
             var par1 = pars[1];
 
             if (!(par0 is KeyValueCollection))
-                throw new Error.TypeMismatchError($"{Symbol} function: The first parameter should be {ParName(0)}");
+                return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"{Symbol} function: The first parameter should be {ParName(0)}");
 
             if (!(par1 is KeyValueCollection))
-                throw new Error.TypeMismatchError($"{Symbol} function: The second parameter should be {ParName(1)}");
+                return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"{Symbol} function: The second parameter should be {ParName(1)}");
 
             var first = (KeyValueCollection)par0;
             var secondKvc = ((KeyValueCollection)par1);

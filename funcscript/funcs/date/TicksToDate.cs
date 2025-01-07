@@ -14,7 +14,7 @@ namespace FuncScript.Funcs.Logic
             const int MaxParameters = 1;
 
             if (pars.Length > MaxParameters)
-                throw new Error.EvaluationTimeException($"{this.Symbol} function: Invalid parameter count. Expected a maximum of {MaxParameters}, but got {pars.Length}");
+                return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, $"{this.Symbol} function: Invalid parameter count. Expected a maximum of {MaxParameters}, but got {pars.Length}");
 
             var par0 = pars[0];
 
@@ -22,7 +22,7 @@ namespace FuncScript.Funcs.Logic
                 return null;
 
             if (!(par0 is long))
-                throw new Error.TypeMismatchError($"Function {this.Symbol}: Type mismatch. Expected a long.");
+                return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"Function {this.Symbol}: Type mismatch. Expected a long.");
 
             var ticks = (long)par0;
 

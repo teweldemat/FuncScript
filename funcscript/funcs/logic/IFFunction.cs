@@ -12,12 +12,12 @@ namespace FuncScript.Funcs.Logic
         public object EvaluateList(FsList pars)
         {
             if (pars.Length < 3)
-                throw new Error.TypeMismatchError("IfConditionFunction requires three parameters: condition, trueResult, and falseResult.");
+                return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, "IfConditionFunction requires three parameters: condition, trueResult, and falseResult.");
 
             var condition = pars[0];
 
             if (!(condition is bool))
-                return new FsError(FsError.ERROR_TYPE_MISMATCH, $"{this.Symbol}: The first parameter must be a boolean value.");
+                return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"{this.Symbol}: The first parameter must be a boolean value.");
 
             bool evalCondition = (bool)condition;
             int resultIndex = evalCondition ? 1 : 2;
