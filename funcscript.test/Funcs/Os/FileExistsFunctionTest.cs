@@ -1,3 +1,4 @@
+using System.IO;
 using FuncScript.Model;
 using FuncScript.Error;
 using NUnit.Framework;
@@ -9,9 +10,27 @@ namespace FuncScript.Test.Funcs.Os
         [Test]
         public void TestFileExists_ValidFilePath_ReturnsTrue()
         {
-            var exp = "fileexists('C:/path/to/existing/file.txt')";
-            var res = FuncScript.Evaluate(exp);
-            Assert.That(res, Is.True);
+            // Arrange: Create a temporary file
+            string tempFilePath = Path.Combine(Path.GetTempPath(), "temp_test_file.txt");
+            File.WriteAllText(tempFilePath, "Temporary test file content");
+
+            try
+            {
+                // Act: Use the temporary file in your expression
+                var exp = $"fileexists('{tempFilePath}')";
+                var res = FuncScript.Evaluate(exp);
+
+                // Assert: Validate the result
+                Assert.That(res, Is.True);
+            }
+            finally
+            {
+                // Cleanup: Delete the temporary file
+                if (File.Exists(tempFilePath))
+                {
+                    File.Delete(tempFilePath);
+                }
+            }
         }
 
         [Test]

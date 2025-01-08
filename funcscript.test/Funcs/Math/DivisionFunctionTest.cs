@@ -44,7 +44,7 @@ namespace FuncScript.Test.Funcs.Math
         {
             var exp = "5 / 'a'";
             var res = FuncScript.Evaluate(exp);
-            Assert.That(res is FsError);
+            Assert.That(res is FsError,$"Unexpected value {FuncScript.FormatToJson(res)}");
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
         }
 
@@ -52,9 +52,7 @@ namespace FuncScript.Test.Funcs.Math
         public void TestDivisionNoParameters()
         {
             var exp = "6 / ";
-            var res = FuncScript.Evaluate(exp);
-            Assert.That(res is FsError);
-            Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_PARAMETER_COUNT_MISMATCH));
+            Assert.Throws<SyntaxError>(() => { FuncScript.Evaluate(exp); });
         }
     }
 }

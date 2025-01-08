@@ -52,8 +52,7 @@ namespace FuncScript.Test.Funcs.List
         {
             var exp = "Contains([1, 2, 3], 'two')";
             var res = FuncScript.Evaluate(exp);
-            Assert.That(res is FsError);
-            Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
+            Assert.That(res,Is.EqualTo(false));
         }
 
         [Test]

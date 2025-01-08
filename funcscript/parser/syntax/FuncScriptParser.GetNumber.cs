@@ -1,6 +1,7 @@
 using FuncScript.Block;
 using FuncScript.Funcs.Math;
 using FuncScript.Model;
+
 namespace FuncScript.Core
 {
     public partial class FuncScriptParser
@@ -11,48 +12,106 @@ namespace FuncScript.Core
         static GetNumberResult GetNumber(ParseContext context, int index)
         {
             ParseNode parseNode = null;
-            var hasDecimal = false;
-            var hasExp = false;
-            var hasLong = false;
             object number = null;
+            bool hasDecimal = false;
+            bool hasExp = false;
+            bool hasLong = false;
+
             int i = index;
+
+            // 1. Parse initial integer part (sign allowed)
             var (intDigits, nodeDigits, i2) = GetInt(context, true, i);
             if (i2 == i)
                 return new GetNumberResult(null, null, index);
+
             i = i2;
 
-            i2 = GetLiteralMatch(context, i, ".").NextIndex;
-            if (i2 > i)
-                hasDecimal = true;
-            i = i2;
-            if (hasDecimal)
+            // 2. Check if we have a decimal point. If next char after '.' is
+            //    a letter other than 'e' or 'E', do NOT treat it as decimal.
+            var dotMatch = GetLiteralMatch(context, i, ".");
+            if (dotMatch.NextIndex > i)
             {
-                (var decimalDigits, var nodeDecimlaDigits, i) = GetInt(context, false, i);
-            }
-
-            i2 = GetLiteralMatch(context, i, "E").NextIndex;
-            if (i2 > i)
-                hasExp = true;
-            i = i2;
-            string expDigits = null;
-            ParseNode nodeExpDigits;
-            if (hasExp)
-                (expDigits, nodeExpDigits, i) = GetInt(context, true, i);
-
-            if (!hasDecimal)
-            {
-                i2 = GetLiteralMatch(context, i, "l").NextIndex;
-                if (i2 > i)
-                    hasLong = true;
-                i = i2;
-            }
-
-            if (hasDecimal)
-            {
-                if (!double.TryParse(context.Expression.Substring(index, i - index), out var dval))
+                // Look ahead
+                bool parseAsDecimal = false;
+                if (dotMatch.NextIndex < context.Expression.Length)
                 {
-                    context.SyntaxErrors.Add(new SyntaxErrorData(index, i - index,
-                        $"{context.Expression.Substring(index, i - index)} couldn't be parsed as floating point"));
+                    char nextChar = context.Expression[dotMatch.NextIndex];
+                    // If next char is end-of-string boundary, digit, 'e', 'E',
+                    // or some non-letter operator, we parse decimal.
+                    // We also allow "12." -> parse as double.
+                    // But "5.a" -> do NOT parse decimal (consume only '5').
+                    if (!char.IsLetter(nextChar) || nextChar == 'e' || nextChar == 'E')
+                    {
+                        parseAsDecimal = true;
+                    }
+                }
+                else
+                {
+                    // '.' is the last character -> parse as decimal, e.g. "12."
+                    parseAsDecimal = true;
+                }
+
+                if (parseAsDecimal)
+                {
+                    hasDecimal = true;
+                    i = dotMatch.NextIndex;
+
+                    // Parse optional digits after the decimal point
+                    var (decimalDigits, nodeDecimalDigits, i3) = GetInt(context, false, i);
+                    i = i3;
+                }
+            }
+
+            // 3. Check for exponent ('e' or 'E'). If found, parse optional sign, then digits.
+            //    If no digits, it's an error. We'll rely on double.TryParse to do final check.
+            var expMatch = GetLiteralMatch(context, i, "E");
+            if (expMatch.NextIndex == i)
+                expMatch = GetLiteralMatch(context, i, "e");
+
+            if (expMatch.NextIndex > i)
+            {
+                hasExp = true;
+                i = expMatch.NextIndex;
+
+                // Parse optional '+'/'-' after E/e
+                var minusMatch = GetLiteralMatch(context, i, "-");
+                if (minusMatch.NextIndex > i)
+                {
+                    i = minusMatch.NextIndex;
+                }
+                else
+                {
+                    var plusMatch = GetLiteralMatch(context, i, "+");
+                    if (plusMatch.NextIndex > i)
+                        i = plusMatch.NextIndex;
+                }
+
+                var (expDigits, nodeExpDigits, i3) = GetInt(context, true, i);
+                if (i3 == i)
+                {
+                    context.SyntaxErrors.Add(new SyntaxErrorData(
+                        i,
+                        1,
+                        $"Invalid exponent: missing digits after E/e"
+                    ));
+                    return new GetNumberResult(null, null, index);
+                }
+                i = i3;
+            }
+
+            // 4. If we have a decimal or exponent, parse as double
+            if (hasDecimal || hasExp)
+            {
+                if (!double.TryParse(
+                        context.Expression.Substring(index, i - index),
+                        out var dval
+                    ))
+                {
+                    context.SyntaxErrors.Add(new SyntaxErrorData(
+                        index,
+                        i - index,
+                        $"{context.Expression.Substring(index, i - index)} couldn't be parsed as floating point"
+                    ));
                     return new GetNumberResult(null, null, index);
                 }
 
@@ -61,34 +120,24 @@ namespace FuncScript.Core
                 return new GetNumberResult(number, parseNode, i);
             }
 
-            if (hasExp)
+            // 5. If still no decimal/exponent, check for 'l' (long) suffix
+            var lMatch = GetLiteralMatch(context, i, "l");
+            if (lMatch.NextIndex > i)
             {
-                if (!int.TryParse(expDigits, out var e) || e < 0)
-                {
-                    context.SyntaxErrors.Add(new SyntaxErrorData(index, expDigits == null ? 0 : expDigits.Length,
-                        $"Invalid exponentional {expDigits}"));
-                    return new GetNumberResult(null, null, index);
-                }
-
-                var maxLng = long.MaxValue.ToString();
-                if (maxLng.Length + 1 < intDigits.Length + e)
-                {
-                    context.SyntaxErrors.Add(new SyntaxErrorData(index, expDigits.Length,
-                        $"Exponential {expDigits} is out of range"));
-                    return new GetNumberResult(null, null, index);
-                }
-
-                intDigits = intDigits + new string('0', e);
+                hasLong = true;
+                i = lMatch.NextIndex;
             }
 
-            long longVal;
-
+            // 6. Parse integer or long
             if (hasLong)
             {
-                if (!long.TryParse(intDigits, out longVal))
+                if (!long.TryParse(intDigits, out var longVal))
                 {
-                    context.SyntaxErrors.Add(new SyntaxErrorData(index, expDigits.Length,
-                        $"{intDigits} couldn't be parsed to 64bit integer"));
+                    context.SyntaxErrors.Add(new SyntaxErrorData(
+                        index,
+                        intDigits.Length,
+                        $"{intDigits} couldn't be parsed to 64-bit integer"
+                    ));
                     return new GetNumberResult(null, null, index);
                 }
 
@@ -97,6 +146,7 @@ namespace FuncScript.Core
                 return new GetNumberResult(number, parseNode, i);
             }
 
+            // Try 32-bit int first
             if (int.TryParse(intDigits, out var intVal))
             {
                 number = intVal;
@@ -104,13 +154,15 @@ namespace FuncScript.Core
                 return new GetNumberResult(number, parseNode, i);
             }
 
-            if (long.TryParse(intDigits, out longVal))
+            // Then 64-bit long
+            if (long.TryParse(intDigits, out var lngVal))
             {
-                number = longVal;
+                number = lngVal;
                 parseNode = new ParseNode(ParseNodeType.LiteralLong, index, i - index);
                 return new GetNumberResult(number, parseNode, i);
             }
 
+            // If we still can't parse, fail
             return new GetNumberResult(null, null, index);
         }
     }

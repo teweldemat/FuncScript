@@ -1,4 +1,5 @@
 using FuncScript.Block;
+using FuncScript.Error;
 using FuncScript.Funcs.Math;
 using FuncScript.Model;
 
@@ -16,8 +17,22 @@ namespace FuncScript.Core
                     return res1;
             }
 
-            context.SyntaxErrors.Clear();
-            return GetExpression(context, 0);
+            {
+                context.SyntaxErrors.Clear();
+                var next = GetExpression(context, 0);
+                if (next.NextIndex > 0)
+                {
+                    var end = SkipSpace(context, next.NextIndex);
+                    if (end.NextIndex < context.Expression.Length)
+                    {
+                        context.SyntaxErrors.Clear();
+                        context.SyntaxErrors.Add(new SyntaxErrorData(next.NextIndex,
+                            context.Expression.Length - next.NextIndex,"Unrecognized code"));
+                        return new ExpressionBlockResult(null, null, 0);
+                    }
+                }
+                return next;
+            }
         }
     }
 }

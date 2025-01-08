@@ -20,7 +20,7 @@ namespace FuncScript.Test.Funcs.Math
         {
             var exp = "Sin(1.5708)"; // Approximately π/2
             var res = FuncScript.Evaluate(exp);
-            Assert.That(res, Is.EqualTo(1.0));
+            Assert.That(res, Is.EqualTo(1.0).Within(0.0001));
         }
 
         [Test]
@@ -65,7 +65,7 @@ namespace FuncScript.Test.Funcs.Math
         {
             var exp = "Cos(3.14159)"; // Approximately π
             var res = FuncScript.Evaluate(exp);
-            Assert.That(res, Is.EqualTo(-1.0));
+            Assert.That(res, Is.EqualTo(-1.0).Within(0.001));
         }
 
         [Test]
@@ -73,7 +73,7 @@ namespace FuncScript.Test.Funcs.Math
         {
             var exp = "Cos(10L)";
             var res = FuncScript.Evaluate(exp);
-            Assert.That(res, Is.EqualTo(-0.839071529076));
+            Assert.That(res, Is.EqualTo(-0.839071529076).Within(0.001));
         }
 
         [Test]

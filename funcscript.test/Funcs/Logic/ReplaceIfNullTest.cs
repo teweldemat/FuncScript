@@ -34,10 +34,10 @@ namespace FuncScript.Test.Funcs.Logic
         public void TestReplaceIfNull_WithParameterCountMismatch_ReturnsError()
         {
             var exp = "null ??";
-            var res = FuncScript.Evaluate(exp);
-            Assert.That(res, Is.InstanceOf<FsError>());
-            var error = (FsError)res;
-            Assert.That(error.ErrorType, Is.EqualTo(FsError.ERROR_PARAMETER_COUNT_MISMATCH));
+            Assert.Throws<SyntaxError>(() =>
+            {
+                var res = FuncScript.Evaluate(exp);
+            });
         }
 
         [Test]

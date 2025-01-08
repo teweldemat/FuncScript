@@ -23,10 +23,10 @@ namespace FuncScript.Funcs.Text
             int index = Convert.ToInt32(par1 ?? 0);
             int count = Convert.ToInt32(par2 ?? par0.Length);
 
-            if (index < 0 || index >= par0.Length)
+            if (count<0||index < 0 || index >= par0.Length)
                 return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"{this.Symbol}: index is out of range.");
 
-            if (count < 0 || index + count > par0.Length)
+            if (index + count > par0.Length)
                 count = par0.Length - index;
 
             return par0.Substring(index, count);

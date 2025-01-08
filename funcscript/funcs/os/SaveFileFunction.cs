@@ -35,7 +35,12 @@ namespace FuncScript.Funcs.OS
             {
                 var directory = Path.GetDirectoryName(fileName);
                 if (!string.IsNullOrEmpty(directory))
-                    Directory.CreateDirectory(directory);
+                {
+                    if(!Directory.Exists(directory))
+                        return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER,
+                            $"Function {this.Symbol}: directory {directory} doesn't exist");
+
+                }
 
                 File.WriteAllText(fileName, content);
                 Console.WriteLine($"Saved {fileName}");

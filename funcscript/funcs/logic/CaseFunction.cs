@@ -7,7 +7,7 @@ namespace FuncScript.Funcs.Logic
     {
         public CallType CallType => CallType.Prefix;
 
-        public string Symbol => "Case";
+        public string Symbol => "case";
 
         public object EvaluateList(FsList pars)
         {
@@ -37,8 +37,7 @@ namespace FuncScript.Funcs.Logic
             {
                 return pars[count - 1];
             }
-
-            return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, "Case: no conditions were true and no default case provided");
+            return null;
         }
 
         public string ParName(int index)

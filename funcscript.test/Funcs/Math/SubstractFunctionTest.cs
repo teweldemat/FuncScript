@@ -44,7 +44,7 @@ namespace FuncScript.Test.Funcs.Math
             var exp = "-()";
             var res = FuncScript.Evaluate(exp);
             Assert.That(res is FsError);
-            Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_PARAMETER_COUNT_MISMATCH));
+            Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
         }
 
         [Test]
@@ -77,7 +77,7 @@ namespace FuncScript.Test.Funcs.Math
         {
             var exp = "10 - 2 - 3 - 4 - 5 - 6 - 7";
             var res = FuncScript.Evaluate(exp);
-            Assert.That(res, Is.EqualTo(-13));
+            Assert.That(res, Is.EqualTo(-17));
         }
     }
 }

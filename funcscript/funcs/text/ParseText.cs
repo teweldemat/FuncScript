@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text;
 using FuncScript.Core;
 using FuncScript.Model;
@@ -15,13 +16,14 @@ namespace FuncScript.Funcs.Text
         public object EvaluateList(FsList pars)
         {
             if (pars.Length == 0)
-                return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, $"{this.Symbol} requires at least one parameter");
+                return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH,
+                    $"{this.Symbol} requires at least one parameter");
 
             var par0 = pars[0];
-            
+
             if (par0 == null)
                 return null;
-            
+
             var str = par0.ToString();
             object par1;
             string format = null;
@@ -45,13 +47,28 @@ namespace FuncScript.Funcs.Text
                 switch (format.ToLower())
                 {
                     case "hex":
-                        if (str.StartsWith("0x"))
-                            return Convert.ToInt32(str, 16);
-                        return Convert.ToInt32("0x" + str, 16);
+                        var strToParse = str.StartsWith("0x") ? str.Substring(2) : str;
+                        if (int.TryParse(strToParse, NumberStyles.AllowHexSpecifier, CultureInfo.InvariantCulture, out var intVal))
+                        {
+                            return intVal;
+                        }
+                        else
+                        {
+                            return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER,
+                                $"{this.Symbol}: invalid string: {str}");
+                        }                    
                     case "l":
-                        return Convert.ToInt64(str);
+                        if (long.TryParse(str,  out var longVal))
+                        {
+                            return longVal;
+                        }
+                        else
+                        {
+                            return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER,
+                                $"{this.Symbol}: invalid string: {str}");
+                        }
                     case "fs":
-                        return FuncScript.Evaluate(this, str);
+                        return FuncScript.Evaluate(new DefaultFsDataProvider(), str);
                     default:
                         return str;
                 }
@@ -74,10 +91,12 @@ namespace FuncScript.Funcs.Text
 
         public object Get(string name)
         {
-            return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"The parsed function script should have no variables");
+            return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER,
+                $"The parsed function script should have no variables");
         }
 
         public KeyValueCollection ParentContext { get; }
+
         public bool IsDefined(string key)
         {
             throw new NotImplementedException();

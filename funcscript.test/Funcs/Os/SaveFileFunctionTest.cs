@@ -1,3 +1,5 @@
+using System;
+using System.IO;
 using FuncScript.Model;
 using FuncScript.Error;
 using NUnit.Framework;
@@ -40,14 +42,20 @@ namespace FuncScript.Test.Funcs.Os
             Assert.That(res is FsError);
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
         }
-        
+
         [Test]
         public void TestSaveFilePathError()
         {
-            var exp = "SaveFile('invalid_path/test.txt', 'Hello')";
+            // Arrange: Use a non-existent subfolder in the temporary directory
+            string tempDirectory = Path.GetTempPath();
+            string invalidPath = Path.Combine(tempDirectory, Guid.NewGuid().ToString(), "test.txt");
+
+            // Act: Attempt to save a file to the invalid path
+            var exp = $"SaveFile('{invalidPath}', 'Hello')";
             var res = FuncScript.Evaluate(exp);
-            Assert.That(res is FsError);
-            // Note: Since we can't predict the internal exception, we won't check the message.
+
+            // Assert: Validate that the result is an FsError
+            Assert.That(res, Is.InstanceOf<FsError>());
         }
     }
 }

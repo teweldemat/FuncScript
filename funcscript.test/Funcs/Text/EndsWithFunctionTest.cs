@@ -27,8 +27,7 @@ namespace FuncScript.Test.Funcs.Text
         {
             var exp = "endswith(null, 'World')";
             var res = FuncScript.Evaluate(exp);
-            Assert.That(res is FsError);
-            Assert.That((res as FsError).ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
+            Assert.That(res,Is.EqualTo(false));
         }
 
         [Test]
@@ -36,8 +35,7 @@ namespace FuncScript.Test.Funcs.Text
         {
             var exp = "endswith('Hello World', null)";
             var res = FuncScript.Evaluate(exp);
-            Assert.That(res is FsError);
-            Assert.That((res as FsError).ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
+            Assert.That(res,Is.EqualTo(false));
         }
 
         [Test]

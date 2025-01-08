@@ -1,3 +1,4 @@
+using System.IO;
 using FuncScript.Model;
 using FuncScript.Error;
 using NUnit.Framework;
@@ -54,11 +55,29 @@ namespace FuncScript.Test.Funcs.Os
         [Test]
         public void TestFileText_ValidFile()
         {
-            var filePath = "path_to_valid_file.txt"; // Ensure this file exists and is valid
-            var exp = $"file('{filePath}')";
-            var res = FuncScript.Evaluate(exp);
-            Assert.That(res, Is.InstanceOf<string>());
-            Assert.That((string)res, Is.EqualTo(System.IO.File.ReadAllText(filePath)));
+            // Arrange: Create a temporary file with predefined content
+            string tempFilePath = Path.Combine(Path.GetTempPath(), "temp_valid_file.txt");
+            string fileContent = "This is a test file content.";
+            File.WriteAllText(tempFilePath, fileContent);
+
+            try
+            {
+                // Act: Use the temporary file in your expression
+                var exp = $"file('{tempFilePath}')";
+                var res = FuncScript.Evaluate(exp);
+
+                // Assert: Validate the result
+                Assert.That(res, Is.InstanceOf<string>());
+                Assert.That((string)res, Is.EqualTo(File.ReadAllText(tempFilePath)));
+            }
+            finally
+            {
+                // Cleanup: Delete the temporary file
+                if (File.Exists(tempFilePath))
+                {
+                    File.Delete(tempFilePath);
+                }
+            }
         }
     }
 }

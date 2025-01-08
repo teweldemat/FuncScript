@@ -9,7 +9,7 @@ namespace FuncScript.Test.Funcs.Logic
         [Test]
         public void TestIsErrorWithError()
         {
-            var exp = "isError(new Error('test error'))";
+            var exp = "isError(Error('test error'))";
             var res = FuncScript.Evaluate(exp);
             Assert.That(res is bool);
             Assert.That((bool)res, Is.True);

@@ -81,6 +81,8 @@ namespace FuncScript.Funcs.Math
                         isDouble = true;
                         doubleTotal = intTotal;
                     }
+                    else
+                        return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"{this.Symbol}: number expected");
                 }
 
                 if (isLong)
@@ -98,6 +100,9 @@ namespace FuncScript.Funcs.Math
                         isDouble = true;
                         doubleTotal = longTotal;
                     }
+                    else
+                        return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"{this.Symbol}: number expected");
+
                 }
 
                 if (isDouble)
@@ -114,6 +119,9 @@ namespace FuncScript.Funcs.Math
                     {
                         doubleTotal /= (double)d;
                     }
+                    else
+                        return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"{this.Symbol}: number expected");
+
                 }
             }
 

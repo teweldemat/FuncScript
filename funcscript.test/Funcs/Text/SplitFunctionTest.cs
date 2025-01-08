@@ -53,7 +53,7 @@ namespace FuncScript.Test.Funcs
             var res = FuncScript.Evaluate(exp);
             Assert.That(res is FsList);
             var list = (FsList)res;
-            Assert.That(list, Is.EquivalentTo(new [] {"a", "b", "c"}));
+            Assert.That(list, Is.EquivalentTo(new [] {"abc"}));
         }
     }
 }

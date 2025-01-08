@@ -12,9 +12,9 @@ namespace FuncScript.Test.Funcs.Os
         {
             var tempDir = Path.Combine(Path.GetTempPath(), "testDir");
             Directory.CreateDirectory(tempDir);
-            var exp = $"dirlist(['{tempDir}'])";
+            var exp = $"dirlist('{tempDir}')";
             var res = FuncScript.Evaluate(exp);
-            Assert.That(res is FsList);
+            Assert.That(res is FsList,$"Unexpected value {FuncScript.FormatToJson(res)}");
             Directory.Delete(tempDir, true);
         }
 
@@ -35,7 +35,7 @@ namespace FuncScript.Test.Funcs.Os
             var res = FuncScript.Evaluate(exp);
             Assert.That(res is FsError);
             var error = (FsError)res;
-            Assert.That(error.ErrorType, Is.EqualTo(FsError.ERROR_PARAMETER_COUNT_MISMATCH));
+            Assert.That(error.ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
         }
 
         [Test]

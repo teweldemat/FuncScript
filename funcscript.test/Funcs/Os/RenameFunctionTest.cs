@@ -11,20 +11,30 @@ namespace FuncScript.Test.Funcs.Os
         [Test]
         public void TestRenameFile_ValidParameters_ReturnsNewPath()
         {
-            // Arrange
-            var oldFilePath = "test.txt";
-            var newFileName = "renamed_test.txt";
-            File.Create(oldFilePath).Dispose();
+            // Arrange: Create a temporary file
+            string tempDirectory = Path.GetTempPath();
+            string oldFilePath = Path.Combine(tempDirectory, "test.txt");
+            string newFileName = "renamed_test.txt";
+            string newFilePath = Path.Combine(tempDirectory, newFileName);
 
-            var exp = $"RenameFile('{oldFilePath}', '{newFileName}')";
-            // Act
-            var res = FuncScript.Evaluate(exp);
+            File.WriteAllText(oldFilePath, "Temporary file content.");
 
-            // Assert
-            Assert.That(res, Is.EqualTo(Path.Combine(Directory.GetCurrentDirectory(), newFileName)));
+            try
+            {
+                // Act: Rename the file using the expression
+                var exp = $"RenameFile('{oldFilePath}', '{newFilePath}')";
+                var res = FuncScript.Evaluate(exp);
 
-            // Cleanup
-            File.Delete(Path.Combine(Directory.GetCurrentDirectory(), newFileName));
+                // Assert: Validate the result
+                Assert.That(res, Is.EqualTo(newFilePath));
+                Assert.That(File.Exists(newFilePath), Is.True);
+            }
+            finally
+            {
+                // Cleanup: Delete both the old and new files if they exist
+                if (File.Exists(oldFilePath)) File.Delete(oldFilePath);
+                if (File.Exists(newFilePath)) File.Delete(newFilePath);
+            }
         }
 
         [Test]

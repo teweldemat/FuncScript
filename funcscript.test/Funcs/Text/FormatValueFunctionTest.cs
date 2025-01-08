@@ -37,7 +37,7 @@ namespace FuncScript.Test.Funcs.Text
         {
             var exp = "format(42, 'Number: {}, Extra: {}')";
             var res = FuncScript.Evaluate(exp);
-            Assert.That(res is FsError);
+            Assert.That(res is FsError,$"Unexpected value {FuncScript.FormatToJson(res)}");
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_PARAMETER_COUNT_MISMATCH));
         }
 

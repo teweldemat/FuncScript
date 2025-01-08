@@ -9,7 +9,7 @@ namespace FuncScript.Test.Funcs.Logic
         [Test]
         public void TestSwitchCaseMatch()
         {
-            var exp = "switch(2, 1, 'one', 2, 'two', 'default')";
+            var exp = "switch 2; 1:'one'; 2:'two'; 'default';";
             var res = FuncScript.Evaluate(exp);
             Assert.That(res, Is.EqualTo("two"));
         }
@@ -17,7 +17,7 @@ namespace FuncScript.Test.Funcs.Logic
         [Test]
         public void TestSwitchNoMatchDefault()
         {
-            var exp = "switch(3, 1, 'one', 2, 'two', 'default')";
+            var exp = "switch 3; 1:'one'; 2:'two'; 'default';";
             var res = FuncScript.Evaluate(exp);
             Assert.That(res, Is.EqualTo("default"));
         }
@@ -25,7 +25,7 @@ namespace FuncScript.Test.Funcs.Logic
         [Test]
         public void TestSwitchNoMatchWithoutDefault()
         {
-            var exp = "switch(3, 1, 'one', 2, 'two')";
+            var exp = "switch 3; 1:'one'; 2:'two';";
             var res = FuncScript.Evaluate(exp);
             Assert.That(res, Is.Null);
         }
@@ -33,7 +33,7 @@ namespace FuncScript.Test.Funcs.Logic
         [Test]
         public void TestSwitchNullSelector()
         {
-            var exp = "switch(null, null, 'matched', 1, 'not matched')";
+            var exp = "switch null; null:'matched'; 1:'not matched';";
             var res = FuncScript.Evaluate(exp);
             Assert.That(res, Is.EqualTo("matched"));
         }
@@ -41,19 +41,16 @@ namespace FuncScript.Test.Funcs.Logic
         [Test]
         public void TestSwitchErrorEvenParameters()
         {
-            var exp = "switch(1, 'one', 'two', 'three')";
+            var exp = "switch 1; 'one':'two'; 'three';";
             var res = FuncScript.Evaluate(exp);
-            Assert.That(res, Is.InstanceOf<FsError>());
-            Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
+            Assert.That(res, Is.EqualTo("three"));
         }
 
         [Test]
         public void TestSwitchErrorOddParameters()
         {
-            var exp = "switch(1, 'one', 'two', 'three', 'four')";
-            var res = FuncScript.Evaluate(exp);
-            Assert.That(res, Is.InstanceOf<FsError>());
-            Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
+            var exp = "switch 1; 'one':'two'; 'three'; 'four';";
+            Assert.Throws<SyntaxError>(() => { FuncScript.Evaluate(exp); });
         }
     }
 }

@@ -28,7 +28,7 @@ namespace FuncScript.Test.Funcs.Text
         {
             var exp = "_templatemerge(['A', null, 'B', null, 'C'])";
             var res = FuncScript.Evaluate(exp);
-            Assert.That(res, Is.EqualTo("AB C"));
+            Assert.That(res, Is.EqualTo("ABC"));
         }
 
         [Test]
@@ -44,8 +44,7 @@ namespace FuncScript.Test.Funcs.Text
         {
             var exp = "_templatemerge(null)";
             var res = FuncScript.Evaluate(exp);
-            Assert.That(res, Is.TypeOf<FsError>());
-            Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_PARAMETER_COUNT_MISMATCH));
+            Assert.That(res, Is.EqualTo(""));
         }
     }
 }

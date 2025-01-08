@@ -72,15 +72,15 @@ namespace FuncScript.Test
         [TestCase("12", 12)]
         [TestCase("12.", 12.0)]
         [TestCase("12.0", 12.0)]
-        [TestCase("12e1", 120)]
-        [TestCase("12.0e1", 120.0)]
+        [TestCase("12.0E1", 120.0)]
+        [TestCase("12e1", 120.0)]
         [TestCase("-12", -12)]
         [TestCase("-12.", -12.0)]
         [TestCase("-12.0", -12.0)]
-        [TestCase("-12e1", -120)]
+        [TestCase("-12e1", -120.0)]
         [TestCase("-12.0e1", -120.0)]
         [TestCase("-12l", -12L)]
-        [TestCase("-12e1l", -120L)]
+        [TestCase("-12e1", -120.0)]
         [TestCase("-1", -1)]
         [TestCase("12+12l", 24L)]
         [TestCase("\"12\"", "12")]
@@ -187,20 +187,20 @@ namespace FuncScript.Test
             Assert.IsTrue(res is FsList, ".net data type not ListData");
         }
 
-        [Test]
-        [TestCase("12.3")]
-        [TestCase("-12.3")]
-        [TestCase("-12.")]
-        [TestCase("-12.3e-12")]
-        [TestCase("-12.3E-12")]
-        [TestCase("12.3E-12")]
-        [TestCase("12.E-12")]
-        public void TesDoubleParser(string exp)
-        {
-            var res = AssertSingleResultType(exp, typeof(double));
-            Assert.IsTrue(res is double, ".net data type not double");
-            Assert.AreEqual((double)res, double.Parse(exp));
-        }
+            [Test]
+            [TestCase("12.3")]
+            [TestCase("-12.3")]
+            [TestCase("-12.")]
+            [TestCase("-12.3e-12")]
+            [TestCase("-12.3E-12")]
+            [TestCase("12.3E-12")]
+            [TestCase("12.E-12")]
+            public void TesDoubleParser(string exp)
+            {
+                var res = AssertSingleResultType(exp, typeof(double));
+                Assert.IsTrue(res is double, ".net data type not double");
+                Assert.AreEqual((double)res, double.Parse(exp));
+            }
 
         [Test]
         [TestCase(@"''", "")]

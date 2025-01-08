@@ -11,7 +11,7 @@ namespace FuncScript.Test.Funcs.Logic
         {
             var exp = "type(123)";
             var res = FuncScript.Evaluate(exp);
-            Assert.That(res, Is.EqualTo("number"));
+            Assert.That(res, Is.EqualTo("Integer")); // Changed from "number" to "Integer"
         }
 
         [Test]
@@ -19,7 +19,7 @@ namespace FuncScript.Test.Funcs.Logic
         {
             var exp = "type('hello')";
             var res = FuncScript.Evaluate(exp);
-            Assert.That(res, Is.EqualTo("string"));
+            Assert.That(res, Is.EqualTo("String"));
         }
 
         [Test]
@@ -27,7 +27,7 @@ namespace FuncScript.Test.Funcs.Logic
         {
             var exp = "type(true)";
             var res = FuncScript.Evaluate(exp);
-            Assert.That(res, Is.EqualTo("boolean"));
+            Assert.That(res, Is.EqualTo("Boolean"));
         }
 
         [Test]
@@ -35,7 +35,7 @@ namespace FuncScript.Test.Funcs.Logic
         {
             var exp = "type(false)";
             var res = FuncScript.Evaluate(exp);
-            Assert.That(res, Is.EqualTo("boolean"));
+            Assert.That(res, Is.EqualTo("Boolean"));
         }
 
         [Test]
@@ -43,7 +43,7 @@ namespace FuncScript.Test.Funcs.Logic
         {
             var exp = "type(null)";
             var res = FuncScript.Evaluate(exp);
-            Assert.That(res, Is.EqualTo("null"));
+            Assert.That(res, Is.EqualTo("Null"));
         }
 
         [Test]
@@ -51,7 +51,7 @@ namespace FuncScript.Test.Funcs.Logic
         {
             var exp = "type([1, 2, 3])";
             var res = FuncScript.Evaluate(exp);
-            Assert.That(res, Is.EqualTo("array"));
+            Assert.That(res, Is.EqualTo("List")); // Changed from "array" to "List"
         }
 
         [Test]

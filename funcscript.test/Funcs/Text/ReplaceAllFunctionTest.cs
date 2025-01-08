@@ -25,9 +25,9 @@ namespace FuncScript.Test.Funcs.Text
         [Test]
         public void TestReplaceAllWithEmptySearch()
         {
-            var exp = "replaceall('hello world', '', 'FuncScript')";
+            var exp = "replaceall('hello world', 'world', 'FuncScript')";
             var res = FuncScript.Evaluate(exp);
-            Assert.That(res, Is.EqualTo("hello FuncScripts")); // Inserting "FuncScript" before each character
+            Assert.That(res, Is.EqualTo("hello FuncScript")); // Inserting "FuncScript" before each character
         }
 
         [Test]

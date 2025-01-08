@@ -36,9 +36,10 @@ namespace FuncScript.Test.Funcs.Logic
         public void TestNotParameterCountMismatch()
         {
             var exp = "!(true, false)";
-            var res = FuncScript.Evaluate(exp);
-            Assert.That(res is FsError);
-            Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_PARAMETER_COUNT_MISMATCH));
+            Assert.Throws<SyntaxError>(()=>
+            {
+                FuncScript.Evaluate(exp);
+            });
         }
 
         [Test]

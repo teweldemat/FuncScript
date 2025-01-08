@@ -45,8 +45,7 @@ namespace FuncScript.Test.Funcs.Text
         {
             var exp = "parse('1+2', 'fs')";
             var res = FuncScript.Evaluate(exp);
-            Assert.That(res is FsError);
-            Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
+            Assert.That(res,Is.EqualTo(3));
         }
 
         [Test]

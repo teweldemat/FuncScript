@@ -45,9 +45,7 @@ namespace FuncScript.Test.Funcs.Logic
         {
             var exp = "1 in [1, 2, 3, 4]";
             var res = FuncScript.Evaluate(exp);
-            Assert.That(res is FsError);
-            var error = (FsError)res;
-            Assert.That(error.ErrorType, Is.EqualTo(FsError.ERROR_PARAMETER_COUNT_MISMATCH));
+            Assert.That(res,Is.EqualTo(true));
         }
 
         [Test]

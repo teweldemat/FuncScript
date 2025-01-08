@@ -48,6 +48,14 @@ namespace FuncScript.Funcs.Math
             {
                 d = pars[i];
 
+                // Check for division by zero before performing modulo
+                if ((d is int intDiv && intDiv == 0) ||
+                    (d is long longDiv && longDiv == 0L) ||
+                    (d is double doubleDiv && doubleDiv == 0.0))
+                {
+                    return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"{this.Symbol}: division by zero at parameter {i + 1}");
+                }
+
                 if (isInt)
                 {
                     if (d is int)

@@ -27,7 +27,7 @@ namespace FuncScript.Test.Funcs.Math
         {
             var exp = "5.5 % 1.5";
             var res = FuncScript.Evaluate(exp);
-            Assert.That(res, Is.EqualTo(0.5));
+            Assert.That(res, Is.EqualTo(1.0));
         }
 
         [Test]
@@ -51,10 +51,11 @@ namespace FuncScript.Test.Funcs.Math
         [Test]
         public void TestModuloEmptyParameters()
         {
-            var exp = "%()";
-            var res = FuncScript.Evaluate(exp);
-            Assert.That(res is FsError);
-            Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_PARAMETER_COUNT_MISMATCH));
+            var exp = "%";
+            Assert.Throws<SyntaxError>(() =>
+            {
+                FuncScript.Evaluate(exp);
+            });
         }
 
         [Test]
