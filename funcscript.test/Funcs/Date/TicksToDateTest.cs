@@ -11,7 +11,7 @@ namespace FuncScript.Test.Funcs.Date
         public void TestTicksToDate_ValidTicks()
         {
             var exp = "TicksToDate(637701984000000000)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo(new DateTime(2021, 10, 19)));
         }
 
@@ -19,7 +19,7 @@ namespace FuncScript.Test.Funcs.Date
         public void TestTicksToDate_NullInput()
         {
             var exp = "TicksToDate(null)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.Null);
         }
 
@@ -27,7 +27,7 @@ namespace FuncScript.Test.Funcs.Date
         public void TestTicksToDate_InvalidTypeInput()
         {
             var exp = "TicksToDate('invalid')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.InstanceOf<FsError>());
             var error = (FsError)res;
             Assert.That(error.ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
@@ -37,7 +37,7 @@ namespace FuncScript.Test.Funcs.Date
         public void TestTicksToDate_TooManyParameters()
         {
             var exp = "TicksToDate(1, 2)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.InstanceOf<FsError>());
             var error = (FsError)res;
             Assert.That(error.ErrorType, Is.EqualTo(FsError.ERROR_PARAMETER_COUNT_MISMATCH));

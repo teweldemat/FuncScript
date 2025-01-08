@@ -20,7 +20,7 @@ namespace FuncScript.Funcs.KeyValue
                 return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"{Symbol} function: Can't get member {par1} from null data");
 
             if (!(par0 is KeyValueCollection))
-                return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"{Symbol} function: Can't get member {par1} from a {FuncScript.GetFsDataType(par0)}");
+                return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"{Symbol} function: Can't get member {par1} from a {Helpers.GetFsDataType(par0)}");
 
             return ((KeyValueCollection)par0).Get(((string)par1).ToLower());
         }

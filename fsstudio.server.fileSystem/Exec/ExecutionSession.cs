@@ -211,7 +211,7 @@ public class ExecutionSession : KeyValueCollection
         string? json = null;
         try
         {
-            json = c == null ? null : FuncScript.FuncScript.FormatToJson(c);
+            json = c == null ? null : FuncScript.Helpers.FormatToJson(c);
         }
         catch (Exception e)
         {
@@ -310,7 +310,7 @@ public class ExecutionSession : KeyValueCollection
             {
                 _evaluationResult = task.Result;
                 var sb = new StringBuilder();
-                FuncScript.FuncScript.Format(sb, _evaluationResult,
+                FuncScript.Helpers.Format(sb, _evaluationResult,
                     asJsonLiteral: _evaluationResult is KeyValueCollection || _evaluationResult is FsList
                 );
                 if (logger != null)

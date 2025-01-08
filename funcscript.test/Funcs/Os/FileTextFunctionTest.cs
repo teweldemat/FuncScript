@@ -11,7 +11,7 @@ namespace FuncScript.Test.Funcs.Os
         public void TestFileText_MissingParameter()
         {
             var exp = "file()";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.InstanceOf<FsError>());
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_PARAMETER_COUNT_MISMATCH));
         }
@@ -20,7 +20,7 @@ namespace FuncScript.Test.Funcs.Os
         public void TestFileText_NullParameter()
         {
             var exp = "file(null)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.InstanceOf<FsError>());
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
         }
@@ -29,7 +29,7 @@ namespace FuncScript.Test.Funcs.Os
         public void TestFileText_InvalidTypeParameter()
         {
             var exp = "file(123)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.InstanceOf<FsError>());
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
         }
@@ -38,7 +38,7 @@ namespace FuncScript.Test.Funcs.Os
         public void TestFileText_FileDoesNotExist()
         {
             var exp = "file('non_existent_file.txt')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.InstanceOf<FsError>());
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_TYPE_EVALUATION));
         }
@@ -47,7 +47,7 @@ namespace FuncScript.Test.Funcs.Os
         public void TestFileText_FileTooBig()
         {
             var exp = "file('path_to_large_file.txt')"; // Ensure this file exists and is larger than 1MB
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.InstanceOf<FsError>());
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_TYPE_EVALUATION));
         }
@@ -64,7 +64,7 @@ namespace FuncScript.Test.Funcs.Os
             {
                 // Act: Use the temporary file in your expression
                 var exp = $"file('{tempFilePath}')";
-                var res = FuncScript.Evaluate(exp);
+                var res = Helpers.Evaluate(exp);
 
                 // Assert: Validate the result
                 Assert.That(res, Is.InstanceOf<string>());

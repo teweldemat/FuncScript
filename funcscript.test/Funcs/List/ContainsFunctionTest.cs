@@ -10,7 +10,7 @@ namespace FuncScript.Test.Funcs.List
         public void TestContainsInList_Positive()
         {
             var exp = "Contains([1, 2, 3], 2)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo(true));
         }
 
@@ -18,7 +18,7 @@ namespace FuncScript.Test.Funcs.List
         public void TestContainsInList_Negative()
         {
             var exp = "Contains([1, 2, 3], 4)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo(false));
         }
 
@@ -26,7 +26,7 @@ namespace FuncScript.Test.Funcs.List
         public void TestContainsInString_Positive()
         {
             var exp = "Contains('Hello World', 'world')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo(true));
         }
 
@@ -34,7 +34,7 @@ namespace FuncScript.Test.Funcs.List
         public void TestContainsInString_Negative()
         {
             var exp = "Contains('Hello World', 'moon')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo(false));
         }
 
@@ -42,7 +42,7 @@ namespace FuncScript.Test.Funcs.List
         public void TestContainsInvalidType_Container()
         {
             var exp = "Contains(123, 2)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
         }
@@ -51,7 +51,7 @@ namespace FuncScript.Test.Funcs.List
         public void TestContainsInvalidType_Item()
         {
             var exp = "Contains([1, 2, 3], 'two')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res,Is.EqualTo(false));
         }
 
@@ -59,7 +59,7 @@ namespace FuncScript.Test.Funcs.List
         public void TestContainsParameterCountMismatch()
         {
             var exp = "Contains([1, 2, 3])";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_PARAMETER_COUNT_MISMATCH));
         }

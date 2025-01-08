@@ -10,7 +10,7 @@ namespace FuncScript.Test.Funcs.Os
         public void TestMkdirValidPath()
         {
             var exp = "mkdir('testDir')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo("testDir"));
         }
 
@@ -18,7 +18,7 @@ namespace FuncScript.Test.Funcs.Os
         public void TestMkdirInvalidPath()
         {
             var exp = "mkdir(123)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That((FsError)res, Has.Property("ErrorType").EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
         }
@@ -27,7 +27,7 @@ namespace FuncScript.Test.Funcs.Os
         public void TestMkdirNullPath()
         {
             var exp = "mkdir(null)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That((FsError)res, Has.Property("ErrorType").EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
         }
@@ -36,7 +36,7 @@ namespace FuncScript.Test.Funcs.Os
         public void TestMkdirExcessParameters()
         {
             var exp = "mkdir('testDir', 'extra')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That((FsError)res, Has.Property("ErrorType").EqualTo(FsError.ERROR_PARAMETER_COUNT_MISMATCH));
         }
@@ -45,7 +45,7 @@ namespace FuncScript.Test.Funcs.Os
         public void TestMkdirZeroParameters()
         {
             var exp = "mkdir()";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That((FsError)res, Has.Property("ErrorType").EqualTo(FsError.ERROR_PARAMETER_COUNT_MISMATCH));
         }

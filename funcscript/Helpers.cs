@@ -10,11 +10,11 @@ using Newtonsoft.Json.Serialization;
 
 namespace FuncScript
 {
-    public static partial class FuncScript
+    public static partial class Helpers
     {
         static HashSet<Type> _useJson;
         static Newtonsoft.Json.JsonSerializerSettings _nsSetting;
-        static FuncScript()
+        static Helpers()
         {
             _nsSetting = new Newtonsoft.Json.JsonSerializerSettings
             {
@@ -162,7 +162,7 @@ namespace FuncScript
             if (_useJson.Contains(value.GetType()))
             {
                 var json = Newtonsoft.Json.JsonConvert.SerializeObject(value, _nsSetting);
-                var obj = FuncScript.Evaluate(json);
+                var obj = Helpers.Evaluate(json);
                 return obj;
             }
             if (FsList.IsListType(t))

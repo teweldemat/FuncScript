@@ -136,7 +136,7 @@ public class Tests
         };
         var session = new ExecutionSession(nodes, null);
         var res =await session.EvaluateNodeAsync("dl");
-        FuncScript.FuncScript.FormatToJson(res);
+        FuncScript.Helpers.FormatToJson(res);
         Assert.That(logger.GetLogContent().Trim(),Is.EqualTo("a"));
 
     }
@@ -169,17 +169,17 @@ public class Tests
         };
         var session = new ExecutionSession(nodes, null);
         var res = await session.EvaluateNodeAsync("dl");
-        var json=FuncScript.FuncScript.FormatToJson(res);
+        var json=FuncScript.Helpers.FormatToJson(res);
         Assert.That(logger.GetLogContent().Trim(),Is.EqualTo("a"));
-        Assert.That(FuncScript.FuncScript.FormatToJson(FuncScript.FuncScript.NormalizeDataType(new {r="5y",m="5z"})),Is.EqualTo(json));
+        Assert.That(FuncScript.Helpers.FormatToJson(FuncScript.Helpers.NormalizeDataType(new {r="5y",m="5z"})),Is.EqualTo(json));
 
         logger.Clear();
         nodes[0].Expression = "2 log 'b'";
         res = await session.EvaluateNodeAsync("dl");
-        json=FuncScript.FuncScript.FormatToJson(res);
+        json=FuncScript.Helpers.FormatToJson(res);
         Assert.That(logger.GetLogContent().Trim(),Is.EqualTo("b"));
         
-        Assert.That(FuncScript.FuncScript.FormatToJson(FuncScript.FuncScript.NormalizeDataType(new {r="2y",m="2z"})),Is.EqualTo(json));
+        Assert.That(FuncScript.Helpers.FormatToJson(FuncScript.Helpers.NormalizeDataType(new {r="2y",m="2z"})),Is.EqualTo(json));
 
     }
     [Test]

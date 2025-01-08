@@ -10,7 +10,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestLowercaseSimple()
         {
             var exp = "lowercase('HELLO')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo("hello"));
         }
 
@@ -18,7 +18,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestLowercaseMixedCase()
         {
             var exp = "lowercase('HeLLo WoRLd')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo("hello world"));
         }
 
@@ -26,7 +26,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestLowercaseEmptyString()
         {
             var exp = "lowercase('')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo(""));
         }
 
@@ -34,7 +34,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestLowercaseNonStringParameter()
         {
             var exp = "lowercase(123)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
         }
@@ -43,7 +43,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestLowercaseNoParameters()
         {
             var exp = "lowercase()";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_PARAMETER_COUNT_MISMATCH));
         }

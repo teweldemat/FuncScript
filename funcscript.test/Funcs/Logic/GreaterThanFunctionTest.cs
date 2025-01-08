@@ -10,7 +10,7 @@ namespace FuncScript.Test.Funcs.Logic
         public void TestGreaterThanWithValidInputs()
         {
             var exp = "3 > 2";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo(true));
         }
 
@@ -18,7 +18,7 @@ namespace FuncScript.Test.Funcs.Logic
         public void TestGreaterThanWithEqualInputs()
         {
             var exp = "2 > 2";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo(false));
         }
 
@@ -26,7 +26,7 @@ namespace FuncScript.Test.Funcs.Logic
         public void TestGreaterThanWithInvalidCount()
         {
             var exp = "1 > 2 > 3";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_PARAMETER_COUNT_MISMATCH));
         }
@@ -35,7 +35,7 @@ namespace FuncScript.Test.Funcs.Logic
         public void TestGreaterThanWithNullInputs()
         {
             var exp = "null > 5";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.Null);
         }
 
@@ -43,7 +43,7 @@ namespace FuncScript.Test.Funcs.Logic
         public void TestGreaterThanWithIncompatibleTypes()
         {
             var exp = "'apple' > 5";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
         }
@@ -52,7 +52,7 @@ namespace FuncScript.Test.Funcs.Logic
         public void TestGreaterThanWithDifferentTypes()
         {
             var exp = "3.14 > 'banana'";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
         }

@@ -13,8 +13,8 @@ namespace FuncScript.Test.Funcs.Os
             var tempDir = Path.Combine(Path.GetTempPath(), "testDir");
             Directory.CreateDirectory(tempDir);
             var exp = $"dirlist('{tempDir}')";
-            var res = FuncScript.Evaluate(exp);
-            Assert.That(res is FsList,$"Unexpected value {FuncScript.FormatToJson(res)}");
+            var res = Helpers.Evaluate(exp);
+            Assert.That(res is FsList,$"Unexpected value {Helpers.FormatToJson(res)}");
             Directory.Delete(tempDir, true);
         }
 
@@ -22,7 +22,7 @@ namespace FuncScript.Test.Funcs.Os
         public void TestDirListNonExistentDirectory()
         {
             var exp = "dirlist(['nonexistentDirectory'])";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             var error = (FsError)res;
             Assert.That(error.ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
@@ -32,7 +32,7 @@ namespace FuncScript.Test.Funcs.Os
         public void TestDirListInvalidParameterCount()
         {
             var exp = "dirlist(['path1', 'path2'])";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             var error = (FsError)res;
             Assert.That(error.ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
@@ -42,7 +42,7 @@ namespace FuncScript.Test.Funcs.Os
         public void TestDirListInvalidParameterType()
         {
             var exp = "dirlist([123])";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             var error = (FsError)res;
             Assert.That(error.ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
@@ -53,7 +53,7 @@ namespace FuncScript.Test.Funcs.Os
         {
             var invalidPath = Path.Combine(Path.GetTempPath(), "testDir", "invalidFile");
             var exp = $"dirlist(['{invalidPath}'])";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
         }
     }

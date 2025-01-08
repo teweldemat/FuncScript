@@ -10,7 +10,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestReplaceAllSuccessful()
         {
             var exp = "replaceall('hello world', 'world', 'FuncScript')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo("hello FuncScript"));
         }
 
@@ -18,7 +18,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestReplaceAllWithEmptyInput()
         {
             var exp = "replaceall('', 'world', 'FuncScript')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo(""));
         }
 
@@ -26,7 +26,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestReplaceAllWithEmptySearch()
         {
             var exp = "replaceall('hello world', 'world', 'FuncScript')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo("hello FuncScript")); // Inserting "FuncScript" before each character
         }
 
@@ -34,7 +34,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestReplaceAllWithErrorNotEnoughParameters()
         {
             var exp = "replaceall('hello world', 'world')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_PARAMETER_COUNT_MISMATCH));
         }
@@ -43,7 +43,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestReplaceAllWithNullInput()
         {
             var exp = "replaceall(null, 'world', 'FuncScript')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
         }
@@ -52,7 +52,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestReplaceAllWithNullSearch()
         {
             var exp = "replaceall('hello world', null, 'FuncScript')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
         }
@@ -61,7 +61,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestReplaceAllWithNullReplacement()
         {
             var exp = "replaceall('hello world', 'world', null)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
         }

@@ -23,7 +23,7 @@ namespace FuncScript.Test.Funcs.Os
             {
                 // Act: Rename the file using the expression
                 var exp = $"RenameFile('{oldFilePath}', '{newFilePath}')";
-                var res = FuncScript.Evaluate(exp);
+                var res = Helpers.Evaluate(exp);
 
                 // Assert: Validate the result
                 Assert.That(res, Is.EqualTo(newFilePath));
@@ -44,7 +44,7 @@ namespace FuncScript.Test.Funcs.Os
             var exp = "RenameFile('oldPath')";
 
             // Act
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
 
             // Assert
             Assert.That(res is FsError);
@@ -58,7 +58,7 @@ namespace FuncScript.Test.Funcs.Os
             var exp = "RenameFile(null, 'newName')";
 
             // Act
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
 
             // Assert
             Assert.That(res is FsError);
@@ -72,7 +72,7 @@ namespace FuncScript.Test.Funcs.Os
             var exp = "RenameFile(123, 'newName')";
 
             // Act
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
 
             // Assert
             Assert.That(res is FsError);
@@ -86,7 +86,7 @@ namespace FuncScript.Test.Funcs.Os
             var exp = "RenameFile('non_existent_file.txt', 'newName')";
 
             // Act
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
 
             // Assert
             Assert.That(res is FsError);

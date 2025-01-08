@@ -10,7 +10,7 @@ namespace FuncScript.Test.Funcs.Logic
         public void TestGetTypeNumber()
         {
             var exp = "type(123)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo("Integer")); // Changed from "number" to "Integer"
         }
 
@@ -18,7 +18,7 @@ namespace FuncScript.Test.Funcs.Logic
         public void TestGetTypeString()
         {
             var exp = "type('hello')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo("String"));
         }
 
@@ -26,7 +26,7 @@ namespace FuncScript.Test.Funcs.Logic
         public void TestGetTypeBooleanTrue()
         {
             var exp = "type(true)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo("Boolean"));
         }
 
@@ -34,7 +34,7 @@ namespace FuncScript.Test.Funcs.Logic
         public void TestGetTypeBooleanFalse()
         {
             var exp = "type(false)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo("Boolean"));
         }
 
@@ -42,7 +42,7 @@ namespace FuncScript.Test.Funcs.Logic
         public void TestGetTypeNull()
         {
             var exp = "type(null)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo("Null"));
         }
 
@@ -50,7 +50,7 @@ namespace FuncScript.Test.Funcs.Logic
         public void TestGetTypeArray()
         {
             var exp = "type([1, 2, 3])";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo("List")); // Changed from "array" to "List"
         }
 
@@ -58,7 +58,7 @@ namespace FuncScript.Test.Funcs.Logic
         public void TestGetTypeInvalidParameterCount()
         {
             var exp = "type(1, 2)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.InstanceOf<FsError>());
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_PARAMETER_COUNT_MISMATCH));
         }
@@ -67,7 +67,7 @@ namespace FuncScript.Test.Funcs.Logic
         public void TestGetTypeNoParameters()
         {
             var exp = "type()";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.InstanceOf<FsError>());
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_PARAMETER_COUNT_MISMATCH));
         }

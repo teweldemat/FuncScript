@@ -11,7 +11,7 @@ namespace FuncScript.Test.Funcs.List
         public void TestTakeValid()
         {
             var exp = "Take([1, 2, 3, 4], 2)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsList);
             var list = (FsList)res;
             Assert.That(list, Is.EquivalentTo(new[] { 1, 2 }));
@@ -21,7 +21,7 @@ namespace FuncScript.Test.Funcs.List
         public void TestTakeParameterCountMismatch()
         {
             var exp = "Take([1, 2, 3])";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_PARAMETER_COUNT_MISMATCH));
         }
@@ -30,7 +30,7 @@ namespace FuncScript.Test.Funcs.List
         public void TestTakeInvalidFirstParameter()
         {
             var exp = "Take(123, 2)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
         }
@@ -39,7 +39,7 @@ namespace FuncScript.Test.Funcs.List
         public void TestTakeInvalidSecondParameter()
         {
             var exp = "Take([1, 2, 3], 'two')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
         }
@@ -48,7 +48,7 @@ namespace FuncScript.Test.Funcs.List
         public void TestTakeNegativeNumber()
         {
             var exp = "Take([1, 2, 3, 4], -1)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsList);
             var list = (FsList)res;
             Assert.That(list, Is.EquivalentTo(new object[] { }));
@@ -58,7 +58,7 @@ namespace FuncScript.Test.Funcs.List
         public void TestTakeExceedingLength()
         {
             var exp = "Take([1, 2], 5)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsList);
             var list = (FsList)res;
             Assert.That(list, Is.EquivalentTo(new[] { 1, 2 }));

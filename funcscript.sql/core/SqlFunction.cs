@@ -38,13 +38,13 @@ namespace FuncScript.Sql.Core
                 var row = new List<KeyValuePair<string, object?>>();
                 for (var i = 0; i < reader.FieldCount; i++)
                 {
-                    var value = FuncScript.NormalizeDataType(reader.GetValue(i));
+                    var value = Helpers.NormalizeDataType(reader.GetValue(i));
                     row.Add(new KeyValuePair<string, object?>(reader.GetName(i), value));
                 }
                 results.Add(new SimpleKeyValueCollection(null, row.ToArray()));
             }
 
-            var normalizedResults = FuncScript.NormalizeDataType(results);
+            var normalizedResults = Helpers.NormalizeDataType(results);
             return normalizedResults ?? "null";
         }
 

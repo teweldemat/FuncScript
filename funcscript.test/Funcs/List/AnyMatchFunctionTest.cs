@@ -11,7 +11,7 @@ namespace FuncScript.Test.Funcs.List
         public void TestAnyMatchWithValidParameters()
         {
             var exp = "Any([1, 2, 3, 4], (x) => x > 2)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo(true));
         }
 
@@ -19,7 +19,7 @@ namespace FuncScript.Test.Funcs.List
         public void TestAnyMatchWithNoMatchingElement()
         {
             var exp = "Any([1, 2, 3], (x) => x > 3)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo(false));
         }
 
@@ -27,7 +27,7 @@ namespace FuncScript.Test.Funcs.List
         public void TestAnyMatchWithEmptyList()
         {
             var exp = "Any([], (x) => x > 2)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo(false));
         }
 
@@ -35,7 +35,7 @@ namespace FuncScript.Test.Funcs.List
         public void TestAnyMatchWithParameterCountMismatch()
         {
             var exp = "Any([1, 2, 3])"; // No filter function provided
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_PARAMETER_COUNT_MISMATCH));
         }
@@ -44,7 +44,7 @@ namespace FuncScript.Test.Funcs.List
         public void TestAnyMatchWithInvalidFirstParameter()
         {
             var exp = "Any('not_a_list', (x) => x > 2)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
         }
@@ -53,7 +53,7 @@ namespace FuncScript.Test.Funcs.List
         public void TestAnyMatchWithInvalidSecondParameter()
         {
             var exp = "Any([1, 2, 3], 'not_a_function')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
         }

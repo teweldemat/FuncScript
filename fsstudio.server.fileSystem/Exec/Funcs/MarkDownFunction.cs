@@ -29,7 +29,7 @@ namespace FsStudio.Server.FileSystem.Exec.Funcs
             }
             else
             {
-                remoteLogger.SendMarkdDown(sessionId, $"Unsupported type {FuncScript.FuncScript.GetFsDataType(par0)} for markdown");
+                remoteLogger.SendMarkdDown(sessionId, $"Unsupported type {FuncScript.Helpers.GetFsDataType(par0)} for markdown");
             }
             return par0;
         }

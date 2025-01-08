@@ -10,7 +10,7 @@ do
     var exp = Console.ReadLine();
     try
     {
-        var res=FuncScript.FuncScript.Evaluate(exp);
+        var res=FuncScript.Helpers.Evaluate(exp);
         Console.WriteLine("result");
         Console.WriteLine(res.ToString());
     }

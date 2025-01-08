@@ -10,7 +10,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestChangeCaseLower()
         {
             var exp = "changecase('Hello World', 'lower')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo("hello world"));
         }
 
@@ -18,7 +18,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestChangeCaseUpper()
         {
             var exp = "changecase('Hello World', 'upper')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo("HELLO WORLD"));
         }
 
@@ -26,7 +26,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestChangeCasePascal()
         {
             var exp = "changecase('hello world', 'pascal')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo("HelloWorld"));
         }
 
@@ -34,7 +34,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestChangeCaseSnake()
         {
             var exp = "changecase('Hello World', 'snake')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo("hello_world"));
         }
 
@@ -42,7 +42,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestChangeCaseKebab()
         {
             var exp = "changecase('Hello World', 'kebab')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo("hello-world"));
         }
 
@@ -50,7 +50,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestChangeCaseInvalidType()
         {
             var exp = "changecase('Hello World', 'invalid')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             var error = (FsError)res;
             Assert.That(error.ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
@@ -60,7 +60,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestChangeCaseMissingParameters()
         {
             var exp = "changecase('Hello World')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             var error = (FsError)res;
             Assert.That(error.ErrorType, Is.EqualTo(FsError.ERROR_PARAMETER_COUNT_MISMATCH));
@@ -70,7 +70,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestChangeCaseNullInput()
         {
             var exp = "changecase(null, 'upper')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             var error = (FsError)res;
             Assert.That(error.ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
@@ -80,7 +80,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestChangeCaseNullCaseType()
         {
             var exp = "changecase('Hello World', null)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             var error = (FsError)res;
             Assert.That(error.ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));

@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FuncScript", "FuncScript\Fu
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FsExample", "FsExample\FsExample.csproj", "{90C7C4A4-9B5E-4978-A831-E0268B03DB3B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fsstudio.Server.FileSystem", "FsStudio.Server.FileSystem\Fsstudio.Server.FileSystem.csproj", "{4ACF1CEC-5B8E-451B-9EFF-7951F56B81C2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FsStudio.Server.FileSystem", "FsStudio.Server.FileSystem\FsStudio.Server.FileSystem.csproj", "{4ACF1CEC-5B8E-451B-9EFF-7951F56B81C2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FsStudio.Test", "FsStudio.Test\FsStudio.Test.csproj", "{1E697E63-8EA9-42A6-AF9E-5B61EABD678D}"
 EndProject

@@ -109,7 +109,7 @@ namespace FuncScript.Block
             else
                 throw new EvaluationException(this.CodePos, this.CodeLength,
                 new TypeMismatchError(
-                    $"Function part didn't evaluate to a function or a list. {FuncScript.GetFsDataType(func)}"));
+                    $"Function part didn't evaluate to a function or a list. {Helpers.GetFsDataType(func)}"));
 
             _evaluated = true;
             _result = res;

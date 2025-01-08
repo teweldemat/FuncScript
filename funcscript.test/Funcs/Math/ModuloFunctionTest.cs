@@ -10,7 +10,7 @@ namespace FuncScript.Test.Funcs.Math
         public void TestModuloInt()
         {
             var exp = "5 % 3";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo(2));
         }
 
@@ -18,7 +18,7 @@ namespace FuncScript.Test.Funcs.Math
         public void TestModuloLong()
         {
             var exp = "10000000000 % 3";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo(1));
         }
 
@@ -26,7 +26,7 @@ namespace FuncScript.Test.Funcs.Math
         public void TestModuloDouble()
         {
             var exp = "5.5 % 1.5";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo(1.0));
         }
 
@@ -34,7 +34,7 @@ namespace FuncScript.Test.Funcs.Math
         public void TestModuloWithZeroDivisor()
         {
             var exp = "5 % 0";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
         }
@@ -43,7 +43,7 @@ namespace FuncScript.Test.Funcs.Math
         public void TestModuloWithInvalidType()
         {
             var exp = "5 % 'string'";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
         }
@@ -54,7 +54,7 @@ namespace FuncScript.Test.Funcs.Math
             var exp = "%";
             Assert.Throws<SyntaxError>(() =>
             {
-                FuncScript.Evaluate(exp);
+                Helpers.Evaluate(exp);
             });
         }
 
@@ -62,7 +62,7 @@ namespace FuncScript.Test.Funcs.Math
         public void TestModuloMixedTypes()
         {
             var exp = "5 % 2.5";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo(0));
         }
     }

@@ -10,7 +10,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestParseHexValid()
         {
             var exp = "parse('FF', 'hex')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo(255));
         }
 
@@ -18,7 +18,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestParseHexInvalid()
         {
             var exp = "parse('GG', 'hex')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
         }
@@ -27,7 +27,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestParseLongValid()
         {
             var exp = "parse('123456789', 'l')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo(123456789L));
         }
 
@@ -35,7 +35,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestParseLongInvalid()
         {
             var exp = "parse('abc', 'l')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
         }
@@ -44,7 +44,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestParseFsScriptInvalid()
         {
             var exp = "parse('1+2', 'fs')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res,Is.EqualTo(3));
         }
 
@@ -52,7 +52,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestParseWithNoParams()
         {
             var exp = "parse()";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_PARAMETER_COUNT_MISMATCH));
         }
@@ -61,7 +61,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestParseWithNull()
         {
             var exp = "parse(null)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.Null);
         }
 
@@ -69,7 +69,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestParseWithEmptyFormat()
         {
             var exp = "parse('test', '')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo("test"));
         }
     }

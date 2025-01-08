@@ -33,6 +33,6 @@ public class MapFilterBug
         ParseTreeTests.AssertNoOverlappingSpans(node);
         exp.SetReferenceProvider(context.ReferenceProvider);
         var res = exp.Evaluate();
-        Assert.That(FuncScript.FormatToJson(res).Replace(" ", ""), Is.EqualTo("[]"));
+        Assert.That(Helpers.FormatToJson(res).Replace(" ", ""), Is.EqualTo("[]"));
     }
 }

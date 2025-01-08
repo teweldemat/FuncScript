@@ -10,7 +10,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestEndsWithTrue()
         {
             var exp = "endswith('Hello World', 'World')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo(true));
         }
 
@@ -18,7 +18,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestEndsWithFalse()
         {
             var exp = "endswith('Hello World', 'Hello')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo(false));
         }
 
@@ -26,7 +26,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestEndsWithNullFirstParameter()
         {
             var exp = "endswith(null, 'World')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res,Is.EqualTo(false));
         }
 
@@ -34,7 +34,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestEndsWithNullSecondParameter()
         {
             var exp = "endswith('Hello World', null)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res,Is.EqualTo(false));
         }
 
@@ -42,7 +42,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestEndsWithInvalidParameterCount()
         {
             var exp = "endswith('Hello World')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That((res as FsError).ErrorType, Is.EqualTo(FsError.ERROR_PARAMETER_COUNT_MISMATCH));
         }
@@ -51,7 +51,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestEndsWithInvalidParameterTypeFirst()
         {
             var exp = "endswith(123, 'World')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That((res as FsError).ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
         }
@@ -60,7 +60,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestEndsWithInvalidParameterTypeSecond()
         {
             var exp = "endswith('Hello World', 456)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That((res as FsError).ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
         }

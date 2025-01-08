@@ -10,7 +10,7 @@ namespace FuncScript.Test.Funcs.List
         public void TestLengthOfList()
         {
             var exp = "Len([1,2,3,4])";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo(4));
         }
 
@@ -18,7 +18,7 @@ namespace FuncScript.Test.Funcs.List
         public void TestLengthOfString()
         {
             var exp = "Len('Hello World')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo(11));
         }
 
@@ -26,7 +26,7 @@ namespace FuncScript.Test.Funcs.List
         public void TestLengthOfEmptyList()
         {
             var exp = "Len([])";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo(0));
         }
 
@@ -34,7 +34,7 @@ namespace FuncScript.Test.Funcs.List
         public void TestLengthOfNull()
         {
             var exp = "Len(null)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo(0));
         }
 
@@ -42,7 +42,7 @@ namespace FuncScript.Test.Funcs.List
         public void TestLengthWithInvalidParameterCount()
         {
             var exp = "Len([1, 2], 'extra')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             var error = (FsError)res;
             Assert.That(error.ErrorType, Is.EqualTo(FsError.ERROR_PARAMETER_COUNT_MISMATCH));
@@ -52,7 +52,7 @@ namespace FuncScript.Test.Funcs.List
         public void TestLengthWithInvalidType()
         {
             var exp = "Len(123)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             var error = (FsError)res;
             Assert.That(error.ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));

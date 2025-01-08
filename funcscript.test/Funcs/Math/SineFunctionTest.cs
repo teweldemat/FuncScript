@@ -11,7 +11,7 @@ namespace FuncScript.Test.Funcs.Math
         public void TestSineWithInteger()
         {
             var exp = "Sin(0)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo(0.0));
         }
 
@@ -19,7 +19,7 @@ namespace FuncScript.Test.Funcs.Math
         public void TestSineWithDouble()
         {
             var exp = "Sin(1.5708)"; // Approximately π/2
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo(1.0).Within(0.0001));
         }
 
@@ -27,7 +27,7 @@ namespace FuncScript.Test.Funcs.Math
         public void TestSineWithLong()
         {
             var exp = "Sin(10L)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo(-0.544021110329).Within(0.0001));
         }
 
@@ -35,7 +35,7 @@ namespace FuncScript.Test.Funcs.Math
         public void TestSineWithIncorrectParameterCount()
         {
             var exp = "Sin(1, 2)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.InstanceOf<FsError>());
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_PARAMETER_COUNT_MISMATCH));
         }
@@ -44,7 +44,7 @@ namespace FuncScript.Test.Funcs.Math
         public void TestSineWithInvalidParameter()
         {
             var exp = "Sin('text')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.InstanceOf<FsError>());
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
         }
@@ -56,7 +56,7 @@ namespace FuncScript.Test.Funcs.Math
         public void TestCosineWithInteger()
         {
             var exp = "Cos(0)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo(1.0));
         }
 
@@ -64,7 +64,7 @@ namespace FuncScript.Test.Funcs.Math
         public void TestCosineWithDouble()
         {
             var exp = "Cos(3.14159)"; // Approximately π
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo(-1.0).Within(0.001));
         }
 
@@ -72,7 +72,7 @@ namespace FuncScript.Test.Funcs.Math
         public void TestCosineWithLong()
         {
             var exp = "Cos(10L)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo(-0.839071529076).Within(0.001));
         }
 
@@ -80,7 +80,7 @@ namespace FuncScript.Test.Funcs.Math
         public void TestCosineWithIncorrectParameterCount()
         {
             var exp = "Cos(1, 2)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.InstanceOf<FsError>());
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_PARAMETER_COUNT_MISMATCH));
         }
@@ -89,7 +89,7 @@ namespace FuncScript.Test.Funcs.Math
         public void TestCosineWithInvalidParameter()
         {
             var exp = "Cos('text')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.InstanceOf<FsError>());
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
         }

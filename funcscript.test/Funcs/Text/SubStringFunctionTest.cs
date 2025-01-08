@@ -10,7 +10,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestSubstringValid()
         {
             var exp = "substring('Hello World', 6, 5)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo("World"));
         }
 
@@ -18,7 +18,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestSubstringNoParameters()
         {
             var exp = "substring()";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             var error = (FsError)res;
             Assert.That(error.ErrorType, Is.EqualTo(FsError.ERROR_PARAMETER_COUNT_MISMATCH));
@@ -28,7 +28,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestSubstringFirstParamNotString()
         {
             var exp = "substring(123, 0, 3)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             var error = (FsError)res;
             Assert.That(error.ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
@@ -38,7 +38,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestSubstringIndexOutOfRange()
         {
             var exp = "substring('Hello', 10)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             var error = (FsError)res;
             Assert.That(error.ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
@@ -48,7 +48,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestSubstringNegativeCount()
         {
             var exp = "substring('Hello', 0, -1)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             var error = (FsError)res;
             Assert.That(error.ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));

@@ -3,7 +3,7 @@ using System.Text;
 using FuncScript.Model;
 
 namespace FuncScript;
-public static partial class FuncScript
+public static partial class Helpers
 {
 
     class ListCache : FsList

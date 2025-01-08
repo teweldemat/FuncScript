@@ -10,7 +10,7 @@ namespace FuncScript.Test.Funcs.Logic
         public void TestSwitchCaseMatch()
         {
             var exp = "switch 2; 1:'one'; 2:'two'; 'default';";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo("two"));
         }
 
@@ -18,7 +18,7 @@ namespace FuncScript.Test.Funcs.Logic
         public void TestSwitchNoMatchDefault()
         {
             var exp = "switch 3; 1:'one'; 2:'two'; 'default';";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo("default"));
         }
 
@@ -26,7 +26,7 @@ namespace FuncScript.Test.Funcs.Logic
         public void TestSwitchNoMatchWithoutDefault()
         {
             var exp = "switch 3; 1:'one'; 2:'two';";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.Null);
         }
 
@@ -34,7 +34,7 @@ namespace FuncScript.Test.Funcs.Logic
         public void TestSwitchNullSelector()
         {
             var exp = "switch null; null:'matched'; 1:'not matched';";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo("matched"));
         }
 
@@ -42,7 +42,7 @@ namespace FuncScript.Test.Funcs.Logic
         public void TestSwitchErrorEvenParameters()
         {
             var exp = "switch 1; 'one':'two'; 'three';";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo("three"));
         }
 
@@ -50,7 +50,7 @@ namespace FuncScript.Test.Funcs.Logic
         public void TestSwitchErrorOddParameters()
         {
             var exp = "switch 1; 'one':'two'; 'three'; 'four';";
-            Assert.Throws<SyntaxError>(() => { FuncScript.Evaluate(exp); });
+            Assert.Throws<SyntaxError>(() => { Helpers.Evaluate(exp); });
         }
     }
 }

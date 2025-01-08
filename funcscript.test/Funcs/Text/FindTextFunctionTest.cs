@@ -10,7 +10,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestFindTextWithValidInputs()
         {
             var exp = "find('hello world', 'world')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo(6));
         }
 
@@ -18,7 +18,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestFindTextWithStartingIndex()
         {
             var exp = "find('hello world', 'o', 5)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo(7));
         }
 
@@ -26,7 +26,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestFindTextNotFound()
         {
             var exp = "find('hello world', 'test')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo(-1));
         }
 
@@ -34,7 +34,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestFindTextWithInvalidParameterCount()
         {
             var exp = "find('hello world')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_PARAMETER_COUNT_MISMATCH));
         }
@@ -43,7 +43,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestFindTextWithNullFirstParameter()
         {
             var exp = "find(null, 'world')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
         }
@@ -52,7 +52,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestFindTextWithNonStringFirstParameter()
         {
             var exp = "find(123, 'world')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
         }
@@ -61,7 +61,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestFindTextWithNullSecondParameter()
         {
             var exp = "find('hello world', null)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
         }
@@ -70,7 +70,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestFindTextWithNonStringSecondParameter()
         {
             var exp = "find('hello world', 123)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
         }
@@ -79,7 +79,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestFindTextWithInvalidStartIndex()
         {
             var exp = "find('hello world', 'world', -1)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
         }
@@ -88,7 +88,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestFindTextWithOutOfRangeStartIndex()
         {
             var exp = "find('hello world', 'world', 50)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
         }
@@ -97,7 +97,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestFindTextWithInvalidThirdParameter()
         {
             var exp = "find('hello world', 'world', 'ten')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
         }

@@ -11,7 +11,7 @@ namespace FuncScript.Test.Funcs.Html
         public void TestHtmlEncodeValidString()
         {
             var exp = "HEncode('<div>Hello World!</div>')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo("&lt;div&gt;Hello World!&lt;/div&gt;"));
         }
 
@@ -19,7 +19,7 @@ namespace FuncScript.Test.Funcs.Html
         public void TestHtmlEncodeEmptyString()
         {
             var exp = "HEncode('')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo(""));
         }
 
@@ -27,7 +27,7 @@ namespace FuncScript.Test.Funcs.Html
         public void TestHtmlEncodeNullString()
         {
             var exp = "HEncode(null)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
         }
@@ -36,7 +36,7 @@ namespace FuncScript.Test.Funcs.Html
         public void TestHtmlEncodeParameterCountMismatch()
         {
             var exp = "HEncode('first', 'second')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_PARAMETER_COUNT_MISMATCH));
         }

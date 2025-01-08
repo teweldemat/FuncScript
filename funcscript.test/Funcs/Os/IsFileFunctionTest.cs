@@ -18,7 +18,7 @@ namespace FuncScript.Test.Funcs.Os
             {
                 // Act: Use the temporary file in your expression
                 var exp = $"isfile('{tempFilePath}')";
-                var res = FuncScript.Evaluate(exp);
+                var res = Helpers.Evaluate(exp);
 
                 // Assert: Validate the result
                 Assert.That(res, Is.True);
@@ -37,7 +37,7 @@ namespace FuncScript.Test.Funcs.Os
         public void TestIsFileInvalidPath()
         {
             var exp = "isfile('C:\\path\\to\\nonexistent\\file.txt')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.False);
         }
 
@@ -45,7 +45,7 @@ namespace FuncScript.Test.Funcs.Os
         public void TestIsFileDirectoryPath()
         {
             var exp = "isfile('C:\\path\\to\\your\\directory')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.False);
         }
 
@@ -53,7 +53,7 @@ namespace FuncScript.Test.Funcs.Os
         public void TestIsFileNullParameter()
         {
             var exp = "isfile(null)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
         }
@@ -62,7 +62,7 @@ namespace FuncScript.Test.Funcs.Os
         public void TestIsFileInvalidParameterCount()
         {
             var exp = "isfile('file.txt', 'extra')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_PARAMETER_COUNT_MISMATCH));
         }
@@ -71,7 +71,7 @@ namespace FuncScript.Test.Funcs.Os
         public void TestIsFileInvalidParameterType()
         {
             var exp = "isfile(123)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
         }

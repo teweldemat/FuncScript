@@ -11,7 +11,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestFormatWithSingleValue()
         {
             var exp = "format(42)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo("42"));
         }
 
@@ -21,7 +21,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestFormatEmptyParameters()
         {
             var exp = "format()";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_PARAMETER_COUNT_MISMATCH));
         }
@@ -32,7 +32,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestFormatWithNonStringFormat()
         {
             var exp = "format(42, 123)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo("42")); // Assuming it defaults to toString for non-string formats.
         }
     }

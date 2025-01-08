@@ -36,7 +36,7 @@ namespace FuncScript.Funcs.List
                 total = func.EvaluateList(context,new ArrayFsList(new object[] { lst[i], total, i }));
             }
 
-            return FuncScript.NormalizeDataType(total);
+            return Helpers.NormalizeDataType(total);
         }
 
         public string ParName(int index)

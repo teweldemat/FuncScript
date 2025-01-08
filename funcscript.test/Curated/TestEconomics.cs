@@ -19,8 +19,8 @@ public class TestEconomics
 }";
         var logger = new StringLogger();
         FsLogger.SetDefaultLogger(logger);
-        var res = FuncScript.Evaluate(new DefaultFsDataProvider(), exp);
-        var str = FuncScript.FormatToJson(res);
+        var res = Helpers.Evaluate(new DefaultFsDataProvider(), exp);
+        var str = Helpers.FormatToJson(res);
         Assert.That(res is FsList);
         var l = (FsList)res;
         Assert.That(l.Length, Is.EqualTo(1));
@@ -35,8 +35,8 @@ public class TestEconomics
         var exp = @"([log('x','x')] filter (a)=>a!=2) map (x)=>1=1";
         var logger = new StringLogger();
         FsLogger.SetDefaultLogger(logger);
-        var res = FuncScript.Evaluate(new DefaultFsDataProvider(), exp);
-        var str = FuncScript.FormatToJson(res);
+        var res = Helpers.Evaluate(new DefaultFsDataProvider(), exp);
+        var str = Helpers.FormatToJson(res);
         Assert.That(logger.GetLogContent().Trim(), Is.EqualTo("x"));
     }
 }

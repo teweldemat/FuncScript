@@ -19,7 +19,7 @@ namespace FuncScript.Test.Curated
         public void TestMapSquare()
         {
             var exp="map([1,2,4],(x)=>x*x)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsList);
             var list = (FsList)res;
             Assert.That(list ,Is.EquivalentTo(new []{1,4,16}));
@@ -30,7 +30,7 @@ namespace FuncScript.Test.Curated
         {
             var p = new KvcProvider(new ObjectKvc(new { x = 100 }),
                 new DefaultFsDataProvider());
-            var res = FuncScript.Evaluate(p, @"f'y={x+2}'");
+            var res = Helpers.Evaluate(p, @"f'y={x+2}'");
             Assert.AreEqual("y=102", res);
         }
 
@@ -39,7 +39,7 @@ namespace FuncScript.Test.Curated
         {
             var p = new KvcProvider(new ObjectKvc(new { x = 100 }),
                 new DefaultFsDataProvider());
-            var res = FuncScript.Evaluate(p, @"f'y=\{x+2}'");
+            var res = Helpers.Evaluate(p, @"f'y=\{x+2}'");
             Assert.AreEqual(@"y={x+2}", res);
         }
 
@@ -49,7 +49,7 @@ namespace FuncScript.Test.Curated
             var exp = @"'test\'\''";
             var p = new KvcProvider(new ObjectKvc(new { x = 100 }),
                 new DefaultFsDataProvider());
-            var res = FuncScript.Evaluate(p, exp);
+            var res = Helpers.Evaluate(p, exp);
             Assert.That(res, Is.EqualTo("test''"));
         }
 
@@ -57,7 +57,7 @@ namespace FuncScript.Test.Curated
         public void ParseUnicodeString()
         {
             var exp = @"'test\u0020'";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo("test "));
         }
         
@@ -65,7 +65,7 @@ namespace FuncScript.Test.Curated
         public void NullSafeGetMemberNullValue()
         {
             var p = new DefaultFsDataProvider();
-            var res = FuncScript.Evaluate(p, @"x?.y");
+            var res = Helpers.Evaluate(p, @"x?.y");
             Assert.AreEqual(null, res);
         }
 
@@ -73,7 +73,7 @@ namespace FuncScript.Test.Curated
         public void NullSafeGetMemberNoneNullValue()
         {
             var p = new DefaultFsDataProvider();
-            var res = FuncScript.Evaluate(p, @"{ x:{y:5}; return x?.y}");
+            var res = Helpers.Evaluate(p, @"{ x:{y:5}; return x?.y}");
             Assert.AreEqual(5, res);
         }
 
@@ -81,7 +81,7 @@ namespace FuncScript.Test.Curated
         public void NullSafeExpressionNullValue()
         {
             var p = new DefaultFsDataProvider();
-            var res = FuncScript.Evaluate(p, @"x?!(x*200)");
+            var res = Helpers.Evaluate(p, @"x?!(x*200)");
             Assert.AreEqual(null, res);
         }
 
@@ -89,7 +89,7 @@ namespace FuncScript.Test.Curated
         public void NullSafeExpressionNoneNullValue()
         {
             var p = new DefaultFsDataProvider();
-            var res = FuncScript.Evaluate(p, @"{ x:5; return x?!(x*200)}");
+            var res = Helpers.Evaluate(p, @"{ x:5; return x?!(x*200)}");
             Assert.AreEqual(1000, res);
         }
 
@@ -97,7 +97,7 @@ namespace FuncScript.Test.Curated
         public void SquareBraceIndexLiteral()
         {
             var p = new DefaultFsDataProvider();
-            var res = FuncScript.Evaluate(p, @"[4,5,6][1]");
+            var res = Helpers.Evaluate(p, @"[4,5,6][1]");
             Assert.AreEqual(5, res);
         }
 
@@ -106,7 +106,7 @@ namespace FuncScript.Test.Curated
         {
             var exp = @"{y:()=>5;return y()}";
             var p = new DefaultFsDataProvider();
-            var res = FuncScript.Evaluate(p, exp);
+            var res = Helpers.Evaluate(p, exp);
             Assert.AreEqual(5, res);
         }
 
@@ -114,7 +114,7 @@ namespace FuncScript.Test.Curated
         public void SquareBraceIndexVariable()
         {
             var p = new DefaultFsDataProvider();
-            var res = FuncScript.Evaluate(p, @"{x:[4,5,6];return x[1]}");
+            var res = Helpers.Evaluate(p, @"{x:[4,5,6];return x[1]}");
             Assert.AreEqual(5, res);
         }
 
@@ -123,7 +123,7 @@ namespace FuncScript.Test.Curated
         {
             var template = "abc";
             var expected = "abc";
-            var res = FuncScript.Evaluate(template, new DefaultFsDataProvider(), null, FuncScript.ParseMode.FsTemplate);
+            var res = Helpers.Evaluate(template, new DefaultFsDataProvider(), null, Helpers.ParseMode.FsTemplate);
             Assert.That(res, Is.EqualTo(expected));
         }
 
@@ -132,7 +132,7 @@ namespace FuncScript.Test.Curated
         {
             var template = "abc${'1'}";
             var expected = "abc1";
-            var res = FuncScript.Evaluate(template, new DefaultFsDataProvider(), null, FuncScript.ParseMode.FsTemplate);
+            var res = Helpers.Evaluate(template, new DefaultFsDataProvider(), null, Helpers.ParseMode.FsTemplate);
             Assert.That(res, Is.EqualTo(expected));
         }
 
@@ -141,7 +141,7 @@ namespace FuncScript.Test.Curated
         {
             var template = "abc${['d',1,['e',2]]}f";
             var expected = "abcd1e2f";
-            var res = FuncScript.Evaluate(template, new DefaultFsDataProvider(), null, FuncScript.ParseMode.FsTemplate);
+            var res = Helpers.Evaluate(template, new DefaultFsDataProvider(), null, Helpers.ParseMode.FsTemplate);
             Assert.That(res, Is.EqualTo(expected));
         }
 
@@ -150,7 +150,7 @@ namespace FuncScript.Test.Curated
         {
             var template = "abc${['d',1] map (x)=>'>'+x}f";
             var expected = "abc>d>1f";
-            var res = FuncScript.Evaluate(template, new DefaultFsDataProvider(), null, FuncScript.ParseMode.FsTemplate);
+            var res = Helpers.Evaluate(template, new DefaultFsDataProvider(), null, Helpers.ParseMode.FsTemplate);
             Assert.That(res, Is.EqualTo(expected));
         }
 
@@ -162,7 +162,7 @@ namespace FuncScript.Test.Curated
         [TestCase("(case 1>2:[1], [10])[0]", 10)]
         public void CaseExpression(string exp, object expected)
         {
-            Assert.AreEqual(expected, FuncScript.Evaluate(exp));
+            Assert.AreEqual(expected, Helpers.Evaluate(exp));
         }
 
         [Test]
@@ -172,14 +172,14 @@ namespace FuncScript.Test.Curated
         [TestCase("switch 4, 1:'a', 2:'b', 3:'c','that'", "that")]
         public void SwitchExpression(string exp, object expected)
         {
-            Assert.AreEqual(expected, FuncScript.Evaluate(exp));
+            Assert.AreEqual(expected, Helpers.Evaluate(exp));
         }
 
         [Test]
         [TestCase("If(true,30,2)", 30)]
         public void IfFunction(string exp, object expected)
         {
-            Assert.AreEqual(expected, FuncScript.Evaluate(exp));
+            Assert.AreEqual(expected, Helpers.Evaluate(exp));
         }
     }
 }

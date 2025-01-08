@@ -45,7 +45,7 @@ namespace FuncScript.Sql.Core
                     results.Add(new SimpleKeyValueCollection(null,row.ToArray()));
                 }
 
-                var normalizedResults = FuncScript.NormalizeDataType(results);
+                var normalizedResults = Helpers.NormalizeDataType(results);
                 return normalizedResults ?? "null";
             }
             catch (Exception e)

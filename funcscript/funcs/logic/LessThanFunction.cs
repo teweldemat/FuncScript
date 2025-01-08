@@ -24,9 +24,9 @@ namespace FuncScript.Funcs.Logic
                 return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER,
                     $"{this.Symbol}: null value(s) not allowed");
 
-            if (FuncScript.IsNumeric(par0) && FuncScript.IsNumeric(par1))
+            if (Helpers.IsNumeric(par0) && Helpers.IsNumeric(par1))
             {
-                FuncScript.ConvertToCommonNumericType(par0, par1, out par0, out par1);
+                Helpers.ConvertToCommonNumericType(par0, par1, out par0, out par1);
             }
 
             if (par0.GetType() != par1.GetType())

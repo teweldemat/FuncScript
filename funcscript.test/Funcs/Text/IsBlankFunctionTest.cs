@@ -10,7 +10,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestIsBlankWithNull()
         {
             var exp = "isBlank(null)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.IsTrue((bool)res);
         }
 
@@ -18,7 +18,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestIsBlankWithEmptyString()
         {
             var exp = "isBlank('')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.IsTrue((bool)res);
         }
 
@@ -26,7 +26,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestIsBlankWithBlankString()
         {
             var exp = "isBlank('   ')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.IsTrue((bool)res);
         }
 
@@ -34,7 +34,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestIsBlankWithNonBlankString()
         {
             var exp = "isBlank('Hello')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.IsFalse((bool)res);
         }
 
@@ -42,7 +42,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestIsBlankWithInvalidType()
         {
             var exp = "isBlank(123)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.InstanceOf<FsError>());
             var error = (FsError)res;
             Assert.That(error.ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
@@ -52,7 +52,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestIsBlankWithNoParameters()
         {
             var exp = "isBlank()";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.InstanceOf<FsError>());
             var error = (FsError)res;
             Assert.That(error.ErrorType, Is.EqualTo(FsError.ERROR_PARAMETER_COUNT_MISMATCH));

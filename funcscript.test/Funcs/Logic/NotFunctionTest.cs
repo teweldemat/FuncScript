@@ -11,7 +11,7 @@ namespace FuncScript.Test.Funcs.Logic
         public void TestNotTrue()
         {
             var exp = "!(true)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo(false));
         }
 
@@ -19,7 +19,7 @@ namespace FuncScript.Test.Funcs.Logic
         public void TestNotFalse()
         {
             var exp = "!(false)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo(true));
         }
 
@@ -27,7 +27,7 @@ namespace FuncScript.Test.Funcs.Logic
         public void TestNotNull()
         {
             var exp = "!(null)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
         }
@@ -38,7 +38,7 @@ namespace FuncScript.Test.Funcs.Logic
             var exp = "!(true, false)";
             Assert.Throws<SyntaxError>(()=>
             {
-                FuncScript.Evaluate(exp);
+                Helpers.Evaluate(exp);
             });
         }
 
@@ -46,7 +46,7 @@ namespace FuncScript.Test.Funcs.Logic
         public void TestNotNonBoolean()
         {
             var exp = "!(1)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
         }

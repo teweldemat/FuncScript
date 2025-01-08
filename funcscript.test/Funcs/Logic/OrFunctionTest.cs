@@ -10,7 +10,7 @@ namespace FuncScript.Test.Funcs.Logic
         public void TestOrTrueTrue()
         {
             var exp = "or(true, true)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo(true));
         }
 
@@ -18,7 +18,7 @@ namespace FuncScript.Test.Funcs.Logic
         public void TestOrTrueFalse()
         {
             var exp = "or(true, false)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo(true));
         }
 
@@ -26,7 +26,7 @@ namespace FuncScript.Test.Funcs.Logic
         public void TestOrFalseFalse()
         {
             var exp = "or(false, false)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo(false));
         }
 
@@ -34,7 +34,7 @@ namespace FuncScript.Test.Funcs.Logic
         public void TestOrMixedTypes()
         {
             var exp = "or(1, true)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             var error = (FsError)res;
             Assert.That(error.ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
@@ -44,7 +44,7 @@ namespace FuncScript.Test.Funcs.Logic
         public void TestOrWithNull()
         {
             var exp = "or(null, true)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             var error = (FsError)res;
             Assert.That(error.ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
@@ -54,7 +54,7 @@ namespace FuncScript.Test.Funcs.Logic
         public void TestOrEmptyList()
         {
             var exp = "or()";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo(false));
         }
     }

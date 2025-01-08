@@ -10,7 +10,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestUppercaseValidString()
         {
             var exp = "uppercase('hello')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo("HELLO"));
         }
 
@@ -18,7 +18,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestUppercaseEmptyString()
         {
             var exp = "uppercase('')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo(string.Empty));
         }
 
@@ -26,7 +26,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestUppercaseParameterCountMismatch()
         {
             var exp = "uppercase()";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             var error = (FsError)res;
             Assert.That(error.ErrorType, Is.EqualTo(FsError.ERROR_PARAMETER_COUNT_MISMATCH));
@@ -36,7 +36,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestUppercaseInvalidParameterType()
         {
             var exp = "uppercase(123)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             var error = (FsError)res;
             Assert.That(error.ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));

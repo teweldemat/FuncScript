@@ -25,9 +25,9 @@ namespace FuncScript.Funcs.Logic
             if (par0 == null || par1 == null)
                 return null;
 
-            if (FuncScript.IsNumeric(par0) && FuncScript.IsNumeric(par1))
+            if (Helpers.IsNumeric(par0) && Helpers.IsNumeric(par1))
             {
-                FuncScript.ConvertToCommonNumericType(par0, par1, out par0, out par1);
+                Helpers.ConvertToCommonNumericType(par0, par1, out par0, out par1);
             }
 
             if (par0.GetType() != par1.GetType())

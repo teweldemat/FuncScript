@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 using FuncScript.Core;
 using FuncScript.Model;
 
@@ -15,7 +15,7 @@ namespace FuncScript.Block
         public override string AsExpString()
         {
             var sb = new StringBuilder();
-            FuncScript.Format(sb, Value, null, true, false);
+            Helpers.Format(sb, Value, null, true, false);
             return sb.ToString();
         }
 

@@ -67,12 +67,12 @@ namespace FuncScript.Model
     {
         public static T ConvertTo<T>(this KeyValueCollection kvc)
         {
-            var json = FuncScript.FormatToJson(kvc);
+            var json = Helpers.FormatToJson(kvc);
             return Newtonsoft.Json.JsonConvert.DeserializeObject<T>(json);
         }
         public static object ConvertTo(this KeyValueCollection kvc,Type t)
         {
-            var json = FuncScript.FormatToJson(kvc);
+            var json = Helpers.FormatToJson(kvc);
             return Newtonsoft.Json.JsonConvert.DeserializeObject(json,t);
         }
         

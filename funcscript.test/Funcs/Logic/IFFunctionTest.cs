@@ -11,7 +11,7 @@ namespace FuncScript.Test.Funcs.Logic
         public void TestIfConditionTrue()
         {
             var exp = "If(true,'yes','no')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo("yes"));
         }
 
@@ -19,7 +19,7 @@ namespace FuncScript.Test.Funcs.Logic
         public void TestIfConditionFalse()
         {
             var exp = "If(false,'yes','no')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo("no"));
         }
 
@@ -27,7 +27,7 @@ namespace FuncScript.Test.Funcs.Logic
         public void TestIfConditionInvalidParameterCount()
         {
             var exp = "If(true,'yes')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_PARAMETER_COUNT_MISMATCH));
         }
@@ -36,7 +36,7 @@ namespace FuncScript.Test.Funcs.Logic
         public void TestIfConditionInvalidType()
         {
             var exp = "If(1,'yes','no')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
         }

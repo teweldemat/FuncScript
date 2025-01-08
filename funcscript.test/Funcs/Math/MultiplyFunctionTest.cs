@@ -10,7 +10,7 @@ namespace FuncScript.Test.Funcs.Math
         public void TestMultiplyIntegers()
         {
             var exp = "2 * 3 * 4"; // Changed to infix notation
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo(24));
         }
 
@@ -18,7 +18,7 @@ namespace FuncScript.Test.Funcs.Math
         public void TestMultiplyLongs()
         {
             var exp = "10000000000 * 2 * 3"; // Changed to infix notation
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo(60000000000));
         }
 
@@ -26,7 +26,7 @@ namespace FuncScript.Test.Funcs.Math
         public void TestMultiplyDoubles()
         {
             var exp = "1.5 * 2.0 * 3.0"; // Changed to infix notation
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo(9.0));
         }
 
@@ -34,7 +34,7 @@ namespace FuncScript.Test.Funcs.Math
         public void TestEmptyParameters()
         {
             var exp = "[]*2"; // Ensure to verify how empty parameters are handled with the original function if required
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
         }
@@ -43,7 +43,7 @@ namespace FuncScript.Test.Funcs.Math
         public void TestInvalidParameterType()
         {
             var exp = "1 * 'a' * 3"; // Changed to infix notation
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
         }
@@ -52,7 +52,7 @@ namespace FuncScript.Test.Funcs.Math
         public void TestMixedParameters()
         {
             var exp = "2 * 3.5 * 4"; // Changed to infix notation
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo(28.0));
         }
     }

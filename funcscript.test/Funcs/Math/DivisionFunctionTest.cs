@@ -10,7 +10,7 @@ namespace FuncScript.Test.Funcs.Math
         public void TestDivisionValidIntegers()
         {
             var exp = "6 / 3 / 2";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo(1));
         }
 
@@ -18,7 +18,7 @@ namespace FuncScript.Test.Funcs.Math
         public void TestDivisionValidLongs()
         {
             var exp = "18L / 2L / 3L";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo(3L));
         }
 
@@ -26,7 +26,7 @@ namespace FuncScript.Test.Funcs.Math
         public void TestDivisionValidDoubles()
         {
             var exp = "10.0 / 2.0 / 5.0";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo(1.0));
         }
 
@@ -34,7 +34,7 @@ namespace FuncScript.Test.Funcs.Math
         public void TestDivisionDivisionByZero()
         {
             var exp = "5 / 0";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
         }
@@ -43,8 +43,8 @@ namespace FuncScript.Test.Funcs.Math
         public void TestDivisionInvalidParameterType()
         {
             var exp = "5 / 'a'";
-            var res = FuncScript.Evaluate(exp);
-            Assert.That(res is FsError,$"Unexpected value {FuncScript.FormatToJson(res)}");
+            var res = Helpers.Evaluate(exp);
+            Assert.That(res is FsError,$"Unexpected value {Helpers.FormatToJson(res)}");
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
         }
 
@@ -52,7 +52,7 @@ namespace FuncScript.Test.Funcs.Math
         public void TestDivisionNoParameters()
         {
             var exp = "6 / ";
-            Assert.Throws<SyntaxError>(() => { FuncScript.Evaluate(exp); });
+            Assert.Throws<SyntaxError>(() => { Helpers.Evaluate(exp); });
         }
     }
 }

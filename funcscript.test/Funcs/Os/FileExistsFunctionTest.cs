@@ -18,7 +18,7 @@ namespace FuncScript.Test.Funcs.Os
             {
                 // Act: Use the temporary file in your expression
                 var exp = $"fileexists('{tempFilePath}')";
-                var res = FuncScript.Evaluate(exp);
+                var res = Helpers.Evaluate(exp);
 
                 // Assert: Validate the result
                 Assert.That(res, Is.True);
@@ -37,7 +37,7 @@ namespace FuncScript.Test.Funcs.Os
         public void TestFileExists_InvalidFilePath_ReturnsFalse()
         {
             var exp = "fileexists('C:/path/to/nonexistent/file.txt')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.False);
         }
 
@@ -45,7 +45,7 @@ namespace FuncScript.Test.Funcs.Os
         public void TestFileExists_InvalidParameterCount_ReturnsError()
         {
             var exp = "fileexists('C:/path/to/file.txt', 'extra')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             var error = (FsError)res;
             Assert.That(error.ErrorType, Is.EqualTo(FsError.ERROR_PARAMETER_COUNT_MISMATCH));
@@ -55,7 +55,7 @@ namespace FuncScript.Test.Funcs.Os
         public void TestFileExists_NullParameter_ReturnsError()
         {
             var exp = "fileexists(null)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             var error = (FsError)res;
             Assert.That(error.ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
@@ -65,7 +65,7 @@ namespace FuncScript.Test.Funcs.Os
         public void TestFileExists_InvalidTypeParameter_ReturnsError()
         {
             var exp = "fileexists(123)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             var error = (FsError)res;
             Assert.That(error.ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));

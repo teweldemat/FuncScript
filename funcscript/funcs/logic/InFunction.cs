@@ -23,7 +23,7 @@ namespace FuncScript.Funcs.Logic
             if (!(par1 is FsList))
                 return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"{Symbol} function: {ParName(1)} should be a list");
 
-            bool par0Numeric = FuncScript.IsNumeric(par0);
+            bool par0Numeric = Helpers.IsNumeric(par0);
 
             foreach (var val in (FsList)par1)
             {
@@ -32,9 +32,9 @@ namespace FuncScript.Funcs.Logic
 
                 object left, right;
 
-                if (par0Numeric && FuncScript.IsNumeric(val))
+                if (par0Numeric && Helpers.IsNumeric(val))
                 {
-                    FuncScript.ConvertToCommonNumericType(par0, val, out left, out right);
+                    Helpers.ConvertToCommonNumericType(par0, val, out left, out right);
                 }
                 else
                 {

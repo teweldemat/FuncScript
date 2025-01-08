@@ -230,7 +230,7 @@ namespace FuncScript.Test.Curated
         [Test]
         public void TestSeriesFunction()
         {
-            var res = FuncScript.Evaluate("series(1,5)");
+            var res = Helpers.Evaluate("series(1,5)");
             var expected = new ArrayFsList(new object[] { 1, 2, 3, 4, 5 });
             Assert.AreEqual(expected, res);
         }
@@ -253,19 +253,19 @@ namespace FuncScript.Test.Curated
         [Test]
         public void TestFindFirst()
         {
-            var res = FuncScript.Evaluate("first([1,2,4,-5,3],(x)=>x<0)");
+            var res = Helpers.Evaluate("first([1,2,4,-5,3],(x)=>x<0)");
             Assert.AreEqual(-5, res);
         }
         [Test]
         public void TestFindFirst2()
         {
-            var res = FuncScript.Evaluate("first([1,2,4,5,3],(x)=>x<0)");
+            var res = Helpers.Evaluate("first([1,2,4,5,3],(x)=>x<0)");
             Assert.IsNull(res);
         }
         [Test]
         public void MemberofNull()
         {
-            var res = FuncScript.Evaluate("x.a");
+            var res = Helpers.Evaluate("x.a");
             
             Assert.That(res,Is.TypeOf<FsError>());
         }

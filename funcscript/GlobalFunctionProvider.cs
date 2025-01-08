@@ -68,7 +68,7 @@ namespace FuncScript
                 if (k.Value is Func<object>)
                     _data.Add(k.Key, k.Value);
                 else
-                    _data.Add(k.Key, FuncScript.NormalizeDataType(k.Value));
+                    _data.Add(k.Key, Helpers.NormalizeDataType(k.Value));
             }
         }
         public object Get(string name)

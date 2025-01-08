@@ -12,7 +12,7 @@ namespace FuncScript.Test.Funcs.Os
         public void TestSaveFileSuccess()
         {
             var exp = "SaveFile('test.txt', 'Hello, world!')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo("Hello, world!"));
         }
 
@@ -20,7 +20,7 @@ namespace FuncScript.Test.Funcs.Os
         public void TestSaveFileInvalidParameterCount()
         {
             var exp = "SaveFile('test.txt')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_PARAMETER_COUNT_MISMATCH));
         }
@@ -29,7 +29,7 @@ namespace FuncScript.Test.Funcs.Os
         public void TestSaveFileNullParameters()
         {
             var exp = "SaveFile(null, null)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
         }
@@ -38,7 +38,7 @@ namespace FuncScript.Test.Funcs.Os
         public void TestSaveFileTypeMismatch()
         {
             var exp = "SaveFile(123, true)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
         }
@@ -52,7 +52,7 @@ namespace FuncScript.Test.Funcs.Os
 
             // Act: Attempt to save a file to the invalid path
             var exp = $"SaveFile('{invalidPath}', 'Hello')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
 
             // Assert: Validate that the result is an FsError
             Assert.That(res, Is.InstanceOf<FsError>());

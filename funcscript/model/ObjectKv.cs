@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Reflection;
 using FuncScript.Core;
 
@@ -70,8 +70,8 @@ namespace FuncScript.Model
             if (!tInfo.Properties.TryGetValue(key, out var val))
                 return null;
             if (val.Prop != null)
-                return FuncScript.NormalizeDataType(val.Prop.GetValue(_val));
-            return FuncScript.NormalizeDataType(val.Field.GetValue(_val));
+                return Helpers.NormalizeDataType(val.Prop.GetValue(_val));
+            return Helpers.NormalizeDataType(val.Field.GetValue(_val));
         }
 
         public KeyValueCollection ParentContext => null;
@@ -87,7 +87,7 @@ namespace FuncScript.Model
             {
                 var val = prop.Value.Field == null ?
                         prop.Value.Prop.GetValue(_val) : prop.Value.Field.GetValue(_val);
-                val = FuncScript.NormalizeDataType(val);
+                val = Helpers.NormalizeDataType(val);
                 list.Add(prop.Value.Name);
             }
             return list;

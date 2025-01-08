@@ -12,7 +12,7 @@ namespace FuncScript.Test.Funcs.Os
         public void TestShellWithValidCommand()
         {
             var exp = "shell('echo Hello World')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is KeyValueCollection);
             var shellResult = ((KeyValueCollection)res).ConvertTo<ShellResult>();
             Assert.That(shellResult.ExitCode, Is.EqualTo(0));
@@ -25,7 +25,7 @@ namespace FuncScript.Test.Funcs.Os
         public void TestShellWithCommandTimeout()
         {
             var exp = "shell('ping -n 10 127.0.0.1', 1000)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             if (res is KeyValueCollection)
             {
                 var shellResult = ((KeyValueCollection)res).ConvertTo<ShellResult>();
@@ -46,7 +46,7 @@ namespace FuncScript.Test.Funcs.Os
         public void TestShellWithInvalidCommandType()
         {
             var exp = "shell(123)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError, "Expected an error due to invalid command type.");
 
             var shellResult = res as FsError;
@@ -59,7 +59,7 @@ namespace FuncScript.Test.Funcs.Os
         public void TestShellWithTooManyParameters()
         {
             var exp = "shell('echo Hello', 'extra param')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError, "Expected an error due to invalid time out parameter type.");
 
             var shellResult = res as FsError;
@@ -71,7 +71,7 @@ namespace FuncScript.Test.Funcs.Os
         public void TestShellWithInvalidTimeoutType()
         {
             var exp = "shell('echo Hello', 'not an int')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError, "Expected an error due to invalid timeout type.");
 
             var shellResult = res as FsError;

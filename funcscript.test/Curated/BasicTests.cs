@@ -14,7 +14,7 @@ namespace FuncScript.Test.Curated
             Assert.Throws(typeof(EvaluationException), () =>
             {
                 var g = new DefaultFsDataProvider();
-                FuncScript.Evaluate(g,"3(4,5)");
+                Helpers.Evaluate(g,"3(4,5)");
             });
         }
         [Test]
@@ -22,7 +22,7 @@ namespace FuncScript.Test.Curated
         {
             Assert.Throws(typeof(SyntaxError), () =>
             {
-                FuncScript.Evaluate("{a:5;a:6;return 5;}");
+                Helpers.Evaluate("{a:5;a:6;return 5;}");
             });
         }
     }
@@ -35,15 +35,15 @@ namespace FuncScript.Test.Curated
         public static object AssertSingleResult(string expStr)
         {
             var p = new DefaultFsDataProvider();
-            var ret = FuncScript.Evaluate(p, expStr);
-            Assert.AreEqual(ret, FuncScript.NormalizeDataType(ret));
+            var ret = Helpers.Evaluate(p, expStr);
+            Assert.AreEqual(ret, Helpers.NormalizeDataType(ret));
             return ret;
         }
         public static object AssertSingleResultType(string expStr, System.Type type)
         {
             var p = new DefaultFsDataProvider();
-            var res = FuncScript.Evaluate(p, expStr);
-            Assert.AreEqual(res, FuncScript.NormalizeDataType(res));
+            var res = Helpers.Evaluate(p, expStr);
+            Assert.AreEqual(res, Helpers.NormalizeDataType(res));
 
             if (type == null)
                 Assert.IsTrue(res == null, $"Expected null resul");
@@ -57,7 +57,7 @@ namespace FuncScript.Test.Curated
         void ShouldReturnEmpty(string expStr)
         {
             var p = new DefaultFsDataProvider();
-            var res = FuncScript.Evaluate(p, expStr);
+            var res = Helpers.Evaluate(p, expStr);
             Assert.IsTrue(res == null, $"Must returl empty result, got {res}");
         }
 
@@ -143,7 +143,7 @@ namespace FuncScript.Test.Curated
         {
             Assert.Throws<SyntaxError>(() =>
             {
-                FuncScript.Evaluate($"{long.MaxValue}0");
+                Helpers.Evaluate($"{long.MaxValue}0");
             });
         }
         [Test]
@@ -152,7 +152,7 @@ namespace FuncScript.Test.Curated
         {
             Assert.Throws<SyntaxError>(() =>
             {
-                FuncScript.Evaluate(exp);
+                Helpers.Evaluate(exp);
             });
         }
         [Test]
@@ -302,38 +302,38 @@ return j;
         public void TestSpread()
         {
             var res = AssertSingleResultType("Select({'a':1,'b':2},{'b':5,'c':8})", typeof(KeyValueCollection));
-            var expected = FuncScript.Evaluate(null, "{'b':5,'c':8}");
-            Assert.That(FuncScript.FormatToJson(res),Is.EqualTo(FuncScript.FormatToJson(expected)));
+            var expected = Helpers.Evaluate(null, "{'b':5,'c':8}");
+            Assert.That(Helpers.FormatToJson(res),Is.EqualTo(Helpers.FormatToJson(expected)));
         }
 
         [Test]
         public void TestDotnetObject()
         {
             var res = new ObjectKvc(new { a = 1, b = 5, c = 8 });
-            var expected = FuncScript.Evaluate(null, "{'a':1,'b':5,'c':8}") as KeyValueCollection;
-            Assert.That(FuncScript.ValueEqual(expected, res));
+            var expected = Helpers.Evaluate(null, "{'a':1,'b':5,'c':8}") as KeyValueCollection;
+            Assert.That(Helpers.ValueEqual(expected, res));
         }
         [Test]
         public void TestSpread2()
         {
             var g = new DefaultFsDataProvider();
-            var res = FuncScript.Evaluate(g, "Select({'a':1,'b':5,'c':8},{'a':null,'b':null})");
+            var res = Helpers.Evaluate(g, "Select({'a':1,'b':5,'c':8},{'a':null,'b':null})");
             var expected = new ObjectKvc(new { a = 1, b = 5 });
-            Assert.That(FuncScript.ValueEqual(expected, res));
+            Assert.That(Helpers.ValueEqual(expected, res));
         }
         [Test]
         public void TestIdenKey()
         {
             var g = new DefaultFsDataProvider();
-            var res = FuncScript.Evaluate(g, "Select({a:3,b:4},{a,c:5})") as KeyValueCollection;
+            var res = Helpers.Evaluate(g, "Select({a:3,b:4},{a,c:5})") as KeyValueCollection;
             var expected = new ObjectKvc(new { a = 3, c = 5 });
-            Assert.That(FuncScript.ValueEqual(expected, res));
+            Assert.That(Helpers.ValueEqual(expected, res));
         }
         [Test]
         public void MapNull()
         {
-            Assert.IsNull(FuncScript.Evaluate("null map (x)=>x"));
-            Assert.IsNull(FuncScript.Evaluate("y map (x)=>x"));
+            Assert.IsNull(Helpers.Evaluate("null map (x)=>x"));
+            Assert.IsNull(Helpers.Evaluate("y map (x)=>x"));
         }
 
         [TestCase(null, "3 in null")]
@@ -342,7 +342,7 @@ return j;
         [TestCase(false, "null in [2,null]")]
         public void InFunction(object expected, string exp)
         {
-            Assert.AreEqual(expected, FuncScript.Evaluate(exp));
+            Assert.AreEqual(expected, Helpers.Evaluate(exp));
         }
 
         [Test]
@@ -352,7 +352,7 @@ return j;
             x:-5;
             return -x;
             }";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.AreEqual(5, res);
         }
         
@@ -360,13 +360,13 @@ return j;
         public void LambdaFunctionCaseIssue()
         {
             var exp = "((X)=>X)('t')";
-            Assert.AreEqual("t", FuncScript.Evaluate(exp));
+            Assert.AreEqual("t", Helpers.Evaluate(exp));
         }
         [Test]
         public void EmptyKeyValueCollection()
         {
             var exp = "{}";
-            var res = FuncScript.Evaluate(exp) as KeyValueCollection;
+            var res = Helpers.Evaluate(exp) as KeyValueCollection;
             Assert.IsNotNull(res);
             Assert.That(res.GetAllKeys().Count,Is.EqualTo(0));
         }
@@ -375,7 +375,7 @@ return j;
         public void EmptyList()
         {
             var exp = "[]";
-            var res = FuncScript.Evaluate(exp) as FsList;
+            var res = Helpers.Evaluate(exp) as FsList;
             Assert.IsNotNull(res);
             Assert.That(res.Length, Is.EqualTo(0));
         }
@@ -388,7 +388,7 @@ return j;
     f:(x)=>g(x)+3;
     return f(3);
 }";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res,Is.EqualTo(9));
         }
         [Test]
@@ -399,7 +399,7 @@ return j;
     f:(x)=>if(x=0,f(1),2);
     return f(3);
 }";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res,Is.EqualTo(2));
         }
         [Test]
@@ -410,7 +410,7 @@ return j;
     fib:(x)=>if(x<2,1,fib(x-2)+fib(x-1));
     return fib(3);
 }";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res,Is.EqualTo(3));
         }
 
@@ -419,9 +419,9 @@ return j;
         {
             var exp =
                 @"{x:5,y:6}";
-            var obj = FuncScript.Evaluate(exp);
+            var obj = Helpers.Evaluate(exp);
             var sb = new StringBuilder();
-            FuncScript.Format(sb,obj,asJsonLiteral:true);
+            Helpers.Format(sb,obj,asJsonLiteral:true);
             var json = sb.ToString();
             Assert.That(json
                     .Replace(" ","")

@@ -125,7 +125,7 @@ namespace FuncScript.Funcs.OS
                             .ToList()
                     };
 
-                    return FuncScript.NormalizeDataType(result);
+                    return Helpers.NormalizeDataType(result);
                 }
             }
             catch (Exception ex)

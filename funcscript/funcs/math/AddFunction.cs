@@ -241,7 +241,7 @@ namespace FuncScript.Funcs.Math
                     }
                     else
                     {
-                        stringTotal.Append(FuncScript.FormatToJson(d));
+                        stringTotal.Append(Helpers.FormatToJson(d));
                     }                
                 }
                 if (isKv)

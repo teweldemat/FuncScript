@@ -11,7 +11,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestMergeSimpleStrings()
         {
             var exp = "_templatemerge(['Hello', ' ', 'World'])";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo("Hello World"));
         }
 
@@ -19,7 +19,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestMergeWithLists()
         {
             var exp = "_templatemerge(['Start', ['Middle1', 'Middle2'], ' End'])";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo("StartMiddle1Middle2 End"));
         }
 
@@ -27,7 +27,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestMergeWithNulls()
         {
             var exp = "_templatemerge(['A', null, 'B', null, 'C'])";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo("ABC"));
         }
 
@@ -35,7 +35,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestMergeWithEmptyList()
         {
             var exp = "_templatemerge([])";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo(""));
         }
 
@@ -43,7 +43,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestMergeNullParameter()
         {
             var exp = "_templatemerge(null)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo(""));
         }
     }

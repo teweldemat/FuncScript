@@ -12,7 +12,7 @@ namespace FuncScript.Test.Funcs.Date
         public void TestValidDateStringNoFormat()
         {
             var exp = "Date('2023-10-01')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is DateTime);
             Assert.That((DateTime)res, Is.EqualTo(new DateTime(2023, 10, 1)));
         }
@@ -21,7 +21,7 @@ namespace FuncScript.Test.Funcs.Date
         public void TestValidDateStringWithFormat()
         {
             var exp = "Date('01-10-2023', 'dd-MM-yyyy')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is DateTime);
             Assert.That((DateTime)res, Is.EqualTo(new DateTime(2023, 10, 1)));
         }
@@ -30,7 +30,7 @@ namespace FuncScript.Test.Funcs.Date
         public void TestInvalidDateString()
         {
             var exp = "Date('invalid-date')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
         }
@@ -41,7 +41,7 @@ namespace FuncScript.Test.Funcs.Date
         public void TestExceedsParameterCount()
         {
             var exp = "Date('2023-10-01', 'dd-MM-yyyy', 'extra-parameter')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_PARAMETER_COUNT_MISMATCH));
         }
@@ -50,7 +50,7 @@ namespace FuncScript.Test.Funcs.Date
         public void TestNullDateString()
         {
             var exp = "Date(null)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.IsNull(res);
         }
 
@@ -58,7 +58,7 @@ namespace FuncScript.Test.Funcs.Date
         public void TestInvalidTypeDateString()
         {
             var exp = "Date(12345)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
         }

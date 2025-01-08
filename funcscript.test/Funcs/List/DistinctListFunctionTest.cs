@@ -10,7 +10,7 @@ namespace FuncScript.Test.Funcs.List
         public void TestDistinctWithDuplicates()
         {
             var exp = "Distinct([1, 2, 2, 3, 4, 4])";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsList);
             var list = (FsList)res;
             Assert.That(list, Is.EquivalentTo(new[] { 1, 2, 3, 4 }));
@@ -20,7 +20,7 @@ namespace FuncScript.Test.Funcs.List
         public void TestDistinctWithNull()
         {
             var exp = "Distinct([null, 1, 2, null, 3])";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsList);
             var list = (FsList)res;
             Assert.That(list, Is.EquivalentTo(new object[] { null, 1, 2, 3 }));
@@ -30,7 +30,7 @@ namespace FuncScript.Test.Funcs.List
         public void TestDistinctEmptyList()
         {
             var exp = "Distinct([])";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsList);
             var list = (FsList)res;
             Assert.That(list, Is.EquivalentTo(new object[] { }));
@@ -40,7 +40,7 @@ namespace FuncScript.Test.Funcs.List
         public void TestDistinctInvalidParameterCount()
         {
             var exp = "Distinct([1,2], [3])";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             var error = (FsError)res;
             Assert.That(error.ErrorType, Is.EqualTo(FsError.ERROR_PARAMETER_COUNT_MISMATCH));
@@ -50,7 +50,7 @@ namespace FuncScript.Test.Funcs.List
         public void TestDistinctInvalidParameterType()
         {
             var exp = "Distinct('not_a_list')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             var error = (FsError)res;
             Assert.That(error.ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));

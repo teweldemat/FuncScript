@@ -20,7 +20,7 @@ namespace FuncScript.Funcs.Text
 
             string format = par1 as string;
             var sb = new StringBuilder();
-            FuncScript.Format(sb, par0, format);
+            Helpers.Format(sb, par0, format);
             return sb.ToString();
         }
 

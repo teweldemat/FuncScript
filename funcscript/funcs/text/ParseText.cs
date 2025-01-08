@@ -63,7 +63,7 @@ namespace FuncScript.Funcs.Text
                                 $"{this.Symbol}: invalid string: {str}");
                         }
                     case "fs":
-                        return FuncScript.Evaluate(context, str);
+                        return Helpers.Evaluate(context, str);
                     default:
                         return str;
                 }

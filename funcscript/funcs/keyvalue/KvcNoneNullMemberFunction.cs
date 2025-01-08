@@ -18,7 +18,7 @@ namespace FuncScript.Funcs.KeyValue
                 return null;
 
             if (!(target is KeyValueCollection))
-                return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"{Symbol} function: Cannot access member '{key}' on non-KeyValueCollection type '{FuncScript.GetFsDataType(target)}'.");
+                return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"{Symbol} function: Cannot access member '{key}' on non-KeyValueCollection type '{Helpers.GetFsDataType(target)}'.");
 
             return ((KeyValueCollection)target).Get(((string)key).ToLower());
         }

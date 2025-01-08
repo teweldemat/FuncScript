@@ -10,7 +10,7 @@ namespace FuncScript.Test.Funcs.List
         public void TestReverseValidList()
         {
             var exp = "Reverse([1,2,3])";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsList);
             var list = (FsList)res;
             Assert.That(list, Is.EquivalentTo(new[] { 3, 2, 1 }));
@@ -20,7 +20,7 @@ namespace FuncScript.Test.Funcs.List
         public void TestReverseEmptyList()
         {
             var exp = "Reverse([])";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsList);
             var list = (FsList)res;
             Assert.That(list, Is.EquivalentTo(new object[] {}));
@@ -30,7 +30,7 @@ namespace FuncScript.Test.Funcs.List
         public void TestReverseNullList()
         {
             var exp = "Reverse(null)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.Null);
         }
 
@@ -38,7 +38,7 @@ namespace FuncScript.Test.Funcs.List
         public void TestReverseInvalidParameterType()
         {
             var exp = "Reverse(123)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             var error = (FsError)res;
             Assert.That(error.ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
@@ -48,7 +48,7 @@ namespace FuncScript.Test.Funcs.List
         public void TestReverseInvalidParameterCount()
         {
             var exp = "Reverse([1,2,3], 4)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             var error = (FsError)res;
             Assert.That(error.ErrorType, Is.EqualTo(FsError.ERROR_PARAMETER_COUNT_MISMATCH));

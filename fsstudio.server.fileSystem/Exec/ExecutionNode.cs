@@ -95,7 +95,7 @@ public class ExecutionNode : KeyValueCollection
                 _cache= this.Expression;
                 break;
             case ExpressionType.FuncScript:
-                _cache=FuncScript.FuncScript.Evaluate(provider, Expression);
+                _cache=FuncScript.Helpers.Evaluate(provider, Expression);
                 break;
             case ExpressionType.FuncScriptTextTemplate:
                 var serrors = new List<FuncScriptParser.SyntaxErrorData>();

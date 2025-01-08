@@ -55,7 +55,7 @@ c:4
 ";
             Assert.Throws<SyntaxError>(()=>
             {
-                FuncScript.Evaluate(exp);
+                Helpers.Evaluate(exp);
             });
         }
         [Test]
@@ -64,7 +64,7 @@ c:4
             var exp = $"length(a)";
             try
             {
-                FuncScript.Evaluate(exp);
+                Helpers.Evaluate(exp);
             }
             catch (Exception ex)
             {
@@ -80,7 +80,7 @@ c:4
             var exp = $"10+{error_exp}";
             try
             {
-                FuncScript.Evaluate(exp);
+                Helpers.Evaluate(exp);
             }
             catch (Exception ex)
             {
@@ -92,7 +92,7 @@ c:4
         {
             var error_exp = "len(5)";
             var exp = $"10+{error_exp}";
-            var res=FuncScript.Evaluate(exp);
+            var res=Helpers.Evaluate(exp);
             Assert.That(res,Is.TypeOf<FsError>());        
         }
         [Test]
@@ -100,7 +100,7 @@ c:4
         {
             var error_exp = "x.l";
             var exp = $"10+{error_exp}";
-            var res=FuncScript.Evaluate(exp);
+            var res=Helpers.Evaluate(exp);
             Assert.That(res,Is.TypeOf<FsError>());
         }
         [Test]
@@ -108,7 +108,7 @@ c:4
         {
             var error_exp = "[5,6].l";
             var exp = $"10+{error_exp}";
-            var res=FuncScript.Evaluate(exp);
+            var res=Helpers.Evaluate(exp);
             Assert.That(res,Is.TypeOf<FsError>());
         }
 
@@ -121,7 +121,7 @@ c:4
             try
             {
                 //FuncScript.Evaluate(exp, new { f = new Func<int, int>((x) => { throw new Exception("internal"); }) });
-                FuncScript.EvaluateWithVars(exp, new
+                Helpers.EvaluateWithVars(exp, new
                 {
                     f = new Func<int, int>((x) =>
                     {
@@ -143,7 +143,7 @@ c:4
             try
             {
                 //FuncScript.Evaluate(exp, new { f = new Func<int, int>((x) => { throw new Exception("internal"); }) });
-                FuncScript.EvaluateWithVars(exp, new
+                Helpers.EvaluateWithVars(exp, new
                 {
                     f = new Func<int, int>((x) =>
                     {
@@ -166,7 +166,7 @@ c:4
             try
             {
                 //FuncScript.Evaluate(exp, new { f = new Func<int, int>((x) => { throw new Exception("internal"); }) });
-                FuncScript.EvaluateWithVars(exp, new { f = new Func<int, int>((x) =>
+                Helpers.EvaluateWithVars(exp, new { f = new Func<int, int>((x) =>
                 {
                     throw new Exception(msg);
                 })});

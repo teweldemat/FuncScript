@@ -10,7 +10,7 @@ namespace FuncScript.Test.Funcs.Logic
         public void TestAndTrue()
         {
             var exp = "and(true, true, true)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo(true));
         }
 
@@ -18,7 +18,7 @@ namespace FuncScript.Test.Funcs.Logic
         public void TestAndFalse()
         {
             var exp = "and(true, false, true)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo(false));
         }
 
@@ -26,7 +26,7 @@ namespace FuncScript.Test.Funcs.Logic
         public void TestAndMixedBooleans()
         {
             var exp = "and(true, true, false, true)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo(false));
         }
 
@@ -34,7 +34,7 @@ namespace FuncScript.Test.Funcs.Logic
         public void TestAndInvalidParameter()
         {
             var exp = "and(true, 'notABool', false)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.InstanceOf<FsError>());
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
         }
@@ -43,7 +43,7 @@ namespace FuncScript.Test.Funcs.Logic
         public void TestAndNullParameter()
         {
             var exp = "and(true, null, false)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.InstanceOf<FsError>());
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
         }

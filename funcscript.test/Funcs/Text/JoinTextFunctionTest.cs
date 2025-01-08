@@ -10,7 +10,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestJoinTextValid()
         {
             var exp = "join(['Hello', 'World'], ', ')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo("Hello, World"));
         }
 
@@ -18,7 +18,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestJoinTextEmptyList()
         {
             var exp = "join([], ', ')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo(""));
         }
 
@@ -26,7 +26,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestJoinTextWithNullElement()
         {
             var exp = "join(['Hello', null, 'World'], ', ')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.EqualTo("Hello, World"));
         }
 
@@ -34,7 +34,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestJoinTextParameterCountMismatch()
         {
             var exp = "join(['Hello', 'World'])";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_PARAMETER_COUNT_MISMATCH));
         }
@@ -43,7 +43,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestJoinTextInvalidListParameter()
         {
             var exp = "join('NotAList', ', ')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
         }
@@ -52,7 +52,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestJoinTextInvalidSeparatorParameter()
         {
             var exp = "join(['Hello', 'World'], 123)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
         }
@@ -61,7 +61,7 @@ namespace FuncScript.Test.Funcs.Text
         public void TestJoinTextNullParameters()
         {
             var exp = "join(null, null)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
         }

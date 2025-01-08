@@ -11,7 +11,7 @@ namespace FuncScript.Test.Funcs.Misc
         public void TestErrorWithSingleStringParameter()
         {
             var exp = "error('This is an error message')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.InstanceOf<FsError>());
             var error = (FsError)res;
             Assert.That(error.ErrorType, Is.EqualTo(FsError.ERROR_DEFAULT));
@@ -21,7 +21,7 @@ namespace FuncScript.Test.Funcs.Misc
         public void TestErrorWithNonStringParameter()
         {
             var exp = "error(123)";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.InstanceOf<FsError>());
             var error = (FsError)res;
             Assert.That(error.ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
@@ -31,7 +31,7 @@ namespace FuncScript.Test.Funcs.Misc
         public void TestErrorWithNoParameters()
         {
             var exp = "error()";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.InstanceOf<FsError>());
             var error = (FsError)res;
             Assert.That(error.ErrorType, Is.EqualTo(FsError.ERROR_PARAMETER_COUNT_MISMATCH));
@@ -41,7 +41,7 @@ namespace FuncScript.Test.Funcs.Misc
         public void TestErrorWithMultipleParameters()
         {
             var exp = "error('first', 'second')";
-            var res = FuncScript.Evaluate(exp);
+            var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.InstanceOf<FsError>());
             var error = (FsError)res;
             Assert.That(error.ErrorType, Is.EqualTo(FsError.ERROR_PARAMETER_COUNT_MISMATCH));
