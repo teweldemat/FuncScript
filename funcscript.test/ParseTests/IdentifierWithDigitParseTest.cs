@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using FuncScript.Core;
 using NUnit.Framework;
 
-namespace FuncScript.Test;
+namespace FuncScript.Test.ParseTests;
 
 public class IdentifierWithDigitParse
 {

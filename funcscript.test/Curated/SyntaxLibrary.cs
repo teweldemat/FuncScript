@@ -4,7 +4,7 @@ using FuncScript.Model;
 using NUnit.Framework;
 using System;
 
-namespace FuncScript.Test
+namespace FuncScript.Test.Curated
 {
     public class SyntaxLibrary
     {

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using FuncScript.Core;
+using FuncScript.Test.ParseTests;
 using NUnit.Framework;
 
 namespace FuncScript.Test.Bugs;

@@ -3,7 +3,7 @@ using FuncScript.Error;
 using NUnit.Framework;
 using System.Text;
 
-namespace FuncScript.Test
+namespace FuncScript.Test.Curated
 {
     public class TestSet2
     {

@@ -7,7 +7,7 @@ using FuncScript.Funcs.Math;
 using FuncScript.Model;
 using NUnit.Framework;
 
-namespace FuncScript.Test;
+namespace FuncScript.Test.Curated;
 
 public class Fundamentals
 {

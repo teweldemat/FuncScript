@@ -2,7 +2,7 @@ using FuncScript.Model;
 using NUnit.Framework;
 using System.Collections.Generic;
 
-namespace FuncScript.Test;
+namespace FuncScript.Test.Curated;
 
 public class FsToDotNet
 {

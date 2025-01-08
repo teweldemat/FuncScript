@@ -2,7 +2,7 @@ using FuncScript.Error;
 using FuncScript.Model;
 using NUnit.Framework;
 
-namespace FuncScript.Test;
+namespace FuncScript.Test.ParseTests;
 
 public class KvcMerge
 {

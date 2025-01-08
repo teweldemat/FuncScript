@@ -6,7 +6,7 @@ using System.Text;
 using FuncScript.Block;
 using FuncScript.Error;
 
-namespace FuncScript.Test
+namespace FuncScript.Test.ParseTests
 {
     delegate void VoidDelegate(int x);
 

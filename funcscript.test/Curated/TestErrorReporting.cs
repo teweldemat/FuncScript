@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using FuncScript.Model;
 
-namespace FuncScript.Test
+namespace FuncScript.Test.Curated
 {
     public class TestErrorReporting
     {
@@ -53,14 +53,10 @@ b:4
 c:4
 }
 ";
-            try
+            Assert.Throws<SyntaxError>(()=>
             {
                 FuncScript.Evaluate(exp);
-            }
-            catch (Exception ex)
-            {
-                AnalyzeMainSyntaxErrorLine(ex, "c:4");
-            }
+            });
         }
         [Test]
         public void TestFunctionError()
