@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 using FuncScript.Model;
 
 namespace FuncScript.Core
@@ -6,7 +6,7 @@ namespace FuncScript.Core
     
     public interface IFsFunction
     {
-        object EvaluateList(FsList pars);
+        object EvaluateList(KeyValueCollection context,FsList pars);
         CallType CallType { get; }
         String Symbol { get; }
     }

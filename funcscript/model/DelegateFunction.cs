@@ -30,7 +30,7 @@ namespace FuncScript.Model
 
         public string Symbol => throw new NotSupportedException();
 
-        public object EvaluateList(FsList pars)
+        public object EvaluateList(KeyValueCollection context, FsList pars)
         {
             return this.f.DynamicInvoke(pars.ToArray());
         }

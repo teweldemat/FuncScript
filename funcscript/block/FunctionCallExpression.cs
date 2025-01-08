@@ -66,12 +66,8 @@ namespace FuncScript.Block
             {
                 try
                 {
-                    if (func is ExpressionFunction expfn)
-                    {
-                        res = expfn.EvaluateWithContext(_context, paramList);
-                    }
-                    else
-                        res = fn.EvaluateList(paramList);
+                    
+                    res = fn.EvaluateList(_context,paramList);
                 }
                 catch (Error.EvaluationException)
                 {
