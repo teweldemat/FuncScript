@@ -10,7 +10,7 @@ namespace FuncScript.Funcs.List
 
         public string Symbol => "Filter";
 
-        public object EvaluateList(FsList pars)
+        public object EvaluateList(KeyValueCollection context, FsList pars)
         {
             if (pars.Length != 2)
                 return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, $"{this.Symbol} function: Invalid parameter count. Expected 2, but got {pars.Length}");
@@ -18,11 +18,7 @@ namespace FuncScript.Funcs.List
             var par0 = pars[0];
             var par1 = pars[1];
 
-            return EvaluateInternal(par0, par1);
-        }
-
-        private object EvaluateInternal(object par0, object par1)
-        {
+        
             if (par0 == null)
                 return null;
 
@@ -38,7 +34,7 @@ namespace FuncScript.Funcs.List
 
             for (int i = 0; i < lst.Length; i++)
             {
-                var val = func.EvaluateList(new ArrayFsList(new object[] { lst[i], i }));
+                var val = func.EvaluateList(context,new ArrayFsList(new object[] { lst[i], i }));
                 if (val is bool && (bool)val)
                 {
                     res.Add(lst[i]);

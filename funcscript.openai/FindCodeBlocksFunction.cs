@@ -11,7 +11,7 @@ namespace FuncScript.Openai
         public string Symbol => "findCodeBlocks";
 
         record LangCode(string lang, string code);
-        public object EvaluateList(FsList pars)
+        public object EvaluateList(KeyValueCollection context, FsList pars)
         {
             if (pars.Length == 0)
                 throw new Error.EvaluationTimeException($"{Symbol} requires at least one parameter.");

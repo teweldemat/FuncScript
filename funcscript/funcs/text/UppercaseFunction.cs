@@ -8,7 +8,7 @@ public class UppercaseFunction : IFsFunction
     public CallType CallType => CallType.Prefix;
     public string Symbol => "uppercase";
 
-    public object EvaluateList(FsList pars)
+    public object EvaluateList(KeyValueCollection context, FsList pars)
     {
         if (pars.Length == 0)
             return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, $"{this.Symbol}: requires at least one parameter.");

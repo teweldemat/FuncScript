@@ -10,7 +10,7 @@ namespace FuncScript.Funcs.OS
         public CallType CallType => CallType.Prefix;
         public string Symbol => "RenameFile";
 
-        public object EvaluateList(FsList pars)
+        public object EvaluateList(KeyValueCollection context, FsList pars)
         {
             const int maxParameters = 2;
             if (pars.Length != maxParameters)

@@ -9,7 +9,7 @@ namespace FuncScript.Funcs.OS
 
         public string Symbol => "file";
 
-        public object EvaluateList(FsList pars)
+        public object EvaluateList(KeyValueCollection context, FsList pars)
         {
             const int MaxParameters = 1; // Moved const declaration in method scope
             if (pars.Length != MaxParameters)

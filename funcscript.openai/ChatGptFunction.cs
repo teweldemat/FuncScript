@@ -9,7 +9,7 @@ namespace FuncScript.Openai
     public class ChatGptFunction : IFsFunction
     {
         private static readonly string[] SupportedModels = new[] { "gpt-4o", "gpt-4o-mini" };
-        public object EvaluateList(FsList pars)
+        public object EvaluateList(KeyValueCollection context, FsList pars)
         {
             Console.WriteLine("ChatGPT request");
             if (pars.Length < 3)

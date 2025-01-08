@@ -10,7 +10,7 @@ namespace FuncScript.Funcs.Strings
 
         public string Symbol => "endswith";
 
-        public object EvaluateList(FsList pars)
+        public object EvaluateList(KeyValueCollection context, FsList pars)
         {
             if (pars.Length != 2)
                 return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, $"{this.Symbol} function: Invalid parameter count. Expected 2, but got {pars.Length}");

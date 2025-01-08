@@ -10,7 +10,7 @@ namespace FuncScript.Funcs.Logic
 
         public string Symbol => "<";
 
-        public object EvaluateList(FsList pars)
+        public object EvaluateList(KeyValueCollection context, FsList pars)
         {
             const int MaxParameters = 2;
             if (pars.Length != MaxParameters)

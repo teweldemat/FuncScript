@@ -9,7 +9,7 @@ namespace FuncScript.Funcs.Logic
 
         public string Symbol => "If";
 
-        public object EvaluateList(FsList pars)
+        public object EvaluateList(KeyValueCollection context, FsList pars)
         {
             if (pars.Length < 3)
                 return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, "IfConditionFunction requires three parameters: condition, trueResult, and falseResult.");

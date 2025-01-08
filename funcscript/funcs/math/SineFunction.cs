@@ -9,7 +9,7 @@ namespace FuncScript.Funcs.Math
 
         public string Symbol => "Sin";
 
-        public object EvaluateList(FsList pars)
+        public object EvaluateList(KeyValueCollection context, FsList pars)
         {
             if (pars.Length != 1)
                 return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH,
@@ -47,7 +47,7 @@ namespace FuncScript.Funcs.Math
 
         public string Symbol => "Cos";
 
-        public object EvaluateList(FsList pars)
+        public object EvaluateList(KeyValueCollection context, FsList pars)
         {
             if (pars.Length != 1)
                 return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH,

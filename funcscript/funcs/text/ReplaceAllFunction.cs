@@ -8,7 +8,7 @@ namespace FuncScript.Funcs.Text
         public CallType CallType => CallType.Prefix;
         public string Symbol => "replaceall";
 
-        public object EvaluateList(FsList pars)
+        public object EvaluateList(KeyValueCollection context, FsList pars)
         {
             const int requiredParameters = 3;
 

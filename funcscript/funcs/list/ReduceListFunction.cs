@@ -10,7 +10,7 @@ namespace FuncScript.Funcs.List
 
         public string Symbol => "Reduce";
 
-        public object EvaluateList(FsList pars)
+        public object EvaluateList(KeyValueCollection context, FsList pars)
         {
             if (pars.Length < 2)
                 return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH,
@@ -22,11 +22,6 @@ namespace FuncScript.Funcs.List
             var par1 = pars[1];
             var par2 =pars.Length>2?pars[2]:null;
 
-            return EvaluateInternal(par0, par1, par2);
-        }
-
-        private object EvaluateInternal(object par0, object par1, object par2)
-        {
             if (!(par0 is FsList lst))
                 return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"{this.Symbol} function: The first parameter should be {this.ParName(0)}");
 
@@ -38,7 +33,7 @@ namespace FuncScript.Funcs.List
             
             for (int i = 0; i < lst.Length; i++)
             {
-                total = func.EvaluateList(new ArrayFsList(new object[] { lst[i], total, i }));
+                total = func.EvaluateList(context,new ArrayFsList(new object[] { lst[i], total, i }));
             }
 
             return FuncScript.NormalizeDataType(total);

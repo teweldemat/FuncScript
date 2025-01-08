@@ -9,7 +9,7 @@ namespace FuncScript.Funcs.List
 
         public string Symbol => "Series";
 
-        public object EvaluateList(FsList pars)
+        public object EvaluateList(KeyValueCollection context, FsList pars)
         {
             if (pars.Length != 2)
                 return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, $"{this.Symbol}: Two parameters expected");

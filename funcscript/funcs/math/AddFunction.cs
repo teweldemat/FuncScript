@@ -54,7 +54,7 @@ namespace FuncScript.Funcs.Math
         public CallType CallType => CallType.Infix;
         public string Symbol => "+";
 
-        public object EvaluateList(FsList pars)
+        public object EvaluateList(KeyValueCollection context, FsList pars)
         {
             var ret = EvaluateInternal(pars, (i) =>
             {

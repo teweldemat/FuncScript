@@ -9,7 +9,7 @@ namespace FuncScript.Funcs.Logic
 
         public string Symbol => "TicksToDate";
 
-        public object EvaluateList(FsList pars)
+        public object EvaluateList(KeyValueCollection context, FsList pars)
         {
             const int MaxParameters = 1;
 

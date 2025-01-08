@@ -10,7 +10,7 @@ namespace FuncScript.Funcs.Logic
 
         public string Symbol => "and";
 
-        public object EvaluateList(FsList pars)
+        public object EvaluateList(KeyValueCollection context, FsList pars)
         {
             int count = pars.Length;
 

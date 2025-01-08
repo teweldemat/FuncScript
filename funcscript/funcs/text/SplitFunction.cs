@@ -8,7 +8,7 @@ namespace FuncScript.Funcs.Text
         public CallType CallType => CallType.Prefix;
         public string Symbol => "split";
 
-        public object EvaluateList(FsList pars)
+        public object EvaluateList(KeyValueCollection context, FsList pars)
         {
             if (pars.Length < 1)
                 return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, $"{Symbol} requires at least one parameter.");

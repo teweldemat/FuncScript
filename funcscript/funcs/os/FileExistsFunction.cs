@@ -11,7 +11,7 @@ namespace FuncScript.Funcs.OS
 
         public string Symbol => "fileexists";
 
-        public object EvaluateList(FsList pars)
+        public object EvaluateList(KeyValueCollection context, FsList pars)
         {
             const int MaxParameters = 1; // Moved the constant declaration here
             if (pars.Length != MaxParameters)

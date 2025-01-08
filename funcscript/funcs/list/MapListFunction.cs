@@ -10,7 +10,7 @@ namespace FuncScript.Funcs.List
 
         public string Symbol => "Map";
 
-        public object EvaluateList(FsList pars)
+        public object EvaluateList(KeyValueCollection context, FsList pars)
         {
             const int expectedParameters = 2;
             if (pars.Length != expectedParameters)
@@ -19,11 +19,6 @@ namespace FuncScript.Funcs.List
             var par0 = pars[0];
             var par1 = pars[1];
 
-            return EvaluateInternal(par0, par1, false);
-        }
-
-        private object EvaluateInternal(object par0, object par1, bool dref)
-        {
             if (par0 == null)
                 return null;
 
@@ -41,7 +36,7 @@ namespace FuncScript.Funcs.List
             {
                 var item = lst[i];
                 var parsList = new ArrayFsList(new object[] { item, i });
-                res.Add(func.EvaluateList(parsList));
+                res.Add(func.EvaluateList(context,parsList));
             }
 
             return new ArrayFsList(res);

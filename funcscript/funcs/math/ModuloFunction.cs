@@ -9,7 +9,7 @@ namespace FuncScript.Funcs.Math
 
         public string Symbol => "%";
 
-        public object EvaluateList(FsList pars)
+        public object EvaluateList(KeyValueCollection context, FsList pars)
         {
             bool isInt = false, isLong = false, isDouble = false;
             int intTotal = 1;

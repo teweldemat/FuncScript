@@ -9,7 +9,7 @@ namespace FuncScript.Funcs.Logic
 
         public string Symbol => "switch";
 
-        public object EvaluateList(FsList pars)
+        public object EvaluateList(KeyValueCollection context, FsList pars)
         {
 
             var selector = pars[0];

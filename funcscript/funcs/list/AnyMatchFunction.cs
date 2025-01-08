@@ -9,7 +9,7 @@ namespace FuncScript.Funcs.List
 
         public string Symbol => "Any";
 
-        public object EvaluateList(FsList pars)
+        public object EvaluateList(KeyValueCollection context, FsList pars)
         {
             const int MaxParameters = 2;
 
@@ -32,7 +32,7 @@ namespace FuncScript.Funcs.List
 
             for (int i = 0; i < lst.Length; i++)
             {
-                var result = func.EvaluateList(new ArrayFsList(new object[] { lst[i], i }));
+                var result = func.EvaluateList(context,new ArrayFsList(new object[] { lst[i], i }));
 
                 if (result is bool && (bool)result)
                     return true;

@@ -10,7 +10,7 @@ namespace FuncScript.Funcs.List
 
         public string Symbol => "Distinct";
 
-        public object EvaluateList(FsList pars)
+        public object EvaluateList(KeyValueCollection context, FsList pars)
         {
             const int MaxParameters = 1; // Move this declaration inside the method
 

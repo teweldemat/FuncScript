@@ -9,7 +9,7 @@ namespace FuncScript.Funcs.Logic
 
         public string Symbol => "case";
 
-        public object EvaluateList(FsList pars)
+        public object EvaluateList(KeyValueCollection context, FsList pars)
         {
             int count = pars.Length;
 

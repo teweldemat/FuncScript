@@ -9,7 +9,7 @@ namespace FuncScript.Funcs.List
 
         public string Symbol => "Len";
 
-        public object EvaluateList(FsList pars)
+        public object EvaluateList(KeyValueCollection context, FsList pars)
         {
             const int MaxParameters = 1;
             if (pars.Length != MaxParameters)

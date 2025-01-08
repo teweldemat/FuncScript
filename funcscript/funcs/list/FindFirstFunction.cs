@@ -10,7 +10,7 @@ namespace FuncScript.Funcs.List
 
         public string Symbol => "First";
 
-        public object EvaluateList(FsList pars)
+        public object EvaluateList(KeyValueCollection context, FsList pars)
         {
             if (pars.Length != 2)
                 return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, $"{this.Symbol} function: Invalid parameter count. Expected 2, but got {pars.Length}");
@@ -31,7 +31,7 @@ namespace FuncScript.Funcs.List
 
             for (int i = 0; i < lst.Length; i++)
             {
-                var result = func.EvaluateList(new ParameterList { X = lst[i], I = i });
+                var result = func.EvaluateList(context,new ParameterList { X = lst[i], I = i });
 
                 if (result is bool && (bool)result)
                     return lst[i];

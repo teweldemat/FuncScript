@@ -9,7 +9,7 @@ namespace FuncScript.Funcs.KeyValue
 
         public string Symbol => "Select";
 
-        public object EvaluateList(FsList pars)
+        public object EvaluateList(KeyValueCollection context, FsList pars)
         {
             const int ExpectedParameters = 2; // Updated to replace MaxParameters
             

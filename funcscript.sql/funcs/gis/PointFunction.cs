@@ -12,7 +12,7 @@ namespace FuncScript.Sql.Funcs.Gis
 
         public string Symbol => "point";
 
-        public object EvaluateList(FsList pars)
+        public object EvaluateList(KeyValueCollection context, FsList pars)
         {
             if (pars.Length != this.MaxParsCount)
                 throw new Error.EvaluationTimeException($"{this.Symbol} function: invalid parameter count. {this.MaxParsCount} expected, got {pars.Length}");

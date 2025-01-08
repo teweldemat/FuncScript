@@ -1,4 +1,4 @@
-using FuncScript.Core;
+﻿using FuncScript.Core;
 using FuncScript.Model;
 using Npgsql;
 
@@ -12,7 +12,7 @@ namespace FuncScript.Sql.Core
 
         public string Symbol => "pgsql";
 
-        public object EvaluateList(FsList pars)
+        public object EvaluateList(KeyValueCollection context, FsList pars)
         {
             if (pars[0] is not string connectionStr)
                 throw new InvalidOperationException($"{Symbol} - {ParName(0)} is required");

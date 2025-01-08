@@ -9,7 +9,7 @@ namespace FuncScript.Funcs.Logic
 
         public string Symbol => "or";
 
-        public object EvaluateList(FsList pars)
+        public object EvaluateList(KeyValueCollection context, FsList pars)
         {
             for (int i = 0; i < pars.Length; i++)
             {

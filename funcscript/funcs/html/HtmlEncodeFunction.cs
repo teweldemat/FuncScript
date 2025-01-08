@@ -9,7 +9,7 @@ namespace FuncScript.Funcs.Html
 
         public string Symbol => "HEncode";
 
-        public object EvaluateList(FsList pars)
+        public object EvaluateList(KeyValueCollection context, FsList pars)
         {
             if (pars.Length != 1)
                 return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, $"{this.Symbol}: one parameter expected");

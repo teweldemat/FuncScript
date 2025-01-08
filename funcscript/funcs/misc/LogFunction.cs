@@ -9,7 +9,7 @@ namespace FuncScript.Funcs.Misc
         public CallType CallType => CallType.Dual;
         public string Symbol => "log";
 
-        public object EvaluateList(FsList pars)
+        public object EvaluateList(KeyValueCollection context, FsList pars)
         {
             if (pars.Length == 0)
                 return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, $"{this.Symbol} function: {this.ParName(0)} expected");
@@ -19,7 +19,7 @@ namespace FuncScript.Funcs.Misc
 
             if (second is IFsFunction func)
             {
-                var result = func.EvaluateList(new ArrayFsList(new object[] { anchor }));
+                var result = func.EvaluateList(context,new ArrayFsList(new object[] { anchor }));
                 FsLogger.DefaultLogger.WriteLine(result?.ToString() ?? "<null>");
             }
             else

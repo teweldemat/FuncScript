@@ -11,7 +11,7 @@ namespace FuncScript.Funcs.Logic
         public CallType CallType => CallType.Prefix;
         public string Symbol => "Date";
 
-        public object EvaluateList(FsList pars)
+        public object EvaluateList(KeyValueCollection context, FsList pars)
         {
             if (pars.Length > 2)
                 return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, $"{this.Symbol} function: invalid parameter count. Max of 2 expected, got {pars.Length}");
