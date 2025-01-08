@@ -33,11 +33,6 @@ namespace FuncScript.Funcs.Text
                 format = par1?.ToString();
             }
 
-            return ParseAccordingToFormat(str, format);
-        }
-
-        private object ParseAccordingToFormat(string str, string format)
-        {
             if (string.IsNullOrEmpty(format))
                 return str;
             if (str == null)
@@ -68,7 +63,7 @@ namespace FuncScript.Funcs.Text
                                 $"{this.Symbol}: invalid string: {str}");
                         }
                     case "fs":
-                        return FuncScript.Evaluate(new DefaultFsDataProvider(), str);
+                        return FuncScript.Evaluate(context, str);
                     default:
                         return str;
                 }
