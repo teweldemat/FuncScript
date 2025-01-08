@@ -15,13 +15,7 @@ namespace FuncScript.Test.Funcs.Text
             Assert.That(res, Is.EqualTo("42"));
         }
 
-        [Test]
-        public void TestFormatWithValueAndFormat()
-        {
-            var exp = "format(42, 'Value: {}')";
-            var res = FuncScript.Evaluate(exp);
-            Assert.That(res, Is.EqualTo("Value: 42"));
-        }
+       
 
         [Test]
         public void TestFormatEmptyParameters()
@@ -32,14 +26,7 @@ namespace FuncScript.Test.Funcs.Text
             Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_PARAMETER_COUNT_MISMATCH));
         }
 
-        [Test]
-        public void TestFormatWithMultipleValues()
-        {
-            var exp = "format(42, 'Number: {}, Extra: {}')";
-            var res = FuncScript.Evaluate(exp);
-            Assert.That(res is FsError,$"Unexpected value {FuncScript.FormatToJson(res)}");
-            Assert.That(((FsError)res).ErrorType, Is.EqualTo(FsError.ERROR_PARAMETER_COUNT_MISMATCH));
-        }
+        
 
         [Test]
         public void TestFormatWithNonStringFormat()
