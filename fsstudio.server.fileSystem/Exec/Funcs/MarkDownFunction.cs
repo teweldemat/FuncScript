@@ -5,7 +5,7 @@ using System.Runtime.InteropServices.JavaScript;
 
 namespace FsStudio.Server.FileSystem.Exec.Funcs
 {
-    internal class MarkDownFunction(RemoteLogger remoteLogger, string sessionId) : IFsFunction
+    internal class MarkDownFunction(RemoteLogger? remoteLogger, string sessionId) : IFsFunction
     {
         private const int MaxParameters = 1;
         public CallType CallType => CallType.Prefix;
@@ -13,13 +13,16 @@ namespace FsStudio.Server.FileSystem.Exec.Funcs
 
         public object EvaluateList(KeyValueCollection context, FsList pars)
         {
+            
             if (pars.Length != MaxParameters)
                 return new FsError(
                     FsError.ERROR_PARAMETER_COUNT_MISMATCH,
                     $"{Symbol} function: invalid parameter count. {MaxParameters} expected, got {pars.Length}"
                 );
-
             var par0 = pars[0];
+            if (remoteLogger == null)
+                return par0;
+
             if (par0 is null)
                 remoteLogger.SendMarkdDown(sessionId, "");
             else if (par0 is string str)

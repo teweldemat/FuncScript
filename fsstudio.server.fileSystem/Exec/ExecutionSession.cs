@@ -11,9 +11,10 @@ namespace FsStudio.Server.FileSystem.Exec;
 
 public class ExecutionSession : KeyValueCollection
 {
+    private readonly bool _updateFile;
     List<ExecutionNode> _nodes;
     private KeyValueCollection _context;
-    readonly string fileName;
+    readonly string? fileName;
     public Guid SessionId { get; private set; } = Guid.NewGuid();
     public KeyValueCollection ParentContext => _context;
 
@@ -27,12 +28,20 @@ public class ExecutionSession : KeyValueCollection
     public object? LastEvaluationResult => _evaluationResult;
     public Exception? LastEvaluationException => _evaluationException;
 
-    public ExecutionSession(string fileName, RemoteLogger logger)
+    public ExecutionSession(string fileName, RemoteLogger logger, bool updateFile = true)
     {
         this._logger = logger;
         this.fileName = fileName;
+        _updateFile = updateFile;
         var json = System.IO.File.ReadAllText(fileName);
         InitFromNodes(System.Text.Json.JsonSerializer.Deserialize<List<ExecutionNode>>(json) ?? []);
+    }
+
+    public ExecutionSession(IEnumerable<ExecutionNode> nodes, RemoteLogger logger, bool updateFile = true)
+    {
+        this._logger = logger;
+        _updateFile = updateFile;
+        InitFromNodes(nodes);
     }
 
     void InitFromNodes(IEnumerable<ExecutionNode> nodes)
@@ -40,22 +49,18 @@ public class ExecutionSession : KeyValueCollection
         _nodes = nodes.ToList();
         foreach (var n in _nodes)
             n.SetParent(this);
-        this._context = new DefaultFsDataProvider(
+        _context = new DefaultFsDataProvider(
             new[]
             {
-                KeyValuePair.Create<string, object>("md", new MarkDownFunction(this._logger, this.SessionId.ToString()))
+                KeyValuePair.Create<string, object>("md", new MarkDownFunction(_logger, SessionId.ToString()))
             }
         );
     }
 
-    public ExecutionSession(IEnumerable<ExecutionNode> nodes, RemoteLogger logger)
-    {
-        this._logger = logger;
-        InitFromNodes(nodes);
-    }
-
     void UpdateFile()
     {
+        if (!_updateFile) return;
+        if (fileName == null) return;
         System.IO.File.WriteAllText(fileName, System.Text.Json.JsonSerializer.Serialize(_nodes));
     }
 
@@ -182,7 +187,7 @@ public class ExecutionSession : KeyValueCollection
         UpdateFile();
     }
 
-    public void UpdateExpression(string nodePath, string expression,bool updateFile)
+    public void UpdateExpression(string nodePath, string expression)
     {
         var node = FindNodeByPath(nodePath);
         if (node == null)
@@ -190,8 +195,7 @@ public class ExecutionSession : KeyValueCollection
         if (node.Children.Count > 0)
             throw new Exception("Expression can't be set to a parent node");
         node.Expression = expression;
-        if(updateFile)
-            UpdateFile();
+        UpdateFile();
     }
 
     public List<ExpressionNodeInfo> GetChildNodeList(string? nodePath)

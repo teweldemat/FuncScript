@@ -64,7 +64,7 @@ namespace FsStudio.Server.FileSystem.Exec
             File.WriteAllText(_lastRootFolderFilePath, newRootPath);
         }
 
-        public ExecutionSession CreateOrGetSession(string fromFile)
+        public ExecutionSession CreateOrGetSession(string fromFile,bool editable)
         {
             var absolutePath = GetAbsolutePath(fromFile + ".fsp");
             if (_sessionsByFile.TryGetValue(absolutePath, out var existingSession))
@@ -72,7 +72,7 @@ namespace FsStudio.Server.FileSystem.Exec
                 return existingSession;
             }
 
-            var newSession = new ExecutionSession(absolutePath, _remoteLogger);
+            var newSession = new ExecutionSession(absolutePath, _remoteLogger,editable);
             _sessionsByFile[absolutePath] = newSession;
             return newSession;
         }

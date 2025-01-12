@@ -1,14 +1,22 @@
+//Program.cs
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using FsStudio.Server.FileSystem.Exec;
 using FuncScript;
+using FuncScript.Model;
 
 namespace FsStudio.Server.FileSystem;
-internal class Program
+public static class Program
 {
-    private static void Main(string[] args)
+    public static void Main(string[] args)
     {
         InitFuncScript();
+        if (IsCommandLineMode(args))
+        {
+            RunCommandLineMode(args);
+            return;
+        }
+
         var options = new WebApplicationOptions
         {
             Args = args,
@@ -18,9 +26,7 @@ internal class Program
         };
 
         var builder = WebApplication.CreateBuilder(options);
-        //var builder = WebApplication.CreateBuilder(args);
         var env = builder.Environment;
-        //builder.WebHost.UseWebRoot("wwwroot");
         if (env.IsDevelopment())
         {
             builder.Services.AddCors(options =>
@@ -59,12 +65,11 @@ internal class Program
         
         if (env.IsEnvironment("Desktop"))
         {
-            // Launch the browser after the server starts
             app.Lifetime.ApplicationStarted.Register(() =>
             {
                 try
                 {
-                    string url = "http://localhost:5091"; // Ensure this is the correct URL
+                    string url = "http://localhost:5091";
                     if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                     {
                         Process.Start(new ProcessStartInfo("cmd", $"/c start {url}") { CreateNoWindow = true });
@@ -80,12 +85,10 @@ internal class Program
                 }
                 catch (Exception ex)
                 {
-                    // Log the exception if needed
                     Console.WriteLine($"Failed to launch browser: {ex.Message}");
                 }
             });
         }
-
         app.Run();
     }
 
@@ -95,4 +98,129 @@ internal class Program
         DefaultFsDataProvider.LoadFromAssembly(typeof(FuncScript.Sql.Core.PgSqlFunction).Assembly);
     }
 
+    static bool IsCommandLineMode(string[] args)
+    {
+        foreach (var arg in args)
+        {
+            if (arg.StartsWith("--project:", StringComparison.OrdinalIgnoreCase) ||
+                arg.StartsWith("--file:", StringComparison.OrdinalIgnoreCase) ||
+                arg.StartsWith("--exec-node:", StringComparison.OrdinalIgnoreCase) ||
+                arg.StartsWith("--set-node-text:", StringComparison.OrdinalIgnoreCase) ||
+                arg.StartsWith("--set-node-expression:", StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    static void RunCommandLineMode(string[] args)
+    {
+        string? projectPath = null;
+        string? fileToExecute = null;
+        string? nodeToEvaluate = null;
+        var nodeTextCommands = new List<string>();
+        var nodeExpressionCommands = new List<string>();
+        foreach (var arg in args)
+        {
+            if (arg.StartsWith("--project:", StringComparison.OrdinalIgnoreCase))
+            {
+                projectPath = arg.Substring("--project:".Length);
+            }
+            else if (arg.StartsWith("--file:", StringComparison.OrdinalIgnoreCase))
+            {
+                fileToExecute = arg.Substring("--file:".Length);
+            }
+            else if (arg.StartsWith("--exec-node:", StringComparison.OrdinalIgnoreCase))
+            {
+                nodeToEvaluate = arg.Substring("--exec-node:".Length);
+            }
+            else if (arg.StartsWith("--set-node-text:", StringComparison.OrdinalIgnoreCase))
+            {
+                nodeTextCommands.Add(arg.Substring("--set-node-text:".Length));
+            }
+            else if (arg.StartsWith("--set-node-expression:", StringComparison.OrdinalIgnoreCase))
+            {
+                nodeExpressionCommands.Add(arg.Substring("--set-node-expression:".Length));
+            }
+        }
+
+        var sessionManager = new SessionManager(null);
+
+        if (projectPath == null)
+        {
+            Console.WriteLine("Missing --project:<root folder>");
+            Environment.ExitCode = 1;
+            return;
+        }
+
+        sessionManager.SetRootFolder(projectPath);
+
+        if (fileToExecute == null)
+        {
+            Console.WriteLine("Missing --file:<the file to execute>");
+            Environment.ExitCode = 1;
+            return;
+        }
+
+        if (nodeToEvaluate == null)
+        {
+            Console.WriteLine("Missing --exec-node:<node path to evaluate>");
+            Environment.ExitCode = 1;
+            return;
+        }
+
+        var session = sessionManager.CreateOrGetSession(fileToExecute,false);
+
+        foreach (var cmd in nodeTextCommands)
+        {
+            var idx1 = cmd.IndexOf(':');
+            if (idx1 < 0) continue;
+            var nodePath = cmd.Substring(0, idx1);
+            var content = cmd.Substring(idx1 + 1).Trim().Trim('"');
+            session.ChangeExpressionType(nodePath, ExpressionType.ClearText);
+            session.UpdateExpression(nodePath, content);
+        }
+
+        foreach (var cmd in nodeExpressionCommands)
+        {
+            var idx1 = cmd.IndexOf(':');
+            if (idx1 < 0) continue;
+            var nodePath = cmd.Substring(0, idx1);
+            var content = cmd.Substring(idx1 + 1).Trim().Trim('"');
+            session.ChangeExpressionType(nodePath, ExpressionType.FuncScript);
+            session.UpdateExpression(nodePath, content);
+        }
+
+        try
+        {
+            var task = session.EvaluateNodeAsync(nodeToEvaluate);
+            task.Wait();
+            var res = task.Result;
+            var json=Helpers.FormatToJson(res);
+            if (res is FsError error)
+            {
+                Console.WriteLine(json);
+                Environment.ExitCode = 1;
+            }
+            else
+            {
+                
+                Console.WriteLine("----start-output----");
+                Console.WriteLine(json);
+                Console.WriteLine("----end-output----");
+            }
+        }
+        catch (Exception ex)
+        {
+            Exception? inner = ex;
+            while (inner!=null)
+            {
+                Console.WriteLine( inner.Message+"\n"+inner.StackTrace);
+                inner = inner.InnerException;
+            }
+            
+            Environment.ExitCode = 1;
+        }
+    }
 }

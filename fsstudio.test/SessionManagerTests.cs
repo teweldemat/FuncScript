@@ -17,7 +17,7 @@ namespace FsStudio.Server.FileSystem.Tests
             _tempFolder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
             Directory.CreateDirectory(_tempFolder);
             _remoteLogger = new TestRemoteLogger();
-            _sessionManager = new SessionManager(_configuration, _remoteLogger);
+            _sessionManager = new SessionManager(_remoteLogger);
             _sessionManager.SetRootFolder(_tempFolder);
         }
 
@@ -62,7 +62,7 @@ namespace FsStudio.Server.FileSystem.Tests
         public void CreateOrGetSession_ReturnsNewSession()
         {
             _sessionManager.CreateFile("", "mySession");  // Ensure repeatSession.fsp is actually there
-            var session = _sessionManager.CreateOrGetSession("mySession");
+            var session = _sessionManager.CreateOrGetSession("mySession",true);
             Assert.IsNotNull(session);
         }
 
@@ -70,8 +70,8 @@ namespace FsStudio.Server.FileSystem.Tests
         public void CreateOrGetSession_ExistingSession_ReturnsSame()
         {
             _sessionManager.CreateFile("", "repeatSession");  // Ensure repeatSession.fsp is actually there
-            var s1 = _sessionManager.CreateOrGetSession("repeatSession");
-            var s2 = _sessionManager.CreateOrGetSession("repeatSession");
+            var s1 = _sessionManager.CreateOrGetSession("repeatSession",true);
+            var s2 = _sessionManager.CreateOrGetSession("repeatSession",true);
             Assert.AreEqual(s1.SessionId, s2.SessionId);
         }
 
@@ -79,7 +79,7 @@ namespace FsStudio.Server.FileSystem.Tests
         public void UnloadSession_RemovesSession()
         {
             _sessionManager.CreateFile("","toUnload");
-            var session = _sessionManager.CreateOrGetSession("toUnload");
+            var session = _sessionManager.CreateOrGetSession("toUnload",true);
             Assert.IsTrue(_sessionManager.UnloadSession(session.SessionId));
             Assert.IsFalse(_sessionManager.UnloadSession(session.SessionId));
         }
@@ -146,7 +146,7 @@ namespace FsStudio.Server.FileSystem.Tests
         {
             _sessionManager.CreateFile("","someSession");
             
-            var s = _sessionManager.CreateOrGetSession("someSession");
+            var s = _sessionManager.CreateOrGetSession("someSession",true);
             var fetched = _sessionManager.GetSession(s.SessionId);
             Assert.IsNotNull(fetched);
             Assert.AreEqual(s.SessionId, fetched.SessionId);

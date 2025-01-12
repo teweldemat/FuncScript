@@ -28,7 +28,7 @@ namespace FsStudio.Server.FileSystem.Controllers
         {
             try
             {
-                var session = sessionManager.CreateOrGetSession(request.FromFile);
+                var session = sessionManager.CreateOrGetSession(request.FromFile,true);
                 Console.WriteLine($"Session created {session.SessionId}");
                 return Ok(new { SessionId = session.SessionId });
             }
@@ -188,10 +188,9 @@ namespace FsStudio.Server.FileSystem.Controllers
                 var session = sessionManager.GetSession(sessionId);
                 if (session == null)
                     return NotFound($"Session with ID {sessionId} not found.");
-
                 try
                 {
-                    session.UpdateExpression(nodePath, model.Expression,true);
+                    session.UpdateExpression(nodePath, model.Expression);
                     return Ok();
                 }
                 catch (Exception ex)
