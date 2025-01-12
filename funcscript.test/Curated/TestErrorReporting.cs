@@ -7,6 +7,7 @@ using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
+using FuncScript.Block;
 using FuncScript.Model;
 
 namespace FuncScript.Test.Curated
@@ -72,6 +73,32 @@ c:4
             }
         }
 
+        [Test]
+        public void TestNoFunction2()
+        {
+            var exp = $@"r:(f)=>f(0);
+r(1);";
+            var e = FuncScriptParser.Parse(exp);
+            Assert.That(e.Block is KeyValueCollection);
+            var kvc = (KvcExpression)e.Block;
+            Assert.That(kvc.KeyValues.Count,Is.EqualTo(1));
+            Assert.That(kvc.KeyValues[0].ValueExpression is LiteralBlock);
+            var lb = (LiteralBlock)kvc.KeyValues[0].ValueExpression;
+            Assert.That(lb.Value is ExpressionFunction);
+            Assert.That(((ExpressionFunction)lb.Value).Expression is FunctionCallExpression);
+            var fc = (FunctionCallExpression)((ExpressionFunction)lb.Value).Expression;
+            Assert.That(fc.CodePos,Is.EqualTo("r:(f)=>".Length));
+            Assert.That(fc.CodeLength,Is.EqualTo("f(0)".Length));
+
+            var res = e.Block.Evaluate();
+            
+            Assert.That(res,Is.TypeOf<FsError>());
+            var err = (FsError)res;
+            Assert.That(err.ErrorData is CodeLocation);
+            var loc = (CodeLocation)err.ErrorData;
+            Assert.That(loc.Loc,Is.EqualTo("r:(f)=>".Length));
+            Assert.That(loc.Length,Is.EqualTo("f(0)".Length));
+        }
 
         [Test]
         public void TestFunctionError2()

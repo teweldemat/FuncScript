@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Runtime.CompilerServices;
 using FuncScript.Core;
 using FuncScript.Model;
@@ -72,6 +72,8 @@ namespace FuncScript.Block
         {
             var ret = new ListExpression
             {
+                CodePos = this.CodePos,
+                CodeLength = this.CodeLength,
                 ValueExpressions = this.ValueExpressions.Select(l => l.CloneExpression()).ToArray()
             };
             

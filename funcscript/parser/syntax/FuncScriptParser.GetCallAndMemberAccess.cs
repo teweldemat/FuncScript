@@ -18,6 +18,8 @@ namespace FuncScript.Core
                 {
                     i = i2;
                     theUnit = funcCall;
+                    theUnit.CodePos = parseNode.Pos;
+                    theUnit.CodeLength=nodeParList.Pos-parseNode.Pos+nodeParList.Length;
                     parseNode = new ParseNode(ParseNodeType.FunctionCall, index, i - index, new[] { parseNode, nodeParList });
                     continue;
                 }

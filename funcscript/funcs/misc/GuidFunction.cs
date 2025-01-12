@@ -11,8 +11,10 @@ namespace FuncScript.Funcs.Logic
 
         public object EvaluateList(KeyValueCollection context, FsList pars)
         {
-            if (pars.Length != 1)
-                return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, $"{this.Symbol} function: Invalid parameter count. Expected 1, but got {pars.Length}");
+            if (pars.Length == 0)
+            {
+                return Guid.NewGuid();
+            }
 
             var par0 = pars[0];
 

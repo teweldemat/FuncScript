@@ -9,11 +9,20 @@ export function App() {
         <Router>
             <ExecutionSessionProvider>
                 <Routes>
-                    <Route path="/" element={<ExecussionSessionView />} />
+                    <Route
+                        path="/"
+                        element={
+                            <ExecussionSessionView
+                                initialFile=""
+                                initialNodePath=""
+                            />
+                        }
+                    />
                     <Route path="/open-dialog-web" element={<OpenFileModal />} />
                 </Routes>
             </ExecutionSessionProvider>
         </Router>
     );
 }
+
 export default App;

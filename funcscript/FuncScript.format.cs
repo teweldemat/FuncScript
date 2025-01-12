@@ -128,7 +128,7 @@ public static partial class Helpers
             sb.Append($"Error: {error.ErrorMessage}");
             sb.Append($"  type: {error.ErrorType}");
             if (error.ErrorData != null)
-                sb.Append($"\nData:\n{error.ErrorData}");
+                sb.Append($"\n{error.ErrorData}");
             return;
         }
 

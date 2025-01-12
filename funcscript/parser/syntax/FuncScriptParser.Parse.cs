@@ -10,5 +10,15 @@ namespace FuncScript.Core
         {
             return GetRootExpression(context);
         }
+        public static ExpressionBlockResult Parse(string expression)
+        {
+            var context = new ParseContext
+            (
+                new DefaultFsDataProvider(),
+                expression,
+                new List<SyntaxErrorData>()
+            );
+            return GetRootExpression(context);
+        }
     }
 }

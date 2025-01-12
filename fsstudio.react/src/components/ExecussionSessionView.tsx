@@ -7,14 +7,18 @@ import React, {
 import { Grid, Typography, Box, IconButton } from '@mui/material';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import SaveIcon from '@mui/icons-material/Save';
-import { SERVER_URL } from '../backend';
 import { SessionState, useExecutionSession } from './SessionContext';
 import ExpressionNodeTree from './ExpressionNodeTree';
 import FileTree from './FileTree';
 import ExecussionContent from './ExecussionContent';
 import { findNodeByPath } from './SessionUtils';
 
-export function ExecussionSessionView() {
+type ExecussionSessionViewProps = {
+    initialFile?: string;
+    initialNodePath?: string;
+};
+
+export function ExecussionSessionView({ initialFile, initialNodePath }: ExecussionSessionViewProps) {
     const {
         createSession,
         loadNode,
@@ -31,9 +35,16 @@ export function ExecussionSessionView() {
     const [copied, setCopied] = useState(false);
     const [queuedExpression, setQueuedExpression] = useState<string | null>(null);
     const [savingInProgress, setSavingInProgress] = useState(false);
+    const [lastLoadedNodePath, setLastLoadedNodePath] = useState<string | null>(null);
 
-    // Track evaluation status
-    //const [evaluationInProgress, setEvaluationInProgress] = useState(false);
+    const saveTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+    useEffect(() => {
+        const storedFile = localStorage.getItem('initialFile') || initialFile || '';
+        if (storedFile) {
+            handleFileSelect(storedFile);
+        }
+    }, []);
 
     useEffect(() => {
         if (!session) return;
@@ -41,7 +52,12 @@ export function ExecussionSessionView() {
     }, [sessions]);
 
     useEffect(() => {
-        loadNodeData(session?.selectedNodePath ?? null);
+        if (!session) return;
+        const currentPath = session.selectedNodePath;
+        if (currentPath && currentPath !== lastLoadedNodePath) {
+            loadNodeData(currentPath);
+            setLastLoadedNodePath(currentPath);
+        }
     }, [session]);
 
     useEffect(() => {
@@ -58,7 +74,9 @@ export function ExecussionSessionView() {
     }
 
     function loadNodeData(nodePath: string | null) {
+        console.log('loading: '+nodePath)
         if (!session || !nodePath) {
+            console.log('loading: '+nodePath+' no session')
             clearCurrentNode();
             return;
         }
@@ -67,6 +85,7 @@ export function ExecussionSessionView() {
             clearCurrentNode();
             return;
         }
+        console.log('loading: '+nodePath)
         if (!node.dataLoaded) {
             loadNode(session, nodePath).then((newNode) => {
                 setExpression(newNode?.expression ?? '');
@@ -82,6 +101,9 @@ export function ExecussionSessionView() {
         async (nodePath: string | null) => {
             if (session) {
                 setSelectedNodePath(session, nodePath);
+                if (nodePath) {
+                    localStorage.setItem('initialNodePath', nodePath);
+                }
             }
             await loadNodeData(nodePath);
         },
@@ -110,8 +132,6 @@ export function ExecussionSessionView() {
         if (!session || !session.selectedNodePath) return;
         evaluateNode(session, session.selectedNodePath);
     }, [session, evaluateNode]);
-
-    const saveTimerRef = useRef<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
         if (!session || !session.selectedNodePath || expression == null) return;
@@ -171,11 +191,18 @@ export function ExecussionSessionView() {
             if (selectedFile === '') {
                 setSession(null);
             } else {
+                localStorage.setItem('initialFile', selectedFile);
                 const newSession = await createSession(selectedFile);
                 setSession(newSession);
+                const storedNodePath = localStorage.getItem('initialNodePath') || initialNodePath || '';
+                console.log('restore node')
+                if (storedNodePath) {
+                    console.log(storedNodePath)
+                    await handleNodeSelect(storedNodePath);
+                }
             }
         },
-        [createSession]
+        [createSession, initialNodePath, handleNodeSelect]
     );
 
     return (
@@ -190,7 +217,6 @@ export function ExecussionSessionView() {
                             session={session}
                             onSelect={handleNodeSelect}
                             selectedNode={session.selectedNodePath ?? ''}
-                            // You can add a `disabled` prop if ExpressionNodeTree supports it
                             readOnly={evaluationInProgress}
                         />
                     ) : (
@@ -231,8 +257,8 @@ export function ExecussionSessionView() {
                             <IconButton
                                 onClick={() =>
                                     session?.selectedNodePath &&
-                                        expression &&
-                                        !isSaveDisabled
+                                    expression &&
+                                    !isSaveDisabled
                                         ? saveExpression(session, session.selectedNodePath, expression, false)
                                         : null
                                 }

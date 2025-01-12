@@ -44,7 +44,11 @@ namespace FuncScript.Block
 
         public override ExpressionBlock CloneExpression()
         {
-            return new LiteralBlock(this.Value);
+            return new LiteralBlock(this.Value)
+            {
+                CodePos = this.CodePos,
+                CodeLength = this.CodeLength,
+            };
         }
     }
 }

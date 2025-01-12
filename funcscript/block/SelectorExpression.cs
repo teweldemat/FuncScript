@@ -1,4 +1,4 @@
-using FuncScript.Core;
+﻿using FuncScript.Core;
 using FuncScript.Model;
 
 namespace FuncScript.Block
@@ -61,6 +61,8 @@ namespace FuncScript.Block
         {
             return new SelectorExpression
             {
+                CodePos = this.CodePos,
+                CodeLength = this.CodeLength,
                 Source = this.Source.CloneExpression(),
                 Selector = this.Selector.CloneExpression() as KvcExpression,
             };

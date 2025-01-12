@@ -1,5 +1,10 @@
 namespace FuncScript.Model;
 
+public class CodeLocation
+{
+    public int Loc { get; set; }
+    public int Length { get; set; }
+}
 public class FsError
 {
     public const string ERROR_DEFAULT = "Default";
@@ -34,7 +39,7 @@ public class FsError
         
     }
 
-    public FsError(string type, string message, string data)
+    public FsError(string type, string message, object data)
     {
         this.ErrorType = type;
         this.ErrorMessage = message;
@@ -43,6 +48,6 @@ public class FsError
 
     public override string ToString()
     {
-        return $"{this.ErrorMessage} ({this.ErrorType})";
+        return $"{this.ErrorMessage} ({this.ErrorType}){(ErrorData==null?"":"\n"+ErrorData.ToString())}";
     }
 }

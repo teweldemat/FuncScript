@@ -111,6 +111,17 @@ public class ExecutionNode : KeyValueCollection
                 throw new InvalidOperationException("Unsupported expression type");
         }
 
+        if (_cache is FsError err)
+        {
+            if (err.ErrorData is CodeLocation loc)
+            {
+                if (loc.Loc < this.Expression.Length)
+                {
+                    err.ErrorData = "Error at " + this.Expression.Substring(loc.Loc,
+                        Math.Min(this.Expression.Length - loc.Loc, loc.Length));
+                }
+            }
+        }
         _cached = true;
         return _cache;
     }

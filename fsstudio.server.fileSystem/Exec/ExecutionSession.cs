@@ -17,7 +17,7 @@ public class ExecutionSession : KeyValueCollection
     public Guid SessionId { get; private set; } = Guid.NewGuid();
     public KeyValueCollection ParentContext => _context;
 
-    private RemoteLogger logger;
+    private RemoteLogger? _logger=null;
     private Task<object>? _evaluationTask;
     private Exception? _evaluationException;
     private object? _evaluationResult;
@@ -29,7 +29,7 @@ public class ExecutionSession : KeyValueCollection
 
     public ExecutionSession(string fileName, RemoteLogger logger)
     {
-        this.logger = logger;
+        this._logger = logger;
         this.fileName = fileName;
         var json = System.IO.File.ReadAllText(fileName);
         InitFromNodes(System.Text.Json.JsonSerializer.Deserialize<List<ExecutionNode>>(json) ?? []);
@@ -43,15 +43,17 @@ public class ExecutionSession : KeyValueCollection
         this._context = new DefaultFsDataProvider(
             new[]
             {
-                KeyValuePair.Create<string, object>("md", new MarkDownFunction(this.logger, this.SessionId.ToString()))
+                KeyValuePair.Create<string, object>("md", new MarkDownFunction(this._logger, this.SessionId.ToString()))
             }
         );
     }
+
     public ExecutionSession(IEnumerable<ExecutionNode> nodes, RemoteLogger logger)
     {
-        this.logger = logger;
+        this._logger = logger;
         InitFromNodes(nodes);
     }
+
     void UpdateFile()
     {
         System.IO.File.WriteAllText(fileName, System.Text.Json.JsonSerializer.Serialize(_nodes));
@@ -104,9 +106,11 @@ public class ExecutionSession : KeyValueCollection
                 };
                 parentNode.Children.Add(backupChild);
             }
+
             parentNode.ExpressionType = ExpressionType.FsStudioParentNode;
             parentNode.Expression = null;
         }
+
         n.SetParent(parentNode == null ? this : parentNode);
         nodes.Add(n);
         UpdateFile();
@@ -131,6 +135,7 @@ public class ExecutionSession : KeyValueCollection
                 parentNode.ExpressionType = ExpressionType.FuncScript;
             }
         }
+
         UpdateFile();
     }
 
@@ -163,6 +168,7 @@ public class ExecutionSession : KeyValueCollection
             if (parent.Children.Any(ch => ch.NameLower == _namelower))
                 throw new InvalidOperationException($"{newName} already exists");
         }
+
         node.Name = newName;
         UpdateFile();
     }
@@ -176,7 +182,7 @@ public class ExecutionSession : KeyValueCollection
         UpdateFile();
     }
 
-    public void UpdateExpression(string nodePath, string expression)
+    public void UpdateExpression(string nodePath, string expression,bool updateFile)
     {
         var node = FindNodeByPath(nodePath);
         if (node == null)
@@ -184,7 +190,8 @@ public class ExecutionSession : KeyValueCollection
         if (node.Children.Count > 0)
             throw new Exception("Expression can't be set to a parent node");
         node.Expression = expression;
-        UpdateFile();
+        if(updateFile)
+            UpdateFile();
     }
 
     public List<ExpressionNodeInfo> GetChildNodeList(string? nodePath)
@@ -217,6 +224,7 @@ public class ExecutionSession : KeyValueCollection
         {
             json = e.Message;
         }
+
         return new ExpressionNodeInfoWithExpression
         {
             Name = node.Name,
@@ -260,7 +268,8 @@ public class ExecutionSession : KeyValueCollection
     object EvaluateNodeInternal(string nodePath)
     {
         ClearCache();
-        FsLogger.SetDefaultLogger(new SessionManager.RemoteLoggerForFs(logger, SessionId.ToString()));
+        if(_logger!=null)
+            FsLogger.SetDefaultLogger(new SessionManager.RemoteLoggerForFs(_logger, SessionId.ToString()));
         var segments = nodePath.Split('.');
         var parentNodePath = string.Join(".", segments.Take(segments.Length - 1));
         var provider = (segments.Length > 1) ? (KeyValueCollection)FindNodeByPath(parentNodePath)! : this;
@@ -300,11 +309,15 @@ public class ExecutionSession : KeyValueCollection
                     msg += $"\n{ex.Message}\n{ex.StackTrace}";
                     ex = ex.InnerException;
                 }
-                logger.SendObject("evaluation_error", new
+
+                if (_logger != null)
                 {
-                    sessionId = SessionId,
-                    error = msg
-                });
+                    _logger.SendObject("evaluation_error", new
+                    {
+                        sessionId = SessionId,
+                        error = msg
+                    });
+                }
             }
             else
             {
@@ -313,9 +326,9 @@ public class ExecutionSession : KeyValueCollection
                 FuncScript.Helpers.Format(sb, _evaluationResult,
                     asJsonLiteral: _evaluationResult is KeyValueCollection || _evaluationResult is FsList
                 );
-                if (logger != null)
+                if (_logger != null)
                 {
-                    logger.SendObject("evaluation_success", new
+                    _logger.SendObject("evaluation_success", new
                     {
                         sessionId = SessionId,
                         result = sb.ToString()
@@ -344,7 +357,8 @@ public class ExecutionSession : KeyValueCollection
             throw new InvalidOperationException($"New parent {modelNewParentPath} not found");
         var newChildrenList = newParent == null ? _nodes : newParent.Children;
         if (newChildrenList.Any(n => n.NameLower == node.NameLower))
-            throw new InvalidOperationException($"Node named {node.Name} already exists under {modelNewParentPath ?? "root"}");
+            throw new InvalidOperationException(
+                $"Node named {node.Name} already exists under {modelNewParentPath ?? "root"}");
 
         if (newParent != null && !string.IsNullOrEmpty(newParent.Expression))
         {

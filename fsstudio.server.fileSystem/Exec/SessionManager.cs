@@ -8,7 +8,7 @@ namespace FsStudio.Server.FileSystem.Exec
     {
         private readonly ConcurrentDictionary<string, ExecutionSession> _sessionsByFile = new();
         private string _rootPath = null;
-        private readonly RemoteLogger _remoteLogger;
+        private readonly RemoteLogger? _remoteLogger;
         private readonly string _lastRootFolderFilePath;
 
         public string RootPath => _rootPath;
@@ -38,7 +38,7 @@ namespace FsStudio.Server.FileSystem.Exec
             }
         }
 
-        public SessionManager(IConfiguration configuration, RemoteLogger remoteLogger)
+        public SessionManager(RemoteLogger? remoteLogger)
         {
             _remoteLogger = remoteLogger;
             var appDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);

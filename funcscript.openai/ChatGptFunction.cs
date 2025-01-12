@@ -8,7 +8,7 @@ namespace FuncScript.Openai
 {
     public class ChatGptFunction : IFsFunction
     {
-        private static readonly string[] SupportedModels = new[] { "gpt-4o", "gpt-4o-mini" };
+        private static readonly string[] SupportedModels = new[] { "gpt-4o", "gpt-4o-mini","o1-mini" };
         public object EvaluateList(KeyValueCollection context, FsList pars)
         {
             Console.WriteLine("ChatGPT request");
@@ -56,6 +56,7 @@ namespace FuncScript.Openai
 
                 messages.Add(ChatMessage.CreateUserMessage(instruction));
 
+                var client = api.GetChatClient(model);
                 ClientResult<ChatCompletion> response = api.GetChatClient(model).CompleteChat(messages);
 
                 if (response == null)

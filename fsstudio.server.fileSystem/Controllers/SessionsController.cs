@@ -191,7 +191,7 @@ namespace FsStudio.Server.FileSystem.Controllers
 
                 try
                 {
-                    session.UpdateExpression(nodePath, model.Expression);
+                    session.UpdateExpression(nodePath, model.Expression,true);
                     return Ok();
                 }
                 catch (Exception ex)

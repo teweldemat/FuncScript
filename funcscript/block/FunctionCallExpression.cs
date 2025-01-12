@@ -68,6 +68,15 @@ namespace FuncScript.Block
                 {
                     
                     res = fn.EvaluateList(_context,paramList);
+                    if (res is FsError { ErrorData: null } err)
+                    {
+                        err.ErrorData = new CodeLocation
+                        {
+                            Loc = this.CodePos,
+                            Length = this.Count
+                        };
+                    }
+                        
                 }
                 catch (Error.EvaluationException)
                 {
@@ -107,9 +116,8 @@ namespace FuncScript.Block
                     res = null;
             }
             else
-                throw new EvaluationException(this.CodePos, this.CodeLength,
-                new TypeMismatchError(
-                    $"Function part didn't evaluate to a function or a list. {Helpers.GetFsDataType(func)}"));
+                return new FsError(FsError.ERROR_TYPE_EVALUATION,$"Function part didn't evaluate to a function or a list. {Helpers.GetFsDataType(func)}",
+                    new CodeLocation{Loc = CodePos, Length = this.CodeLength});
 
             _evaluated = true;
             _result = res;
@@ -153,6 +161,8 @@ namespace FuncScript.Block
         {
             return new FunctionCallExpression
             {
+                CodePos = this.CodePos,
+                CodeLength = this.CodeLength,
                 Function = this.Function.CloneExpression(),
                 Parameters = this.Parameters.Select(p => p.CloneExpression()).ToArray()
             };
