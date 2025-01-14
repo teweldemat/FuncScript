@@ -1,0 +1,15 @@
+[Unit]
+Description=FS Web Service
+After=network.target
+
+[Service]
+User=tewelde    
+WorkingDirectory=/home/tewelde/fss/bin
+ExecStart=/usr/bin/dotnet FsStudio.Server.FileSystem.dll --urls "http://localhost:5051"
+Restart=always
+RestartSec=5
+SyslogIdentifier=fsweb
+Environment=ASPNETCORE_ENVIRONMENT=Production
+
+[Install]
+WantedBy=multi-user.target

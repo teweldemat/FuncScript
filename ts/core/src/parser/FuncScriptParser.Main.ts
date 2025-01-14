@@ -17,7 +17,7 @@
         LiteralString,//15
         StringTemplate,//16
         KeyValuePair,//17
-        KeyValueCollection,//19
+        KeyValueCollection,//18
         List,//19
         Key,//20
         Case,//21
@@ -77,7 +77,6 @@
         s_KeyWords.add(KW_RETURN);
         s_KeyWords.add(KW_ERROR);
         s_KeyWords.add(KW_CASE);
-        s_KeyWords.add(KW_SWITCH);
         s_KeyWords.add(KW_SWITCH);
     })();
 
