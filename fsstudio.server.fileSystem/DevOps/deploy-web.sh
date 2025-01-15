@@ -5,9 +5,9 @@ cd ../fsstudio.react
 npm install
 npm run build
 
-cp -R build/ ../fsstudio.server.fileSystem/wwwroot/
+cp -R build/ ../FsStudio.Server.FileSystem/wwwroot/
 
-cd ../fsstudio.server.fileSystem
+cd ../FsStudio.Server.FileSystem
 dotnet publish -c Release
 
 # Use rsync to copy only changed files

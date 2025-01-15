@@ -3,10 +3,11 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ExecutionSessionProvider } from './components/SessionContext';
 import { ExecussionSessionView } from './components/ExecussionSessionView';
 import { OpenFileModal } from './OpenFileModal';
+import { APP_TYPE } from './backend';
 
 export function App() {
     return (
-        <Router>
+        <Router basename={APP_TYPE=='web'?'/fshidden':'/'}>
             <ExecutionSessionProvider>
                 <Routes>
                     <Route
