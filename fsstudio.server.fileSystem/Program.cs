@@ -194,9 +194,7 @@ public static class Program
 
         try
         {
-            var task = session.EvaluateNodeAsync(nodeToEvaluate);
-            task.Wait();
-            var res = task.Result;
+            var res = session.EvaluateNode(nodeToEvaluate);
             var json=Helpers.FormatToJson(res);
             if (res is FsError error)
             {

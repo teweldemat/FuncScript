@@ -5,9 +5,9 @@ cd ../fsstudio.react
 # Copy the fs.png file to the Electron project's directory
 cp public/fs.png ../fsstudio.electron/
 
-# Install dependencies and build the React project
+# Install dependencies and build the React project with production env
 npm install
-npm run build
+NODE_ENV=production npm run build
 
 # Copy the build output to the .NET project's wwwroot directory
 cp -R build/ ../fsstudio.server.fileSystem/wwwroot/

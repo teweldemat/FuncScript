@@ -8,6 +8,17 @@ namespace FuncScript.Model
         private KeyValueCollection _parent;
         KeyValuePair<string, object>[] _data;
         Dictionary<string, object> _index;
+        public override bool Equals(object obj)
+        {
+            if (!(obj is KeyValueCollection kvc))
+                return false;
+            return this.IsEqualTo(kvc);
+        }
+
+        public override int GetHashCode()
+        {
+            return this.GetKvcHashCode();
+        }
         public SimpleKeyValueCollection(KeyValuePair<string, object>[] kv)
             : this(null, kv)
         {

@@ -9,7 +9,6 @@ const RemoteLogger: React.FC<{ messages: string[] }> = ({ messages }) => {
       containerRef.current.scrollTop = containerRef.current.scrollHeight;
     }
   }, [messages]);
-
   return (
     <div
       ref={containerRef}

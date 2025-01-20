@@ -16,6 +16,19 @@ namespace FuncScript
         {
             LoadFromAssembly(Assembly.GetExecutingAssembly()); //always load builtin functions. May be we don't need this
         }
+
+        public override bool Equals(object? obj)
+        {
+            if (!(obj is KeyValueCollection kvc))
+                return false;
+            return this.IsEqualTo(kvc);
+        }
+
+        public override int GetHashCode()
+        {
+            return this.GetKvcHashCode();
+        }
+
         public KeyValueCollection ParentContext => null;
         public bool IsDefined(string key)
         {
@@ -99,6 +112,17 @@ namespace FuncScript
         public KeyValueCollection ParentContext => _parent;
         KeyValueCollection _kvc;
         KeyValueCollection _parent;
+        public override bool Equals(object obj)
+        {
+            if (!(obj is KeyValueCollection kvc))
+                return false;
+            return this.IsEqualTo(kvc);
+        }
+
+        public override int GetHashCode()
+        {
+            return this.GetKvcHashCode();
+        }
         public KvcProvider(KeyValueCollection kvc, KeyValueCollection parent)
         {
             _kvc = kvc;

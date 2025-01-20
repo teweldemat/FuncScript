@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Text.Json;
 
 namespace FsStudio.Server.FileSystem.Tests;
@@ -49,4 +50,38 @@ public class CommandLineTests
         Assert.DoesNotThrow(() => JsonDocument.Parse(jsonString));
 
     }
+    
+    
+    [Test]
+    public void TestNrlaisRerunInPrc()
+    {
+        var project = "/Users/teweldema.tegegne/src/nrlais/core/fs/";
+        var file = "nrlais-report";
+        var execNode = "control.rerun";
+
+        var args = new[]
+        {
+            $"--project:{project}",
+            $"--file:{file}",
+            $"--exec-node:{execNode}",
+        };
+
+        using var sw = new StringWriter();
+        var originalOut = Console.Out;
+        Console.SetOut(sw);
+
+        FsStudio.Server.FileSystem.Program.Main(args);
+
+        Console.SetOut(originalOut);
+        var output = sw.ToString();
+
+        var startMarker = "----start-output----";
+        var endMarker = "----end-output----";
+        Assert.That(output, Does.Contain(startMarker));
+        Assert.That(output, Does.Contain(endMarker));
+        
+        var analyzingCount = output.Split("analyzing", StringSplitOptions.None).Length - 1;
+        Assert.That(analyzingCount, Is.EqualTo(1), "Expected 'analyzing' to appear exactly once in the output");
+    }
+    
 }

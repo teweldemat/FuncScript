@@ -15,6 +15,17 @@ public class ExecutionSession : KeyValueCollection
     List<ExecutionNode> _nodes;
     private KeyValueCollection _context;
     readonly string? fileName;
+    public override bool Equals(object? obj)
+    {
+        if (!(obj is KeyValueCollection kvc))
+            return false;
+        return this.IsEqualTo(kvc);
+    }
+
+    public override int GetHashCode()
+    {
+        return this.GetKvcHashCode();
+    }
     public Guid SessionId { get; private set; } = Guid.NewGuid();
     public KeyValueCollection ParentContext => _context;
 
@@ -165,7 +176,7 @@ public class ExecutionSession : KeyValueCollection
             throw new InvalidOperationException($"{newName} is invalid");
         var node = FindNodeByPath(nodePath);
         if (node == null)
-            throw new Exception("Node not found.");
+            throw new Exception($"{nodePath} Node not found.");
         var parent = GetParentPath(nodePath);
         var _namelower = newName.ToLower();
         if (parent != null)
@@ -182,7 +193,7 @@ public class ExecutionSession : KeyValueCollection
     {
         var node = FindNodeByPath(nodePath);
         if (node == null)
-            throw new Exception("Node not found.");
+            throw new Exception($"{nodePath} Node not found.");
         node.ExpressionType = expType;
         UpdateFile();
     }
@@ -191,7 +202,7 @@ public class ExecutionSession : KeyValueCollection
     {
         var node = FindNodeByPath(nodePath);
         if (node == null)
-            throw new Exception("Node not found.");
+            throw new Exception($"{nodePath} Node not found.");
         if (node.Children.Count > 0)
             throw new Exception("Expression can't be set to a parent node");
         node.Expression = expression;
@@ -280,6 +291,12 @@ public class ExecutionSession : KeyValueCollection
         return provider.Get(segments.Last());
     }
 
+    public object EvaluateNode(string nodePath)
+    {
+        var res = EvaluateNodeInternal(nodePath.ToLowerInvariant());
+        return res;
+
+    }
     public Task<object> EvaluateNodeAsync(string nodePath)
     {
         if (IsEvaluationInProgress)

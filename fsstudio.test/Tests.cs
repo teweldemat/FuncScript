@@ -1,5 +1,6 @@
 
 using FsStudio.Server.FileSystem.Exec;
+using FuncScript;
 using FuncScript.Host;
 using FuncScript.Model;
 
@@ -105,6 +106,29 @@ public class Tests
         Assert.That(l[0],Is.EqualTo("x"));
         Assert.That(logger.GetLogContent().Trim(),Is.EqualTo("start"));
 
+    }
+    
+    [Test]
+    public async Task  TestLoggerLogBug()
+    {
+        var logger = new StringLogger();
+        FsLogger.SetDefaultLogger(logger);
+        var exp = @"{a:'ls' log 'running'}";
+        var nodes = new[]
+        {
+            new ExecutionNode
+            {
+                Name = "x",
+                Expression = exp,
+                ExpressionType = ExpressionType.FuncScript,
+                Children = new ExecutionNode[0]
+            }                   
+        };
+        var session = new ExecutionSession(nodes, null);
+        var res = await session.EvaluateNodeAsync("x");
+        var json = Helpers.FormatToJson(res);
+        var n = logger.GetLogContent().Split("running").Length - 1;
+        Assert.That(n,Is.EqualTo(1));
     }
     
     [Test]

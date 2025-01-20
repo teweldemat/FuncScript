@@ -73,10 +73,10 @@ const FileItemComponent: React.FC<FileItemProps> = ({
     ) => {
         switch (action) {
             case 'open-project':
-                window.location.href = APP_TYPE=="web"?"/open-dialog-web":"/open-dialog-native";
+                window.location.href = APP_TYPE!="electron"?"/open-dialog-web":"/open-dialog-native";
                 break;
             case 'create-project':
-                window.location.href =  APP_TYPE=="web"?"/create-folder-web":'/create-folder-dialog';
+                window.location.href =  APP_TYPE!="electron"?"/create-folder-web":'/create-folder-dialog';
                 break;
             case 'add-folder':
                 setNewInputMode(true);

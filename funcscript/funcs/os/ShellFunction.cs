@@ -9,10 +9,15 @@ using System.Collections.Generic;
 
 namespace FuncScript.Funcs.OS
 {
+    public class ShellResultAccumulator
+    {
+        public int ExitCode { get; set; }
+        public object Output { get; set; }
+    }
     public class ShellResult
     {
         public int ExitCode { get; set; }
-        public List<ShellMessage> Output { get; set; } = new List<ShellMessage>();
+        public List<ShellMessage> Output { get; set; }
     }
 
     public class ShellMessage
@@ -28,19 +33,26 @@ namespace FuncScript.Funcs.OS
 
         public object EvaluateList(KeyValueCollection context, FsList pars)
         {
-            if (pars.Length < 1 || pars.Length > 2)
+            if (pars.Length < 1 || pars.Length > 3)
                 return new FsError(
                     FsError.ERROR_PARAMETER_COUNT_MISMATCH,
-                    $"{Symbol} function: invalid parameter count. 1 or 2 expected, got {pars.Length}"
+                    $"{Symbol} function: invalid parameter count. 1-3 expected, got {pars.Length}"
                 );
 
             var cmdParam = pars[0];
-            var timeoutParam = pars.Length == 2 ? pars[1] : null;
+            var reducerParam = pars.Length >= 2 ? pars[1] : null;
+            var timeoutParam = pars.Length == 3 ? pars[2] : null;
 
             if (cmdParam is not string)
                 return new FsError(
                     FsError.ERROR_TYPE_INVALID_PARAMETER,
                     $"Function {Symbol}: Type mismatch. First parameter (command) must be string."
+                );
+
+            if (reducerParam != null && reducerParam is not IFsFunction)
+                return new FsError(
+                    FsError.ERROR_TYPE_INVALID_PARAMETER,
+                    $"Function {Symbol}: Type mismatch. Second parameter (reducer) must be a function."
                 );
 
             var command = (string)cmdParam;
@@ -52,7 +64,7 @@ namespace FuncScript.Funcs.OS
                 else
                     return new FsError(
                         FsError.ERROR_TYPE_INVALID_PARAMETER,
-                        $"Function {Symbol}: Type mismatch. Second parameter (timeout) must be int."
+                        $"Function {Symbol}: Type mismatch. Third parameter (timeout) must be int."
                     );
             }
 
@@ -67,32 +79,54 @@ namespace FuncScript.Funcs.OS
                     CreateNoWindow = true
                 };
 
-                psi.Arguments = Environment.OSVersion.Platform == PlatformID.Win32NT 
-                    ? $"/c {command}" 
+                psi.Arguments = Environment.OSVersion.Platform == PlatformID.Win32NT
+                    ? $"/c {command}"
                     : $"-c \"{command}\"";
 
                 using (var process = new Process { StartInfo = psi })
                 {
+                    object accumulator = null;
+                    var reducer = reducerParam as IFsFunction;
                     var messages = new ConcurrentBag<(int index, bool error, string msg)>();
                     int counter = 0;
+                    var syncLock = new object();
+                    bool breakEncountered = false;
 
-                    process.OutputDataReceived += (_, args) =>
+                    void ProcessOutput(string data, bool isError)
                     {
-                        if (args.Data != null)
-                        {
-                            int myIndex = System.Threading.Interlocked.Increment(ref counter);
-                            messages.Add((myIndex, false, args.Data));
-                        }
-                    };
+                        if (data == null || breakEncountered) return;
 
-                    process.ErrorDataReceived += (_, args) =>
-                    {
-                        if (args.Data != null)
+                        int myIndex = Interlocked.Increment(ref counter);
+                        if (reducer != null)
                         {
-                            int myIndex = System.Threading.Interlocked.Increment(ref counter);
-                            messages.Add((myIndex, true, args.Data));
+                            var msg = new ShellMessage { Msg = data, Error = isError };
+                            lock (syncLock)
+                            {
+                                if (!breakEncountered)
+                                {
+                                    accumulator = reducer.EvaluateList(context, new ArrayFsList(new object[] { msg, accumulator,myIndex }));
+
+                                    if (accumulator is FsError err && err.ErrorType == FsError.CONTROL_BREAK)
+                                    {
+                                        accumulator = err.ErrorData;
+                                        breakEncountered = true;
+                                        try
+                                        {
+                                            process.Kill();
+                                        }
+                                        catch { /* Ignore kill exceptions */ }
+                                    }
+                                }
+                            }
                         }
-                    };
+                        else
+                        {
+                            messages.Add((myIndex, isError, data));
+                        }
+                    }
+
+                    process.OutputDataReceived += (_, args) => ProcessOutput(args.Data, false);
+                    process.ErrorDataReceived += (_, args) => ProcessOutput(args.Data, true);
 
                     process.Start();
                     process.BeginOutputReadLine();
@@ -114,34 +148,33 @@ namespace FuncScript.Funcs.OS
                         process.WaitForExit();
                     }
 
-                    var exitCode = process.ExitCode;
-                    var ordered = messages.OrderBy(x => x.index);
-
-                    var result = new ShellResult
+                    if (reducer != null)
                     {
-                        ExitCode = exitCode,
-                        Output = ordered
-                            .Select(o => new ShellMessage { Msg = o.msg, Error = o.error })
-                            .ToList()
-                    };
+                        var result = new ShellResultAccumulator
+                        {
+                            ExitCode = process.ExitCode,
+                            Output = accumulator
+                        };
+                        return Helpers.NormalizeDataType(result);
+                    }
+                    else
+                    {
+                        var result = new ShellResult
+                        {
+                            ExitCode = process.ExitCode,
+                            Output = messages.OrderBy(x => x.index)
+                                .Select(o => new ShellMessage { Msg = o.msg, Error = o.error })
+                                .ToList()
+                        };
 
-                    return Helpers.NormalizeDataType(result);
+                        return Helpers.NormalizeDataType(result);
+                    }
                 }
             }
             catch (Exception ex)
             {
                 return new FsError(ex);
             }
-        }
-
-        public string ParName(int index)
-        {
-            return index switch
-            {
-                0 => "command",
-                1 => "timeout (ms)",
-                _ => null
-            };
         }
     }
 }

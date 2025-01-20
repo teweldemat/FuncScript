@@ -6,6 +6,7 @@ import { OpenFileModal } from './OpenFileModal';
 import { APP_TYPE } from './backend';
 
 export function App() {
+    console.log("APP_TYPE", APP_TYPE);
     return (
         <Router basename={APP_TYPE=='web'?'/fshidden':'/'}>
             <ExecutionSessionProvider>

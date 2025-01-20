@@ -104,6 +104,7 @@ export function ExecutionSessionProvider({ children }: { children: React.ReactNo
     const wsRef = useRef<WebSocket | null>(null);
 
     useEffect(() => {
+        if (wsRef.current) return;
         let retryTimeoutId: number | null = null;
         let retryDelay = 1000;
         let ws: WebSocket | null = null;
@@ -487,8 +488,6 @@ export function ExecutionSessionProvider({ children }: { children: React.ReactNo
     };
 
     const loadChildNodeList = async (session: SessionState, nodePath: string | null) => {
-        console.log('loadChildNodeList');
-        console.log(nodePath);
 
         const params = new URLSearchParams();
         if (nodePath) {
@@ -532,8 +531,6 @@ export function ExecutionSessionProvider({ children }: { children: React.ReactNo
                     updatedSession = { ...updatedSession, rootNode: updatedRoot };
                 }
             } else {
-                console.log('updated parent');
-                console.log(children);
                 updatedSession = {
                     ...updatedSession,
                     rootNode: {

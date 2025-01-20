@@ -19,7 +19,7 @@ namespace FuncScript.Test.Funcs.List
         {
             var exp = "First([1, 2, 3], (x) => x > 4)";
             var res = Helpers.Evaluate(exp);
-            Assert.That(res, Is.Null);
+            Assert.That(res is FsError);
         }
 
         [Test]

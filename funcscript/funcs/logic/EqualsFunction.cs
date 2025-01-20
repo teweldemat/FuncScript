@@ -34,23 +34,12 @@ namespace FuncScript.Funcs.Logic
                 Helpers.ConvertToCommonNumericType(par0, par1, out par0, out par1);
             }
 
-            if (par0?.GetType() != par1?.GetType())
-                return false;
-
+            if ((par0 is IEnumerable<object> e1) && (par1 is IEnumerable<object> e2))
+            {
+                return e1.SequenceEqual(e2);
+            }
             return par0.Equals(par1);
         }
-
-        public string ParName(int index)
-        {
-            switch(index)
-            {
-                case 0:
-                    return "Left Value";
-                case 1:
-                    return "Right Value";
-                default:
-                    return "";
-            }
-        }
+        
     }
 }

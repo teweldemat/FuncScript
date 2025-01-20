@@ -52,6 +52,17 @@ public static partial class Helpers
         {
             _kvc = kvc;
         }
+        public override bool Equals(object obj)
+        {
+            if (!(obj is KeyValueCollection kvc))
+                return false;
+            return this.IsEqualTo(kvc);
+        }
+
+        public override int GetHashCode()
+        {
+            return this.GetKvcHashCode();
+        }
         public object Get(string key)
         {
             var keyLower = key.ToLower();

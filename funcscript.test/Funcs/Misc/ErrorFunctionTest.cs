@@ -44,7 +44,7 @@ namespace FuncScript.Test.Funcs.Misc
             var res = Helpers.Evaluate(exp);
             Assert.That(res, Is.InstanceOf<FsError>());
             var error = (FsError)res;
-            Assert.That(error.ErrorType, Is.EqualTo(FsError.ERROR_PARAMETER_COUNT_MISMATCH));
+            Assert.That(error.ErrorType, Is.EqualTo(FsError.ERROR_DEFAULT));
         }
     }
 }

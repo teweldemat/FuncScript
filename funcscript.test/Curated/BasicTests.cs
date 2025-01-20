@@ -11,11 +11,9 @@ namespace FuncScript.Test.Curated
         [Test]
         public void CallingNoneFunction()
         {
-            Assert.Throws(typeof(EvaluationException), () =>
-            {
-                var g = new DefaultFsDataProvider();
-                Helpers.Evaluate(g,"3(4,5)");
-            });
+            var g = new DefaultFsDataProvider();
+            var res=Helpers.Evaluate(g,"3(4,5)");
+            Assert.That(res is FsError err);
         }
         [Test]
         public void DuplicateKeyInCollection()

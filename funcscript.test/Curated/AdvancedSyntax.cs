@@ -23,7 +23,15 @@ public class AdvancedSyntax
         var expected = new ObjectKvc(new { a = 4, b = 5 });
         Assert.That(Helpers.FormatToJson(res), Is.EqualTo(Helpers.FormatToJson(expected)));
     }
-    
+
+    [Test]
+    public void TestCaseInKvc()
+    {
+        var exp = "t:(case false:1,null);";
+        var res = Helpers.Evaluate(exp);
+        var json = Helpers.FormatToJson(res);
+        Assert.That(json.Replace("\n","").Replace(" ",""),Is.EqualTo("{\"t\":null}"));
+    }
     [Test]
     public void NakedWithImplicitReturn()
     {

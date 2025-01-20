@@ -5,7 +5,7 @@ using FuncScript.Model;
 
 namespace FuncScript.Funcs.Text
 {
-    public class ParseText : IFsFunction, KeyValueCollection
+    public class ParseText : IFsFunction
     {
         private KeyValueCollection _parentContext;
 
@@ -84,22 +84,5 @@ namespace FuncScript.Funcs.Text
             };
         }
 
-        public object Get(string name)
-        {
-            return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER,
-                $"The parsed function script should have no variables");
-        }
-
-        public KeyValueCollection ParentContext { get; }
-
-        public bool IsDefined(string key)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IList<string> GetAllKeys()
-        {
-            throw new NotImplementedException();
-        }
     }
 }

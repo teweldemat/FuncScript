@@ -10,6 +10,6 @@ public class TestCompoundComparision
         var expStr = "[]=[]";
         var p = new DefaultFsDataProvider();
         var ret = Helpers.Evaluate(p, expStr);
-        Assert.AreEqual(true, Helpers.NormalizeDataType(ret));
+        Assert.AreEqual(true, ret);
     }
 }

@@ -10,7 +10,8 @@ cp -R build/ ../FsStudio.Server.FileSystem/wwwroot/
 cd ../FsStudio.Server.FileSystem
 dotnet publish -c Release
 
-# Use rsync to copy only changed files
-rsync -av --delete bin/Release/net8.0/publish/ tewelde@nrlais.gov.et:~/fss/bin/
+# Use rsync to copy to staging directory first
+rsync -av --delete bin/Release/net8.0/publish/ tewelde@nrlais.gov.et:~/stage/
 
-ssh tewelde@nrlais.gov.et "sudo systemctl restart fsweb"
+# Use sudo to copy from staging to final destination
+ssh tewelde@nrlais.gov.et "sudo cp -R ~/stage/* /usr/bin/fss/bin/"

@@ -260,7 +260,7 @@ namespace FuncScript.Test.Curated
         public void TestFindFirst2()
         {
             var res = Helpers.Evaluate("first([1,2,4,5,3],(x)=>x<0)");
-            Assert.IsNull(res);
+            Assert.That(res is FsError);
         }
         [Test]
         public void MemberofNull()

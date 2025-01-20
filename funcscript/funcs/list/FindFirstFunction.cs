@@ -17,10 +17,7 @@ namespace FuncScript.Funcs.List
 
             var par0 = pars[0];
             var par1 = pars[1];
-
-            if (par0 == null)
-                return null;
-
+            
             if (!(par0 is FsList))
                 return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, $"{this.Symbol} function: The first parameter should be {this.ParName(0)}");
 
@@ -37,7 +34,7 @@ namespace FuncScript.Funcs.List
                     return lst[i];
             }
 
-            return null;
+            return new FsError(FsError.ERROR_TYPE_EVALUATION,"Not found");
         }
 
         public string ParName(int index)

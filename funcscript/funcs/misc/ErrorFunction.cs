@@ -13,13 +13,17 @@ namespace FuncScript.Funcs.Misc
 
         public object EvaluateList(KeyValueCollection context, FsList pars)
         {
-            if (pars.Length != 1)
-                return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, "One parameter expected");
+            if (pars.Length < 1 || pars.Length > 2)
+                return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, "One or two parameters expected");
 
             var param = pars[0];
+            object extraData = null;
+
+            if (pars.Length == 2)
+                extraData = pars[1];
 
             if (param is string str)
-                return new FsError(FsError.ERROR_DEFAULT, str);    
+                return new FsError(FsError.ERROR_DEFAULT, str, extraData);    
 
             return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER, "Parameter is not a valid string object");
         }

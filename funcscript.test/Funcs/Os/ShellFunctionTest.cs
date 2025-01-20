@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using FuncScript.Core;
 using FuncScript.Model;
 using FuncScript.Error;
@@ -16,9 +17,11 @@ namespace FuncScript.Test.Funcs.Os
             Assert.That(res is KeyValueCollection);
             var shellResult = ((KeyValueCollection)res).ConvertTo<ShellResult>();
             Assert.That(shellResult.ExitCode, Is.EqualTo(0));
-            Assert.That(shellResult.Output.Count, Is.GreaterThan(0));
-            Assert.That(shellResult.Output[0].Msg.Trim(), Is.EqualTo("Hello World"));
-            Assert.That(shellResult.Output[0].Error, Is.False);
+            var output=shellResult.Output as List<ShellMessage>;
+            Assert.NotNull(output);
+            Assert.That(output.Count, Is.GreaterThan(0));
+            Assert.That(output[0].Msg.Trim(), Is.EqualTo("Hello World"));
+            Assert.That(output[0].Error, Is.False);
         }
 
         [Test]
@@ -78,6 +81,36 @@ namespace FuncScript.Test.Funcs.Os
             Assert.That(shellResult, Is.Not.Null);
             Assert.That(shellResult.ErrorType, Is.EqualTo(FsError.ERROR_TYPE_INVALID_PARAMETER));
             Assert.That(shellResult.ErrorMessage, Does.Contain("Second parameter (timeout) must be int."));
+        }
+
+        [Test]
+        public void TestShellWithReducer()
+        {
+            // Test using a reducer that concatenates messages with a counter
+            var exp = "shell('echo Line1 && echo Line2', (msg, acc) => if(acc = null,msg.Msg, acc + ' | ' + msg.Msg))";
+            var res = Helpers.Evaluate(exp);
+            Assert.That(res is KeyValueCollection);
+            
+            var shellResult = ((KeyValueCollection)res).ConvertTo<ShellResultAccumulator>();
+            Assert.That(shellResult.ExitCode, Is.EqualTo(0));
+            Assert.That(shellResult.Output, Is.TypeOf<string>());
+            Assert.That(shellResult.Output.ToString(), Is.EqualTo("Line1 | Line2"));
+        }
+
+        [Test]
+        public void TestShellWithReducerAndBreak()
+        {
+            // Test using a reducer that accumulates lines until it sees "Line2" and then breaks
+            var exp = "shell('echo Line1 && echo Line2 && echo Line3', (msg, acc, idx) => " +
+                     "if(msg.Msg = 'Line2', break(acc + ' | ' + msg.Msg), " +
+                     "if(acc = null, msg.Msg, acc + ' | ' + msg.Msg)))";
+            
+            var res = Helpers.Evaluate(exp);
+            Assert.That(res is KeyValueCollection);
+            
+            var shellResult = ((KeyValueCollection)res).ConvertTo<ShellResultAccumulator>();
+            Assert.That(shellResult.Output, Is.TypeOf<string>());
+            Assert.That(shellResult.Output.ToString(), Is.EqualTo("Line1 | Line2"));
         }
     }
 }

@@ -17,6 +17,17 @@ namespace FuncScript.Model
             public Dictionary<string, PropInfo> Properties = new Dictionary<string, PropInfo>();
         }
         static Dictionary<Type, TypeInfo> s_typeInfos = new Dictionary<Type, TypeInfo>();
+        public override bool Equals(object obj)
+        {
+            if (!(obj is KeyValueCollection kvc))
+                return false;
+            return this.IsEqualTo(kvc);
+        }
+
+        public override int GetHashCode()
+        {
+            return this.GetKvcHashCode();
+        }
         static TypeInfo GetTypeInfo(Type t)
         {
             lock (s_typeInfos)
@@ -67,7 +78,7 @@ namespace FuncScript.Model
                 return null;
             var t = _val.GetType();
             var tInfo = GetTypeInfo(t);
-            if (!tInfo.Properties.TryGetValue(key, out var val))
+            if (!tInfo.Properties.TryGetValue(key.ToLower(), out var val))
                 return null;
             if (val.Prop != null)
                 return Helpers.NormalizeDataType(val.Prop.GetValue(_val));

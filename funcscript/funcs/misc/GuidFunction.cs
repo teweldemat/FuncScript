@@ -11,6 +11,8 @@ namespace FuncScript.Funcs.Logic
 
         public object EvaluateList(KeyValueCollection context, FsList pars)
         {
+            if (pars.Length > 1)
+                return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, $"{this.Symbol}: Too many parameters");
             if (pars.Length == 0)
             {
                 return Guid.NewGuid();

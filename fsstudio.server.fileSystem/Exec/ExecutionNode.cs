@@ -29,6 +29,7 @@ public enum ExpressionType
 
 public class ExecutionNode : KeyValueCollection
 {
+    
     private string _nameLower;
     private string _name;
     private object?_cache = null;
@@ -39,6 +40,18 @@ public class ExecutionNode : KeyValueCollection
 
     private KeyValueCollection _prentNode = null;
     public KeyValueCollection ParentContext => _prentNode;
+    
+    public override bool Equals(object? obj)
+    {
+        if (!(obj is KeyValueCollection kvc))
+            return false;
+        return this.IsEqualTo(kvc);
+    }
+
+    public override int GetHashCode()
+    {
+        return this.GetKvcHashCode();
+    }
     public object? GetCache() => _cache;
     public bool IsCached() => _cached;
     public void ClearCache()
