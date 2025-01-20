@@ -12,6 +12,13 @@ public class KvcListComparision
         var res = Helpers.Evaluate(exp);
         Assert.That(res, Is.EqualTo(true));
     }
+    [Test]
+    public void TestKvcComparision1_not_equal()
+    {
+        var exp = "{xX:2}={Xx:3}";
+        var res = Helpers.Evaluate(exp);
+        Assert.That(res, Is.EqualTo(false));
+    }
     
     [Test]
     public void TestKvcComparision1_object_kvc()

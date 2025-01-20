@@ -89,8 +89,9 @@ namespace FuncScript.Model
                 return false;
             foreach (var k in keys1)
             {
-                var val1 = kvc1.Get(k);
-                var val2 = kvc2.Get(k);
+                var kl = k.ToLower();
+                var val1 = kvc1.Get(kl);
+                var val2 = kvc2.Get(kl);
                 if (val1 == null && val2 == null)
                     return true;
                 if (val1 == null || val2 == null)

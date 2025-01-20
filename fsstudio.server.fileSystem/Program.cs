@@ -106,7 +106,8 @@ public static class Program
                 arg.StartsWith("--file:", StringComparison.OrdinalIgnoreCase) ||
                 arg.StartsWith("--exec-node:", StringComparison.OrdinalIgnoreCase) ||
                 arg.StartsWith("--set-node-text:", StringComparison.OrdinalIgnoreCase) ||
-                arg.StartsWith("--set-node-expression:", StringComparison.OrdinalIgnoreCase))
+                arg.StartsWith("--set-node-expression:", StringComparison.OrdinalIgnoreCase) ||
+                arg.StartsWith("--input:", StringComparison.OrdinalIgnoreCase))
             {
                 return true;
             }
@@ -119,6 +120,8 @@ public static class Program
         string? projectPath = null;
         string? fileToExecute = null;
         string? nodeToEvaluate = null;
+        string? inputFile = null;
+        string? outputFile = null;
         var nodeTextCommands = new List<string>();
         var nodeExpressionCommands = new List<string>();
         foreach (var arg in args)
@@ -135,6 +138,14 @@ public static class Program
             {
                 nodeToEvaluate = arg.Substring("--exec-node:".Length);
             }
+            else if (arg.StartsWith("--input:", StringComparison.OrdinalIgnoreCase))
+            {
+                inputFile = arg.Substring("--input:".Length);
+            }
+            else if (arg.StartsWith("--output:", StringComparison.OrdinalIgnoreCase))
+            {
+                outputFile = arg.Substring("--output:".Length);
+            }
             else if (arg.StartsWith("--set-node-text:", StringComparison.OrdinalIgnoreCase))
             {
                 nodeTextCommands.Add(arg.Substring("--set-node-text:".Length));
@@ -147,6 +158,33 @@ public static class Program
 
         var sessionManager = new SessionManager(null);
 
+        if (inputFile != null)
+        {
+            try
+            {
+                string content = File.ReadAllText(inputFile);
+                var result = Helpers.Evaluate(content);
+                var json = Helpers.FormatToJson(result);
+
+                if (outputFile != null)
+                {
+                    File.WriteAllText(outputFile, json);
+                }
+                else
+                {
+                    Console.WriteLine(json);
+                }
+                return; 
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error processing input file: {ex.Message}");
+                Environment.ExitCode = 1;
+                return;
+            }
+        }
+
+        // Project validation only if not processing input file
         if (projectPath == null)
         {
             Console.WriteLine("Missing --project:<root folder>");

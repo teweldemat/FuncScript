@@ -20,14 +20,16 @@ public class FsError
     public string ErrorType { get; set; }
     public string ErrorMessage { get; set; }
     public object ErrorData { get; set; }
-
+    private const int MaxMessageLength = 5000;
     public FsError(Exception ex)
     {
         var msg = ex.Message + "\n" + ex.StackTrace;
         var inner = ex.InnerException;
         while (inner != null)
         {
-            msg += "\n" + ex.Message + "\n" + ex.StackTrace;
+            msg += "\n" + ex.Message + "\n" + ex.StackTrace.Substring(0,MaxMessageLength);
+            if(msg.Length>MaxMessageLength)
+                break;
             inner = inner.InnerException;
         }
 
