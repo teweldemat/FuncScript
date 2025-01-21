@@ -10,6 +10,15 @@ namespace FuncScript.Block
     public class ListExpression : ExpressionBlock, FsList
     {
        
+        public override bool Equals(object obj)
+        {
+            return this.IsEqualTo(obj as FsList);
+        }
+
+        public override int GetHashCode()
+        {
+            return this.GetListHashCode();
+        }
         public ExpressionBlock[] ValueExpressions;
 
        

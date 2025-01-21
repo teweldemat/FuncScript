@@ -34,6 +34,11 @@ namespace FuncScript.Funcs.List
             for (int i = 0; i < lst.Length; i++)
             {
                 total = func.EvaluateList(context,new ArrayFsList(new object[] { lst[i], total, i }));
+                if(total is FsError err && err.ErrorType==FsError.CONTROL_BREAK)
+                {
+                    total = err.ErrorData;
+                    break;
+                }
             }
 
             return Helpers.NormalizeDataType(total);

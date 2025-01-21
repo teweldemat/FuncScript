@@ -102,4 +102,18 @@ public class KvcListComparision
         var res = Helpers.Evaluate(exp);
         Assert.That(res, Is.EqualTo(true));
     }
+    [Test]
+    public void TestKvcListCombo()
+    {
+        var exp = "{b:[3,4]}={b:[3,4]}";
+        var res = Helpers.Evaluate(exp);
+        Assert.That(res, Is.EqualTo(true));
+    }
+    [Test]
+    public void TestKvcListCombo2()
+    {
+        var exp = "{b:[3,4]}={b:[3,4]}";
+        var res = Helpers.Evaluate(exp);
+        Assert.That(res, Is.EqualTo(true));
+    }
 }

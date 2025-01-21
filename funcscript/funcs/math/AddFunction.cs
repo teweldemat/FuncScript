@@ -17,7 +17,15 @@ namespace FuncScript.Funcs.Math
             this._lists = lists;
             this._length = lists.Sum(l => l.Length);
         }
+        public override bool Equals(object obj)
+        {
+            return this.IsEqualTo(obj as FsList);
+        }
 
+        public override int GetHashCode()
+        {
+            return this.GetListHashCode();
+        }
         public object this[int index]
         {
             get

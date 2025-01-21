@@ -42,11 +42,6 @@ namespace FuncScript.Funcs.Logic
             {
                 Helpers.ConvertToCommonNumericType(par0, par1, out par0, out par1);
             }
-            if ((par0 is IEnumerable<object> e1) && (par1 is IEnumerable<object> e2))
-            {
-                return !e1.SequenceEqual(e2);
-            }
-
             return !par0.Equals(par1);
         }
 
