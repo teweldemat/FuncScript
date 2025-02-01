@@ -9,7 +9,7 @@ namespace FuncScript.Test.Funcs.List
         [Test]
         public void TestSortValidList()
         {
-            var exp = "Sort([3,1,2],(x,y)=> if(x<y,-1,if(x>y,1,0)))";
+            var exp = "Sort([3,1,2],(x,y)=> if x<y then -1 else if x>y then 1 else 0)";
             var res = Helpers.Evaluate(exp);
             Assert.That(res is ArrayFsList);
             var list = (ArrayFsList)res;
@@ -39,7 +39,7 @@ namespace FuncScript.Test.Funcs.List
         [Test]
         public void TestSortWithInvalidFirstParameter()
         {
-            var exp = "Sort('not_a_list',(x,y)=> if(x<y,-1,if(x>y,1,0)))";
+            var exp = "Sort('not_a_list',(x,y)=> if x<y then -1 else if x>y then 1 else 0)";
             var res = Helpers.Evaluate(exp);
             Assert.That(res is FsError);
             var error = (FsError)res;

@@ -5,7 +5,7 @@ namespace FuncScript.Funcs.Text
 {
     public class SplitFunction : IFsFunction
     {
-        public CallType CallType => CallType.Prefix;
+        public CallType CallType => CallType.Dual;
         public string Symbol => "split";
 
         public object EvaluateList(KeyValueCollection context, FsList pars)

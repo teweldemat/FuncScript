@@ -71,7 +71,7 @@ namespace FuncScript.Test.Curated
         [TestCase(@"1<2<3", null, FsError.ERROR_PARAMETER_COUNT_MISMATCH)]
         [TestCase(@"1=2=3", null, FsError.ERROR_PARAMETER_COUNT_MISMATCH)]
         [TestCase(@"1!=2!=3", null, FsError.ERROR_PARAMETER_COUNT_MISMATCH)]
-        [TestCase(@"if(2=null,0,1)", 1)]  //how would if deal with null condition
+        [TestCase(@"if  2=null then 0 else 1", 1)]  //how would if deal with null condition
         [TestCase(@"not(1=1)", false)] //not function
         [TestCase(@"not(3=1)", true)]
         [TestCase(@"not(null)", null, FsError.ERROR_TYPE_INVALID_PARAMETER)]
@@ -98,8 +98,8 @@ namespace FuncScript.Test.Curated
         [TestCase(@"0 in [1,2]", false)]
         [TestCase(@"0 in [1,2,0]", true)] //finds it at last
         [TestCase(@"0 in [1,0,2]", true)] //finds it in the middle
-        [TestCase(@"if(0 in [1,2],1,2)", 2)]
-        [TestCase(@"if(1 in [1,2],1,2)", 1)]
+        [TestCase(@"if 0 in [1,2] then 1 else 2", 2)]
+        [TestCase(@"if 1 in [1,2] then 1 else 2", 1)]
         [TestCase(@"""1"" in [""1"",1,2]", true)]
         [TestCase(@"1 in [""1"",2]", false)]
         [TestCase(@"not(""1"" in [""1"",2])", false)]

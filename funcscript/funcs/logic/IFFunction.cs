@@ -11,8 +11,8 @@ namespace FuncScript.Funcs.Logic
 
         public object EvaluateList(KeyValueCollection context, FsList pars)
         {
-            if (pars.Length < 3)
-                return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, "IfConditionFunction requires three parameters: condition, trueResult, and falseResult.");
+            if (pars.Length < 2)
+                return new FsError(FsError.ERROR_PARAMETER_COUNT_MISMATCH, "IfConditionFunction requires two or three parameters: condition, trueResult, and falseResult (optional).");
 
             var condition = pars[0];
 

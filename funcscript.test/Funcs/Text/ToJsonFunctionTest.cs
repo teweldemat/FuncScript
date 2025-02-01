@@ -10,31 +10,31 @@ namespace FuncScript.Test.Funcs.Text
         {
             var exp = "tojson({a:1, b:2})";
             var res = Helpers.Evaluate(exp);
-            Assert.That(res, Is.EqualTo("{\"a\":1,\"b\":2}"));
+            Assert.That(res.ToString().Replace(" ",""), Is.EqualTo("{\"a\":1,\"b\":2}"));
         }
 
         [Test]
         public void TestToJsonWithArray()
         {
-            var exp = "Helpers([1, 2, 3])";
+            var exp = "toJson([1, 2, 3])";
             var res = Helpers.Evaluate(exp);
-            Assert.That(res, Is.EqualTo("[1,2,3]"));
+            Assert.That(res.ToString().Replace(" ",""), Is.EqualTo("[1,2,3]"));
         }
 
         [Test]
         public void TestToJsonEmptyObject()
         {
-            var exp = "Helpers({})";
+            var exp = "toJson({})";
             var res = Helpers.Evaluate(exp);
-            Assert.That(res, Is.EqualTo("{}"));
+            Assert.That(res.ToString().Replace(" ",""), Is.EqualTo("{}"));
         }
 
         [Test]
         public void TestToJsonEmptyArray()
         {
-            var exp = "Helpers([])";
+            var exp = "toJson([])";
             var res = Helpers.Evaluate(exp);
-            Assert.That(res, Is.EqualTo("[]"));
+            Assert.That(res.ToString().Replace(" ",""), Is.EqualTo("[]"));
         }
 
         [Test]

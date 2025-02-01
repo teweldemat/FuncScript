@@ -99,6 +99,17 @@ public class AdvancedSyntax
     }
     
     [Test]
+    [TestCase("if true then 1 else 0", 1)]
+    [TestCase("if false then 1", null)]
+    [TestCase("if 1>2 then 1 else 3", 3)]
+    [TestCase("if 1>0 then 'positive' else if 1<0 then 'negative' else 'zero' ", "positive")]
+    public void TestIf(string exp, object expected)
+    {
+        var res = Helpers.Evaluate(exp);
+        Assert.That(res, Is.EqualTo(expected));
+    }
+
+    [Test]
     [TestCase("1+2*4", 9)]
     [TestCase("1+4/2", 3)]
     public void Precidence(string exp, object expected)

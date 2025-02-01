@@ -82,6 +82,17 @@ namespace FuncScript.Core
                 expBlock.CodeLength = i - index;
                 return new Core.FuncScriptParser.ExpressionBlockResult(expBlock, parseNode, i);
             }
+            
+            var ifExpressionResult = GetIfExpression(context, i);
+            i = ifExpressionResult.NextIndex;
+            if (i > index)
+            {
+                parseNode = ifExpressionResult.ParseNode;
+                expBlock = ifExpressionResult.Block;
+                expBlock.CodePos = index;
+                expBlock.CodeLength = i - index;
+                return new Core.FuncScriptParser.ExpressionBlockResult(expBlock, parseNode, i);
+            }
 
             var switchExprResult = GetSwitchExpression(context, i);
             i = switchExprResult.NextIndex;

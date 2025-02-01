@@ -286,6 +286,7 @@ export function ExecussionSessionView({ initialFile, initialNodePath }: Execussi
                         handleClearLog={handleClearLog}
                         displayedMarkdown={displayedMarkdown}
                         readOnly={evaluationInProgress || !!!selectedNode}
+                        sessionId={session?.sessionId}
                     />
                 </Box>
             </Grid>

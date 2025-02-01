@@ -32,7 +32,8 @@ namespace FuncScript.Core
             Key,
             Case,
             PrefixOperatorExpression,
-            ReturnExpression
+            ReturnExpression,
+            IfExpression
         }
 
         public class SyntaxErrorData
@@ -103,7 +104,11 @@ namespace FuncScript.Core
         const string KW_RETURN = "return";
         const string KW_CASE = "case";
         const string KW_SWITCH = "switch";
-        private const string KW_ERROR = "fault";
+        const string KW_ERROR = "fault";
+        const string KW_IF = "if";
+        const string KW_THEN = "then";
+        const string KW_ELSE = "else";
+        
         static HashSet<string> s_KeyWords;
 
         static FuncScriptParser()
@@ -113,7 +118,9 @@ namespace FuncScript.Core
             s_KeyWords.Add(KW_ERROR);
             s_KeyWords.Add(KW_CASE);
             s_KeyWords.Add(KW_SWITCH);
-            s_KeyWords.Add(KW_SWITCH);
+            s_KeyWords.Add(KW_IF);
+            s_KeyWords.Add(KW_THEN);
+            s_KeyWords.Add(KW_ELSE);
         }
 
         public record ParseResult(ParseNode ParseNode, int NextIndex);

@@ -16,7 +16,7 @@ public class FlattenBug
 {{
     data:{data},
     flatten:(d)=>{{
-  f:(l)=>reduce(l, (x,m)=>m+if(type(x)=""List"",f(x),x),[]);
+  f:(l)=>reduce(l, (x,m)=>m+if type(x)=""List"" then f(x) else x,[]);
   return f(d)
 }},
     return Flatten(data);    

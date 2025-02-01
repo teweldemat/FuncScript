@@ -22,7 +22,18 @@ namespace FsStudio.Server.FileSystem.Controllers
         {
             public string FromFile { get; set; }
         }
-
+        [HttpPost("{sessionId}/input")]
+        public IActionResult PushInput(Guid sessionId, [FromBody] string input)
+        {
+            lock (GetSessionLock(sessionId))
+            {
+                var session = sessionManager.GetSession(sessionId);
+                if (session == null)
+                    return NotFound($"Session with ID {sessionId} not found.");
+                session.PushInput(input);
+                return Ok();
+            }
+        }   
         [HttpPost("create")]
         public IActionResult CreateSession([FromBody] CreateSessionRequest request)
         {

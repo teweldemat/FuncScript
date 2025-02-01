@@ -176,7 +176,7 @@ namespace FuncScript.Test.Curated
         }
 
         [Test]
-        [TestCase("If(true,30,2)", 30)]
+        [TestCase("If true then 30 else 2", 30)]
         public void IfFunction(string exp, object expected)
         {
             Assert.AreEqual(expected, Helpers.Evaluate(exp));

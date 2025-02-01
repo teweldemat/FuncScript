@@ -8,7 +8,7 @@ namespace FuncScript.Test.Funcs.List
         [Test]
         public void TestFilterEvenNumbers()
         {
-            var exp = "Filter([1, 2, 3, 4], (x) => x % 2 == 0)";
+            var exp = "Filter([1, 2, 3, 4], (x) => x % 2 = 0)";
             var res = Helpers.Evaluate(exp);
             Assert.That(res is FsList);
             var list = (FsList)res;

@@ -95,6 +95,7 @@ interface SessionsContextValue {
         newExpression: string,
         thenEvaluate: boolean
     ) => Promise<void>;
+    sendInput: (session: SessionState, input: string) => Promise<void>;
 }
 
 const ExecutionSessionContext = createContext<SessionsContextValue | null>(null);
@@ -677,6 +678,16 @@ export function ExecutionSessionProvider({ children }: { children: React.ReactNo
         }
     };
 
+    const sendInput = async (session: SessionState, input: string) => {
+        console.log('sending '+input)
+        const res = await fetch(`${SERVER_URL}/api/sessions/${session.sessionId}/input`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(input)
+        });
+        if (!res.ok) throw new Error(await res.text());
+    };
+
     return (
         <ExecutionSessionContext.Provider
             value={{
@@ -704,6 +715,7 @@ export function ExecutionSessionProvider({ children }: { children: React.ReactNo
                 setRootFolder,
                 setSelectedNodePath,
                 saveExpression,
+                sendInput,
             }}
         >
             {children}

@@ -93,7 +93,7 @@ namespace FuncScript.Test.Curated
         [TestCase("1+2*3", 7)]
         [TestCase("1+2*3+4", 11)]
         [TestCase("\"a\"+\"b\"+3+\"c\"", "ab3c")]
-        [TestCase("If(1=0,1,\n3)", 3)] //ignores line feed
+        [TestCase("If 1=0 then 1 else \n3", 3)] //ignores line feed
         [TestCase("{r:2; return R;}", 2)] //ignore cases
         [TestCase("{r:(a)=>A*A; return R(2);}", 4)] //ignore cases
         [TestCase("{R:(a)=>A*A; return r(2);}", 4)] //ignore cases
@@ -257,7 +257,7 @@ namespace FuncScript.Test.Curated
         [TestCase("2--1", 3)] //parse negative number
         [TestCase("2-1", 1)] //simple subtraction
         [TestCase("1/2", 0)]
-        [TestCase("If(1=0,10,5-1)", 4)]
+        [TestCase("If  1=0 then 10 else 5-1", 4)]
         [TestCase("((a)=>a*a)(3)", 9)]
         [TestCase(
 @"{
@@ -394,7 +394,7 @@ return j;
         {
             var exp = 
 @"{
-    f:(x)=>if(x=0,f(1),2);
+    f:(x)=>if  x=0 then f(1) else 2;
     return f(3);
 }";
             var res = Helpers.Evaluate(exp);
@@ -405,7 +405,7 @@ return j;
         {
             var exp = 
 @"{
-    fib:(x)=>if(x<2,1,fib(x-2)+fib(x-1));
+    fib:(x)=>if x<2 then 1 else fib(x-2)+fib(x-1);
     return fib(3);
 }";
             var res = Helpers.Evaluate(exp);

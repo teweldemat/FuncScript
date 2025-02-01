@@ -64,6 +64,16 @@ namespace FuncScript.Funcs.Text
                         }
                     case "fs":
                         return Helpers.Evaluate(context, str);
+                    case "int":
+                        if (int.TryParse(str, out intVal))
+                            return intVal;
+                        return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER,
+                            "String couldn't be parsed to integer");
+                    case "d":
+                        if (double.TryParse(str, out var dVal))
+                            return dVal;
+                        return new FsError(FsError.ERROR_TYPE_INVALID_PARAMETER,
+                            "String couldn't be parsed to integer");
                     default:
                         return str;
                 }

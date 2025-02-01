@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Text;
 using System.Text.RegularExpressions;
 using FsStudio.Server.FileSystem.Exec.Funcs;
@@ -15,6 +16,17 @@ public class ExecutionSession : KeyValueCollection
     List<ExecutionNode> _nodes;
     private KeyValueCollection _context;
     readonly string? fileName;
+    private BlockingCollection<string> _inputQueue = new();
+    public void PushInput(string input) => _inputQueue.Add(input);
+
+    public string WaitForInput(int? timeoutMs = null)
+    {
+        if (timeoutMs is null or <= 0)
+            return _inputQueue.Take();
+        if (_inputQueue.TryTake(out var line, timeoutMs.Value))
+            return line;
+        throw new TimeoutException("No input provided within the specified timeout.");
+    }
     public override bool Equals(object? obj)
     {
         if (!(obj is KeyValueCollection kvc))
@@ -63,7 +75,9 @@ public class ExecutionSession : KeyValueCollection
         _context = new DefaultFsDataProvider(
             new[]
             {
-                KeyValuePair.Create<string, object>("md", new MarkDownFunction(_logger, SessionId.ToString()))
+                KeyValuePair.Create<string, object>("md", new MarkDownFunction(_logger, SessionId.ToString())),
+                KeyValuePair.Create<string, object>("agentmem",new MemoryCommandExecutor()),
+                KeyValuePair.Create<string, object>("input",new InputFunction(this))
             }
         );
     }
