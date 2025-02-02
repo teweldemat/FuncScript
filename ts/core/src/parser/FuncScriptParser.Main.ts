@@ -17,12 +17,13 @@
         LiteralString,//15
         StringTemplate,//16
         KeyValuePair,//17
-        KeyValueCollection,//18
+        KeyValueCollection,//19
         List,//19
         Key,//20
         Case,//21
         PrefixOperatorExpression,//22
-        ReturnExpression//23
+        ReturnExpression,//23
+        IfExpression//24
     }
 
     export class SyntaxErrorData {
@@ -71,6 +72,10 @@
     export const KW_CASE = "case";
     export const KW_SWITCH = "switch";
     export const KW_ERROR = "fault";
+    export const KW_IF = "if";
+    export const KW_THEN = "then";
+    export const KW_ELSE = "else";
+
     export const s_KeyWords: Set<string> = new Set<string>();
 
     (function initKeyWords() {
@@ -78,6 +83,9 @@
         s_KeyWords.add(KW_ERROR);
         s_KeyWords.add(KW_CASE);
         s_KeyWords.add(KW_SWITCH);
+        s_KeyWords.add(KW_IF);
+        s_KeyWords.add(KW_THEN);
+        s_KeyWords.add(KW_ELSE);
     })();
 
     export interface ParseResult {

@@ -11,6 +11,7 @@ import { GetKeyWordLiteral } from "./FuncScriptParser.GetKeyWordLiteral";
 import { GetIdentifier } from "./FuncScriptParser.GetIdentifier";  
 import { GetExpInParenthesis } from "./FuncScriptParser.GetExpInParenthesis";  
 import { GetPrefixOperator } from "./FuncScriptParser.GetPrefixOperator";  
+import { GetIfExpression } from "./FuncScriptParser.GetIfExpression";
 
 export function GetUnit(context: ParseContext, index: number): ParseResult {  
     let parseNode: ParseNode | null = null;  
@@ -51,6 +52,12 @@ export function GetUnit(context: ParseContext, index: number): ParseResult {
     if (i > index) {  
         return { ParseNode: caseExprResult.ParseNode, NextIndex: i };  
     }  
+    const ifExprResult =GetIfExpression(context, index);  
+    i = ifExprResult.NextIndex;  
+    if (i > index) {  
+        return { ParseNode: ifExprResult.ParseNode, NextIndex: i };  
+    }  
+
 
     const switchExprResult = GetSwitchExpression(context, index);  
     i = switchExprResult.NextIndex;  
